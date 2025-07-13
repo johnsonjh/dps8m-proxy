@@ -56,8 +56,7 @@ const (
 
 var (
 	sshAddr                string
-	telnetHost             string
-	telnetPort             int
+	telnetHostPort         string
 	debugNegotiation       bool
 	logDir                 string
 	gracefulShutdownMode   atomic.Bool
@@ -75,6 +74,7 @@ var (
 	noLog                  bool
 	idleMax                int
 	timeMax                int
+	altHosts               = make(map[string]string)
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,16 +95,47 @@ type Connection struct {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// altHostFlag implements flag.Value interface for parsing multiple alt-host flags.
+type altHostFlag struct{}
+
+func (a *altHostFlag) String() string {
+	return ""
+}
+
+func (a *altHostFlag) Set(value string) error {
+	parts := strings.SplitN(value, "@", 2)
+	if len(parts) != 2 {
+		return fmt.Errorf("invalid alt-host format: %s, expected username@host:port", value)
+	}
+	username := parts[0]
+	hostPort := parts[1]
+
+	if _, ok := altHosts[username]; ok {
+		return fmt.Errorf("duplicate alt-host entry for username: %s", username)
+	}
+
+	// Validate hostPort format (simple check for now, net.Dial will do full validation)
+	_, _, err := net.SplitHostPort(hostPort)
+	if err != nil {
+		return fmt.Errorf("invalid host:port in alt-host '%s': %v", value, err)
+	}
+
+	altHosts[username] = hostPort
+	return nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func init() {
 	flag.StringVar(&sshAddr, "ssh-addr", ":2222", "SSH listen address")
-	flag.StringVar(&telnetHost, "telnet-host", "127.0.0.1", "default TELNET target host")
-	flag.IntVar(&telnetPort, "telnet-port", 6180, "default TELNET target port")
+	flag.StringVar(&telnetHostPort, "telnet-host", "127.0.0.1:6180", "default TELNET target host (host:port). Cannot contain a username.")
 	flag.BoolVar(&debugNegotiation, "debug", false, "Debug TELNET negotiation")
 	flag.StringVar(&logDir, "log-dir", "./log", "Base directory for session logs")
 	flag.BoolVar(&noCompress, "no-compress", false, "Disable gzip compression of logs")
 	flag.BoolVar(&noLog, "no-log", false, "Disable session logging")
 	flag.IntVar(&idleMax, "idle-max", 0, "Maximum connection idle time in seconds")
 	flag.IntVar(&timeMax, "time-max", 0, "Maximum connection link time in seconds")
+	flag.Var(&altHostFlag{}, "alt-host", "Alternate TELNET target host for specific users (username@host:port, can be specified multiple times)")
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
@@ -114,6 +145,10 @@ func init() {
 
 func main() {
 	flag.Parse()
+
+	if strings.Contains(telnetHostPort, "@") {
+		log.Fatalf("Error: -telnet-host cannot contain a username (e.g., 'user@'). Received: %s", telnetHostPort)
+	}
 
 	if idleMax > 0 && timeMax > 0 && idleMax > timeMax {
 		log.Fatalf("Error: -idle-max (%d) cannot be greater than -time-max (%d)", idleMax, timeMax)
@@ -136,6 +171,18 @@ func main() {
 	defer listener.Close()
 
 	log.Printf("SSH LISTEN ON %s", sshAddr)
+
+	// Output default and alternate targets to console
+	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
+	if err != nil {
+		log.Fatalf("Error parsing default telnet-host: %v", err)
+	}
+	log.Printf("DEFAULT TARGET: %s:%d", defaultHost, defaultPort)
+
+	for user, hostPort := range altHosts {
+		log.Printf("ALT TARGET: %s [%s]", hostPort, user)
+	}
+
 	log.Printf("Type '?' for help.")
 
 	go handleConsoleInput()
@@ -632,6 +679,20 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+func parseHostPort(hostPort string) (string, int, error) {
+	host, portStr, err := net.SplitHostPort(hostPort)
+	if err != nil {
+		return "", 0, err
+	}
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		return "", 0, fmt.Errorf("invalid port: %s", portStr)
+	}
+	return host, port, nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func handleSession(
 	conn *Connection,
 	channel ssh.Channel,
@@ -639,6 +700,7 @@ func handleSession(
 	keyLog []string,
 	ctx context.Context,
 ) {
+
 	if gracefulShutdownMode.Load() || denyNewConnectionsMode.Load() {
 		if denyMsg, err := ioutil.ReadFile("deny.txt"); err == nil {
 			txt := strings.ReplaceAll(
@@ -707,7 +769,36 @@ func handleSession(
 		}
 	}()
 
-	remote, err := net.Dial("tcp", fmt.Sprintf("%s:%d", telnetHost, telnetPort))
+	var targetHost string
+	var targetPort int
+
+	// Check if an alternate host is configured for this username
+	if altHostPort, ok := altHosts[conn.userName]; ok {
+		var err error
+		targetHost, targetPort, err = parseHostPort(altHostPort)
+		if err != nil {
+			fmt.Fprintf(channel, "Error parsing alt-host for user %s: %v\r\n\r\n", conn.userName, err)
+			log.Printf("Error parsing alt-host for user %s: %v", conn.userName, err)
+			channel.Close()
+			return
+		}
+		log.Printf("ALT-HOST [%s] %s@%s:%d", conn.ID, conn.userName, targetHost, targetPort)
+	} else {
+		var err error
+		targetHost, targetPort, err = parseHostPort(telnetHostPort)
+		if err != nil {
+			fmt.Fprintf(channel, "Error parsing default telnet-host: %v\r\n\r\n", err)
+			log.Printf("Error parsing default telnet-host: %v", err)
+			channel.Close()
+			return
+		}
+	}
+
+	if !noLog {
+		logwriter.Write([]byte(fmt.Sprintf(nowStamp()+" Target: %s:%d\r\n", targetHost, targetPort)))
+	}
+
+	remote, err := net.Dial("tcp", fmt.Sprintf("%s:%d", targetHost, targetPort))
 	if err != nil {
 		fmt.Fprintf(channel, "%v\r\n\r\n", err)
 		log.Printf("%v", err)
