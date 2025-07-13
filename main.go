@@ -246,7 +246,7 @@ func main() {
 							"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
 							connUptime.Round(time.Second))))
 						conn.sshConn.Close()
-						delete(connections, id) // Remove from map immediately
+						delete(connections, id)
 					} else if timeMax > 0 && connUptime > time.Duration(timeMax)*time.Second {
 						connUptime := time.Since(conn.startTime)
 						log.Printf("TIMEKICK [%s] %s@%s (link time %s)",
@@ -605,7 +605,6 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	config := &ssh.ServerConfig{
 		PasswordCallback: func(
 			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) {
-			// Allow password authentication fallback.
 			return &ssh.Permissions{Extensions: map[string]string{"auth-method": "password"}}, nil
 		},
 		PublicKeyCallback: func(
