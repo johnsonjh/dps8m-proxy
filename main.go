@@ -468,6 +468,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		cancelFunc: cancel,
 	}
 
+	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
+
 	connectionsMutex.Lock()
 	connections[sid] = conn
 	connectionsMutex.Unlock()
@@ -484,11 +486,15 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		} else {
 			connectionsMutex.Unlock()
 		}
-		log.Printf("DISCONNECT (SSH) [%s]", sid)
+		if !suppressLogs {
+			log.Printf("DISCONNECT (SSH) [%s]", sid)
+		}
 	}()
 
 	addr := sshConn.RemoteAddr().String()
-	log.Printf("CONNECT %s [%s]", addr, sid)
+	if !suppressLogs {
+		log.Printf("CONNECT %s [%s]", addr, sid)
+	}
 
 	go ssh.DiscardRequests(reqs)
 
