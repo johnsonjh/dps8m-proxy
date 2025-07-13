@@ -128,14 +128,14 @@ func (a *altHostFlag) Set(value string) error {
 
 func init() {
 	flag.StringVar(&sshAddr, "ssh-addr", ":2222", "SSH listen address")
-	flag.StringVar(&telnetHostPort, "telnet-host", "127.0.0.1:6180", "default TELNET target host (host:port). Cannot contain a username.")
+	flag.StringVar(&telnetHostPort, "telnet-host", "127.0.0.1:6180", "Default TELNET target (host:port)")
 	flag.BoolVar(&debugNegotiation, "debug", false, "Debug TELNET negotiation")
 	flag.StringVar(&logDir, "log-dir", "./log", "Base directory for session logs")
-	flag.BoolVar(&noCompress, "no-compress", false, "Disable gzip compression of logs")
-	flag.BoolVar(&noLog, "no-log", false, "Disable session logging")
+	flag.BoolVar(&noCompress, "no-compress", false, "Disable gzip log compression")
+	flag.BoolVar(&noLog, "no-log", false, "Disable all session logging")
 	flag.IntVar(&idleMax, "idle-max", 0, "Maximum connection idle time in seconds")
 	flag.IntVar(&timeMax, "time-max", 0, "Maximum connection link time in seconds")
-	flag.Var(&altHostFlag{}, "alt-host", "Alternate TELNET target host for specific users (username@host:port, can be specified multiple times)")
+	flag.Var(&altHostFlag{}, "alt-host", "Alternate TELNET targets (username@host:port) [allowed multiple times]")
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
@@ -280,6 +280,9 @@ func handleConsoleInput() {
 		case "l":
 			listConnections()
 
+		case "c":
+			listConfiguration()
+
 		case "k":
 			killConnection()
 
@@ -297,6 +300,7 @@ func showHelp() {
 	fmt.Print("\r\n" +
 		"\r+========== HELP ==========+\r\n" +
 		"\r|                          |\r\n" +
+		"\r|  c - Show Configuration  |\r\n" +
 		"\r|  l - List Connections    |\r\n" +
 		"\r|  k - Kill Connection     |\r\n" +
 		"\r|  d - Deny Connections    |\r\n" +
@@ -395,6 +399,31 @@ func listConnections() {
 			time.Since(conn.startTime).Round(time.Second),
 			time.Since(conn.lastActivityTime).Round(time.Second))
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func listConfiguration() {
+	fmt.Println("\r\n\rConfiguration")
+	fmt.Println("\r=============")
+	fmt.Printf("\rSSH LISTEN ON: %s\r\n", sshAddr)
+	fmt.Printf("\rDEFAULT TARGET: %s\r\n", telnetHostPort)
+
+	if len(altHosts) > 0 {
+		fmt.Println("\rALT TARGETS:")
+		for user, hostPort := range altHosts {
+			fmt.Printf("\r  %s [%s]\r\n", hostPort, user)
+		}
+	} else {
+		fmt.Println("\rALT TARGETS: None configured")
+	}
+
+	fmt.Printf("\rTIME MAX: %d seconds\r\n", timeMax)
+	fmt.Printf("\rIDLE MAX: %d seconds\r\n", idleMax)
+	fmt.Printf("\rNO LOG: %t\r\n", noLog)
+	fmt.Printf("\rLOG DIR: %s\r\n", logDir)
+	fmt.Printf("\rNO LOG COMPRESS: %t\r\n", noCompress)
+	fmt.Printf("\rDEBUG: %t\r\n", debugNegotiation)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
