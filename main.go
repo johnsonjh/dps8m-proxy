@@ -427,6 +427,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	sid := newSessionID()
 	keyLog := []string{}
 
+	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
+
 	config := &ssh.ServerConfig{
 		PasswordCallback: func(
 			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) {
@@ -442,7 +444,9 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 				pubKey.Type(),
 				ssh.FingerprintSHA256(pubKey),
 			)
-			log.Print(line)
+			if !suppressLogs {
+				log.Print(line)
+			}
 			keyLog = append(keyLog, line)
 			return nil, nil
 		},
@@ -473,8 +477,6 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		cancelCtx:  ctx,
 		cancelFunc: cancel,
 	}
-
-	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
 
 	connectionsMutex.Lock()
 	connections[sid] = conn
@@ -567,14 +569,14 @@ func handleSession(
 		conn.basePath = basePath
 		logwriter = logfile
 
-		logwriter.Write([]byte(nowStamp() + " Session start\r\n"))
+		logwriter.Write([]byte(nowStamp() + "\r\n Session start\r\n"))
 
 		for _, line := range keyLog {
 			logwriter.Write([]byte(nowStamp() + " " + line + "\r\n"))
 		}
 
 		defer func() {
-			logwriter.Write([]byte(nowStamp() + " Session end\r\n"))
+			logwriter.Write([]byte(nowStamp() + "\r\n Session end\r\n"))
 			closeAndCompressLog(logfile, basePath+".log")
 		}()
 	} else {
