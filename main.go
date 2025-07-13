@@ -158,6 +158,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	keyLog := []string{}
 
 	config := &ssh.ServerConfig{
+		NoClientAuth: true,
 		PublicKeyCallback: func(
 			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) {
 			line := fmt.Sprintf(
