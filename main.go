@@ -383,7 +383,7 @@ func immediateShutdown() {
 			if conn.channel != nil {
 				conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
 				connUptime := time.Since(conn.startTime)
-				log.Printf("TERMINATED [%s] %s@%s (link time %s)",
+				log.Printf("LINKDOWN [%s] %s@%s (link time %s)",
 					conn.ID, conn.userName, conn.hostName, connUptime.Round(time.Second))
 			}
 			if conn.cancelFunc != nil {
@@ -436,24 +436,26 @@ func listConnections() {
 func listConfiguration() {
 	fmt.Println("\r\n\rConfiguration")
 	fmt.Println("\r=============")
-	fmt.Printf("\rSSH LISTEN ON: %s\r\n", sshAddr)
-	fmt.Printf("\rDEFAULT TARGET: %s\r\n", telnetHostPort)
+	fmt.Printf("\r* SSH LISTEN ON: %s\r\n", sshAddr)
+	fmt.Printf("\r* DEFAULT TARGET: %s\r\n", telnetHostPort)
 
 	if len(altHosts) > 0 {
-		fmt.Println("\rALT TARGETS:")
+		fmt.Println("\r* ALT TARGETS:")
 		for user, hostPort := range altHosts {
-			fmt.Printf("\r  %s [%s]\r\n", hostPort, user)
+			fmt.Printf("\r  * %s [%s]\r\n", hostPort, user)
 		}
 	} else {
-		fmt.Println("\rALT TARGETS: None configured")
+		fmt.Println("\r* ALT TARGETS: None configured")
 	}
 
-	fmt.Printf("\rTIME MAX: %d seconds\r\n", timeMax)
-	fmt.Printf("\rIDLE MAX: %d seconds\r\n", idleMax)
-	fmt.Printf("\rNO LOG: %t\r\n", noLog)
-	fmt.Printf("\rLOG DIR: %s\r\n", logDir)
-	fmt.Printf("\rNO LOG COMPRESS: %t\r\n", noCompress)
-	fmt.Printf("\rDEBUG: %t\r\n", debugNegotiation)
+	fmt.Printf("\r* TIME MAX: %d seconds\r\n", timeMax)
+	fmt.Printf("\r* IDLE MAX: %d seconds\r\n", idleMax)
+	fmt.Printf("\r* NO LOG: %t\r\n", noLog)
+	fmt.Printf("\r* LOG DIR: %s\r\n", logDir)
+	fmt.Printf("\r* NO LOG COMPRESS: %t\r\n", noCompress)
+	fmt.Printf("\r* DEBUG: %t\r\n", debugNegotiation)
+	fmt.Printf("\r* GRACEFUL SHUTDOWN: %t\r\n", gracefulShutdownMode.Load())
+	fmt.Printf("\r* DENY NEW CONNECTIONS: %t\r\n", denyNewConnectionsMode.Load())
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -482,9 +484,6 @@ func stopBufferingLogs() {
 func killConnection() {
 	consoleInputActive.Store(true)
 	defer consoleInputActive.Store(false)
-
-	startBufferingLogs()
-	defer stopBufferingLogs()
 
 	fmt.Print("Enter session ID to kill: ")
 	reader := bufio.NewReader(os.Stdin)
@@ -532,7 +531,7 @@ func killConnection() {
 	fmt.Printf("Killing connection %s...\n", id)
 	conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
 	connUptime := time.Since(conn.startTime)
-	log.Printf("KILLED [%s] %s@%s (link time %s)",
+	log.Printf("TERMKICK [%s] %s@%s (link time %s)",
 		conn.ID, conn.userName, conn.hostName, connUptime.Round(time.Second))
 	conn.sshConn.Close()
 }
@@ -972,14 +971,14 @@ func sendBanner(sid string, sshConn *ssh.ServerConn, ch ssh.Channel) {
 	names, _ := net.DefaultResolver.LookupAddr(ctx, host)
 	var origin string
 	if len(names) > 0 {
-		origin = fmt.Sprintf("%s@%s (%s)", user, strings.TrimSuffix(names[0], "."), host)
+		origin = fmt.Sprintf("%s [%s]", strings.TrimSuffix(names[0], "."), host)
 	} else if user != "" {
-		origin = fmt.Sprintf("%s@%s", user, host)
+		origin = fmt.Sprintf("%s", host)
 	} else {
 		origin = host
 	}
 	now := nowStamp()
-	fmt.Fprintf(ch, "CONNECT from %s at %s.\r\n", origin, now)
+	fmt.Fprintf(ch, "CONNECTION from %s started at %s.\r\n", origin, now)
 	fmt.Fprint(ch, "\r\n")
 }
 
@@ -1113,7 +1112,7 @@ func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
 			dur := time.Since(start)
 			ch.Write([]byte("\r\n"))
 			ch.Write([]byte(fmt.Sprintf(
-				">> Session link time: %s\r\n", dur.Round(time.Second).String())))
+				">> LNK - link time: %s\r\n", dur.Round(time.Second).String())))
 			ch.Write([]byte(fmt.Sprintf(
 				">> SSH - in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
 				atomic.LoadUint64(sshIn),
