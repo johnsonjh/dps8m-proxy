@@ -65,6 +65,7 @@ var (
 	connections            = make(map[string]*Connection)
 	connectionsMutex       sync.Mutex
 	shutdownOnce           sync.Once
+	loggingWg              sync.WaitGroup
 	consoleInputActive     atomic.Bool
 	originalLogOutput      io.Writer
 	logBuffer              *strings.Builder
@@ -135,7 +136,8 @@ func main() {
 
 	go func() {
 		<-shutdownSignal
-		log.Println("Received shutdown signal. Exiting.")
+		loggingWg.Wait()
+		log.Println("All connections closed. Exiting.")
 		os.Exit(0)
 	}()
 
@@ -252,9 +254,6 @@ func immediateShutdown() {
 			if conn.sshConn != nil {
 				conn.sshConn.Close()
 			}
-			if conn.logFile != nil {
-				closeAndCompressLog(conn.logFile, conn.basePath+".log")
-			}
 		}
 
 		connectionsMutex.Unlock()
@@ -268,6 +267,8 @@ func immediateShutdown() {
 			connectionsMutex.Unlock()
 			time.Sleep(100 * time.Millisecond)
 		}
+
+		loggingWg.Wait()
 		log.Println("Exiting.")
 		os.Exit(0)
 	})
@@ -547,7 +548,7 @@ func handleSession(
 
 	logfile, basePath, err := createDatedLog(conn.ID, conn.sshConn.RemoteAddr())
 	if err != nil {
-		fmt.Fprintf(channel, "log file error: %v\n", err)
+		fmt.Fprintf(channel, "log file error: %v\r\n", err)
 		channel.Close()
 		return
 	}
@@ -871,6 +872,8 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 		}
 	}
 
+	loggingWg.Add(1)
+
 	seq := maxSeq + 1
 	base := fmt.Sprintf("%s_%s_%d", ts, sid, seq)
 	pathBase := filepath.Join(dir, base)
@@ -883,6 +886,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func closeAndCompressLog(logfile *os.File, logFilePath string) {
+	defer loggingWg.Done()
 	err := logfile.Close()
 	if err != nil {
 		return
