@@ -72,6 +72,7 @@ var (
 	logBufferMutex         sync.Mutex
 	shutdownSignal         chan struct{}
 	noCompress             bool
+	noLog                  bool
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,6 +97,7 @@ func init() {
 	flag.BoolVar(&debugNegotiation, "debug", false, "Debug TELNET negotiation")
 	flag.StringVar(&logDir, "log-dir", "./log", "Base directory for session logs")
 	flag.BoolVar(&noCompress, "no-compress", false, "Disable gzip compression on log files")
+	flag.BoolVar(&noLog, "no-log", false, "Disable session logging")
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
@@ -546,25 +548,35 @@ func handleSession(
 	start := time.Now()
 	var sshIn, sshOut, telnetIn, telnetOut uint64
 
-	logfile, basePath, err := createDatedLog(conn.ID, conn.sshConn.RemoteAddr())
-	if err != nil {
-		fmt.Fprintf(channel, "log file error: %v\r\n", err)
-		channel.Close()
-		return
+	var logfile *os.File
+	var logwriter io.Writer
+	var basePath string
+	var err error
+
+	if !noLog {
+		logfile, basePath, err = createDatedLog(conn.ID, conn.sshConn.RemoteAddr())
+		if err != nil {
+			fmt.Fprintf(channel, "log file error: %v\r\n", err)
+			channel.Close()
+			return
+		}
+		conn.logFile = logfile
+		conn.basePath = basePath
+		logwriter = logfile
+
+		logwriter.Write([]byte(nowStamp() + " Session start\r\n"))
+
+		for _, line := range keyLog {
+			logwriter.Write([]byte(nowStamp() + " " + line + "\r\n"))
+		}
+
+		defer func() {
+			logwriter.Write([]byte(nowStamp() + " Session end\r\n"))
+			closeAndCompressLog(logfile, basePath+".log")
+		}()
+	} else {
+		logwriter = ioutil.Discard
 	}
-	conn.logFile = logfile
-	conn.basePath = basePath
-
-	logfile.Write([]byte(nowStamp() + " Session start\r\n"))
-
-	for _, line := range keyLog {
-		logfile.Write([]byte(nowStamp() + " " + line + "\r\n"))
-	}
-
-	defer func() {
-		logfile.Write([]byte(nowStamp() + " Session end\r\n"))
-		closeAndCompressLog(logfile, basePath+".log")
-	}()
 
 	go func() {
 		for req := range requests {
@@ -593,7 +605,7 @@ func handleSession(
 
 	defer remote.Close()
 
-	negotiateTelnet(remote, channel, logfile)
+	negotiateTelnet(remote, channel, logwriter)
 
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -612,13 +624,13 @@ func handleSession(
 			if n > 0 {
 				atomic.AddUint64(&sshIn, uint64(n))
 				if buf[0] == 0x1D { // Ctrl-]
-					showMenu(channel, remote, logfile, &sshIn,
+					showMenu(channel, remote, logwriter, &sshIn,
 						&sshOut, &telnetIn, &telnetOut, start)
 					continue
 				}
 				m, err2 := remote.Write(buf[:n])
 				atomic.AddUint64(&telnetOut, uint64(m))
-				logfile.Write(buf[:n])
+				logwriter.Write(buf[:n])
 				if err2 != nil {
 					channel.Close()
 					return
@@ -651,7 +663,7 @@ func handleSession(
 				}
 				atomic.AddUint64(&sshOut, uint64(len(fwd)))
 				channel.Write(fwd)
-				logfile.Write(buf[:n])
+				logwriter.Write(buf[:n])
 			}
 			if err != nil {
 				dur := time.Since(start).Seconds()
@@ -820,7 +832,7 @@ func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
 			dur := time.Since(start).Seconds()
 			ch.Write([]byte("\r\n"))
 			ch.Write([]byte(fmt.Sprintf(
-				">> SSH -in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
+				">> SSH - in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
 				atomic.LoadUint64(sshIn),
 				atomic.LoadUint64(sshOut),
 				float64(atomic.LoadUint64(sshIn))/dur,
