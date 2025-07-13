@@ -54,20 +54,21 @@ const (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 var (
-	sshAddr              string
-	telnetHost           string
-	telnetPort           int
-	debugNegotiation     bool
-	logDir               string
-	gracefulShutdownMode atomic.Bool
-	connections          = make(map[string]*Connection)
-	connectionsMutex     sync.Mutex
-	shutdownOnce         sync.Once
-	consoleInputActive   atomic.Bool
-	originalLogOutput    io.Writer
-	logBuffer            *strings.Builder
-	logBufferMutex       sync.Mutex
-	shutdownSignal       chan struct{}
+	sshAddr                string
+	telnetHost             string
+	telnetPort             int
+	debugNegotiation       bool
+	logDir                 string
+	gracefulShutdownMode   atomic.Bool
+	denyNewConnectionsMode atomic.Bool
+	connections            = make(map[string]*Connection)
+	connectionsMutex       sync.Mutex
+	shutdownOnce           sync.Once
+	consoleInputActive     atomic.Bool
+	originalLogOutput      io.Writer
+	logBuffer              *strings.Builder
+	logBufferMutex         sync.Mutex
+	shutdownSignal         chan struct{}
 )
 
 type Connection struct {
@@ -137,16 +138,6 @@ func main() {
 		rawConn, err := listener.Accept()
 		if err != nil {
 			if gracefulShutdownMode.Load() {
-				connectionsMutex.Lock()
-				if len(connections) == 0 {
-					connectionsMutex.Unlock()
-					select {
-					case shutdownSignal <- struct{}{}:
-					default:
-					}
-				} else {
-					connectionsMutex.Unlock()
-				}
 				return
 			}
 			log.Printf("ACCEPT ERROR: %v", err)
@@ -176,6 +167,8 @@ func handleConsoleInput() {
 			showHelp()
 		case "q":
 			toggleGracefulShutdown()
+		case "d":
+			toggleDenyNewConnections()
 		case "Q":
 			immediateShutdown()
 		case "l":
@@ -192,14 +185,15 @@ func handleConsoleInput() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func showHelp() {
-	fmt.Println("\r\n" +
-		"\r +========================+\r\n" +
-		"\r | ? - Help               |\r\n" +
+	fmt.Print("\r\n" +
+		"\r +========= HELP =========+\r\n" +
+		"\r | ? - Display This Help  |\r\n" +
 		"\r | l - List Connections   |\r\n" +
 		"\r | k - Kill Connection    |\r\n" +
+		"\r | d - Deny Connections   |\r\n" +
 		"\r | q - Graceful Shutdown  |\r\n" +
 		"\r | Q - Immediate Shutdown |\r\n" +
-		"\r +========================+\r\n")
+		"\r +========================+\r\n\r\n")
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,7 +201,7 @@ func showHelp() {
 func toggleGracefulShutdown() {
 	if gracefulShutdownMode.Load() {
 		gracefulShutdownMode.Store(false)
-		log.Println("Graceful shutdown aborted.")
+		log.Println("Graceful shutdown cancelled.")
 	} else {
 		gracefulShutdownMode.Store(true)
 		log.Println("No new connections will be accepted.")
@@ -219,8 +213,21 @@ func toggleGracefulShutdown() {
 			case shutdownSignal <- struct{}{}:
 			default:
 			}
+		} else {
+			connectionsMutex.Unlock()
 		}
-		connectionsMutex.Unlock()
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func toggleDenyNewConnections() {
+	if denyNewConnectionsMode.Load() {
+		denyNewConnectionsMode.Store(false)
+		log.Println("Deny connections cancelled.")
+	} else {
+		denyNewConnectionsMode.Store(true)
+		log.Println("No new connections will be accepted.")
 	}
 }
 
@@ -245,6 +252,7 @@ func immediateShutdown() {
 				os.Rename(conn.basePath+".open.log", conn.basePath+".log")
 			}
 		}
+
 		connectionsMutex.Unlock()
 
 		for {
@@ -256,7 +264,7 @@ func immediateShutdown() {
 			connectionsMutex.Unlock()
 			time.Sleep(100 * time.Millisecond)
 		}
-		log.Println("All connections closed. Exiting.")
+		log.Println("Exiting.")
 		os.Exit(0)
 	})
 }
@@ -266,14 +274,16 @@ func immediateShutdown() {
 func listConnections() {
 	connectionsMutex.Lock()
 	defer connectionsMutex.Unlock()
-	fmt.Println("\nActive Connections:")
+	fmt.Println("\r\nActive Connections")
+	fmt.Println("\r\n------------------")
 	if len(connections) == 0 {
 		fmt.Println("  None")
 		return
 	}
 	for id, conn := range connections {
-		fmt.Printf("  ID: %s, Remote: %s, User: %s, Uptime: %s\n",
-			id, conn.sshConn.RemoteAddr(), conn.sshConn.User(), time.Since(conn.startTime).Round(time.Second))
+		fmt.Printf("* ID: %s, Remote: %s, User: %s, Uptime: %s\r\n",
+			id, conn.sshConn.RemoteAddr(), conn.sshConn.User(),
+			time.Since(conn.startTime).Round(time.Second))
 	}
 }
 
@@ -503,11 +513,11 @@ func handleSession(
 	keyLog []string,
 	ctx context.Context,
 ) {
-
-	if gracefulShutdownMode.Load() {
+	if gracefulShutdownMode.Load() || denyNewConnectionsMode.Load() {
 		if denyMsg, err := ioutil.ReadFile("deny.txt"); err == nil {
+			txt := strings.ReplaceAll(strings.ReplaceAll(string(denyMsg), "\r\n", "\n"), "\n", "\r\n")
 			channel.Write([]byte("\r\n"))
-			channel.Write(denyMsg)
+			channel.Write([]byte(txt))
 			channel.Write([]byte("\r\n"))
 		}
 		channel.Close()
@@ -549,10 +559,8 @@ func handleSession(
 			switch req.Type {
 			case "pty-req":
 				req.Reply(true, nil)
-
 			case "shell":
 				req.Reply(true, nil)
-
 			default:
 				req.Reply(false, nil)
 			}
@@ -698,16 +706,12 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 				switch cmd {
 				case WILL:
 					reply = DO
-
 				case WONT:
 					reply = DONT
-
 				case DO:
 					reply = WILL
-
 				case DONT:
 					reply = WONT
-
 				default:
 					i += 3
 					continue
@@ -729,7 +733,6 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 func writeNegotiation(ch io.Writer, logw io.Writer, line string) {
 	msg := line + "\r\n"
 	logw.Write([]byte(msg))
-
 	if debugNegotiation {
 		ch.Write([]byte(msg))
 	}
@@ -780,7 +783,8 @@ func optName(b byte) string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) {
+func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
+	sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) {
 	menu := "\r\n\r\n" +
 		"+==== MENU =====+\r\n" +
 		"| 1) Send Break |\r\n" +
@@ -800,13 +804,17 @@ func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer, sshIn, sshOut, te
 			ch.Write([]byte("\r\n"))
 			ch.Write([]byte(fmt.Sprintf(
 				">> SSH: in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
-				atomic.LoadUint64(sshIn), atomic.LoadUint64(sshOut),
-				float64(atomic.LoadUint64(sshIn))/dur, float64(atomic.LoadUint64(sshOut))/dur,
+				atomic.LoadUint64(sshIn),
+				atomic.LoadUint64(sshOut),
+				float64(atomic.LoadUint64(sshIn))/dur,
+				float64(atomic.LoadUint64(sshOut))/dur,
 			)))
 			ch.Write([]byte(fmt.Sprintf(
 				">> NVT: in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n\r\n",
-				atomic.LoadUint64(telnetIn), atomic.LoadUint64(telnetOut),
-				float64(atomic.LoadUint64(telnetIn))/dur, float64(atomic.LoadUint64(telnetOut))/dur,
+				atomic.LoadUint64(telnetIn),
+				atomic.LoadUint64(telnetOut),
+				float64(atomic.LoadUint64(telnetIn))/dur,
+				float64(atomic.LoadUint64(telnetOut))/dur,
 			)))
 		default:
 			ch.Write([]byte("\r\n>> Unknown option!\r\n"))
@@ -835,7 +843,6 @@ func createDatedLog(addr net.Addr) (*os.File, string, error) {
 	files, _ := ioutil.ReadDir(dir)
 	maxSeq := 0
 	prefix := ts + "_"
-
 	for _, f := range files {
 		if strings.HasPrefix(f.Name(), prefix) {
 			parts := strings.SplitN(f.Name()[len(prefix):], ".", 2)

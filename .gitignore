@@ -3,6 +3,7 @@
 *~
 2025
 *.bak
+dps8m-proxy
 *.log
 log
 *.o
