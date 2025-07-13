@@ -476,7 +476,6 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 			select {
 			case shutdownSignal <- struct{}{}:
 			default:
-				// Channel already closed or signal sent, do nothing
 			}
 		} else {
 			connectionsMutex.Unlock()
@@ -515,7 +514,8 @@ func handleSession(
 ) {
 	if gracefulShutdownMode.Load() || denyNewConnectionsMode.Load() {
 		if denyMsg, err := ioutil.ReadFile("deny.txt"); err == nil {
-			txt := strings.ReplaceAll(strings.ReplaceAll(string(denyMsg), "\r\n", "\n"), "\n", "\r\n")
+			txt := strings.ReplaceAll(
+				strings.ReplaceAll(string(denyMsg), "\r\n", "\n"), "\n", "\r\n")
 			channel.Write([]byte("\r\n"))
 			channel.Write([]byte(txt))
 			channel.Write([]byte("\r\n"))
@@ -527,7 +527,8 @@ func handleSession(
 	sendBanner(conn.ID, conn.sshConn, channel)
 
 	if raw, err := ioutil.ReadFile("motd.txt"); err == nil {
-		txt := strings.ReplaceAll(strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
+		txt := strings.ReplaceAll(
+			strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
 		channel.Write([]byte(txt + "\r\n"))
 	}
 
@@ -600,7 +601,8 @@ func handleSession(
 			if n > 0 {
 				atomic.AddUint64(&sshIn, uint64(n))
 				if buf[0] == 0x1D { // Ctrl-]
-					showMenu(channel, remote, logfile, &sshIn, &sshOut, &telnetIn, &telnetOut, start)
+					showMenu(channel, remote, logfile, &sshIn,
+						&sshOut, &telnetIn, &telnetOut, start)
 					continue
 				}
 				m, err2 := remote.Write(buf[:n])
@@ -645,13 +647,11 @@ func handleSession(
 				channel.Write([]byte("\r\nCONNECTION CLOSED\r\n\r\n"))
 				channel.Write([]byte(fmt.Sprintf(
 					">> SSH: in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
-					sshIn, sshOut,
-					float64(sshIn)/dur, float64(sshOut)/dur,
+					sshIn, sshOut, float64(sshIn)/dur, float64(sshOut)/dur,
 				)))
 				channel.Write([]byte(fmt.Sprintf(
 					">> NVT: in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n\r\n",
-					telnetIn, telnetOut,
-					float64(telnetIn)/dur, float64(telnetOut)/dur,
+					telnetIn, telnetOut, float64(telnetIn)/dur, float64(telnetOut)/dur,
 				)))
 				channel.Close()
 				return
@@ -706,12 +706,16 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 				switch cmd {
 				case WILL:
 					reply = DO
+
 				case WONT:
 					reply = DONT
+
 				case DO:
 					reply = WILL
+
 				case DONT:
 					reply = WONT
+
 				default:
 					i += 3
 					continue
@@ -786,10 +790,10 @@ func optName(b byte) string {
 func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
 	sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) {
 	menu := "\r\n\r\n" +
-		"+==== MENU =====+\r\n" +
-		"| 1) Send Break |\r\n" +
-		"| 2) Show Stats |\r\n" +
-		"+===============+\r\n"
+		" +===== MENU =====+\r\n" +
+		" | 1 - Send Break |\r\n" +
+		" | 2 - Show Stats |\r\n" +
+		" +================+\r\n"
 	ch.Write([]byte(menu))
 	sel := make([]byte, 1)
 
@@ -799,6 +803,7 @@ func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
 			remote.Write([]byte{IAC, 243}) // BREAK
 			logw.Write([]byte{IAC, 243})
 			ch.Write([]byte("\r\n>> Sent BREAK\r\n"))
+
 		case '2':
 			dur := time.Since(start).Seconds()
 			ch.Write([]byte("\r\n"))
@@ -816,6 +821,7 @@ func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
 				float64(atomic.LoadUint64(telnetIn))/dur,
 				float64(atomic.LoadUint64(telnetOut))/dur,
 			)))
+
 		default:
 			ch.Write([]byte("\r\n>> Unknown option!\r\n"))
 		}
