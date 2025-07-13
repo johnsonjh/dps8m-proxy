@@ -1,7 +1,7 @@
 ##############################################################################
 # Copyright (c) 2025 Jeffrey H. Johnson
 # SPDX-License-Identifier: MIT
-# vim ft=make expandtab tabstop=4 :
+# vim ft=make expandtab tabstop=4 cc=78 :
 
 ##############################################################################
 # Configuration
@@ -40,7 +40,8 @@ tidy: go.mod
 
 .PHONY: distclean
 distclean: clean
-	$(RM) ssh_host_ed25519_key.pem ssh_host_rsa_key.pem motd.txt
+	$(RM) ssh_host_ed25519_key.pem ssh_host_rsa_key.pem
+	$(RM) -r ./log/
 
 ##############################################################################
 # Target: lint
@@ -53,7 +54,9 @@ lint: reuse gofumpt gofmt goverify gotidydiff govet
 
 .PHONY: reuse
 reuse:
-	reuse lint -q || reuse lint
+	@$$(command -v reuse > /dev/null 2>&1) || \
+		{ printf '%s\n' "⚠️ reuse not found"; exit 0; } ; \
+		set -x; reuse lint -q || reuse lint
 
 ##############################################################################
 # Target: gofmt
@@ -81,7 +84,9 @@ gotidydiff: go.mod
 
 .PHONY: gofumpt
 gofumpt: main.go
-	gofumpt -d -e -s main.go
+	@$$(command -v gofumpt > /dev/null 2>&1) || \
+		{ printf '%s\n' "⚠️ gofumpt not found!"; exit 0; } ; \
+		set -x; gofumpt -d -e -s main.go
 
 ##############################################################################
 # Target: govet
