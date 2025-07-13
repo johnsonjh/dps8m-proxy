@@ -96,7 +96,7 @@ func init() {
 	flag.IntVar(&telnetPort, "telnet-port", 6180, "TELNET target port")
 	flag.BoolVar(&debugNegotiation, "debug", false, "Debug TELNET negotiation")
 	flag.StringVar(&logDir, "log-dir", "./log", "Base directory for session logs")
-	flag.BoolVar(&noCompress, "no-compress", false, "Disable gzip compression on log files")
+	flag.BoolVar(&noCompress, "no-compress", false, "Disable gzip compression of logs")
 	flag.BoolVar(&noLog, "no-log", false, "Disable session logging")
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
@@ -428,7 +428,10 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	keyLog := []string{}
 
 	config := &ssh.ServerConfig{
-		NoClientAuth: true,
+		PasswordCallback: func(
+			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) {
+			return nil, nil
+		},
 		PublicKeyCallback: func(
 			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) {
 			line := fmt.Sprintf(
@@ -441,7 +444,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 			)
 			log.Print(line)
 			keyLog = append(keyLog, line)
-			return nil, fmt.Errorf("trying next method")
+			return nil, nil
 		},
 		KeyboardInteractiveCallback: func(
 			conn ssh.ConnMetadata,
@@ -912,13 +915,13 @@ func closeAndCompressLog(logfile *os.File, logFilePath string) {
 
 	data, err := ioutil.ReadFile(logFilePath)
 	if err != nil {
-		log.Printf("Error reading log file %s for compression: %v", logFilePath, err)
+		log.Printf("Error reading log '%s' for compression: %v", logFilePath, err)
 		return
 	}
 
 	gzFile, err := os.Create(compressedFilePath)
 	if err != nil {
-		log.Printf("Error creating compressed file %s: %v", compressedFilePath, err)
+		log.Printf("Error creating compressed file '%s': %v", compressedFilePath, err)
 		return
 	}
 	defer gzFile.Close()
@@ -926,19 +929,19 @@ func closeAndCompressLog(logfile *os.File, logFilePath string) {
 	gzipWriter := gzip.NewWriter(gzFile)
 	_, err = gzipWriter.Write(data)
 	if err != nil {
-		log.Printf("Error writing to compressed file %s: %v", compressedFilePath, err)
+		log.Printf("Error writing to compressed file '%s': %v", compressedFilePath, err)
 		return
 	}
 
 	err = gzipWriter.Close()
 	if err != nil {
-		log.Printf("Error closing gzip writer for %s: %v", compressedFilePath, err)
+		log.Printf("Error closing gzip writer for '%s': %v", compressedFilePath, err)
 		return
 	}
 
 	err = os.Remove(logFilePath)
 	if err != nil {
-		log.Printf("Error removing original log file %s after compression: %v", logFilePath, err)
+		log.Printf("Error removing original log '%s' after compression: %v", logFilePath, err)
 	}
 }
 
