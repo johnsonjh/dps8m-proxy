@@ -95,12 +95,15 @@ type Connection struct {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// altHostFlag implements flag.Value interface for parsing multiple alt-host flags.
 type altHostFlag struct{}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (a *altHostFlag) String() string {
 	return ""
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (a *altHostFlag) Set(value string) error {
 	parts := strings.SplitN(value, "@", 2)
@@ -114,7 +117,6 @@ func (a *altHostFlag) Set(value string) error {
 		return fmt.Errorf("duplicate alt-host entry for username: %s", username)
 	}
 
-	// Validate hostPort format (simple check for now, net.Dial will do full validation)
 	_, _, err := net.SplitHostPort(hostPort)
 	if err != nil {
 		return fmt.Errorf("invalid host:port in alt-host '%s': %v", value, err)
@@ -127,15 +129,33 @@ func (a *altHostFlag) Set(value string) error {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func init() {
-	flag.StringVar(&sshAddr, "ssh-addr", ":2222", "SSH listen address")
-	flag.StringVar(&telnetHostPort, "telnet-host", "127.0.0.1:6180", "Default TELNET target (host:port)")
-	flag.BoolVar(&debugNegotiation, "debug", false, "Debug TELNET negotiation")
-	flag.StringVar(&logDir, "log-dir", "./log", "Base directory for session logs")
-	flag.BoolVar(&noCompress, "no-compress", false, "Disable gzip log compression")
-	flag.BoolVar(&noLog, "no-log", false, "Disable all session logging")
-	flag.IntVar(&idleMax, "idle-max", 0, "Maximum connection idle time in seconds")
-	flag.IntVar(&timeMax, "time-max", 0, "Maximum connection link time in seconds")
-	flag.Var(&altHostFlag{}, "alt-host", "Alternate TELNET targets (username@host:port) [allowed multiple times]")
+	flag.StringVar(&sshAddr,
+		"ssh-addr", ":2222", "SSH listen address")
+
+	flag.StringVar(&telnetHostPort,
+		"telnet-host", "127.0.0.1:6180", "Default TELNET target (host:port)")
+
+	flag.BoolVar(&debugNegotiation,
+		"debug", false, "Debug TELNET negotiation")
+
+	flag.StringVar(&logDir,
+		"log-dir", "./log", "Base directory for session logs")
+
+	flag.BoolVar(&noCompress,
+		"no-compress", false, "Disable gzip session log compression")
+
+	flag.BoolVar(&noLog,
+		"no-log", false, "Disable all session logging")
+
+	flag.IntVar(&idleMax,
+		"idle-max", 0, "Maximum connection idle time in seconds")
+
+	flag.IntVar(&timeMax,
+		"time-max", 0, "Maximum connection link time in seconds")
+
+	flag.Var(&altHostFlag{},
+		"alt-host", "Alternate TELNET targets (username@host:port) [allowed multiple times]")
+
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
@@ -147,11 +167,13 @@ func main() {
 	flag.Parse()
 
 	if strings.Contains(telnetHostPort, "@") {
-		log.Fatalf("Error: -telnet-host cannot contain a username (e.g., 'user@'). Received: %s", telnetHostPort)
+		log.Fatalf("Error: -telnet-host cannot contain a username (e.g., 'user@'). Received: %s",
+			telnetHostPort)
 	}
 
-	if idleMax > 0 && timeMax > 0 && idleMax > timeMax {
-		log.Fatalf("Error: -idle-max (%d) cannot be greater than -time-max (%d)", idleMax, timeMax)
+	if idleMax > 0 && timeMax > 0 && idleMax >= timeMax {
+		log.Fatalf("Error: -idle-max (%d) cannot be greater than or equal to -time-max (%d)",
+			idleMax, timeMax)
 	}
 
 	edSigner, err := loadOrCreateHostKey("ssh_host_ed25519_key.pem", "ed25519")
@@ -172,7 +194,6 @@ func main() {
 
 	log.Printf("SSH LISTEN ON %s", sshAddr)
 
-	// Output default and alternate targets to console
 	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
 	if err != nil {
 		log.Fatalf("Error parsing default telnet-host: %v", err)
@@ -201,12 +222,11 @@ func main() {
 		os.Exit(0)
 	}()
 
-	// Goroutine to periodically check for idle connections
 	go func() {
 		if idleMax == 0 {
-			return // Idle timeout disabled
+			return
 		}
-		checkInterval := 10 * time.Second // Check every 10 seconds
+		checkInterval := 10 * time.Second
 		for {
 			select {
 			case <-shutdownSignal:
@@ -218,15 +238,22 @@ func main() {
 					connUptime := time.Since(conn.startTime)
 
 					if idleMax > 0 && idleTime > time.Duration(idleMax)*time.Second {
-						log.Printf("IDLEKICK [%s] %s@%s (idle %s)",
-							id, conn.userName, conn.hostName, idleTime.Round(time.Second))
-						conn.channel.Write([]byte("\r\n\r\nIDLE TIMEOUT\r\n\r\n"))
+						connUptime := time.Since(conn.startTime)
+						log.Printf("IDLEKICK [%s] %s@%s (idle %s, link %s)",
+							id, conn.userName, conn.hostName, idleTime.Round(time.Second),
+							connUptime.Round(time.Second))
+						conn.channel.Write([]byte(fmt.Sprintf(
+							"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
+							connUptime.Round(time.Second))))
 						conn.sshConn.Close()
 						delete(connections, id) // Remove from map immediately
 					} else if timeMax > 0 && connUptime > time.Duration(timeMax)*time.Second {
-						log.Printf("TIMEKICK [%s] %s@%s (connected %s)",
+						connUptime := time.Since(conn.startTime)
+						log.Printf("TIMEKICK [%s] %s@%s (link time %s)",
 							id, conn.userName, conn.hostName, connUptime.Round(time.Second))
-						conn.channel.Write([]byte("\r\n\r\nCONNECTION TIMEOUT\r\n\r\n"))
+						conn.channel.Write([]byte(fmt.Sprintf(
+							"\r\n\r\nCONNECTION TIMEOUT (link time %s)\r\n\r\n",
+							connUptime.Round(time.Second))))
 						conn.sshConn.Close()
 						delete(connections, id)
 					}
@@ -355,6 +382,9 @@ func immediateShutdown() {
 		for _, conn := range connections {
 			if conn.channel != nil {
 				conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+				connUptime := time.Since(conn.startTime)
+				log.Printf("TERMINATED [%s] %s@%s (link time %s)",
+					conn.ID, conn.userName, conn.hostName, connUptime.Round(time.Second))
 			}
 			if conn.cancelFunc != nil {
 				conn.cancelFunc()
@@ -394,7 +424,7 @@ func listConnections() {
 		return
 	}
 	for id, conn := range connections {
-		fmt.Printf("\r* ID %s: %s@%s [Up: %s, Idle: %s]\r\n",
+		fmt.Printf("\r* ID %s: %s@%s [Link: %s, Idle: %s]\r\n",
 			id, conn.sshConn.User(), conn.sshConn.RemoteAddr(),
 			time.Since(conn.startTime).Round(time.Second),
 			time.Since(conn.lastActivityTime).Round(time.Second))
@@ -501,6 +531,9 @@ func killConnection() {
 
 	fmt.Printf("Killing connection %s...\n", id)
 	conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+	connUptime := time.Since(conn.startTime)
+	log.Printf("KILLED [%s] %s@%s (link time %s)",
+		conn.ID, conn.userName, conn.hostName, connUptime.Round(time.Second))
 	conn.sshConn.Close()
 }
 
@@ -590,12 +623,16 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 				log.Print(line)
 			}
 			keyLog = append(keyLog, line)
-			return &ssh.Permissions{Extensions: map[string]string{"auth-method": "publickey"}}, fmt.Errorf("next key")
+			return &ssh.Permissions{
+				Extensions: map[string]string{"auth-method": "publickey"},
+			}, fmt.Errorf("next key")
 		},
 		KeyboardInteractiveCallback: func(
 			conn ssh.ConnMetadata,
 			challenge ssh.KeyboardInteractiveChallenge) (*ssh.Permissions, error) {
-			return &ssh.Permissions{Extensions: map[string]string{"auth-method": "keyboard-interactive"}}, nil
+			return &ssh.Permissions{
+				Extensions: map[string]string{"auth-method": "keyboard-interactive"},
+			}, nil
 		},
 	}
 	config.AddHostKey(edSigner)
@@ -729,7 +766,6 @@ func handleSession(
 	keyLog []string,
 	ctx context.Context,
 ) {
-
 	if gracefulShutdownMode.Load() || denyNewConnectionsMode.Load() {
 		if denyMsg, err := ioutil.ReadFile("deny.txt"); err == nil {
 			txt := strings.ReplaceAll(
@@ -801,17 +837,17 @@ func handleSession(
 	var targetHost string
 	var targetPort int
 
-	// Check if an alternate host is configured for this username
 	if altHostPort, ok := altHosts[conn.userName]; ok {
 		var err error
 		targetHost, targetPort, err = parseHostPort(altHostPort)
 		if err != nil {
-			fmt.Fprintf(channel, "Error parsing alt-host for user %s: %v\r\n\r\n", conn.userName, err)
+			fmt.Fprintf(channel, "Error parsing alt-host for user %s: %v\r\n\r\n",
+				conn.userName, err)
 			log.Printf("Error parsing alt-host for user %s: %v", conn.userName, err)
 			channel.Close()
 			return
 		}
-		log.Printf("ALT-HOST [%s] %s@%s:%d", conn.ID, conn.userName, targetHost, targetPort)
+		log.Printf("ALTROUTE [%s] %s@%s:%d", conn.ID, conn.userName, targetHost, targetPort)
 	} else {
 		var err error
 		targetHost, targetPort, err = parseHostPort(telnetHostPort)
@@ -824,7 +860,8 @@ func handleSession(
 	}
 
 	if !noLog {
-		logwriter.Write([]byte(fmt.Sprintf(nowStamp()+" Target: %s:%d\r\n", targetHost, targetPort)))
+		logwriter.Write([]byte(fmt.Sprintf(nowStamp()+" Target: %s:%d\r\n",
+			targetHost, targetPort)))
 	}
 
 	remote, err := net.Dial("tcp", fmt.Sprintf("%s:%d", targetHost, targetPort))
@@ -904,15 +941,18 @@ func handleSession(
 				conn.lastActivityTime = time.Now()
 			}
 			if err != nil {
-				dur := time.Since(start).Seconds()
-				channel.Write([]byte("\r\nCONNECTION CLOSED\r\n\r\n"))
+				dur := time.Since(start)
+				log.Printf("DETACHED [%s] %s@%s (link time %s)",
+					conn.ID, conn.userName, conn.hostName, dur.Round(time.Second))
+				channel.Write([]byte(fmt.Sprintf("\r\nCONNECTION CLOSED (link time %s)\r\n\r\n",
+					dur.Round(time.Second))))
 				channel.Write([]byte(fmt.Sprintf(
 					">> SSH - in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
-					sshIn, sshOut, float64(sshIn)/dur, float64(sshOut)/dur,
+					sshIn, sshOut, float64(sshIn)/dur.Seconds(), float64(sshOut)/dur.Seconds(),
 				)))
 				channel.Write([]byte(fmt.Sprintf(
 					">> NVT - in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n\r\n",
-					telnetIn, telnetOut, float64(telnetIn)/dur, float64(telnetOut)/dur,
+					telnetIn, telnetOut, float64(telnetIn)/dur.Seconds(), float64(telnetOut)/dur.Seconds(),
 				)))
 				channel.Close()
 				return
@@ -1055,6 +1095,7 @@ func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
 		"\r|                  |\r\n" +
 		"\r|  B - Send Break  |\r\n" +
 		"\r|  S - Show Stats  |\r\n" +
+		"\r|  X - Disconnect  |\r\n" +
 		"\r|                  |\r\n" +
 		"\r+==================+\r\n"
 	ch.Write([]byte(menu))
@@ -1069,23 +1110,29 @@ func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
 			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
 		case 's', 'S':
-			dur := time.Since(start).Seconds()
+			dur := time.Since(start)
 			ch.Write([]byte("\r\n"))
+			ch.Write([]byte(fmt.Sprintf(
+				">> Session link time: %s\r\n", dur.Round(time.Second).String())))
 			ch.Write([]byte(fmt.Sprintf(
 				">> SSH - in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
 				atomic.LoadUint64(sshIn),
 				atomic.LoadUint64(sshOut),
-				float64(atomic.LoadUint64(sshIn))/dur,
-				float64(atomic.LoadUint64(sshOut))/dur,
+				float64(atomic.LoadUint64(sshIn))/dur.Seconds(),
+				float64(atomic.LoadUint64(sshOut))/dur.Seconds(),
 			)))
 			ch.Write([]byte(fmt.Sprintf(
 				">> NVT - in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
 				atomic.LoadUint64(telnetIn),
 				atomic.LoadUint64(telnetOut),
-				float64(atomic.LoadUint64(telnetIn))/dur,
-				float64(atomic.LoadUint64(telnetOut))/dur,
+				float64(atomic.LoadUint64(telnetIn))/dur.Seconds(),
+				float64(atomic.LoadUint64(telnetOut))/dur.Seconds(),
 			)))
 			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+
+		case 'x', 'X':
+			ch.Write([]byte("\r\n>> DISCONNECTING...\r\n"))
+			ch.Close()
 
 		default:
 			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
