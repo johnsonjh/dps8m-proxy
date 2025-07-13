@@ -73,33 +73,38 @@ var (
 	shutdownSignal         chan struct{}
 	noCompress             bool
 	noLog                  bool
+	idleMax                int
+	timeMax                int
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 type Connection struct {
-	ID         string
-	sshConn    *ssh.ServerConn
-	channel    ssh.Channel
-	startTime  time.Time
-	logFile    *os.File
-	basePath   string
-	cancelCtx  context.Context
-	cancelFunc context.CancelFunc
-	userName   string
-	hostName   string
+	ID               string
+	sshConn          *ssh.ServerConn
+	channel          ssh.Channel
+	startTime        time.Time
+	lastActivityTime time.Time
+	logFile          *os.File
+	basePath         string
+	cancelCtx        context.Context
+	cancelFunc       context.CancelFunc
+	userName         string
+	hostName         string
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func init() {
 	flag.StringVar(&sshAddr, "ssh-addr", ":2222", "SSH listen address")
-	flag.StringVar(&telnetHost, "telnet-host", "127.0.0.1", "TELNET target host")
-	flag.IntVar(&telnetPort, "telnet-port", 6180, "TELNET target port")
+	flag.StringVar(&telnetHost, "telnet-host", "127.0.0.1", "default TELNET target host")
+	flag.IntVar(&telnetPort, "telnet-port", 6180, "default TELNET target port")
 	flag.BoolVar(&debugNegotiation, "debug", false, "Debug TELNET negotiation")
 	flag.StringVar(&logDir, "log-dir", "./log", "Base directory for session logs")
 	flag.BoolVar(&noCompress, "no-compress", false, "Disable gzip compression of logs")
 	flag.BoolVar(&noLog, "no-log", false, "Disable session logging")
+	flag.IntVar(&idleMax, "idle-max", 0, "Maximum connection idle time in seconds")
+	flag.IntVar(&timeMax, "time-max", 0, "Maximum connection link time in seconds")
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
@@ -109,6 +114,10 @@ func init() {
 
 func main() {
 	flag.Parse()
+
+	if idleMax > 0 && timeMax > 0 && idleMax > timeMax {
+		log.Fatalf("Error: -idle-max (%d) cannot be greater than -time-max (%d)", idleMax, timeMax)
+	}
 
 	edSigner, err := loadOrCreateHostKey("ssh_host_ed25519_key.pem", "ed25519")
 	if err != nil {
@@ -143,6 +152,41 @@ func main() {
 		loggingWg.Wait()
 		log.Println("All connections closed. Exiting.")
 		os.Exit(0)
+	}()
+
+	// Goroutine to periodically check for idle connections
+	go func() {
+		if idleMax == 0 {
+			return // Idle timeout disabled
+		}
+		checkInterval := 10 * time.Second // Check every 10 seconds
+		for {
+			select {
+			case <-shutdownSignal:
+				return
+			case <-time.After(checkInterval):
+				connectionsMutex.Lock()
+				for id, conn := range connections {
+					idleTime := time.Since(conn.lastActivityTime)
+					connUptime := time.Since(conn.startTime)
+
+					if idleMax > 0 && idleTime > time.Duration(idleMax)*time.Second {
+						log.Printf("IDLEKICK [%s] %s@%s (idle %s)",
+							id, conn.userName, conn.hostName, idleTime.Round(time.Second))
+						conn.channel.Write([]byte("\r\n\r\nIDLE TIMEOUT\r\n\r\n"))
+						conn.sshConn.Close()
+						delete(connections, id) // Remove from map immediately
+					} else if timeMax > 0 && connUptime > time.Duration(timeMax)*time.Second {
+						log.Printf("TIMEKICK [%s] %s@%s (connected %s)",
+							id, conn.userName, conn.hostName, connUptime.Round(time.Second))
+						conn.channel.Write([]byte("\r\n\r\nCONNECTION TIMEOUT\r\n\r\n"))
+						conn.sshConn.Close()
+						delete(connections, id)
+					}
+				}
+				connectionsMutex.Unlock()
+			}
+		}
 	}()
 
 	for {
@@ -299,9 +343,10 @@ func listConnections() {
 		return
 	}
 	for id, conn := range connections {
-		fmt.Printf("\r* ID %s: %s@%s [Up: %s]\r\n",
+		fmt.Printf("\r* ID %s: %s@%s [Up: %s, Idle: %s]\r\n",
 			id, conn.sshConn.User(), conn.sshConn.RemoteAddr(),
-			time.Since(conn.startTime).Round(time.Second))
+			time.Since(conn.startTime).Round(time.Second),
+			time.Since(conn.lastActivityTime).Round(time.Second))
 	}
 }
 
@@ -507,13 +552,14 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	conn := &Connection{
-		ID:         sid,
-		sshConn:    sshConn,
-		startTime:  time.Now(),
-		cancelCtx:  ctx,
-		cancelFunc: cancel,
-		userName:   sshConn.User(),
-		hostName:   sshConn.RemoteAddr().String(),
+		ID:               sid,
+		sshConn:          sshConn,
+		startTime:        time.Now(),
+		lastActivityTime: time.Now(),
+		cancelCtx:        ctx,
+		cancelFunc:       cancel,
+		userName:         sshConn.User(),
+		hostName:         sshConn.RemoteAddr().String(),
 	}
 
 	connectionsMutex.Lock()
@@ -701,6 +747,7 @@ func handleSession(
 				m, err2 := remote.Write(buf[:n])
 				atomic.AddUint64(&telnetOut, uint64(m))
 				logwriter.Write(buf[:n])
+				conn.lastActivityTime = time.Now()
 				if err2 != nil {
 					channel.Close()
 					return
@@ -734,6 +781,7 @@ func handleSession(
 				atomic.AddUint64(&sshOut, uint64(len(fwd)))
 				channel.Write(fwd)
 				logwriter.Write(buf[:n])
+				conn.lastActivityTime = time.Now()
 			}
 			if err != nil {
 				dur := time.Since(start).Seconds()
