@@ -176,17 +176,24 @@ func handleConsoleInput() {
 		switch cmd {
 		case "?", "h", "H":
 			showHelp()
+
 		case "q":
 			toggleGracefulShutdown()
+
 		case "d":
 			toggleDenyNewConnections()
+
 		case "Q":
 			immediateShutdown()
+
 		case "l":
 			listConnections()
+
 		case "k":
 			killConnection()
+
 		case "":
+
 		default:
 			log.Printf("Unknown command: %s", cmd)
 		}
@@ -199,7 +206,6 @@ func showHelp() {
 	fmt.Print("\r\n" +
 		"\r+========== HELP ==========+\r\n" +
 		"\r|                          |\r\n" +
-		"\r|  ? - Display This Help   |\r\n" +
 		"\r|  l - List Connections    |\r\n" +
 		"\r|  k - Kill Connection     |\r\n" +
 		"\r|  d - Deny Connections    |\r\n" +
@@ -253,7 +259,7 @@ func immediateShutdown() {
 		connectionsMutex.Lock()
 		for _, conn := range connections {
 			if conn.channel != nil {
-				conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n"))
+				conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
 			}
 			if conn.cancelFunc != nil {
 				conn.cancelFunc()
@@ -286,15 +292,15 @@ func immediateShutdown() {
 func listConnections() {
 	connectionsMutex.Lock()
 	defer connectionsMutex.Unlock()
-	fmt.Println("\r\nActive Connections")
+	fmt.Println("\r\n\rActive Connections")
 	fmt.Println("\r==================")
 	if len(connections) == 0 {
-		fmt.Println("* None!")
+		fmt.Println("\r* None!")
 		return
 	}
 	for id, conn := range connections {
-		fmt.Printf("* ID: %s, Remote: %s, User: %s, Uptime: %s\r\n",
-			id, conn.sshConn.RemoteAddr(), conn.sshConn.User(),
+		fmt.Printf("\r* ID %s: %s@%s [Up: %s]\r\n",
+			id, conn.sshConn.User(), conn.sshConn.RemoteAddr(),
 			time.Since(conn.startTime).Round(time.Second))
 	}
 }
@@ -351,6 +357,7 @@ func killConnection() {
 			return
 		}
 		input = line
+
 	case <-time.After(10 * time.Second):
 		fmt.Println("\nPrompt timed out.")
 		return
@@ -372,7 +379,7 @@ func killConnection() {
 	}
 
 	fmt.Printf("Killing connection %s...\n", id)
-	conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n"))
+	conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
 	conn.sshConn.Close()
 }
 
@@ -434,18 +441,27 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
 
+	if !suppressLogs {
+		host, _, err := net.SplitHostPort(rawConn.RemoteAddr().String())
+		if err != nil {
+			host = rawConn.RemoteAddr().String()
+		}
+		log.Printf("INITIATE [%s] %s", sid, host)
+	}
+
 	config := &ssh.ServerConfig{
 		PasswordCallback: func(
 			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) {
-			return nil, nil
+			// Allow password authentication fallback.
+			return &ssh.Permissions{Extensions: map[string]string{"auth-method": "password"}}, nil
 		},
 		PublicKeyCallback: func(
 			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) {
 			line := fmt.Sprintf(
-				"CONNECT %s@%s [%s] %q:%s",
+				"VALIDATE [%s] %s@%s %q:%s",
+				sid,
 				c.User(),
 				c.RemoteAddr(),
-				sid,
 				pubKey.Type(),
 				ssh.FingerprintSHA256(pubKey),
 			)
@@ -453,12 +469,12 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 				log.Print(line)
 			}
 			keyLog = append(keyLog, line)
-			return nil, nil
+			return &ssh.Permissions{Extensions: map[string]string{"auth-method": "publickey"}}, fmt.Errorf("next key")
 		},
 		KeyboardInteractiveCallback: func(
 			conn ssh.ConnMetadata,
 			challenge ssh.KeyboardInteractiveChallenge) (*ssh.Permissions, error) {
-			return nil, nil
+			return &ssh.Permissions{Extensions: map[string]string{"auth-method": "keyboard-interactive"}}, nil
 		},
 	}
 	config.AddHostKey(edSigner)
@@ -470,8 +486,23 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 	sshConn, chans, reqs, err := ssh.NewServerConn(rawConn, config)
 	if err != nil {
-		log.Printf("SSH HANDSHAKE FAILED: %v", err)
+		log.Printf("TEARDOWN [%s] HANDSHAKE FAILED: %v", sid, err)
 		return
+	}
+
+	var authMethod string
+	switch sshConn.Permissions.Extensions["auth-method"] {
+	case "password":
+		authMethod = "password"
+
+	case "publickey":
+		authMethod = "publickey"
+
+	case "keyboard-interactive":
+		authMethod = "keyboard-interactive"
+
+	default:
+		authMethod = "unknown"
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -504,17 +535,37 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		if !suppressLogs {
 			host, _, err := net.SplitHostPort(conn.hostName)
 			if err != nil {
-				log.Printf("DISCONNECT %s@<UNKNOWN> [%s]", conn.userName, sid)
+				log.Printf("TEARDOWN [%s] %s@<UNKNOWN>",
+					sid, func() string {
+						if conn.userName == "" {
+							return "<UNKNOWN>"
+						}
+						return conn.userName
+					}())
 			} else {
-				log.Printf("DISCONNECT %s@%s [%s]", conn.userName, host, sid)
+				log.Printf("TEARDOWN [%s] %s@%s",
+					sid, func() string {
+						if conn.userName == "" {
+							return "<UNKNOWN>"
+						}
+						return conn.userName
+					}(), host)
 			}
 		}
 	}()
 
 	addr := sshConn.RemoteAddr().String()
+	handshakeLog := fmt.Sprintf("VALIDATE [%s] %s@%s \"ssh\":%s",
+		sid, func() string {
+			if conn.userName == "" {
+				return "<UNKNOWN>"
+			}
+			return conn.userName
+		}(), addr, authMethod)
 	if !suppressLogs {
-		log.Printf("CONNECT %s@%s [%s]", conn.userName, addr, sid)
+		log.Print(handshakeLog)
 	}
+	keyLog = append(keyLog, handshakeLog)
 
 	go ssh.DiscardRequests(reqs)
 
@@ -573,7 +624,7 @@ func handleSession(
 	if !noLog {
 		logfile, basePath, err = createDatedLog(conn.ID, conn.sshConn.RemoteAddr())
 		if err != nil {
-			fmt.Fprintf(channel, "log file error: %v\r\n", err)
+			fmt.Fprintf(channel, "%v\r\n", err)
 			channel.Close()
 			return
 		}
@@ -581,14 +632,14 @@ func handleSession(
 		conn.basePath = basePath
 		logwriter = logfile
 
-		logwriter.Write([]byte(nowStamp() + "\r\n Session start\r\n"))
+		logwriter.Write([]byte(nowStamp() + " Session start\r\n"))
 
 		for _, line := range keyLog {
 			logwriter.Write([]byte(nowStamp() + " " + line + "\r\n"))
 		}
 
 		defer func() {
-			logwriter.Write([]byte(nowStamp() + "\r\n Session end\r\n"))
+			logwriter.Write([]byte(nowStamp() + " Session end\r\n"))
 			closeAndCompressLog(logfile, basePath+".log")
 		}()
 	} else {
@@ -600,8 +651,10 @@ func handleSession(
 			switch req.Type {
 			case "pty-req":
 				req.Reply(true, nil)
+
 			case "shell":
 				req.Reply(true, nil)
+
 			default:
 				req.Reply(false, nil)
 			}
@@ -611,7 +664,7 @@ func handleSession(
 	remote, err := net.Dial("tcp", fmt.Sprintf("%s:%d", telnetHost, telnetPort))
 	if err != nil {
 		fmt.Fprintf(channel, "%v\r\n\r\n", err)
-		log.Printf("ERROR: %v", err)
+		log.Printf("%v", err)
 		channel.Close()
 		return
 	}
