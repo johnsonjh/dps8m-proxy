@@ -59,7 +59,6 @@ var (
 	telnetPort           int
 	debugNegotiation     bool
 	logDir               string
-	usersOnline          int32
 	gracefulShutdownMode atomic.Bool
 	connections          = make(map[string]*Connection)
 	connectionsMutex     sync.Mutex
@@ -68,6 +67,7 @@ var (
 	originalLogOutput    io.Writer
 	logBuffer            *strings.Builder
 	logBufferMutex       sync.Mutex
+	shutdownSignal       chan struct{}
 )
 
 type Connection struct {
@@ -91,6 +91,7 @@ func init() {
 	flag.StringVar(&logDir, "log-dir", "./log", "Base directory for session logs")
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
+	shutdownSignal = make(chan struct{})
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,10 +127,26 @@ func main() {
 		immediateShutdown()
 	}()
 
+	go func() {
+		<-shutdownSignal
+		log.Println("Received shutdown signal. Exiting.")
+		os.Exit(0)
+	}()
+
 	for {
 		rawConn, err := listener.Accept()
 		if err != nil {
 			if gracefulShutdownMode.Load() {
+				connectionsMutex.Lock()
+				if len(connections) == 0 {
+					connectionsMutex.Unlock()
+					select {
+					case shutdownSignal <- struct{}{}:
+					default:
+					}
+				} else {
+					connectionsMutex.Unlock()
+				}
 				return
 			}
 			log.Printf("ACCEPT ERROR: %v", err)
@@ -139,6 +156,8 @@ func main() {
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func handleConsoleInput() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
@@ -146,7 +165,6 @@ func handleConsoleInput() {
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}
-		fmt.Print("> ")
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			log.Printf("Console read error: %v", err)
@@ -171,9 +189,20 @@ func handleConsoleInput() {
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func showHelp() {
-	fmt.Println("\n? - Help\nq - Graceful Shutdown\nQ - Immediate Shutdown\nl - List Connections\nk - Kill Connection")
+	fmt.Println("\r\n" +
+		"\r +========================+\r\n" +
+		"\r | ? - Help               |\r\n" +
+		"\r | l - List Connections   |\r\n" +
+		"\r | k - Kill Connection    |\r\n" +
+		"\r | q - Graceful Shutdown  |\r\n" +
+		"\r | Q - Immediate Shutdown |\r\n" +
+		"\r +========================+\r\n")
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func toggleGracefulShutdown() {
 	if gracefulShutdownMode.Load() {
@@ -181,16 +210,21 @@ func toggleGracefulShutdown() {
 		log.Println("Graceful shutdown aborted.")
 	} else {
 		gracefulShutdownMode.Store(true)
-		log.Println("Graceful shutdown initiated. No new connections will be accepted.")
+		log.Println("No new connections will be accepted.")
+		log.Println("Graceful shutdown initiated.")
 		connectionsMutex.Lock()
 		if len(connections) == 0 {
 			connectionsMutex.Unlock()
-			log.Println("No active connections. Shutting down.")
-			os.Exit(0)
+			select {
+			case shutdownSignal <- struct{}{}:
+			default:
+			}
 		}
 		connectionsMutex.Unlock()
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func immediateShutdown() {
 	shutdownOnce.Do(func() {
@@ -203,6 +237,9 @@ func immediateShutdown() {
 			if conn.cancelFunc != nil {
 				conn.cancelFunc()
 			}
+			if conn.sshConn != nil {
+				conn.sshConn.Close()
+			}
 			if conn.logFile != nil {
 				conn.logFile.Close()
 				os.Rename(conn.basePath+".open.log", conn.basePath+".log")
@@ -210,7 +247,6 @@ func immediateShutdown() {
 		}
 		connectionsMutex.Unlock()
 
-		// Wait for all connections to be removed from the map
 		for {
 			connectionsMutex.Lock()
 			if len(connections) == 0 {
@@ -218,12 +254,14 @@ func immediateShutdown() {
 				break
 			}
 			connectionsMutex.Unlock()
-			time.Sleep(100 * time.Millisecond) // Wait a bit before checking again
+			time.Sleep(100 * time.Millisecond)
 		}
 		log.Println("All connections closed. Exiting.")
 		os.Exit(0)
 	})
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func listConnections() {
 	connectionsMutex.Lock()
@@ -239,12 +277,16 @@ func listConnections() {
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func startBufferingLogs() {
 	logBufferMutex.Lock()
 	defer logBufferMutex.Unlock()
 	logBuffer.Reset()
 	log.SetOutput(io.MultiWriter(originalLogOutput, logBuffer))
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func stopBufferingLogs() {
 	logBufferMutex.Lock()
@@ -255,6 +297,8 @@ func stopBufferingLogs() {
 		logBuffer.Reset()
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func killConnection() {
 	consoleInputActive.Store(true)
@@ -301,12 +345,12 @@ func killConnection() {
 	connectionsMutex.Unlock()
 
 	if !ok {
-		fmt.Printf("Session ID '%s' not found.\n", id)
+		fmt.Printf("Session ID '%s' not found.\r\n", id)
 		return
 	}
 
 	fmt.Printf("Killing connection %s...\n", id)
-	conn.channel.Write([]byte("\r\nCONNECTION TERMINATED BY ADMINISTRATOR\r\n"))
+	conn.channel.Write([]byte("\r\nCONNECTION TERMINATED\r\n"))
 	conn.sshConn.Close()
 }
 
@@ -417,15 +461,21 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	defer func() {
 		connectionsMutex.Lock()
 		delete(connections, sid)
-		connectionsMutex.Unlock()
-		count := atomic.AddInt32(&usersOnline, -1)
-		log.Printf("DISCONNECT (SSH) [%s] (%d)", sid, count)
+		if gracefulShutdownMode.Load() && len(connections) == 0 {
+			connectionsMutex.Unlock()
+			select {
+			case shutdownSignal <- struct{}{}:
+			default:
+				// Channel already closed or signal sent, do nothing
+			}
+		} else {
+			connectionsMutex.Unlock()
+		}
+		log.Printf("DISCONNECT (SSH) [%s]", sid)
 	}()
 
-	count := atomic.AddInt32(&usersOnline, 1)
 	addr := sshConn.RemoteAddr().String()
-	log.Printf("CONNECT %s [%s] (%d)",
-		addr, sid, count)
+	log.Printf("CONNECT %s [%s]", addr, sid)
 
 	go ssh.DiscardRequests(reqs)
 
