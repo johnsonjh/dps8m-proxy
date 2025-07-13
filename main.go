@@ -16,7 +16,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"encoding/base64"
+	"encoding/hex"
 	"encoding/pem"
 	"flag"
 	"fmt"
@@ -239,7 +239,7 @@ func immediateShutdown() {
 		connectionsMutex.Lock()
 		for _, conn := range connections {
 			if conn.channel != nil {
-				conn.channel.Write([]byte("\r\nCONNECTION TERMINATED\r\n"))
+				conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n"))
 			}
 			if conn.cancelFunc != nil {
 				conn.cancelFunc()
@@ -275,9 +275,9 @@ func listConnections() {
 	connectionsMutex.Lock()
 	defer connectionsMutex.Unlock()
 	fmt.Println("\r\nActive Connections")
-	fmt.Println("\r\n------------------")
+	fmt.Println("\r==================")
 	if len(connections) == 0 {
-		fmt.Println("  None")
+		fmt.Println("* None!")
 		return
 	}
 	for id, conn := range connections {
@@ -360,7 +360,7 @@ func killConnection() {
 	}
 
 	fmt.Printf("Killing connection %s...\n", id)
-	conn.channel.Write([]byte("\r\nCONNECTION TERMINATED\r\n"))
+	conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n"))
 	conn.sshConn.Close()
 }
 
@@ -535,7 +535,7 @@ func handleSession(
 	start := time.Now()
 	var sshIn, sshOut, telnetIn, telnetOut uint64
 
-	logfile, basePath, err := createDatedLog(conn.sshConn.RemoteAddr())
+	logfile, basePath, err := createDatedLog(conn.ID, conn.sshConn.RemoteAddr())
 	if err != nil {
 		fmt.Fprintf(channel, "log file error: %v\n", err)
 		channel.Close()
@@ -646,11 +646,11 @@ func handleSession(
 				dur := time.Since(start).Seconds()
 				channel.Write([]byte("\r\nCONNECTION CLOSED\r\n\r\n"))
 				channel.Write([]byte(fmt.Sprintf(
-					">> SSH: in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
+					">> SSH - in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
 					sshIn, sshOut, float64(sshIn)/dur, float64(sshOut)/dur,
 				)))
 				channel.Write([]byte(fmt.Sprintf(
-					">> NVT: in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n\r\n",
+					">> NVT - in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n\r\n",
 					telnetIn, telnetOut, float64(telnetIn)/dur, float64(telnetOut)/dur,
 				)))
 				channel.Close()
@@ -789,11 +789,11 @@ func optName(b byte) string {
 
 func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
 	sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) {
-	menu := "\r\n\r\n" +
-		" +===== MENU =====+\r\n" +
-		" | 1 - Send Break |\r\n" +
-		" | 2 - Show Stats |\r\n" +
-		" +================+\r\n"
+	menu := "\r\n" +
+		"\r +===== MENU =====+\r\n" +
+		"\r | 1 - Send Break |\r\n" +
+		"\r | 2 - Show Stats |\r\n" +
+		"\r +================+\r\n"
 	ch.Write([]byte(menu))
 	sel := make([]byte, 1)
 
@@ -802,35 +802,38 @@ func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
 		case '1':
 			remote.Write([]byte{IAC, 243}) // BREAK
 			logw.Write([]byte{IAC, 243})
-			ch.Write([]byte("\r\n>> Sent BREAK\r\n"))
+			ch.Write([]byte("\r\n >> Sent BREAK <<\r\n"))
+			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
 		case '2':
 			dur := time.Since(start).Seconds()
 			ch.Write([]byte("\r\n"))
 			ch.Write([]byte(fmt.Sprintf(
-				">> SSH: in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
+				">> SSH -in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
 				atomic.LoadUint64(sshIn),
 				atomic.LoadUint64(sshOut),
 				float64(atomic.LoadUint64(sshIn))/dur,
 				float64(atomic.LoadUint64(sshOut))/dur,
 			)))
 			ch.Write([]byte(fmt.Sprintf(
-				">> NVT: in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n\r\n",
+				">> NVT - in: %d bytes, out: %d bytes, in rate: %.2f B/s, out rate: %.2f B/s\r\n",
 				atomic.LoadUint64(telnetIn),
 				atomic.LoadUint64(telnetOut),
 				float64(atomic.LoadUint64(telnetIn))/dur,
 				float64(atomic.LoadUint64(telnetOut))/dur,
 			)))
+			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
 		default:
-			ch.Write([]byte("\r\n>> Unknown option!\r\n"))
+			ch.Write([]byte("\r\n>> Unknown option <<\r\n"))
+			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 		}
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func createDatedLog(addr net.Addr) (*os.File, string, error) {
+func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	host, _, _ := net.SplitHostPort(addr.String())
 	ipDir := sanitizeIP(host)
 	now := time.Now()
@@ -848,7 +851,7 @@ func createDatedLog(addr net.Addr) (*os.File, string, error) {
 	ts := now.Format("150405")
 	files, _ := ioutil.ReadDir(dir)
 	maxSeq := 0
-	prefix := ts + "_"
+	prefix := ts + "_" + sid + "_"
 	for _, f := range files {
 		if strings.HasPrefix(f.Name(), prefix) {
 			parts := strings.SplitN(f.Name()[len(prefix):], ".", 2)
@@ -859,7 +862,7 @@ func createDatedLog(addr net.Addr) (*os.File, string, error) {
 	}
 
 	seq := maxSeq + 1
-	base := fmt.Sprintf("%s_%d", ts, seq)
+	base := fmt.Sprintf("%s_%s_%d", ts, sid, seq)
 	pathBase := filepath.Join(dir, base)
 	f, err := os.OpenFile(pathBase+".open.log",
 		os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
@@ -876,9 +879,9 @@ func sanitizeIP(s string) string {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func newSessionID() string {
-	b := make([]byte, 4)
+	b := make([]byte, 3)
 	rand.Read(b)
-	return base64.RawURLEncoding.EncodeToString(b)
+	return hex.EncodeToString(b)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
