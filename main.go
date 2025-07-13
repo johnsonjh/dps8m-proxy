@@ -2,7 +2,7 @@
 // DPS8M Proxy
 // Copyright (c) 2025 Jeffrey H. Johnson
 // SPDX-License-Identifier: MIT
-// vim: set ft=go noexpandtab tabstop=4 :
+// vim: set ft=go noexpandtab tabstop=4 cc=100 :
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 package main
@@ -11,6 +11,7 @@ package main
 
 import (
 	"bufio"
+	"compress/gzip"
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
@@ -69,7 +70,10 @@ var (
 	logBuffer              *strings.Builder
 	logBufferMutex         sync.Mutex
 	shutdownSignal         chan struct{}
+	noCompress             bool
 )
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 type Connection struct {
 	ID         string
@@ -90,6 +94,7 @@ func init() {
 	flag.IntVar(&telnetPort, "telnet-port", 6180, "TELNET target port")
 	flag.BoolVar(&debugNegotiation, "debug", false, "Debug TELNET negotiation")
 	flag.StringVar(&logDir, "log-dir", "./log", "Base directory for session logs")
+	flag.BoolVar(&noCompress, "no-compress", false, "Disable gzip compression on log files")
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
@@ -248,8 +253,7 @@ func immediateShutdown() {
 				conn.sshConn.Close()
 			}
 			if conn.logFile != nil {
-				conn.logFile.Close()
-				os.Rename(conn.basePath+".open.log", conn.basePath+".log")
+				closeAndCompressLog(conn.logFile, conn.basePath+".log")
 			}
 		}
 
@@ -551,8 +555,7 @@ func handleSession(
 	}
 
 	defer func() {
-		logfile.Close()
-		os.Rename(basePath+".open.log", basePath+".log")
+		closeAndCompressLog(logfile, basePath+".log")
 	}()
 
 	go func() {
@@ -864,10 +867,56 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	seq := maxSeq + 1
 	base := fmt.Sprintf("%s_%s_%d", ts, sid, seq)
 	pathBase := filepath.Join(dir, base)
-	f, err := os.OpenFile(pathBase+".open.log",
+	f, err := os.OpenFile(pathBase+".log",
 		os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
 
 	return f, pathBase, err
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func closeAndCompressLog(logfile *os.File, logFilePath string) {
+	err := logfile.Close()
+	if err != nil {
+		return
+	}
+
+	if noCompress {
+		return
+	}
+
+	compressedFilePath := logFilePath + ".gz"
+
+	data, err := ioutil.ReadFile(logFilePath)
+	if err != nil {
+		log.Printf("Error reading log file %s for compression: %v", logFilePath, err)
+		return
+	}
+
+	gzFile, err := os.Create(compressedFilePath)
+	if err != nil {
+		log.Printf("Error creating compressed file %s: %v", compressedFilePath, err)
+		return
+	}
+	defer gzFile.Close()
+
+	gzipWriter := gzip.NewWriter(gzFile)
+	_, err = gzipWriter.Write(data)
+	if err != nil {
+		log.Printf("Error writing to compressed file %s: %v", compressedFilePath, err)
+		return
+	}
+
+	err = gzipWriter.Close()
+	if err != nil {
+		log.Printf("Error closing gzip writer for %s: %v", compressedFilePath, err)
+		return
+	}
+
+	err = os.Remove(logFilePath)
+	if err != nil {
+		log.Printf("Error removing original log file %s after compression: %v", logFilePath, err)
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

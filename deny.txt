@@ -5,4 +5,4 @@
 |___/ \___/ |_|   |_|    \__, |( ) |_|  |_|   |_| \___||_| |_| \__,_|(_)
                          |___/ |/
 
-The system is shutting down.  New connections are currently unavailable.
+No new connections are allowed.  The system is currently unavailable.
