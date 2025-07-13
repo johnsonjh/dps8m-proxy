@@ -10,6 +10,7 @@ package main
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 import (
+	"bufio"
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
@@ -24,11 +25,13 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"golang.org/x/crypto/ssh"
@@ -51,13 +54,32 @@ const (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 var (
-	sshAddr          string
-	telnetHost       string
-	telnetPort       int
-	debugNegotiation bool
-	logDir           string
-	usersOnline      int32
+	sshAddr              string
+	telnetHost           string
+	telnetPort           int
+	debugNegotiation     bool
+	logDir               string
+	usersOnline          int32
+	gracefulShutdownMode atomic.Bool
+	connections          = make(map[string]*Connection)
+	connectionsMutex     sync.Mutex
+	shutdownOnce         sync.Once
+	consoleInputActive   atomic.Bool
+	originalLogOutput    io.Writer
+	logBuffer            *strings.Builder
+	logBufferMutex       sync.Mutex
 )
+
+type Connection struct {
+	ID         string
+	sshConn    *ssh.ServerConn
+	channel    ssh.Channel
+	startTime  time.Time
+	logFile    *os.File
+	basePath   string
+	cancelCtx  context.Context
+	cancelFunc context.CancelFunc
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -67,6 +89,8 @@ func init() {
 	flag.IntVar(&telnetPort, "telnet-port", 6180, "TELNET target port")
 	flag.BoolVar(&debugNegotiation, "debug", false, "Debug TELNET negotiation")
 	flag.StringVar(&logDir, "log-dir", "./log", "Base directory for session logs")
+	originalLogOutput = log.Writer()
+	logBuffer = &strings.Builder{}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,17 +112,202 @@ func main() {
 	if err != nil {
 		log.Fatalf("LISTEN %s: %v", sshAddr, err)
 	}
+	defer listener.Close()
 
 	log.Printf("SSH LISTEN ON %s", sshAddr)
+	log.Printf("Type '?' for help.")
+
+	go handleConsoleInput()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigChan
+		immediateShutdown()
+	}()
 
 	for {
 		rawConn, err := listener.Accept()
 		if err != nil {
+			if gracefulShutdownMode.Load() {
+				return
+			}
 			log.Printf("ACCEPT ERROR: %v", err)
 			continue
 		}
 		go handleConn(rawConn, edSigner, rsaSigner)
 	}
+}
+
+func handleConsoleInput() {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		if consoleInputActive.Load() {
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+		fmt.Print("> ")
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			log.Printf("Console read error: %v", err)
+			return
+		}
+		cmd := strings.TrimSpace(input)
+		switch cmd {
+		case "?", "h", "H":
+			showHelp()
+		case "q":
+			toggleGracefulShutdown()
+		case "Q":
+			immediateShutdown()
+		case "l":
+			listConnections()
+		case "k":
+			killConnection()
+		case "":
+		default:
+			log.Printf("Unknown command: %s", cmd)
+		}
+	}
+}
+
+func showHelp() {
+	fmt.Println("\n? - Help\nq - Graceful Shutdown\nQ - Immediate Shutdown\nl - List Connections\nk - Kill Connection")
+}
+
+func toggleGracefulShutdown() {
+	if gracefulShutdownMode.Load() {
+		gracefulShutdownMode.Store(false)
+		log.Println("Graceful shutdown aborted.")
+	} else {
+		gracefulShutdownMode.Store(true)
+		log.Println("Graceful shutdown initiated. No new connections will be accepted.")
+		connectionsMutex.Lock()
+		if len(connections) == 0 {
+			connectionsMutex.Unlock()
+			log.Println("No active connections. Shutting down.")
+			os.Exit(0)
+		}
+		connectionsMutex.Unlock()
+	}
+}
+
+func immediateShutdown() {
+	shutdownOnce.Do(func() {
+		log.Println("Immediate shutdown initiated.")
+		connectionsMutex.Lock()
+		for _, conn := range connections {
+			if conn.channel != nil {
+				conn.channel.Write([]byte("\r\nCONNECTION TERMINATED\r\n"))
+			}
+			if conn.cancelFunc != nil {
+				conn.cancelFunc()
+			}
+			if conn.logFile != nil {
+				conn.logFile.Close()
+				os.Rename(conn.basePath+".open.log", conn.basePath+".log")
+			}
+		}
+		connectionsMutex.Unlock()
+
+		// Wait for all connections to be removed from the map
+		for {
+			connectionsMutex.Lock()
+			if len(connections) == 0 {
+				connectionsMutex.Unlock()
+				break
+			}
+			connectionsMutex.Unlock()
+			time.Sleep(100 * time.Millisecond) // Wait a bit before checking again
+		}
+		log.Println("All connections closed. Exiting.")
+		os.Exit(0)
+	})
+}
+
+func listConnections() {
+	connectionsMutex.Lock()
+	defer connectionsMutex.Unlock()
+	fmt.Println("\nActive Connections:")
+	if len(connections) == 0 {
+		fmt.Println("  None")
+		return
+	}
+	for id, conn := range connections {
+		fmt.Printf("  ID: %s, Remote: %s, User: %s, Uptime: %s\n",
+			id, conn.sshConn.RemoteAddr(), conn.sshConn.User(), time.Since(conn.startTime).Round(time.Second))
+	}
+}
+
+func startBufferingLogs() {
+	logBufferMutex.Lock()
+	defer logBufferMutex.Unlock()
+	logBuffer.Reset()
+	log.SetOutput(io.MultiWriter(originalLogOutput, logBuffer))
+}
+
+func stopBufferingLogs() {
+	logBufferMutex.Lock()
+	defer logBufferMutex.Unlock()
+	log.SetOutput(originalLogOutput)
+	if logBuffer.Len() > 0 {
+		fmt.Print(logBuffer.String())
+		logBuffer.Reset()
+	}
+}
+
+func killConnection() {
+	consoleInputActive.Store(true)
+	defer consoleInputActive.Store(false)
+
+	startBufferingLogs()
+	defer stopBufferingLogs()
+
+	fmt.Print("Enter session ID to kill: ")
+	reader := bufio.NewReader(os.Stdin)
+
+	var input string
+
+	inputChan := make(chan string, 1)
+	go func() {
+		line, readErr := reader.ReadString('\n')
+		if readErr != nil {
+			log.Printf("Error reading session ID: %v", readErr)
+			close(inputChan)
+			return
+		}
+		inputChan <- line
+	}()
+
+	select {
+	case line, ok := <-inputChan:
+		if !ok {
+			return
+		}
+		input = line
+	case <-time.After(10 * time.Second):
+		fmt.Println("\nPrompt timed out.")
+		return
+	}
+
+	id := strings.TrimSpace(input)
+	if id == "" {
+		fmt.Println("Aborted.")
+		return
+	}
+
+	connectionsMutex.Lock()
+	conn, ok := connections[id]
+	connectionsMutex.Unlock()
+
+	if !ok {
+		fmt.Printf("Session ID '%s' not found.\n", id)
+		return
+	}
+
+	fmt.Printf("Killing connection %s...\n", id)
+	conn.channel.Write([]byte("\r\nCONNECTION TERMINATED BY ADMINISTRATOR\r\n"))
+	conn.sshConn.Close()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,7 +400,27 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		log.Printf("SSH HANDSHAKE FAILED: %v", err)
 		return
 	}
-	defer sshConn.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	conn := &Connection{
+		ID:         sid,
+		sshConn:    sshConn,
+		startTime:  time.Now(),
+		cancelCtx:  ctx,
+		cancelFunc: cancel,
+	}
+
+	connectionsMutex.Lock()
+	connections[sid] = conn
+	connectionsMutex.Unlock()
+
+	defer func() {
+		connectionsMutex.Lock()
+		delete(connections, sid)
+		connectionsMutex.Unlock()
+		count := atomic.AddInt32(&usersOnline, -1)
+		log.Printf("DISCONNECT (SSH) [%s] (%d)", sid, count)
+	}()
 
 	count := atomic.AddInt32(&usersOnline, 1)
 	addr := sshConn.RemoteAddr().String()
@@ -210,23 +439,32 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		if err != nil {
 			continue
 		}
-
-		go handleSession(sid, sshConn, ch, requests, keyLog)
+		conn.channel = ch
+		go handleSession(conn, ch, requests, keyLog, conn.cancelCtx)
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func handleSession(
-	sid string,
-	sshConn *ssh.ServerConn,
+	conn *Connection,
 	channel ssh.Channel,
 	requests <-chan *ssh.Request,
 	keyLog []string,
+	ctx context.Context,
 ) {
-	defer atomic.AddInt32(&usersOnline, -1)
 
-	sendBanner(sid, sshConn, channel)
+	if gracefulShutdownMode.Load() {
+		if denyMsg, err := ioutil.ReadFile("deny.txt"); err == nil {
+			channel.Write([]byte("\r\n"))
+			channel.Write(denyMsg)
+			channel.Write([]byte("\r\n"))
+		}
+		channel.Close()
+		return
+	}
+
+	sendBanner(conn.ID, conn.sshConn, channel)
 
 	if raw, err := ioutil.ReadFile("motd.txt"); err == nil {
 		txt := strings.ReplaceAll(strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
@@ -236,12 +474,14 @@ func handleSession(
 	start := time.Now()
 	var sshIn, sshOut, telnetIn, telnetOut uint64
 
-	logfile, basePath, err := createDatedLog(sshConn.RemoteAddr())
+	logfile, basePath, err := createDatedLog(conn.sshConn.RemoteAddr())
 	if err != nil {
 		fmt.Fprintf(channel, "log file error: %v\n", err)
 		channel.Close()
 		return
 	}
+	conn.logFile = logfile
+	conn.basePath = basePath
 
 	logfile.Write([]byte(nowStamp() + " Session start\r\n"))
 
@@ -288,13 +528,16 @@ func handleSession(
 	var wg sync.WaitGroup
 	wg.Add(2)
 
-	var once sync.Once
-
 	go func() {
 		defer wg.Done()
 		buf := make([]byte, 1)
 
 		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
 			n, err := channel.Read(buf)
 			if n > 0 {
 				atomic.AddUint64(&sshIn, uint64(n))
@@ -306,21 +549,11 @@ func handleSession(
 				atomic.AddUint64(&telnetOut, uint64(m))
 				logfile.Write(buf[:n])
 				if err2 != nil {
-					once.Do(func() {
-						log.Printf("DISCONNECT (SSH) [%s] (%d)",
-							sid, atomic.LoadInt32(&usersOnline)-1)
-					})
 					channel.Close()
 					return
 				}
 			}
 			if err != nil {
-				once.Do(func() {
-					ts := nowStamp()
-					log.Printf("DISCONNECT (SSH) [%s] (%d)",
-						sid, atomic.LoadInt32(&usersOnline)-1)
-					logfile.Write([]byte(ts + " DISCONNECT (SSH)\r\n"))
-				})
 				remote.Close()
 				return
 			}
@@ -331,6 +564,11 @@ func handleSession(
 		defer wg.Done()
 		buf := make([]byte, 1024)
 		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
 			n, err := remote.Read(buf)
 			if n > 0 {
 				atomic.AddUint64(&telnetIn, uint64(n))
@@ -357,12 +595,6 @@ func handleSession(
 					telnetIn, telnetOut,
 					float64(telnetIn)/dur, float64(telnetOut)/dur,
 				)))
-				once.Do(func() {
-					ts := nowStamp()
-					log.Printf("DISCONNECT (TELNET) [%s] (%d)",
-						sid, atomic.LoadInt32(&usersOnline)-1)
-					logfile.Write([]byte(ts + " DISCONNECT (TELNET)\r\n"))
-				})
 				channel.Close()
 				return
 			}
