@@ -555,6 +555,7 @@ func handleSession(
 	}
 
 	defer func() {
+		logfile.Write([]byte(nowStamp() + " Session end\r\n"))
 		closeAndCompressLog(logfile, basePath+".log")
 	}()
 
