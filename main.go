@@ -86,6 +86,8 @@ type Connection struct {
 	basePath   string
 	cancelCtx  context.Context
 	cancelFunc context.CancelFunc
+	userName   string
+	hostName   string
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,14 +197,17 @@ func handleConsoleInput() {
 
 func showHelp() {
 	fmt.Print("\r\n" +
-		"\r +========= HELP =========+\r\n" +
-		"\r | ? - Display This Help  |\r\n" +
-		"\r | l - List Connections   |\r\n" +
-		"\r | k - Kill Connection    |\r\n" +
-		"\r | d - Deny Connections   |\r\n" +
-		"\r | q - Graceful Shutdown  |\r\n" +
-		"\r | Q - Immediate Shutdown |\r\n" +
-		"\r +========================+\r\n\r\n")
+		"\r+========== HELP ==========+\r\n" +
+		"\r|                          |\r\n" +
+		"\r|  ? - Display This Help   |\r\n" +
+		"\r|  l - List Connections    |\r\n" +
+		"\r|  k - Kill Connection     |\r\n" +
+		"\r|  d - Deny Connections    |\r\n" +
+		"\r|  q - Graceful Shutdown   |\r\n" +
+		"\r|  Q - Immediate Shutdown  |\r\n" +
+		"\r|                          |\r\n" +
+		"\r+==========================+\r\n" +
+		"\r\n")
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -437,7 +442,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		PublicKeyCallback: func(
 			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) {
 			line := fmt.Sprintf(
-				"FROM %s@%s [%s] %q:%s",
+				"CONNECT %s@%s [%s] %q:%s",
 				c.User(),
 				c.RemoteAddr(),
 				sid,
@@ -476,6 +481,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		startTime:  time.Now(),
 		cancelCtx:  ctx,
 		cancelFunc: cancel,
+		userName:   sshConn.User(),
+		hostName:   sshConn.RemoteAddr().String(),
 	}
 
 	connectionsMutex.Lock()
@@ -495,13 +502,18 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 			connectionsMutex.Unlock()
 		}
 		if !suppressLogs {
-			log.Printf("DISCONNECT (SSH) [%s]", sid)
+			host, _, err := net.SplitHostPort(conn.hostName)
+			if err != nil {
+				log.Printf("DISCONNECT %s@<UNKNOWN> [%s]", conn.userName, sid)
+			} else {
+				log.Printf("DISCONNECT %s@%s [%s]", conn.userName, host, sid)
+			}
 		}
 	}()
 
 	addr := sshConn.RemoteAddr().String()
 	if !suppressLogs {
-		log.Printf("CONNECT %s [%s]", addr, sid)
+		log.Printf("CONNECT %s@%s [%s]", conn.userName, addr, sid)
 	}
 
 	go ssh.DiscardRequests(reqs)
@@ -818,22 +830,24 @@ func optName(b byte) string {
 func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
 	sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) {
 	menu := "\r\n" +
-		"\r +===== MENU =====+\r\n" +
-		"\r | 1 - Send Break |\r\n" +
-		"\r | 2 - Show Stats |\r\n" +
-		"\r +================+\r\n"
+		"\r+====== MENU ======+\r\n" +
+		"\r|                  |\r\n" +
+		"\r|  B - Send Break  |\r\n" +
+		"\r|  S - Show Stats  |\r\n" +
+		"\r|                  |\r\n" +
+		"\r+==================+\r\n"
 	ch.Write([]byte(menu))
 	sel := make([]byte, 1)
 
 	if _, err := ch.Read(sel); err == nil {
 		switch sel[0] {
-		case '1':
+		case 'b', 'B':
 			remote.Write([]byte{IAC, 243}) // BREAK
 			logw.Write([]byte{IAC, 243})
-			ch.Write([]byte("\r\n >> Sent BREAK <<\r\n"))
+			ch.Write([]byte("\r\n>> Sent BREAK\r\n"))
 			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
-		case '2':
+		case 's', 'S':
 			dur := time.Since(start).Seconds()
 			ch.Write([]byte("\r\n"))
 			ch.Write([]byte(fmt.Sprintf(
@@ -853,7 +867,6 @@ func showMenu(ch ssh.Channel, remote net.Conn, logw io.Writer,
 			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
 		default:
-			ch.Write([]byte("\r\n>> Unknown option <<\r\n"))
 			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 		}
 	}
