@@ -219,7 +219,7 @@ multi-process application of more than 10,000 SLOC: ≅8,000 lines of
 [C-Kermit](https://www.kermitproject.org/) (*yes, it has it’s own
 [programming language](https://www.kermitproject.org/ckututor.html)*)
 and ≅2,000 lines of [ksh93](https://github.com/ksh93/ksh) (along
-with a small amount of Perl 5).
+with a small amount of Perl 5), excluding some optional components.
 
 This new implementation replaces the original multi-process
 architecture with lightweight *Goroutines*, and achieves improved
