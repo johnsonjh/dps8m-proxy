@@ -197,8 +197,11 @@ func main() {
 			log.Fatalf("Error parsing blacklist: %v", err)
 		}
 		blacklistedNetworks = networks
-		log.Printf("Loaded %d entries from blacklist file: %s",
-			len(blacklistedNetworks), *blacklistFile)
+		if len(blacklistedNetworks) == 1 {
+			log.Printf("Loaded 1 entry from blacklist file: %s", *blacklistFile)
+		} else {
+			log.Printf("Loaded %d entries from blacklist file: %s", len(blacklistedNetworks), *blacklistFile)
+		}
 	}
 
 	if *whitelistFile != "" {
@@ -207,8 +210,11 @@ func main() {
 			log.Fatalf("Error parsing whitelist: %v", err)
 		}
 		whitelistedNetworks = networks
-		log.Printf("Loaded %d entries from whitelist file: %s",
-			len(whitelistedNetworks), *whitelistFile)
+		if len(whitelistedNetworks) == 1 {
+			log.Printf("Loaded 1 entry from whitelist file: %s", *whitelistFile)
+		} else {
+			log.Printf("Loaded %d entries from whitelist file: %s", len(whitelistedNetworks), *whitelistFile)
+		}
 	}
 
 	if *whitelistFile != "" && *blacklistFile == "" {
