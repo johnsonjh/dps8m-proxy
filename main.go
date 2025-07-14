@@ -80,12 +80,11 @@ var (
 	idleMax                int
 	timeMax                int
 	altHosts               = make(map[string]string)
-
-	blacklistedNetworks []*net.IPNet
-	whitelistedNetworks []*net.IPNet
-
-	blacklistFile = flag.String("blacklist", "", "Blacklist file (optional)")
-	whitelistFile = flag.String("whitelist", "", "Whitelist file (optional)")
+	blacklistFile          string
+	whitelistFile          string
+	allowRoot              bool
+	blacklistedNetworks    []*net.IPNet
+	whitelistedNetworks    []*net.IPNet
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -181,6 +180,15 @@ func init() {
 	flag.BoolVar(&noBanner,
 		"no-banner", false, "Disable SSH connection banner")
 
+	flag.StringVar(&blacklistFile,
+		"blacklist", "", "Blacklist file (optional)")
+
+	flag.StringVar(&whitelistFile,
+		"whitelist", "", "Whitelist file (optional)")
+
+	flag.BoolVar(&allowRoot,
+		"allow-root", false, "Allow running as root (UID 0) [strongly discouraged]")
+
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
@@ -191,46 +199,19 @@ func init() {
 func main() {
 	flag.Parse()
 
-	if *blacklistFile != "" {
-		networks, err := parseIPListFile(*blacklistFile)
-		if err != nil {
-			log.Fatalf("Error parsing blacklist: %v", err)
-		}
-		blacklistedNetworks = networks
-		if len(blacklistedNetworks) == 1 {
-			log.Printf("Loaded 1 entry from blacklist file: %s", *blacklistFile)
-		} else {
-			log.Printf("Loaded %d entries from blacklist file: %s", len(blacklistedNetworks), *blacklistFile)
-		}
+	if os.Getuid() == 0 && !allowRoot {
+		log.Fatalf("ERROR: Running as root is strongly discouraged.  Use -allow-root to override.")
 	}
 
-	if *whitelistFile != "" {
-		networks, err := parseIPListFile(*whitelistFile)
-		if err != nil {
-			log.Fatalf("Error parsing whitelist: %v", err)
-		}
-		whitelistedNetworks = networks
-		if len(whitelistedNetworks) == 1 {
-			log.Printf("Loaded 1 entry from whitelist file: %s", *whitelistFile)
-		} else {
-			log.Printf("Loaded %d entries from whitelist file: %s", len(whitelistedNetworks), *whitelistFile)
-		}
-	}
-
-	if *whitelistFile != "" && *blacklistFile == "" {
-		_, ipv4Net, _ := net.ParseCIDR("0.0.0.0/0")
-		_, ipv6Net, _ := net.ParseCIDR("::/0")
-		blacklistedNetworks = append(blacklistedNetworks, ipv4Net, ipv6Net)
-		log.Println("Whitelist enabled without blacklist; blacklisted all addresses by default.")
-	}
+	reloadLists()
 
 	if strings.Contains(telnetHostPort, "@") {
-		log.Fatalf("Error: -telnet-host cannot contain a username (e.g., 'user@'). Received: %s",
+		log.Fatalf("ERROR: -telnet-host cannot contain a username (e.g., 'user@'). Received: %s",
 			telnetHostPort)
 	}
 
 	if idleMax > 0 && timeMax > 0 && idleMax >= timeMax {
-		log.Fatalf("Error: -idle-max (%d) cannot be greater than or equal to -time-max (%d)",
+		log.Fatalf("ERROR: -idle-max (%d) cannot be greater than or equal to -time-max (%d)",
 			idleMax, timeMax)
 	}
 
@@ -249,6 +230,13 @@ func main() {
 		log.Fatalf("LISTEN %s: %v", sshAddr, err)
 	}
 	defer listener.Close()
+
+	pid := os.Getpid()
+	if pid != 0 {
+		log.Printf("STARTING PROXY [PID %d]", pid)
+	} else {
+		log.Printf("STARTING PROXY")
+	}
 
 	log.Printf("SSH LISTEN ON %s", sshAddr)
 
@@ -276,7 +264,8 @@ func main() {
 		for s := range sigChan {
 			switch s {
 			case syscall.SIGHUP:
-				log.Println("SIGHUP received and ignored.")
+				log.Println("SIGHUP received: Reloading whitelist and/or blacklist.")
+				reloadLists()
 
 			case syscall.SIGUSR1:
 				log.Println("SIGUSR1 received: Initiating graceful shutdown.")
@@ -404,6 +393,13 @@ func handleConsoleInput() {
 		case "k", "K":
 			killConnection()
 
+		case "R", "r":
+			if blacklistFile == "" && whitelistFile == "" {
+				log.Printf("NO ACCESS CONTROL LISTS ENABLED")
+			} else {
+				reloadLists()
+			}
+
 		case "":
 
 		default:
@@ -416,16 +412,17 @@ func handleConsoleInput() {
 
 func showHelp() {
 	fmt.Print("\r\n" +
-		"\r+========== HELP ==========+\r\n" +
-		"\r|                          |\r\n" +
-		"\r|  c - Show Configuration  |\r\n" +
-		"\r|  l - List Connections    |\r\n" +
-		"\r|  k - Kill Connection     |\r\n" +
-		"\r|  d - Deny Connections    |\r\n" +
-		"\r|  q - Graceful Shutdown   |\r\n" +
-		"\r|  Q - Immediate Shutdown  |\r\n" +
-		"\r|                          |\r\n" +
-		"\r+==========================+\r\n" +
+		"\r+========== HELP ===========+\r\n" +
+		"\r|                           |\r\n" +
+		"\r|  c - Show Configuration   |\r\n" +
+		"\r|  l - List Connections     |\r\n" +
+		"\r|  k - Kill Connection      |\r\n" +
+		"\r|  d - Deny Connections     |\r\n" +
+		"\r|  r - Reload Access Lists  |\r\n" +
+		"\r|  q - Graceful Shutdown    |\r\n" +
+		"\r|  Q - Immediate Shutdown   |\r\n" +
+		"\r|                           |\r\n" +
+		"\r+===========================+\r\n" +
 		"\r\n")
 }
 
@@ -558,26 +555,97 @@ func listConfiguration() {
 	fmt.Printf("\r* GRACEFUL SHUTDOWN: %t\r\n", gracefulShutdownMode.Load())
 	fmt.Printf("\r* DENY NEW CONNECTIONS: %t\r\n", denyNewConnectionsMode.Load())
 
-	if *blacklistFile == "" && len(blacklistedNetworks) == 0 {
+	if blacklistFile == "" && len(blacklistedNetworks) == 0 {
 		fmt.Printf("\r* BLACKLIST: disabled\r\n")
-	} else if *whitelistFile != "" && *blacklistFile == "" {
+	} else if whitelistFile != "" && blacklistFile == "" {
 		fmt.Printf("\r* BLACKLIST: deny all (due to whitelist only)\r\n")
 	} else {
 		if len(blacklistedNetworks) == 1 {
 			fmt.Printf("\r* BLACKLIST: 1 entry loaded\r\n")
 		} else {
-			fmt.Printf("\r* BLACKLIST: %d entries loaded\r\n", len(blacklistedNetworks))
+			fmt.Printf("\r* BLACKLIST: %d entries loaded\r\n",
+				len(blacklistedNetworks))
 		}
 	}
 
-	if *whitelistFile == "" {
+	if whitelistFile == "" {
 		fmt.Printf("\r* WHITELIST: disabled\r\n")
 	} else {
 		if len(whitelistedNetworks) == 1 {
 			fmt.Printf("\r* WHITELIST: 1 entry loaded\r\n")
 		} else {
-			fmt.Printf("\r* WHITELIST: %d entries loaded\r\n", len(whitelistedNetworks))
+			fmt.Printf("\r* WHITELIST: %d entries loaded\r\n",
+				len(whitelistedNetworks))
 		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func reloadLists() {
+	var newBlacklistedNetworks []*net.IPNet
+	var newWhitelistedNetworks []*net.IPNet
+	var reloadErrors []string
+
+	blacklistReloaded := false
+	whitelistReloaded := false
+
+	if blacklistFile != "" {
+		networks, err := parseIPListFile(blacklistFile)
+		if err != nil {
+			reloadErrors = append(
+				reloadErrors, fmt.Sprintf("BLACKLIST REJECTED: %v", err))
+		} else {
+			newBlacklistedNetworks = networks
+			blacklistReloaded = true
+		}
+	}
+
+	if whitelistFile != "" {
+		networks, err := parseIPListFile(whitelistFile)
+		if err != nil {
+			reloadErrors = append(
+				reloadErrors, fmt.Sprintf("WHITELIST REJECTED: %v", err))
+		} else {
+			newWhitelistedNetworks = networks
+			whitelistReloaded = true
+		}
+	}
+
+	if len(reloadErrors) > 0 {
+		for _, errMsg := range reloadErrors {
+			log.Printf("%s", errMsg)
+		}
+		return
+	}
+
+	if blacklistReloaded {
+		blacklistedNetworks = newBlacklistedNetworks
+		if len(blacklistedNetworks) == 1 {
+			log.Printf("BLACKLIST: 1 ENTRY LOADED [%s]",
+				blacklistFile)
+		} else {
+			log.Printf("BLACKLIST: %d ENTRIES LOADED [%s]",
+				len(blacklistedNetworks), blacklistFile)
+		}
+	}
+
+	if whitelistReloaded {
+		whitelistedNetworks = newWhitelistedNetworks
+		if len(whitelistedNetworks) == 1 {
+			log.Printf("WHITELIST: 1 ENTRY LOADED [%s]",
+				whitelistFile)
+		} else {
+			log.Printf("WHITELIST: %d ENTRIES LOADED [%s]",
+				len(whitelistedNetworks), whitelistFile)
+		}
+	}
+
+	if whitelistFile != "" && blacklistFile == "" {
+		_, ipv4Net, _ := net.ParseCIDR("0.0.0.0/0")
+		_, ipv6Net, _ := net.ParseCIDR("::/0")
+		blacklistedNetworks = append(blacklistedNetworks, ipv4Net, ipv6Net)
+		log.Println("NO BLACKLIST: BLACKLISTING ALL BY DEFAULT")
 	}
 }
 
@@ -652,10 +720,9 @@ func killConnection() {
 		return
 	}
 
-	fmt.Printf("Killing connection %s...\n", id)
 	conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
 	connUptime := time.Since(conn.startTime)
-	log.Printf("TERMKICK [%s] %s@%s (link time %s)",
+	log.Printf("TERMKILL [%s] %s@%s (link time %s)",
 		conn.ID, conn.userName, conn.hostName, connUptime.Round(time.Second))
 	conn.sshConn.Close()
 }
@@ -1631,7 +1698,7 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 			continue
 		}
 
-		return nil, fmt.Errorf("Invalid IP address or CIDR block \"%s\" on line %d of %s",
+		return nil, fmt.Errorf("BAD IP OR CIDR BLOCK \"%s\" ON LINE %d [%s]",
 			line, lineNumber, filePath)
 	}
 

@@ -60,8 +60,12 @@ to anyone who wants to provide modern SSH access to legacy systems.
 
 ```sh
 Usage of proxy:
+  -allow-root
+        Allow running as root (UID 0) [strongly discouraged]
   -alt-host value
         Alternate TELNET targets (user@host:port) [allowed multiple times]
+  -blacklist string
+        Blacklist file (optional)
   -debug
         Debug TELNET negotiation
   -idle-max int
@@ -80,6 +84,8 @@ Usage of proxy:
         Default TELNET target (host:port) (default "127.0.0.1:6180")
   -time-max int
         Maximum connection link time in seconds
+  -whitelist string
+        Whitelist file (optional)
 ```
 
 ### Port binding
@@ -99,6 +105,7 @@ Usage of proxy:
   * `l` - List active connections
   * `k` - Kill connection
   * `d` - Deny new Connections
+  * `r` - Reload Access Control Lists
   * `q` - Graceful shutdown
   * `Q` - Immediate shutdown (also via `^C`)
 
@@ -108,7 +115,7 @@ Usage of proxy:
   * `SIGINT` - enables the *Immediate shutdown* mode
   * `SIGUSR1` - enables the *Graceful shutdown* mode
   * `SIGUSR2` - enables the *Deny new connections* mode
-  * `SIGHUP` - detected but currently ignored
+  * `SIGHUP` - reloads Access Control Lists (`-whitelist`, `-blacklist`)
 
 ### Example setup
 
@@ -169,13 +176,13 @@ Users connected via SSH can send `^]` (*i.e.* `Control + ]`) during
 a session to access the following menu:
 
 ```
-+====== MENU ======+
-|                  |
-|  B - Send Break  |
-|  S - Show Satus  |
-|  X - Disconnect  |
-|                  |
-+==================+
++====== MENU =======+
+|                   |
+|  B - Send Break   |
+|  S - Show Status  |
+|  X - Disconnect   |
+|                   |
++===================+
 ```
 
 * `X` disconnects from the remote host (and ends the SSH session)

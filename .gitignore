@@ -9,3 +9,5 @@ log
 proxy
 ssh_host_ed25519_key.pem
 ssh_host_rsa_key.pem
+whitelist.txt
+blacklist.txt
