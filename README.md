@@ -19,35 +19,35 @@ to anyone needing to provide modern SSH access to legacy systems.
 ## Features
 
 <div>
-  ✅ SSH ⟷ TELNET gateway<br>
-  ✅ Session logging by date and host with automatic log compression<br>
-  ✅ Banners for accepted (`motd.txt`) and denied (`deny.txt`) connections<br>
-  ✅ Session connection monitoring with idle time tracking (and optional timeouts)<br>
-  ✅ Interactive connection management
+&nbsp;&nbsp;✅ SSH ⟷ TELNET gateway<br>
+&nbsp;&nbsp;✅ Session logging by date and host with automatic log compression<br>
+&nbsp;&nbsp;✅ Banners for accepted (<code>motd.txt</code>) and denied (<code>deny.txt</code>) connections<br>
+&nbsp;&nbsp;✅ Session connection monitoring with idle time tracking (and optional timeouts)<br>
+&nbsp;&nbsp;✅ Interactive connection management
 </div>
 
 ## Usage
 
 ### Installation
 
-The software can be installed using `go install`:
-```sh
-go install gitlab.com/dps8m/proxy@latest
-```
+1. The software can be installed using `go install`:
+   ```sh
+   go install gitlab.com/dps8m/proxy@latest
+   ```
+   * This will download the needed source, compile, and install the
+     binary to `${GOEXE}/bin/proxy` (which will be
+     `${HOME}/go/bin/proxy` for most users).
 
-This will download the needed source, compile, and install the binary
-to `${GOEXE}/bin/proxy` (which will be `${HOME}/go/bin/proxy` for most
-users).
-
-You can also clone the `git` repository
-([https://gitlab.com/dps8m/proxy.git](https://gitlab.com/dps8m/proxy.git))
-and build the source code using `go build`.  A
-[`Makefile`](https://gitlab.com/dps8m/proxy/-/blob/master/Makefile)
-is provided for convenience.  The `git` repository also contains
-example
-[`motd.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/motd.txt)
-and [`deny.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/deny.txt)
-files.
+2. You can also clone the
+   [`git` repository](https://gitlab.com/dps8m/proxy.git)) and build
+   the source code using `go build`.  A
+   [`Makefile`](https://gitlab.com/dps8m/proxy/-/blob/master/Makefile)
+   is provided for convenience.
+   * The `git` repository also contains
+     example[`motd.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/motd.txt)
+     and
+     [`deny.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/deny.txt)
+     files.
 
 ### Invocation
 
@@ -122,7 +122,7 @@ proxied to port `9998` on the host `mainframe`.
 ```
 $ dps8-proxy -telnet-host "legacybox:6180" -alt-host "elsewhere@mainframe:9998"  
 
-🅲
+c
 Configuration
 =============
 * SSH LISTEN ON: :2222
@@ -145,13 +145,13 @@ Configuration
 2025/07/13 23:20:03 INITIATE [08d679] 45.67.89.111
 2025/07/13 23:20:03 VALIDATE [08d679] john@45.67.89.111:39969
 
-🅻
+l
 Active Connections
 ==================
 * ID d4fcab: elsewhere@23.45.67.89:22139 [Link: 5s, Idle: 5s]
 * ID 08d679: john@45.67.89.111:39969 [Link: 2s, Idle: 2s]
 
-🅺
+k
 Enter session ID to kill: 08d679
 Killing connection 08d679...
 2025/07/13 23:20:21 TEARDOWN [08d679] john@45.67.89.111
@@ -173,9 +173,9 @@ a session to access the following menu:
 +==================+
 ```
 
-* `🅇` disconnects from the remote host (and ends the SSH session)
-* `🄱` sends an IAC `BREAK` signal to the remote host
-* `🅂` displays some session statistics:
+* `X` disconnects from the remote host (and ends the SSH session)
+* `B` sends an IAC `BREAK` signal to the remote host
+* `S` displays some session statistics:
   ```
   >> LNK - session total link time: 10s
   >> SSH - in: 354 bytes, out: 1289 bytes, in rate: 34.50 B/s, out rate: 125.63 B/s
