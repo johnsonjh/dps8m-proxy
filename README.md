@@ -115,7 +115,7 @@ Usage of proxy:
   * `SIGINT` - enables the *Immediate shutdown* mode
   * `SIGUSR1` - enables the *Graceful shutdown* mode
   * `SIGUSR2` - enables the *Deny new connections* mode
-  * `SIGHUP` - reloads Access Control Lists (`-whitelist`, `-blacklist`)
+  * `SIGHUP` - reloads *access control lists* (`-whitelist`, `-blacklist`)
 
 ### Example setup
 
