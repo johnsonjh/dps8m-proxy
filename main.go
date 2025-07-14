@@ -650,7 +650,7 @@ func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
-	sid := newSessionID()
+	sid := newSessionID(connections, &connectionsMutex)
 	keyLog := []string{}
 
 	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
@@ -732,7 +732,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		cancelFunc:        cancel,
 		userName:          sshConn.User(),
 		hostName:          sshConn.RemoteAddr().String(),
-		shareableUsername: newShareableUsername(),
+		shareableUsername: newShareableUsername(connections, &connectionsMutex),
 	}
 
 	connectionsMutex.Lock()
@@ -1421,22 +1421,48 @@ func sanitizeIP(s string) string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func newSessionID() string {
-	b := make([]byte, 3)
-	rand.Read(b)
-	return hex.EncodeToString(b)
+func newSessionID(connections map[string]*Connection, mutex *sync.Mutex) string {
+	for {
+		b := make([]byte, 3)
+		rand.Read(b)
+		id := hex.EncodeToString(b)
+
+		mutex.Lock()
+		_, exists := connections[id]
+		mutex.Unlock()
+
+		if !exists {
+			return id
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func newShareableUsername() string {
+func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex) string {
 	const chars = "abcdfghjkmnprstvwxyzACDFGHJKMNPRSTVWXYZ2345679" // LOL
-	b := make([]byte, 20)
-	rand.Read(b)
-	for i, v := range b {
-		b[i] = chars[v%byte(len(chars))]
+	for {
+		b := make([]byte, 20)
+		rand.Read(b)
+		for i, v := range b {
+			b[i] = chars[v%byte(len(chars))]
+		}
+		username := "_" + string(b)
+
+		mutex.Lock()
+		found := false
+		for _, conn := range connections {
+			if conn.shareableUsername == username {
+				found = true
+				break
+			}
+		}
+		mutex.Unlock()
+
+		if !found {
+			return username
+		}
 	}
-	return "_" + string(b)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
