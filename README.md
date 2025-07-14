@@ -58,7 +58,7 @@ to anyone who wants to provide modern SSH access to legacy systems.
 
 * The proxy can be invoked with the following command-line arguments:
 
-```sh
+```
 Usage of proxy:
   -allow-root
         Allow running as root (UID 0) [strongly discouraged]
