@@ -6,23 +6,23 @@
 
 ## Overview
 
-The `dps8m-proxy` program acts as a multi-user *terminal server* and
-proxy, accepting incoming **SSH** connections on the front-end and
-relaying (*or proxying*) these connections to one or more **TELNET**
-connections on the back-end.
+The `proxy` (or `dps8m-proxy`) program acts as a multi-user
+*terminal server* and proxy, accepting incoming **SSH** connections on
+the front-end and relaying (*or proxying*) these connections to one or
+more **TELNET** connections on the back-end.
 
-Although this program was written to meet the needs of the
-*BAN.AI Public Access Multics* system and the
-[DPS8M Simulator](https://dps8m.gitlab.io), it is may be useful to
-anyone who needs to provide modern SSH access to legacy systems.
+Although this program was originally written to meet the needs of the
+**BAN.AI Public Access Multics** system and the
+[DPS8M Simulator](https://dps8m.gitlab.io) project, it may be useful
+to anyone needing to provide modern SSH access to legacy systems.
 
 ## Features
 
-* SSH ↔ TELNET gateway
-* Session logging by date and host with automatic log compression
-* Banners for accepted (`motd.txt`) and denied (`deny.txt`) connections
-* Session connection and idle time tracking with optional timeout
-* Interactive connection management
+* ✅ SSH ⟷ TELNET gateway
+* ✅ Session logging by date and host with automatic log compression
+* ✅ Banners for accepted (`motd.txt`) and denied (`deny.txt`) connections
+* ✅ Session connection and idle time tracking with optional timeout
+* ✅ Interactive connection management
 
 ## Usage
 
@@ -30,7 +30,7 @@ anyone who needs to provide modern SSH access to legacy systems.
 
 * The proxy can be invoked with the following command-line arguments:
 
-```
+```sh
 Usage of dps8-proxy:
   -alt-host value
         Alternate TELNET targets (user@host:port) [allowed multiple times]
@@ -58,8 +58,10 @@ Usage of dps8-proxy:
 
 * If you want to listen on the regular SSH port of 22 (without
   running as `root`, which is strongly discouraged) on Linux systems
-  you can use `setcap` to allow the proxy to bind to low ports, *i.e.*
-  `set cap_net_bind_service=+ep' /path/to/dps8m-proxy`.
+  you can use `setcap` to allow the proxy to bind to low ports:
+  ```sh
+  set cap_net_bind_service=+ep' /path/to/dps8m-proxy
+  ```
 
 ### Admin interaction
 
@@ -70,7 +72,7 @@ Usage of dps8-proxy:
   * `k` - Kill connection
   * `d` - Deny new Connections
   * `q` - Graceful shutdown
-  * `Q` - Immediate shutdown
+  * `Q` - Immediate shutdown (also via `^C`)
 
 ### Signals
 
@@ -82,14 +84,14 @@ Usage of dps8-proxy:
 
 ### Example setup
 
-* ***TODO***: A complete example of a production installation using
+* 🚧 ***TODO***: A complete example of a production installation using
   Linux, with the proxy on port 22, executing as an isolated and
   unprivileged user, in a `tmux` session — *should be provided soon*.
 
 #### Example admin session
 
-The following examples shows the proxy listening on `*:2222` (the
-default) for SSH connections with any username, proxying them via
+The following example shows the proxy listening on `*:2222` (the
+default) for SSH connections (with any username), proxying them via
 TELNET to port `6180` on the host `legacybox`.  Users who supply the
 username `elsewhere` (*i.e.* `ssh -oPort=2222 elsewhere@proxybox`) are
 proxied to port `9998` on the host `mainframe`.
@@ -148,9 +150,9 @@ a session to access the following menu:
 +==================+
 ```
 
-* `X` disconnects from the remote host (and ends the SSH session)
-* `B` sends an IAC `BREAK` signal to the remote host
-* `S` displays some session statistics:
+* `🅇` disconnects from the remote host (and ends the SSH session)
+* `🄱` sends an IAC `BREAK` signal to the remote host
+* `🅂` displays some session statistics:
   ```
   >> LNK - session total link time: 10s
   >> SSH - in: 354 bytes, out: 1289 bytes, in rate: 34.50 B/s, out rate: 125.63 B/s
@@ -159,7 +161,7 @@ a session to access the following menu:
 
 ## History
 
-This version of `dps8m-proxy` is a from-scratch
+This version of the `dps8m-proxy` program is a from-scratch
 [Golang](https://go.dev/) reimplementation of an older legacy program
 of the same name, the original being an over-engineered and complex
 multi-process application of more than 10,000 SLOC: *~*8,000 lines of
