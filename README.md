@@ -149,6 +149,8 @@ Configuration
 * DEBUG: false
 * GRACEFUL SHUTDOWN: false
 * DENY NEW CONNECTIONS: false
+* BLACKLIST: 0 entries loaded
+* WHITELIST: 0 entries loaded
 
 2025/07/13 23:20:00 INITIATE [d4fcab] 23.45.67.89
 2025/07/13 23:20:00 VALIDATE [d4fcab] elsewhere@23.45.67.89:22139
