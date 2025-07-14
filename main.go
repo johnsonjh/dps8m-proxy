@@ -125,6 +125,7 @@ func (a *altHostFlag) Set(value string) error {
 	if len(parts) != 2 {
 		return fmt.Errorf("invalid alt-host format: %s, expected username@host:port", value)
 	}
+
 	username := parts[0]
 	hostPort := parts[1]
 
@@ -552,6 +553,7 @@ func killConnection() {
 	var input string
 
 	inputChan := make(chan string, 1)
+
 	go func() {
 		line, readErr := reader.ReadString('\n')
 		if readErr != nil {
@@ -842,6 +844,7 @@ func handleSession(
 	sendBanner(conn.ID, conn.sshConn, channel, conn)
 	if conn.monitoring {
 		log.Printf("UMONITOR [%s] %s -> %s", conn.ID, conn.userName, conn.monitoredConnection.ID)
+
 		go func() {
 			buf := make([]byte, 1)
 			for {
@@ -855,6 +858,7 @@ func handleSession(
 				}
 			}
 		}()
+
 		<-conn.monitoredConnection.cancelCtx.Done()
 		dur := time.Since(conn.startTime)
 		channel.Write([]byte(fmt.Sprintf(
@@ -1087,6 +1091,7 @@ func handleSession(
 			}
 		}
 	}()
+
 	wg.Wait()
 }
 
@@ -1096,11 +1101,13 @@ func sendBanner(sid string, sshConn *ssh.ServerConn, ch ssh.Channel, conn *Conne
 	if noBanner {
 		return
 	}
+
 	user := sshConn.User()
 	host, _, _ := net.SplitHostPort(sshConn.RemoteAddr().String())
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	names, _ := net.DefaultResolver.LookupAddr(ctx, host)
+
 	var origin string
 	if len(names) > 0 {
 		origin = fmt.Sprintf("%s [%s]", strings.TrimSuffix(names[0], "."), host)
@@ -1109,8 +1116,10 @@ func sendBanner(sid string, sshConn *ssh.ServerConn, ch ssh.Channel, conn *Conne
 	} else {
 		origin = host
 	}
+
 	now := nowStamp()
 	fmt.Fprintf(ch, "CONNECTION from %s started at %s.\r\n", origin, now)
+
 	if conn.monitoring {
 		fmt.Fprint(ch, "This is a READ-ONLY shared monitoring session.\r\n")
 		fmt.Fprint(ch, "Send Control-] to disconnect.\r\n")
@@ -1120,6 +1129,7 @@ func sendBanner(sid string, sshConn *ssh.ServerConn, ch ssh.Channel, conn *Conne
 				conn.userName)
 		}
 	}
+
 	fmt.Fprint(ch, "\r\n")
 }
 
@@ -1252,7 +1262,7 @@ func showMenu(conn *Connection, ch ssh.Channel, remote net.Conn, logw io.Writer,
 			dur := time.Since(start)
 			ch.Write([]byte("\r\n"))
 			ch.Write([]byte(fmt.Sprintf(
-				">> LNK - The username '%s' can be used to share this session.\r\n",
+				">> LNK - Username '%s' can be used to share this session.\r\n",
 				conn.shareableUsername)))
 			if conn.wasMonitored {
 				connectionsMutex.Lock()
@@ -1272,7 +1282,7 @@ func showMenu(conn *Connection, ch ssh.Channel, remote net.Conn, logw io.Writer,
 					userStr = "user"
 				}
 				ch.Write([]byte(fmt.Sprintf(
-					">> MON - The shared session has been viewed %d %s; %d %s currently online.\r\n",
+					">> MON - Shared session has been viewed %d %s; %d %s currently online.\r\n",
 					conn.totalMonitors, timesStr, currentMonitors, userStr)))
 			}
 
