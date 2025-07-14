@@ -27,7 +27,7 @@ to anyone who wants to provide modern SSH access to legacy systems.
 * ✅ User access to TELNET features (*e.g.* line BREAK) and statistics
 * ✅ Link filtering
 
-### Future
+## Future plans
 
 Some features are still missing in this implementation and will be
 added in future updates:
@@ -38,6 +38,8 @@ added in future updates:
   connection sharing.
 * The TELNET features currently implemented are minimal—enough to
   support DPS8M.  Improved protocol support is planned.
+
+## Not planned
 
 The original software “grew” some features that would be difficult
 to reimplement, existed but were buggy, or had very little actual use.
@@ -64,10 +66,6 @@ notes explaining why*):
 * Ability for users to download
   [ttyrec](https://nethackwiki.com/wiki/Ttyrec) format session logs.
 * Remote administrative access for monitoring and reconfiguration.
-
-## Limitations
-
-* The TELNET features are minimal—
 
 ## Usage
 
