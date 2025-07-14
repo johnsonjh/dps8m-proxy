@@ -80,6 +80,13 @@ var (
 	idleMax                int
 	timeMax                int
 	altHosts               = make(map[string]string)
+
+	blacklistedNetworks []*net.IPNet
+	whitelistedNetworks []*net.IPNet
+	blockMessage        string
+
+	blacklistFile = flag.String("blacklist", "", "Blacklist file (optional)")
+	whitelistFile = flag.String("whitelist", "", "Whitelist file (optional)")
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,6 +191,40 @@ func init() {
 
 func main() {
 	flag.Parse()
+
+	if *blacklistFile != "" {
+		networks, err := parseIPListFile(*blacklistFile)
+		if err != nil {
+			log.Fatalf("Error parsing blacklist: %v", err)
+		}
+		blacklistedNetworks = networks
+		log.Printf("Loaded %d entries from blacklist file: %s",
+			len(blacklistedNetworks), *blacklistFile)
+	}
+
+	if *whitelistFile != "" {
+		networks, err := parseIPListFile(*whitelistFile)
+		if err != nil {
+			log.Fatalf("Error parsing whitelist: %v", err)
+		}
+		whitelistedNetworks = networks
+		log.Printf("Loaded %d entries from whitelist file: %s",
+			len(whitelistedNetworks), *whitelistFile)
+	}
+
+	if *whitelistFile != "" && *blacklistFile == "" {
+		_, ipv4Net, _ := net.ParseCIDR("0.0.0.0/0")
+		_, ipv6Net, _ := net.ParseCIDR("::/0")
+		blacklistedNetworks = append(blacklistedNetworks, ipv4Net, ipv6Net)
+		log.Println("Whitelist enabled without blacklist; blacklisted all addresses by default.")
+	}
+
+	if raw, err := ioutil.ReadFile("block.txt"); err == nil {
+		blockMessage = strings.ReplaceAll(
+			strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
+	} else {
+		blockMessage = "Connection blocked.\r\n"
+	}
 
 	if strings.Contains(telnetHostPort, "@") {
 		log.Fatalf("Error: -telnet-host cannot contain a username (e.g., 'user@'). Received: %s",
@@ -655,12 +696,54 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
 
+	remoteAddr := rawConn.RemoteAddr().String()
+	host, _, err := net.SplitHostPort(remoteAddr)
+	if err != nil {
+		host = remoteAddr
+	}
+
 	if !suppressLogs {
-		host, _, err := net.SplitHostPort(rawConn.RemoteAddr().String())
-		if err != nil {
-			host = rawConn.RemoteAddr().String()
-		}
 		log.Printf("INITIATE [%s] %s", sid, host)
+	}
+
+	clientIP := net.ParseIP(host)
+	if clientIP == nil {
+		if !suppressLogs {
+			log.Printf("TEARDOWN [%s] Invalid address: %s", sid, host)
+		}
+		rawConn.Close()
+		return
+	}
+
+	var rejectedByRule string
+	for _, ipNet := range blacklistedNetworks {
+		if ipNet.Contains(clientIP) {
+			rejectedByRule = ipNet.String()
+			break
+		}
+	}
+
+	if rejectedByRule != "" {
+		var exemptedByRule string
+		for _, ipNet := range whitelistedNetworks {
+			if ipNet.Contains(clientIP) {
+				exemptedByRule = ipNet.String()
+				break
+			}
+		}
+
+		if exemptedByRule != "" {
+			if !suppressLogs {
+				log.Printf("EXEMPTED [%s] %s [%s]", sid, remoteAddr, exemptedByRule)
+			}
+		} else {
+			if !suppressLogs {
+				log.Printf("REJECTED [%s] %s [%s]", sid, remoteAddr, rejectedByRule)
+			}
+			rawConn.Write([]byte(blockMessage))
+			rawConn.Close()
+			return
+		}
 	}
 
 	config := &ssh.ServerConfig{
@@ -1469,6 +1552,53 @@ func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex)
 
 func nowStamp() string {
 	return time.Now().Format("2006/01/02 15:04:05")
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func parseIPListFile(filePath string) ([]*net.IPNet, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+	defer file.Close()
+
+	var networks []*net.IPNet
+	scanner := bufio.NewScanner(file)
+	lineNumber := 0
+	for scanner.Scan() {
+		lineNumber++
+
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		_, ipNet, err := net.ParseCIDR(line)
+		if err == nil {
+			networks = append(networks, ipNet)
+			continue
+		}
+
+		ip := net.ParseIP(line)
+		if ip != nil {
+			if ip.To4() != nil {
+				networks = append(networks, &net.IPNet{IP: ip, Mask: net.CIDRMask(32, 32)})
+			} else {
+				networks = append(networks, &net.IPNet{IP: ip, Mask: net.CIDRMask(128, 128)})
+			}
+			continue
+		}
+
+		return nil, fmt.Errorf("Invalid IP address or CIDR block \"%s\" on line %d of %s",
+			line, lineNumber, filePath)
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("%s: %w", filePath, err)
+	}
+
+	return networks, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
