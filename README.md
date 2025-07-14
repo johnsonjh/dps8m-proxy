@@ -18,7 +18,7 @@ to anyone who wants to provide modern SSH access to legacy systems.
 
 ## Features
 
-* ✅ **SSH** ⟷ **TELNET** gateway
+* ✅ **SSH**⟷**TELNET** gateway
 * ✅ Full IPv6 support
 * ✅ Access control whitelist/blacklist (by IP address or CIDR block)
 * ✅ Session monitoring and logging (by date/time and host)
