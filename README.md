@@ -18,14 +18,16 @@ to anyone who wants to provide modern SSH access to legacy systems.
 
 ## Features
 
-* ✅ SSH ⟷ TELNET gateway
+* ✅ **SSH** ⟷ **TELNET** gateway
 * ✅ Session monitoring and logging (by date/time and host)
 * ✅ Automatic log compression
 * ✅ Banners for accepted and denied connections
 * ✅ Session connection monitoring with idle time tracking (and optional timeouts)
 * ✅ Interactive connection management for administrators
-* ✅ User access to TELNET features (*e.g.* line BREAK) and statistics
+* ✅ User access to **TELNET** features (*e.g.* line BREAK) and statistics
 * ✅ Link filtering
+* ✅ Live streaming connection sharing (read-only)
+  * 🤝 Allows users to share their session with one or more viewers
 
 ## Future plans
 
@@ -34,10 +36,9 @@ added in future updates:
 
 * The original software has features we have not yet re-implemented
   such as admin messaging, key remapping, access control (blacklists,
-  pre-connect CAPTCHAs), link throttling, RFC-1372 flow control, and
-  connection sharing.
-* The TELNET features currently implemented are minimal—enough to
-  support DPS8M.  Improved protocol support is planned.
+  pre-connect CAPTCHAs), link throttling, and RFC-1372 flow control.
+* The **TELNET** features currently implemented are minimal—enough for
+  supporting **DPS8M**.  Improved protocol support is planned.
 
 ## Not planned
 
@@ -47,22 +48,20 @@ The following were some of these features, which may be added at a
 later but are considered to be ***very low priority*** (*some with
 notes explaining why*):
 
-* TELNET, SUPDUP, TN3370, and Mosh/SSP listener/target support:
-  * TN3270 listener might actually make a return.  A decent enough
-    looking
-    [Go 3270 Server Library](https://github.com/racingmars/go3270?tab=readme-ov-file)
-    exists.
-  * TELNET listener attracted mostly abusive bots and hacker scanners.
-  * SUPDUP listener was based on a buggy 4.2BSD C implementation from
-    1984 and was barely tested (or used).
-  * Mosh has no existing Golang SSP library, would add complicated
-    configuration, requires a bunch of available and open UDP ports.
-* DECnet/CTERM listener/targets:
-  * The old version did it with a private fork of obsolete and
-    *very* buggy C code, lifted mostly from the Linux kernel
-    implementation.  Interfacing with Paul Koning’s PyDECnet stack
-    might be possible in the future—but it’s Python🤮.  People did
-    like seeing Multics on DECnet.
+* **TELNET**, **SUPDUP**, and **TN3370** listener/target support:
+  * **TELNET** listener attracted mostly abusive bots and scanners.
+  * **SUPDUP** listener was based on a buggy 4.2BSD implementation
+    from 1984 and was barely tested (or used).
+  * **TN3270** listener could actually make a return.  A decent enough
+    [Go 3270 Server Library](https://github.com/racingmars/go3270)
+    exists.  If you need **TN3270** proxy functionality, use
+    [Proxy3270](https://github.com/racingmars/proxy3270) for now.
+* **DECnet**/**CTERM** listener/targets:
+  * The legacy program did **DECnet** using an obsolete and *very*
+    buggy fork of the Linux kernel **DECnet**implementation.
+    Interfacing with Paul Koning’s
+    [PyDECnet](https://github.com/pkoning2/pydecnet) stack might be
+    a possibility for the future.
 * Ability for users to download
   [ttyrec](https://nethackwiki.com/wiki/Ttyrec) format session logs.
 * Remote administrative access for monitoring and reconfiguration.
@@ -212,7 +211,7 @@ a session to access the following menu:
 +====== MENU ======+
 |                  |
 |  B - Send Break  |
-|  S - Show Stats  |
+|  S - Show Satus  |
 |  X - Disconnect  |
 |                  |
 +==================+
@@ -222,10 +221,16 @@ a session to access the following menu:
 * `B` sends an IAC `BREAK` signal to the remote host
 * `S` displays some session statistics:
   ```
-  >> LNK - session total link time: 10s
-  >> SSH - in: 354 bytes, out: 1289 bytes, in rate: 34.50 B/s, out rate: 125.63 B/s
-  >> NVT - in: 1289 bytes, out: 353 bytes, in rate: 125.63 B/s, out rate: 34.41 B/s
+  >> LNK - The user name '_abpAVAP6XF2Sc9kg33D3' can be used to share this session.
+  >> SSH - in:   58 B,   out: 4.82 KiB, in rate:   4 B/s, out rate: 381 B/s
+  >> NVT - in: 4.82 KiB, out:   57 B,   in rate: 381 B/s, out rate:   4 B/s
+  >> LNK - link time: 13s
   ```
+
+### Connection sharing
+
+The user can share the user name presented above, allowing the
+session to be viewed live (read-only) by one or more viewers.
 
 ## History
 
