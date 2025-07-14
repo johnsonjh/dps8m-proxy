@@ -40,9 +40,13 @@ to anyone needing to provide modern SSH access to legacy systems.
 
 2. You can also clone the
    [`git` repository](https://gitlab.com/dps8m/proxy.git)) and build
-   the source code using `go build`.  A
+   the source code with:
+   ```
+   go build
+   ```
+   * A
    [`Makefile`](https://gitlab.com/dps8m/proxy/-/blob/master/Makefile)
-   is provided for convenience.
+   is also provided for convenience.
    * The `git` repository also contains
      example[`motd.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/motd.txt)
      and
