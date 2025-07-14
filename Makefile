@@ -2,7 +2,6 @@
 # Copyright (c) 2025 Jeffrey H. Johnson
 # Copyright (c) 2025 The DPS8M Development Team
 # SPDX-License-Identifier: MIT
-# vim ft=make expandtab tabstop=4 cc=78 :
 
 ##############################################################################
 # Configuration
@@ -96,4 +95,6 @@ gofumpt: main.go
 govet: main.go
 	go vet
 
+##############################################################################
+# vim: set ft=make expandtab tabstop=4 cc=78 :
 ##############################################################################
