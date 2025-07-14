@@ -107,8 +107,8 @@ Usage of proxy:
 
 ### Example setup
 
-* 🚧 ***TODO***: A complete example of a production installation using
-  Linux, with the proxy on port 22, executing as an isolated and
+* 🚧 ***TODO*** — A complete example of a production installation
+  using Linux, with the proxy on port 22, executing as an isolated and
   unprivileged user, in a `tmux` session — *should be provided soon*.
 
 #### Example admin session
@@ -244,9 +244,8 @@ permissions—we assume you know what you’re doing!
 
 This software is intended to be **secure**.  If you find any
 security-related problems, please do not hesitate to open an Issue
-or send an [e-mail](mailto:trnsz@pobox.com) to the author.
-
-The canonical home of this software is
+or send an [e-mail](mailto:trnsz@pobox.com) to the author. The
+canonical home of this software is
 [https://gitlab.com/dps8m/proxy](https://gitlab.com/dps8m/proxy).
 
 ## License
