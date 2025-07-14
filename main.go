@@ -104,8 +104,6 @@ type Connection struct {
 	wasMonitored        bool
 	sshInTotal          uint64
 	sshOutTotal         uint64
-	TargetHost          string
-	TargetPort          int
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
