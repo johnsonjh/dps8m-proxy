@@ -20,9 +20,10 @@ to anyone who wants to provide modern SSH access to legacy systems.
 
 * ✅ **SSH** ⟷ **TELNET** gateway
 * ✅ Full IPv6 support
+* ✅ Access control whitelist/blacklist (by IP address or CIDR block)
 * ✅ Session monitoring and logging (by date/time and host)
 * ✅ Automatic log compression
-* ✅ Banners for accepted and denied connections
+* ✅ Banners for accepted, denied, and blocked connections
 * ✅ Session connection monitoring with idle time tracking (and optional timeouts)
 * ✅ Interactive connection management for administrators
 * ✅ User access to **TELNET** features (*e.g.* line BREAK) and statistics
@@ -51,11 +52,7 @@ to anyone who wants to provide modern SSH access to legacy systems.
   * A
   [`Makefile`](https://gitlab.com/dps8m/proxy/-/blob/master/Makefile)
   is also provided for convenience.
-  * The `git` repository also contains
-    example[`motd.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/motd.txt)
-    and
-    [`deny.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/deny.txt)
-    files.
+  * The `git` repository also contains several example files.
 
 ### Invocation
 
@@ -232,8 +229,8 @@ Some features are still missing in this implementation and will be
 added in future updates:
 
 * The original software has features we have not yet re-implemented
-  such as admin messaging, key remapping, access control (blacklists,
-  pre-connect CAPTCHAs), link throttling, and RFC-1372 flow control.
+  such as admin messaging, key remapping, pre-connect CAPTCHAs,
+  link throttling, and RFC-1372 flow control.
 * The **TELNET** features currently implemented are minimal—enough for
   supporting **DPS8M**.  Improved protocol support is planned.
 

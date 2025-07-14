@@ -557,6 +557,28 @@ func listConfiguration() {
 	fmt.Printf("\r* DEBUG: %t\r\n", debugNegotiation)
 	fmt.Printf("\r* GRACEFUL SHUTDOWN: %t\r\n", gracefulShutdownMode.Load())
 	fmt.Printf("\r* DENY NEW CONNECTIONS: %t\r\n", denyNewConnectionsMode.Load())
+
+	if *blacklistFile == "" && len(blacklistedNetworks) == 0 {
+		fmt.Printf("\r* BLACKLIST: disabled\r\n")
+	} else if *whitelistFile != "" && *blacklistFile == "" {
+		fmt.Printf("\r* BLACKLIST: deny all (due to whitelist only)\r\n")
+	} else {
+		if len(blacklistedNetworks) == 1 {
+			fmt.Printf("\r* BLACKLIST: 1 entry loaded\r\n")
+		} else {
+			fmt.Printf("\r* BLACKLIST: %d entries loaded\r\n", len(blacklistedNetworks))
+		}
+	}
+
+	if *whitelistFile == "" {
+		fmt.Printf("\r* WHITELIST: disabled\r\n")
+	} else {
+		if len(whitelistedNetworks) == 1 {
+			fmt.Printf("\r* WHITELIST: 1 entry loaded\r\n")
+		} else {
+			fmt.Printf("\r* WHITELIST: %d entries loaded\r\n", len(whitelistedNetworks))
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
