@@ -1584,7 +1584,11 @@ func closeAndCompressLog(logfile *os.File, logFilePath string) {
 	}
 	defer gzFile.Close()
 
-	gzipWriter := gzip.NewWriter(gzFile)
+	gzipWriter, err := gzip.NewWriterLevel(gzFile, gzip.BestCompression)
+	if err != nil {
+		log.Printf("Error creating gzip writer for '%s': %v", compressedFilePath, err)
+	}
+
 	_, err = gzipWriter.Write(data)
 	if err != nil {
 		log.Printf("Error writing to compressed file '%s': %v", compressedFilePath, err)
