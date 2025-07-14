@@ -104,8 +104,8 @@ Usage of proxy:
   * `c` - Show proxy configuration
   * `l` - List active connections
   * `k` - Kill connection
-  * `d` - Deny new Connections
-  * `r` - Reload Access Control Lists
+  * `d` - Deny new connections
+  * `r` - Reload access control lists
   * `q` - Graceful shutdown
   * `Q` - Immediate shutdown (also via `^C`)
 
