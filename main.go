@@ -104,6 +104,8 @@ type Connection struct {
 	wasMonitored        bool
 	sshInTotal          uint64
 	sshOutTotal         uint64
+	TargetHost          string
+	TargetPort          int
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1067,7 +1069,18 @@ func handleSession(
 				channel.Write([]byte(fmt.Sprintf("\r\nCONNECTION CLOSED (link time %s)\r\n\r\n",
 					dur.Round(time.Second))))
 
-				// insert stats here
+				inRateSSH := uint64(float64(atomic.LoadUint64(&sshIn)) / dur.Seconds())
+				outRateSSH := uint64(float64(atomic.LoadUint64(&sshOut)) / dur.Seconds())
+				inRateNVT := uint64(float64(atomic.LoadUint64(&telnetIn)) / dur.Seconds())
+				outRateNVT := uint64(float64(atomic.LoadUint64(&telnetOut)) / dur.Seconds())
+
+				channel.Write([]byte(fmt.Sprintf(
+					">> SSH - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
+					atomic.LoadUint64(&sshIn), atomic.LoadUint64(&sshOut), inRateSSH, outRateSSH)))
+				channel.Write([]byte(fmt.Sprintf(
+					">> NVT - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
+					atomic.LoadUint64(&telnetIn), atomic.LoadUint64(&telnetOut), inRateNVT, outRateNVT)))
+				channel.Write([]byte("\r\n"))
 
 				channel.Close()
 				conn.sshInTotal = sshIn
