@@ -109,8 +109,8 @@ type Connection struct {
 	wasMonitored        bool
 	sshInTotal          uint64
 	sshOutTotal         uint64
-	TargetHost          string
-	TargetPort          int
+	targetHost          string
+	targetPort          int
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -518,8 +518,8 @@ func listConnections() {
 				time.Since(conn.startTime).Round(time.Second))
 		} else {
 			targetInfo := ""
-			if conn.TargetHost != "" {
-				targetInfo = fmt.Sprintf(" -> %s:%d", conn.TargetHost, conn.TargetPort)
+			if conn.targetHost != "" {
+				targetInfo = fmt.Sprintf(" -> %s:%d", conn.targetHost, conn.targetPort)
 			}
 			fmt.Printf("\r* ID %s: %s@%s%s [Link: %s, Idle: %s]\r\n",
 				id, conn.sshConn.User(), conn.sshConn.RemoteAddr(), targetInfo,
@@ -796,17 +796,14 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	config := &ssh.ServerConfig{
 		PasswordCallback: func(
 			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) {
-			return &ssh.Permissions{Extensions: map[string]string{"auth-method": "password"}}, nil
+			return &ssh.Permissions{
+				Extensions: map[string]string{"auth-method": "password"},
+			}, nil
 		},
 		PublicKeyCallback: func(
 			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) {
-			line := fmt.Sprintf(
-				"VALIDATE [%s] %s@%s %q:%s",
-				sid,
-				c.User(),
-				c.RemoteAddr(),
-				pubKey.Type(),
-				ssh.FingerprintSHA256(pubKey),
+			line := fmt.Sprintf("VALIDATE [%s] %s@%s %q:%s",
+				sid, c.User(), c.RemoteAddr(), pubKey.Type(), ssh.FingerprintSHA256(pubKey),
 			)
 			if !suppressLogs {
 				log.Print(line)
@@ -1148,8 +1145,8 @@ func handleSession(
 			return
 		}
 		log.Printf("ALTROUTE [%s] %s -> %s:%d", conn.ID, conn.userName, targetHost, targetPort)
-		conn.TargetHost = targetHost
-		conn.TargetPort = targetPort
+		conn.targetHost = targetHost
+		conn.targetPort = targetPort
 	} else {
 		var err error
 		targetHost, targetPort, err = parseHostPort(telnetHostPort)
@@ -1269,10 +1266,12 @@ func handleSession(
 
 				channel.Write([]byte(fmt.Sprintf(
 					">> SSH - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-					atomic.LoadUint64(&sshIn), atomic.LoadUint64(&sshOut), inRateSSH, outRateSSH)))
+					atomic.LoadUint64(&sshIn), atomic.LoadUint64(&sshOut),
+					inRateSSH, outRateSSH)))
 				channel.Write([]byte(fmt.Sprintf(
 					">> NVT - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-					atomic.LoadUint64(&telnetIn), atomic.LoadUint64(&telnetOut), inRateNVT, outRateNVT)))
+					atomic.LoadUint64(&telnetIn), atomic.LoadUint64(&telnetOut),
+					inRateNVT, outRateNVT)))
 				channel.Write([]byte("\r\n"))
 
 				channel.Close()
