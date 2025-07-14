@@ -26,12 +26,33 @@ to anyone needing to provide modern SSH access to legacy systems.
 
 ## Usage
 
+### Installation
+
+The software can be installed using `go install`:
+```sh
+go install gitlab.com/dps8m/proxy@latest
+```
+
+This will download the needed source, compile, and install the binary
+to `${GOEXE}/bin/proxy` (which will be `${HOME}/go/bin/proxy` for most
+users).
+
+You can also clone the `git` repository
+([https://gitlab.com/dps8m/proxy.git](https://gitlab.com/dps8m/proxy.git))
+and build the source code using `go build`.  A
+[`Makefile`](https://gitlab.com/dps8m/proxy/-/blob/master/Makefile)
+is provided for convenience.  The `git` repository also contains
+example
+[`motd.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/motd.txt)
+and [`deny.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/deny.txt)
+files.
+
 ### Invocation
 
 * The proxy can be invoked with the following command-line arguments:
 
 ```sh
-Usage of dps8-proxy:
+Usage of proxy:
   -alt-host value
         Alternate TELNET targets (user@host:port) [allowed multiple times]
   -debug
@@ -60,7 +81,7 @@ Usage of dps8-proxy:
   running as `root`, which is strongly discouraged) on Linux systems
   you can use `setcap` to allow the proxy to bind to low ports:
   ```sh
-  set cap_net_bind_service=+ep' /path/to/dps8m-proxy
+  sudo setcap 'cap_net_bind_service=+ep' "/path/to/proxy"
   ```
 
 ### Admin interaction
@@ -99,7 +120,7 @@ proxied to port `9998` on the host `mainframe`.
 ```
 $ dps8-proxy -telnet-host "legacybox:6180" -alt-host "elsewhere@mainframe:9998"  
 
-c
+🅲
 Configuration
 =============
 * SSH LISTEN ON: :2222
@@ -116,19 +137,19 @@ Configuration
 * DENY NEW CONNECTIONS: false
 
 2025/07/13 23:20:00 INITIATE [d4fcab] 23.45.67.89
-2025/07/13 23:20:00 VALIDATE [d4fcab] elsewhwere@23.45.67.89:22139
+2025/07/13 23:20:00 VALIDATE [d4fcab] elsewhere@23.45.67.89:22139
 2025/07/13 23:20:00 ALTROUTE [d4fcab] elsewhere -> mainframe:9998
 
 2025/07/13 23:20:03 INITIATE [08d679] 45.67.89.111
 2025/07/13 23:20:03 VALIDATE [08d679] john@45.67.89.111:39969
 
-l
+🅻
 Active Connections
 ==================
 * ID d4fcab: elsewhere@23.45.67.89:22139 [Link: 5s, Idle: 5s]
 * ID 08d679: john@45.67.89.111:39969 [Link: 2s, Idle: 2s]
 
-k
+🅺
 Enter session ID to kill: 08d679
 Killing connection 08d679...
 2025/07/13 23:20:21 TEARDOWN [08d679] john@45.67.89.111
@@ -164,10 +185,10 @@ a session to access the following menu:
 This version of the `dps8m-proxy` program is a from-scratch
 [Golang](https://go.dev/) reimplementation of an older legacy program
 of the same name, the original being an over-engineered and complex
-multi-process application of more than 10,000 SLOC: *~*8,000 lines of
+multi-process application of more than 10,000 SLOC: *≅*8,000 lines of
 [C-Kermit](https://www.kermitproject.org/) (*yes, it has it’s own
 [programming language](https://www.kermitproject.org/ckututor.html)*)
-and *~*2,000 lines of [ksh93](https://github.com/ksh93/ksh) (along
+and *≅*2,000 lines of [ksh93](https://github.com/ksh93/ksh) (along
 with a small amount of Perl 5).
 
 This new implementation replaces the original multi-process
