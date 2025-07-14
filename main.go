@@ -3,7 +3,6 @@
 // Copyright (c) 2025 Jeffrey H. Johnson
 // Copyright (c) 2025 The DPS8M Development Team
 // SPDX-License-Identifier: MIT
-// vim: set ft=go noexpandtab tabstop=4 cc=100 :
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 package main
@@ -73,6 +72,7 @@ var (
 	shutdownSignal         chan struct{}
 	noCompress             bool
 	noLog                  bool
+	noBanner               bool
 	idleMax                int
 	timeMax                int
 	altHosts               = make(map[string]string)
@@ -156,6 +156,9 @@ func init() {
 
 	flag.Var(&altHostFlag{},
 		"alt-host", "Alternate TELNET targets (username@host:port) [allowed multiple times]")
+
+	flag.BoolVar(&noBanner,
+		"no-banner", false, "Disable SSH connection banner")
 
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
@@ -986,6 +989,9 @@ func handleSession(
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func sendBanner(sid string, sshConn *ssh.ServerConn, ch ssh.Channel) {
+	if noBanner {
+		return
+	}
 	user := sshConn.User()
 	host, _, _ := net.SplitHostPort(sshConn.RemoteAddr().String())
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -1269,4 +1275,6 @@ func nowStamp() string {
 	return time.Now().Format("2006/01/02 15:04:05")
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// vim: set ft=go noexpandtab tabstop=4 cc=100 :
 ///////////////////////////////////////////////////////////////////////////////////////////////////
