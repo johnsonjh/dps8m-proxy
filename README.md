@@ -51,7 +51,7 @@ notes explaining why*):
   * TN3270 listener might actually make a return.  A decent enough
     looking
     [Go 3270 Server Library](https://github.com/racingmars/go3270?tab=readme-ov-file)
-    exists, but it doesn’t look like it directly supports TLS.
+    exists.
   * TELNET listener attracted mostly abusive bots and hacker scanners.
   * SUPDUP listener was based on a buggy 4.2BSD C implementation from
     1984 and was barely tested (or used).
