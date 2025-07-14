@@ -29,43 +29,6 @@ to anyone who wants to provide modern SSH access to legacy systems.
 * ✅ Live streaming connection sharing (read-only)
   * 🤝 Allows users to share their session with one or more viewers
 
-## Future plans
-
-Some features are still missing in this implementation and will be
-added in future updates:
-
-* The original software has features we have not yet re-implemented
-  such as admin messaging, key remapping, access control (blacklists,
-  pre-connect CAPTCHAs), link throttling, and RFC-1372 flow control.
-* The **TELNET** features currently implemented are minimal—enough for
-  supporting **DPS8M**.  Improved protocol support is planned.
-
-## Not planned
-
-The original software “grew” some features that would be difficult
-to reimplement, existed but were buggy, or had very little actual use.
-The following were some of these features, which may be added at a
-later but are considered to be ***very low priority*** (*some with
-notes explaining why*):
-
-* **TELNET**, **SUPDUP**, and **TN3370** listener/target support:
-  * **TELNET** listener attracted mostly abusive bots and scanners.
-  * **SUPDUP** listener was based on a buggy 4.2BSD implementation
-    from 1984 and was barely tested (or used).
-  * **TN3270** listener could actually make a return.  A decent enough
-    [Go 3270 Server Library](https://github.com/racingmars/go3270)
-    exists.  If you need **TN3270** proxy functionality, use
-    [Proxy3270](https://github.com/racingmars/proxy3270) for now.
-* **DECnet**/**CTERM** listener/targets:
-  * The legacy program did **DECnet** using an obsolete and *very*
-    buggy fork of the Linux kernel **DECnet**implementation.
-    Interfacing with Paul Koning’s
-    [PyDECnet](https://github.com/pkoning2/pydecnet) stack might be
-    a possibility for the future.
-* Ability for users to download
-  [ttyrec](https://nethackwiki.com/wiki/Ttyrec) format session logs.
-* Remote administrative access for monitoring and reconfiguration.
-
 ## Usage
 
 ### Installation
@@ -247,18 +210,51 @@ This new implementation replaces the original multi-process
 architecture with lightweight *Goroutines*, and achieves improved
 performance with greatly reduced system overhead.
 
-At this time, approximately 75% of the original functionality has been
+At this time, approximately 70% of the original functionality has been
 re-implemented in Go, with the current codebase coming in under 2,000
 SLOC (as measured by [scc](https://github.com/boyter/scc)).
 
 This is an **85%** reduction in code compared size compared to the
 original legacy codebase.
 
-## Searching compressed logs
+## Future plans
 
-By default, session log files are automatically compressed when a
-session is closed.  Oftentimes an administrator wishes to `grep`
-through all of the logs, including those which have been compressed.
+Some features are still missing in this implementation and will be
+added in future updates:
+
+* The original software has features we have not yet re-implemented
+  such as admin messaging, key remapping, access control (blacklists,
+  pre-connect CAPTCHAs), link throttling, and RFC-1372 flow control.
+* The **TELNET** features currently implemented are minimal—enough for
+  supporting **DPS8M**.  Improved protocol support is planned.
+
+## Not planned
+
+The original software “grew” some features that would be difficult
+to reimplement, existed but were buggy, or had very little actual use.
+The following were some of these features, which may be added at a
+later but are considered to be ***very low priority*** (*some with
+notes explaining why*):
+
+* **TELNET**, **SUPDUP**, and **TN3370** listener/target support:
+  * **TELNET** listener attracted mostly abusive bots and scanners.
+  * **SUPDUP** listener was based on a buggy 4.2BSD implementation
+    from 1984 and was barely tested (or used).
+  * **TN3270** listener could actually make a return.  A decent
+    [Go 3270 Server Library](https://github.com/racingmars/go3270)
+    exists.  If you need **TN3270** proxy functionality, use
+    [Proxy3270](https://github.com/racingmars/proxy3270) for now.
+* **DECnet**/**CTERM** listener/targets:
+  * The legacy program did **DECnet** using an obsolete and *very*
+    buggy fork of the Linux kernel **DECnet**implementation.
+    Interfacing with Paul Koning’s
+    [PyDECnet](https://github.com/pkoning2/pydecnet) stack might be
+    a possibility for the future.
+* Ability for users to download
+  [ttyrec](https://nethackwiki.com/wiki/Ttyrec) format session logs.
+* Remote administrative access for monitoring and reconfiguration.
+
+## Searching compressed logs
 
 By default, session log files are compressed automatically when the
 session terminates.  When reviewing the logs, administrators often
@@ -293,15 +289,15 @@ permissions—we assume you know what you’re doing!
    ```
 ## Security
 
-This software is intended to be **secure**.  If you find any
-security-related problems, please do not hesitate to open an Issue
-or send an [e-mail](mailto:trnsz@pobox.com) to the author. The
-canonical home of this software is
+* The canonical home of this software is
 [https://gitlab.com/dps8m/proxy](https://gitlab.com/dps8m/proxy).
+* This software is intended to be **secure**.  If you find any
+security-related problems, please do not hesitate to open an Issue
+or send an [e-mail](mailto:trnsz@pobox.com) to the author.
 
 ## License
 
-The `dps8m-proxy` program is made available under the terms of the
+* The `dps8m-proxy` program is made available under the terms of the
 [MIT License](https://opensource.org/license/mit), with some bundled
 example and miscellaneous files distributed under the terms of the
 [MIT No Attribution License](https://opensource.org/license/mit-0).
