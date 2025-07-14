@@ -83,7 +83,6 @@ var (
 
 	blacklistedNetworks []*net.IPNet
 	whitelistedNetworks []*net.IPNet
-	blockMessage        string
 
 	blacklistFile = flag.String("blacklist", "", "Blacklist file (optional)")
 	whitelistFile = flag.String("whitelist", "", "Whitelist file (optional)")
@@ -217,13 +216,6 @@ func main() {
 		_, ipv6Net, _ := net.ParseCIDR("::/0")
 		blacklistedNetworks = append(blacklistedNetworks, ipv4Net, ipv6Net)
 		log.Println("Whitelist enabled without blacklist; blacklisted all addresses by default.")
-	}
-
-	if raw, err := ioutil.ReadFile("block.txt"); err == nil {
-		blockMessage = strings.ReplaceAll(
-			strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
-	} else {
-		blockMessage = "Connection blocked.\r\n"
 	}
 
 	if strings.Contains(telnetHostPort, "@") {
@@ -927,7 +919,13 @@ func handleSession(
 				log.Printf("REJECTED [%s] %s (matched %s)",
 					conn.ID, conn.sshConn.RemoteAddr().String(), rejectedByRule)
 			}
-			channel.Write([]byte(blockMessage + "\r\n"))
+			if raw, err := ioutil.ReadFile("block.txt"); err == nil {
+				blockMessageContent := strings.ReplaceAll(
+					strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
+				channel.Write([]byte(blockMessageContent + "\r\n"))
+			} else {
+				channel.Write([]byte("Connection blocked.\r\n"))
+			}
 			channel.Close()
 			conn.sshConn.Close()
 			return
@@ -1031,7 +1029,10 @@ func handleSession(
 	}()
 
 	if conn.monitoring {
-		log.Printf("UMONITOR [%s] %s -> %s", conn.ID, conn.userName, conn.monitoredConnection.ID)
+		if !suppressLogs { // XXX 937
+			log.Printf("UMONITOR [%s] %s -> %s",
+				conn.ID, conn.userName, conn.monitoredConnection.ID)
+		}
 		go io.Copy(ioutil.Discard, channel)
 		<-conn.monitoredConnection.cancelCtx.Done()
 		channel.Close()
