@@ -223,6 +223,9 @@ This software is intended to be **secure**.  If you find any
 security-related problems, please do not hesitate to open an Issue
 or send an [e-mail](mailto:trnsz@pobox.com) to the author.
 
+The canonical home of this software is
+[https://gitlab.com/dps8m/proxy](https://gitlab.com/dps8m/proxy).
+
 ## License
 
 The `dps8m-proxy` program is made available under the terms of the
