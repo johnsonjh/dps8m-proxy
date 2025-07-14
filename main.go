@@ -868,7 +868,7 @@ func handleSession(
 			channel.Close()
 			return
 		}
-		log.Printf("ALTROUTE [%s] %s@%s:%d", conn.ID, conn.userName, targetHost, targetPort)
+		log.Printf("ALTROUTE [%s] %s -> %s:%d", conn.ID, conn.userName, targetHost, targetPort)
 	} else {
 		var err error
 		targetHost, targetPort, err = parseHostPort(telnetHostPort)
