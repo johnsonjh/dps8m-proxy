@@ -18,11 +18,13 @@ to anyone needing to provide modern SSH access to legacy systems.
 
 ## Features
 
-* ✅ SSH ⟷ TELNET gateway
-* ✅ Session logging by date and host with automatic log compression
-* ✅ Banners for accepted (`motd.txt`) and denied (`deny.txt`) connections
-* ✅ Session connection and idle time tracking with optional timeout
-* ✅ Interactive connection management
+<div>
+  ✅ SSH ⟷ TELNET gateway<br>
+  ✅ Session logging by date and host with automatic log compression<br>
+  ✅ Banners for accepted (`motd.txt`) and denied (`deny.txt`) connections<br>
+  ✅ Session connection monitoring with idle time tracking (and optional timeouts)<br>
+  ✅ Interactive connection management
+</div>
 
 ## Usage
 
