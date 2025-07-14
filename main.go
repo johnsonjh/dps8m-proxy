@@ -706,46 +706,6 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		log.Printf("INITIATE [%s] %s", sid, host)
 	}
 
-	clientIP := net.ParseIP(host)
-	if clientIP == nil {
-		if !suppressLogs {
-			log.Printf("TEARDOWN [%s] Invalid address: %s", sid, host)
-		}
-		rawConn.Close()
-		return
-	}
-
-	var rejectedByRule string
-	for _, ipNet := range blacklistedNetworks {
-		if ipNet.Contains(clientIP) {
-			rejectedByRule = ipNet.String()
-			break
-		}
-	}
-
-	if rejectedByRule != "" {
-		var exemptedByRule string
-		for _, ipNet := range whitelistedNetworks {
-			if ipNet.Contains(clientIP) {
-				exemptedByRule = ipNet.String()
-				break
-			}
-		}
-
-		if exemptedByRule != "" {
-			if !suppressLogs {
-				log.Printf("EXEMPTED [%s] %s [%s]", sid, remoteAddr, exemptedByRule)
-			}
-		} else {
-			if !suppressLogs {
-				log.Printf("REJECTED [%s] %s [%s]", sid, remoteAddr, rejectedByRule)
-			}
-			rawConn.Write([]byte(blockMessage))
-			rawConn.Close()
-			return
-		}
-	}
-
 	config := &ssh.ServerConfig{
 		PasswordCallback: func(
 			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) {
@@ -924,9 +884,62 @@ func handleSession(
 	keyLog []string,
 	ctx context.Context,
 ) {
+	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
+
+	remoteHost, _, err := net.SplitHostPort(conn.sshConn.RemoteAddr().String())
+	if err != nil {
+		remoteHost = conn.sshConn.RemoteAddr().String()
+	}
+	clientIP := net.ParseIP(remoteHost)
+	if clientIP == nil {
+		if !suppressLogs {
+			log.Printf("TEARDOWN [%s] Invalid address: %s", conn.ID, remoteHost)
+		}
+		channel.Close()
+		conn.sshConn.Close()
+		return
+	}
+
+	var rejectedByRule string
+	for _, ipNet := range blacklistedNetworks {
+		if ipNet.Contains(clientIP) {
+			rejectedByRule = ipNet.String()
+			break
+		}
+	}
+
+	if rejectedByRule != "" {
+		var exemptedByRule string
+		for _, ipNet := range whitelistedNetworks {
+			if ipNet.Contains(clientIP) {
+				exemptedByRule = ipNet.String()
+				break
+			}
+		}
+
+		if exemptedByRule != "" {
+			if !suppressLogs {
+				log.Printf("EXEMPTED [%s] %s (matched %s)",
+					conn.ID, conn.sshConn.RemoteAddr().String(), exemptedByRule)
+			}
+		} else {
+			if !suppressLogs {
+				log.Printf("REJECTED [%s] %s (matched %s)",
+					conn.ID, conn.sshConn.RemoteAddr().String(), rejectedByRule)
+			}
+			channel.Write([]byte(blockMessage + "\r\n"))
+			channel.Close()
+			conn.sshConn.Close()
+			return
+		}
+	}
+
 	sendBanner(conn.ID, conn.sshConn, channel, conn)
 	if conn.monitoring {
-		log.Printf("UMONITOR [%s] %s -> %s", conn.ID, conn.userName, conn.monitoredConnection.ID)
+		if !suppressLogs {
+			log.Printf("UMONITOR [%s] %s -> %s",
+				conn.ID, conn.userName, conn.monitoredConnection.ID)
+		}
 
 		go func() {
 			buf := make([]byte, 1)
@@ -974,7 +987,6 @@ func handleSession(
 	var logfile *os.File
 	var logwriter io.Writer
 	var basePath string
-	var err error
 
 	if !noLog {
 		logfile, basePath, err = createDatedLog(conn.ID, conn.sshConn.RemoteAddr())
