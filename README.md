@@ -11,21 +11,63 @@ The `proxy` (or `dps8m-proxy`) program acts as a multi-user
 the front-end and relaying (*or proxying*) these connections to one or
 more **TELNET** connections on the back-end.
 
-Although this program was originally written to meet the needs of the
-**BAN.AI Public Access Multics** system and the
-[DPS8M Simulator](https://dps8m.gitlab.io) project, it may be useful
-to anyone needing to provide modern SSH access to legacy systems.
+Although this project was originally developed to meet the needs of
+the **BAN.AI Public Access Multics** system and the
+[DPS8M Simulator](https://dps8m.gitlab.io) projects, it may be useful
+to anyone who wants to provide modern SSH access to legacy systems.
 
 ## Features
 
 * ✅ SSH ⟷ TELNET gateway
 * ✅ Session monitoring and logging (by date/time and host)
 * ✅ Automatic log compression
-* ✅ Banners for accepted (<code>motd.txt</code>) and denied (<code>deny.txt</code>) connections
+* ✅ Banners for accepted and denied connections
 * ✅ Session connection monitoring with idle time tracking (and optional timeouts)
 * ✅ Interactive connection management for administrators
-* ✅ User access to TELNET features (*i.e.* line BREAK) and statistics
-* ✅ Link filtering (*with remote flow control coming soon*)
+* ✅ User access to TELNET features (*e.g.* line BREAK) and statistics
+* ✅ Link filtering
+
+### Future
+
+Some features are still missing in this implementation and will be
+added in future updates:
+
+* The original software has features we have not yet re-implemented
+  such as admin messaging, key remapping, access control (blacklists,
+  pre-connect CAPTCHAs), link throttling, RFC-1372 flow control, and
+  connection sharing.
+* The TELNET features currently implemented are minimal—enough to
+  support DPS8M.  Improved protocol support is planned.
+
+The original software “grew” some features that would be difficult
+to reimplement, existed but were buggy, or had very little actual use.
+The following were some of these features, which may be added at a
+later but are considered to be ***very low priority*** (*some with
+notes explaining why*):
+
+* TELNET, SUPDUP, TN3370, and Mosh/SSP listener/target support:
+  * TN3270 listener might actually make a return.  A decent enough
+    looking
+    [Go 3270 Server Library](https://github.com/racingmars/go3270?tab=readme-ov-file)
+    exists, but it doesn’t look like it directly supports TLS.
+  * TELNET listener attracted mostly abusive bots and hacker scanners.
+  * SUPDUP listener was based on a buggy 4.2BSD C implementation from
+    1984 and was barely tested (or used).
+  * Mosh has no existing Golang SSP library, would add complicated
+    configuration, requires a bunch of available and open UDP ports.
+* DECnet/CTERM listener/targets:
+  * The old version did it with a private fork of obsolete and
+    *very* buggy C code, lifted mostly from the Linux kernel
+    implementation.  Interfacing with Paul Koning’s PyDECnet stack
+    might be possible in the future—but it’s Python🤮.  People did
+    like seeing Multics on DECnet.
+* Ability for users to download
+  [ttyrec](https://nethackwiki.com/wiki/Ttyrec) format session logs.
+* Remote administrative access for monitoring and reconfiguration.
+
+## Limitations
+
+* The TELNET features are minimal—
 
 ## Usage
 
@@ -112,16 +154,16 @@ Usage of proxy:
 
 ### Example setup
 
-* 🚧 ***TODO*** — A complete example of a production installation
-  using Linux, with the proxy on port 22, executing as an isolated and
-  unprivileged user, in a `tmux` session — *should be provided soon*.
+* 🚧 A complete example of a production installation for Linux, with
+  the proxy on port 22, running as an unprivileged user, and managed
+  with a `tmux` session *is coming soon*.
 
 #### Example admin session
 
 The following example shows the proxy listening on `*:2222` (the
 default) for SSH connections (with any username), proxying them via
 TELNET to port `6180` on the host `legacybox`.  Users who supply the
-username `elsewhere` (*i.e.* `ssh -oPort=2222 elsewhere@proxybox`) are
+username `elsewhere` (*e.g.* `ssh -oPort=2222 elsewhere@proxybox`) are
 proxied to port `9998` on the host `mainframe`.
 
 ```
@@ -165,7 +207,7 @@ Killing connection 08d679...
 
 ### User interaction
 
-Users connected via SSH can send `^]` (*i.e.* `Control` + `]`) during
+Users connected via SSH can send `^]` (*i.e.* `Control + ]`) during
 a session to access the following menu:
 
 ```
@@ -190,7 +232,7 @@ a session to access the following menu:
 ## History
 
 This version of the `dps8m-proxy` program is a from-scratch
-[Golang](https://go.dev/) reimplementation of an older legacy program
+[Golang](https://go.dev/) re-implementation of an older legacy program
 of the same name, the original being an over-engineered and complex
 multi-process application of more than 10,000 SLOC: ≅8,000 lines of
 [C-Kermit](https://www.kermitproject.org/) (*yes, it has it’s own
@@ -203,7 +245,7 @@ architecture with lightweight *Goroutines*, and achieves improved
 performance with greatly reduced system overhead.
 
 At this time, approximately 75% of the original functionality has been
-reimplemented in Go, with the current codebase coming in under 2,000
+re-implemented in Go, with the current codebase coming in under 2,000
 SLOC (as measured by [scc](https://github.com/boyter/scc)).
 
 This is an **85%** reduction in code compared size compared to the
