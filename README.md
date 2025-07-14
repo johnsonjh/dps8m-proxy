@@ -246,7 +246,7 @@ added in future updates:
 ## Not planned
 
 The original software “grew” many features that are difficult to
-reimplement and had very little actual usage.  The following are
+re-implement and had very little actual usage.  The following are
 some of these features, which may be added at a later date but are
 considered to be ***very low priority*** (*some with notes explaining
 why*):
