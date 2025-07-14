@@ -933,10 +933,6 @@ func handleSession(
 
 	if conn.monitoring {
 		log.Printf("UMONITOR [%s] %s -> %s", conn.ID, conn.userName, conn.monitoredConnection.ID)
-		if !noLog {
-			logwriter.Write([]byte(fmt.Sprintf(
-				nowStamp()+" UMONITOR %s -> %s\r\n", conn.userName, conn.monitoredConnection.ID)))
-		}
 		go io.Copy(ioutil.Discard, channel)
 		<-conn.monitoredConnection.cancelCtx.Done()
 		channel.Close()
@@ -974,11 +970,7 @@ func handleSession(
 		logwriter.Write([]byte(fmt.Sprintf(
 			nowStamp()+" Target: %s:%d\r\n", targetHost, targetPort)))
 		logwriter.Write([]byte(fmt.Sprintf(
-			nowStamp()+" Shared username: '%s'\r\n", conn.shareableUsername)))
-		if conn.monitoring {
-			logwriter.Write([]byte(fmt.Sprintf(
-				nowStamp()+" Monitoring username: '%s'\r\n", conn.userName)))
-		}
+			nowStamp()+" Connection sharing username: '%s'\r\n", conn.shareableUsername)))
 	}
 
 	remote, err := net.Dial("tcp", fmt.Sprintf("%s:%d", targetHost, targetPort))
@@ -1124,7 +1116,7 @@ func sendBanner(sid string, sshConn *ssh.ServerConn, ch ssh.Channel, conn *Conne
 		fmt.Fprint(ch, "Send Control-] to disconnect.\r\n")
 	} else {
 		if conn.invalidShare {
-			fmt.Fprintf(ch, "The user name '%s' was not active for session sharing.\r\n",
+			fmt.Fprintf(ch, "The username '%s' was not active for session sharing.\r\n",
 				conn.userName)
 		}
 	}
@@ -1260,7 +1252,8 @@ func showMenu(conn *Connection, ch ssh.Channel, remote net.Conn, logw io.Writer,
 			dur := time.Since(start)
 			ch.Write([]byte("\r\n"))
 			ch.Write([]byte(fmt.Sprintf(
-				">> LNK - The user name '%s' can be used to share this session.\r\n", conn.shareableUsername)))
+				">> LNK - The username '%s' can be used to share this session.\r\n",
+				conn.shareableUsername)))
 			if conn.wasMonitored {
 				connectionsMutex.Lock()
 				currentMonitors := 0
