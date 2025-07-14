@@ -18,40 +18,41 @@ to anyone needing to provide modern SSH access to legacy systems.
 
 ## Features
 
-<div>
-&nbsp;&nbsp;✅ SSH ⟷ TELNET gateway<br>
-&nbsp;&nbsp;✅ Session logging by date and host with automatic log compression<br>
-&nbsp;&nbsp;✅ Banners for accepted (<code>motd.txt</code>) and denied (<code>deny.txt</code>) connections<br>
-&nbsp;&nbsp;✅ Session connection monitoring with idle time tracking (and optional timeouts)<br>
-&nbsp;&nbsp;✅ Interactive connection management
-</div>
+* ✅ SSH ⟷ TELNET gateway
+* ✅ Session monitoring and logging (by date/time and host)
+* ✅ Automatic log compression
+* ✅ Banners for accepted (<code>motd.txt</code>) and denied (<code>deny.txt</code>) connections
+* ✅ Session connection monitoring with idle time tracking (and optional timeouts)
+* ✅ Interactive connection management for administrators
+* ✅ User access to TELNET features (*i.e.* line BREAK) and statistics
+* ✅ Link filtering (*with remote flow control coming soon*)
 
 ## Usage
 
 ### Installation
 
-1. The software can be installed using `go install`:
-   ```sh
-   go install gitlab.com/dps8m/proxy@latest
-   ```
-   * This will download the needed source, compile, and install the
-     binary to `${GOEXE}/bin/proxy` (which will be
-     `${HOME}/go/bin/proxy` for most users).
+* The software can be installed using `go install`:
+  ```sh
+  go install gitlab.com/dps8m/proxy@latest
+  ```
+  * This will download the needed source, compile, and install the
+    binary to `${GOEXE}/bin/proxy` (which will be
+    `${HOME}/go/bin/proxy` for most users).
 
-2. You can also clone the
-   [`git` repository](https://gitlab.com/dps8m/proxy.git)) and build
-   the source code with:
-   ```
-   go build
-   ```
-   * A
-   [`Makefile`](https://gitlab.com/dps8m/proxy/-/blob/master/Makefile)
-   is also provided for convenience.
-   * The `git` repository also contains
-     example[`motd.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/motd.txt)
-     and
-     [`deny.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/deny.txt)
-     files.
+* You can also clone the
+  [`git` repository](https://gitlab.com/dps8m/proxy.git) and build
+  the source code with:
+  ```
+  go build
+  ```
+  * A
+  [`Makefile`](https://gitlab.com/dps8m/proxy/-/blob/master/Makefile)
+  is also provided for convenience.
+  * The `git` repository also contains
+    example[`motd.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/motd.txt)
+    and
+    [`deny.txt`](https://gitlab.com/dps8m/proxy/-/blob/master/deny.txt)
+    files.
 
 ### Invocation
 
