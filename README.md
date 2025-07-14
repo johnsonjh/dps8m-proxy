@@ -203,9 +203,10 @@ performance with greatly reduced system overhead.
 
 At this time, approximately 75% of the original functionality has been
 reimplemented in Go, with the current codebase coming in under 2,000
-SLOC (as measured by [scc](https://github.com/boyter/scc)).  This is
-an **85%** reduction in code compared size compared to the original
-legacy codebase!
+SLOC (as measured by [scc](https://github.com/boyter/scc)).
+
+This is an **85%** reduction in code compared size compared to the
+original legacy codebase.
 
 ## Searching compressed logs
 
