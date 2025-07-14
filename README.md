@@ -245,11 +245,11 @@ added in future updates:
 
 ## Not planned
 
-The original software “grew” some features that would be difficult
-to reimplement, existed but were buggy, or had very little actual use.
-The following were some of these features, which may be added at a
-later but are considered to be ***very low priority*** (*some with
-notes explaining why*):
+The original software “grew” many features that are difficult to
+reimplement and had very little actual usage.  The following are
+some of these features, which may be added at a later date but are
+considered to be ***very low priority*** (*some with notes explaining
+why*):
 
 * **TELNET**, **SUPDUP**, and **TN3370** listener/target support:
   * **TELNET** listener attracted mostly abusive bots and scanners.
