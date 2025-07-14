@@ -19,6 +19,7 @@ to anyone who wants to provide modern SSH access to legacy systems.
 ## Features
 
 * ✅ **SSH** ⟷ **TELNET** gateway
+* ✅ Full IPv6 support
 * ✅ Session monitoring and logging (by date/time and host)
 * ✅ Automatic log compression
 * ✅ Banners for accepted and denied connections
@@ -184,7 +185,7 @@ a session to access the following menu:
 * `B` sends an IAC `BREAK` signal to the remote host
 * `S` displays some session statistics:
   ```
-  >> LNK - The user name '_abpAVAP6XF2Sc9kg33D3' can be used to share this session.
+  >> LNK - The username '_gRSyWHxPcMp2MWvtmWWF' can be used to share this session.
   >> SSH - in:   58 B,   out: 4.82 KiB, in rate:   4 B/s, out rate: 381 B/s
   >> NVT - in: 4.82 KiB, out:   57 B,   in rate: 381 B/s, out rate:   4 B/s
   >> LNK - link time: 13s
@@ -192,8 +193,16 @@ a session to access the following menu:
 
 ### Connection sharing
 
-The user can share the user name presented above, allowing the
-session to be viewed live (read-only) by one or more viewers.
+* The user can share the username presented above with others,
+  allowing the session to be viewed live (read-only) by one or more
+  viewers:
+  ```sh
+  $ ssh _gRSyWHxPcMp2MWvtmWWF@proxybox
+
+  CONNECTION from remote.com [18.17.16.15] started at 2025/07/14 08:22:55.
+  This is a READ-ONLY shared monitoring session.
+  Send Control-] to disconnect.
+  ```
 
 ## History
 
