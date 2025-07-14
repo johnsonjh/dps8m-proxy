@@ -104,6 +104,8 @@ type Connection struct {
 	wasMonitored        bool
 	sshInTotal          uint64
 	sshOutTotal         uint64
+	TargetHost          string
+	TargetPort          int
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -478,8 +480,12 @@ func listConnections() {
 				id, conn.sshConn.User(), conn.sshConn.RemoteAddr(), conn.monitoredConnection.ID,
 				time.Since(conn.startTime).Round(time.Second))
 		} else {
-			fmt.Printf("\r* ID %s: %s@%s [Link: %s, Idle: %s]\r\n",
-				id, conn.sshConn.User(), conn.sshConn.RemoteAddr(),
+			targetInfo := ""
+			if conn.TargetHost != "" {
+				targetInfo = fmt.Sprintf(" -> %s:%d", conn.TargetHost, conn.TargetPort)
+			}
+			fmt.Printf("\r* ID %s: %s@%s%s [Link: %s, Idle: %s]\r\n",
+				id, conn.sshConn.User(), conn.sshConn.RemoteAddr(), targetInfo,
 				time.Since(conn.startTime).Round(time.Second),
 				time.Since(conn.lastActivityTime).Round(time.Second))
 		}
@@ -951,6 +957,8 @@ func handleSession(
 			return
 		}
 		log.Printf("ALTROUTE [%s] %s -> %s:%d", conn.ID, conn.userName, targetHost, targetPort)
+		conn.TargetHost = targetHost
+		conn.TargetPort = targetPort
 	} else {
 		var err error
 		targetHost, targetPort, err = parseHostPort(telnetHostPort)
