@@ -399,6 +399,13 @@ func handleConsoleInput() {
 		}
 		input, err := reader.ReadString('\n')
 		if err != nil {
+			if err == io.EOF {
+				if !gracefulShutdownMode.Load() {
+					log.Println("Console EOF, initiating immediate shutdown.")
+					immediateShutdown()
+				}
+				return
+			}
 			log.Printf("Console read error: %v", err)
 			return
 		}
