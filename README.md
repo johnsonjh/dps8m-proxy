@@ -66,12 +66,14 @@ Usage of proxy:
         Alternate TELNET targets (user@host:port) [allowed multiple times]
   -blacklist string
         Blacklist file (optional)
+  -console-log string
+        Enable console logging [requires 'quiet' or 'noquiet' argument]
   -debug
         Debug TELNET negotiation
   -idle-max int
         Maximum connection idle time in seconds
   -log-dir string
-        Base directory for session logs (default "./log")
+        Base directory for logs (default "./log")
   -no-banner
         Disable SSH connection banner
   -no-compress
@@ -84,6 +86,8 @@ Usage of proxy:
         Default TELNET target (host:port) (default "127.0.0.1:6180")
   -time-max int
         Maximum connection link time in seconds
+  -version
+        Show version information
   -whitelist string
         Whitelist file (optional)
 ```
@@ -147,6 +151,7 @@ Configuration
 * LOG DIR: ./log
 * NO LOG COMPRESS: false
 * DEBUG: false
+* CONSOLE LOG: ./log/2025/07/13/console.log
 * GRACEFUL SHUTDOWN: false
 * DENY NEW CONNECTIONS: false
 * BLACKLIST: 0 entries loaded
