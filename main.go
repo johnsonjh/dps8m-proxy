@@ -28,6 +28,9 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"regexp"
+	"runtime"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -59,58 +62,59 @@ const (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 var (
-	sshAddr                string
-	telnetHostPort         string
-	debugNegotiation       bool
-	logDir                 string
-	gracefulShutdownMode   atomic.Bool
-	denyNewConnectionsMode atomic.Bool
+	allowRoot              bool
+	altHosts               = make(map[string]string)
+	blacklistedNetworks    []*net.IPNet
+	blacklistFile          string
 	connections            = make(map[string]*Connection)
 	connectionsMutex       sync.Mutex
-	shutdownOnce           sync.Once
-	loggingWg              sync.WaitGroup
 	consoleInputActive     atomic.Bool
-	originalLogOutput      io.Writer
-	logBuffer              *strings.Builder
+	debugNegotiation       bool
+	denyNewConnectionsMode atomic.Bool
+	gracefulShutdownMode   atomic.Bool
+	idleMax                int
 	logBufferMutex         sync.Mutex
-	shutdownSignal         chan struct{}
+	logBuffer              *strings.Builder
+	logDir                 string
+	loggingWg              sync.WaitGroup
+	noBanner               bool
 	noCompress             bool
 	noLog                  bool
-	noBanner               bool
-	idleMax                int
+	originalLogOutput      io.Writer
+	showVersion            bool
+	shutdownOnce           sync.Once
+	shutdownSignal         chan struct{}
+	sshAddr                string
+	telnetHostPort         string
 	timeMax                int
-	altHosts               = make(map[string]string)
-	blacklistFile          string
-	whitelistFile          string
-	allowRoot              bool
-	blacklistedNetworks    []*net.IPNet
 	whitelistedNetworks    []*net.IPNet
+	whitelistFile          string
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 type Connection struct {
-	ID                  string
-	sshConn             *ssh.ServerConn
-	channel             ssh.Channel
-	startTime           time.Time
-	lastActivityTime    time.Time
-	logFile             *os.File
 	basePath            string
 	cancelCtx           context.Context
 	cancelFunc          context.CancelFunc
-	userName            string
+	channel             ssh.Channel
 	hostName            string
-	shareableUsername   string
-	monitoring          bool
-	monitoredConnection *Connection
+	ID                  string
 	invalidShare        bool
-	totalMonitors       uint64
-	wasMonitored        bool
+	lastActivityTime    time.Time
+	logFile             *os.File
+	monitoredConnection *Connection
+	monitoring          bool
+	shareableUsername   string
+	sshConn             *ssh.ServerConn
 	sshInTotal          uint64
 	sshOutTotal         uint64
+	startTime           time.Time
 	targetHost          string
 	targetPort          int
+	totalMonitors       uint64
+	userName            string
+	wasMonitored        bool
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,6 +193,9 @@ func init() {
 	flag.BoolVar(&allowRoot,
 		"allow-root", false, "Allow running as root (UID 0) [strongly discouraged]")
 
+	flag.BoolVar(&showVersion,
+		"version", false, "Show version information")
+
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
@@ -198,6 +205,11 @@ func init() {
 
 func main() {
 	flag.Parse()
+
+	if showVersion {
+		printVersion()
+		os.Exit(0)
+	}
 
 	if os.Getuid() == 0 && !allowRoot {
 		log.Fatalf("ERROR: Running as root is strongly discouraged.  Use -allow-root to override.")
@@ -354,6 +366,56 @@ func main() {
 		}
 		go handleConn(rawConn, edSigner, rsaSigner)
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func isGitSHA(s string) bool {
+	match, _ := regexp.MatchString("^[0-9a-f]{40}$", s)
+	return match
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func printVersion() {
+	fmt.Printf("DPS8M Proxy")
+
+	if info, ok := debug.ReadBuildInfo(); ok {
+		var date, commit string
+		var modified bool
+
+		for _, setting := range info.Settings {
+			switch setting.Key {
+			case "vcs.time":
+				date = setting.Value
+			case "vcs.revision":
+				commit = setting.Value
+			case "vcs.modified":
+				modified = (setting.Value == "true")
+			}
+		}
+
+		t, err := time.Parse(time.RFC3339, date)
+		if err != nil {
+			t = time.Now()
+		}
+
+		tdate := t.Format("2006-JAN-02")
+
+		if commit != "" && isGitSHA(commit) {
+			commit = commit[:7]
+		}
+
+		if date != "" && commit != "" {
+			if modified == true {
+				fmt.Printf(" (%s g%s+)", tdate, commit)
+			} else {
+				fmt.Printf(" (%s g%s)", tdate, commit)
+			}
+		}
+	}
+
+	fmt.Printf(" [%s/%s]\n", runtime.GOOS, runtime.GOARCH)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -532,6 +594,8 @@ func listConnections() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func listConfiguration() {
+	fmt.Println("")
+	printVersion()
 	fmt.Println("\r\n\rConfiguration")
 	fmt.Println("\r=============")
 	fmt.Printf("\r* SSH LISTEN ON: %s\r\n", sshAddr)
