@@ -90,6 +90,9 @@ var (
 	timeMax                int
 	whitelistedNetworks    []*net.IPNet
 	whitelistFile          string
+	issueFile              = "issue.txt"
+	denyFile               = "deny.txt"
+	blockFile              = "block.txt"
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1087,7 +1090,7 @@ func handleSession(
 				log.Printf("REJECTED [%s] %s (matched %s)",
 					conn.ID, conn.sshConn.RemoteAddr().String(), rejectedByRule)
 			}
-			if raw, err := ioutil.ReadFile("block.txt"); err == nil {
+			if raw, err := getFileContent(blockFile, conn.userName); err == nil {
 				blockMessageContent := strings.ReplaceAll(
 					strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
 				channel.Write([]byte(blockMessageContent + "\r\n"))
@@ -1130,7 +1133,7 @@ func handleSession(
 	}
 
 	if gracefulShutdownMode.Load() || denyNewConnectionsMode.Load() {
-		if denyMsg, err := ioutil.ReadFile("deny.txt"); err == nil {
+		if denyMsg, err := getFileContent(denyFile, conn.userName); err == nil {
 			txt := strings.ReplaceAll(
 				strings.ReplaceAll(string(denyMsg), "\r\n", "\n"), "\n", "\r\n")
 			channel.Write([]byte("\r\n"))
@@ -1141,7 +1144,7 @@ func handleSession(
 		return
 	}
 
-	if raw, err := ioutil.ReadFile("issue.txt"); err == nil {
+	if raw, err := getFileContent(issueFile, conn.userName); err == nil {
 		txt := strings.ReplaceAll(
 			strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
 		channel.Write([]byte(txt + "\r\n"))
@@ -1746,6 +1749,18 @@ func nowStamp() string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+func getFileContent(baseFilename, username string) ([]byte, error) {
+	userSpecificFile := fmt.Sprintf("%s-%s.txt", strings.TrimSuffix(baseFilename, ".txt"), username)
+	content, err := os.ReadFile(userSpecificFile)
+	if err == nil {
+		return content, nil
+	}
+
+	return os.ReadFile(baseFilename)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func getConsoleLogPath(t time.Time) string {
 	return filepath.Join(
 		logDir,
@@ -1763,14 +1778,11 @@ func setupConsoleLogging() {
 		return
 	}
 
-	// Initial setup and compression of yesterday's log
 	rotateConsoleLog()
 
-	// Schedule daily log rotation
 	go func() {
 		for {
 			now := time.Now()
-			// Calculate time until next midnight
 			nextMidnight := now.Add(24 * time.Hour).Truncate(24 * time.Hour)
 			time.Sleep(time.Until(nextMidnight))
 
@@ -1783,17 +1795,14 @@ func rotateConsoleLog() {
 	consoleLogMutex.Lock()
 	defer consoleLogMutex.Unlock()
 
-	// Close existing log file if open
 	if consoleLogFile != nil {
 		if !noCompress {
-			// Compress the log file that was just closed (yesterday's log)
 			yesterdayLogPath := getConsoleLogPath(time.Now().AddDate(0, 0, -1))
 			compressLogFile(yesterdayLogPath)
 		}
 		consoleLogFile.Close()
 	}
 
-	// Open new log file for today
 	logPath := getConsoleLogPath(time.Now())
 	logDir := filepath.Dir(logPath)
 
