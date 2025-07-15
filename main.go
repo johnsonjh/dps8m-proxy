@@ -29,6 +29,7 @@ import (
 	"regexp"
 	"runtime"
 	"runtime/debug"
+	"runtime/metrics"
 	"strconv"
 	"strings"
 	"sync"
@@ -688,10 +689,10 @@ func listConfiguration() {
 
 	printVersion()
 	log.SetOutput(originalWriter)
-	fmt.Println("\r\n\rConfiguration")
-	fmt.Println("\r=============")
-	fmt.Printf("\r* SSH LISTEN ON: %s\r\n", strings.Join(sshAddr, ", "))
-	fmt.Printf("\r* DEFAULT TARGET: %s\r\n", telnetHostPort)
+	fmt.Println("\r\n\rDPS8M PROXY Configuration")
+	fmt.Println("\r=========================")
+	fmt.Printf("\r\n* SSH LISTEN ON: %s\r\n", strings.Join(sshAddr, ", "))
+	fmt.Printf("\r\n* DEFAULT TARGET: %s\r\n", telnetHostPort)
 
 	if len(altHosts) > 0 {
 		fmt.Println("\r* ALT TARGETS:")
@@ -702,15 +703,11 @@ func listConfiguration() {
 		fmt.Println("\r* ALT TARGETS: None configured")
 	}
 
-	fmt.Printf("\r* TIME MAX: %d seconds\r\n", timeMax)
+	fmt.Printf("\r\n* TIME MAX: %d seconds\r\n", timeMax)
 	fmt.Printf("\r* IDLE MAX: %d seconds\r\n", idleMax)
-	fmt.Printf("\r* NO LOG: %t\r\n", noLog)
-	fmt.Printf("\r* LOG DIR: %s\r\n", logDir)
-	fmt.Printf("\r* NO LOG COMPRESS: %t\r\n", noCompress)
-	fmt.Printf("\r* COMPRESS ALGO: %s\r\n", compressAlgo)
-	fmt.Printf("\r* LOG PERMISSIONS: %04o\r\n", logPerm)
-	fmt.Printf("\r* DEBUG: %t\r\n", debugNegotiation)
 
+	fmt.Printf("\r\n* LOG DIR: %s\r\n", logDir)
+	fmt.Printf("\r* NO SESSION LOG: %t\r\n", noLog)
 	if consoleLog != "" {
 		logPath := getConsoleLogPath(time.Now())
 		quietMode := ""
@@ -721,12 +718,15 @@ func listConfiguration() {
 	} else {
 		fmt.Printf("\r* CONSOLE LOG: Disabled\r\n")
 	}
+	fmt.Printf("\r* NO LOG COMPRESS: %t\r\n", noCompress)
+	fmt.Printf("\r* COMPRESS ALGO: %s\r\n", compressAlgo)
+	fmt.Printf("\r* LOG PERMISSIONS: %04o\r\n", logPerm)
 
-	fmt.Printf("\r* GRACEFUL SHUTDOWN: %t\r\n", gracefulShutdownMode.Load())
+	fmt.Printf("\r\n* GRACEFUL SHUTDOWN: %t\r\n", gracefulShutdownMode.Load())
 	fmt.Printf("\r* DENY NEW CONNECTIONS: %t\r\n", denyNewConnectionsMode.Load())
 
 	if blacklistFile == "" && len(blacklistedNetworks) == 0 {
-		fmt.Printf("\r* BLACKLIST: disabled\r\n")
+		fmt.Printf("\r\n* BLACKLIST: disabled\r\n")
 	} else if whitelistFile != "" && blacklistFile == "" {
 		fmt.Printf("\r* BLACKLIST: deny all (due to whitelist only)\r\n")
 	} else {
@@ -748,6 +748,23 @@ func listConfiguration() {
 				len(whitelistedNetworks))
 		}
 	}
+
+	fmt.Printf("\r\n* DEBUG: %t\r\n", debugNegotiation)
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+
+	samples := make([]metrics.Sample, 1)
+	samples[0].Name = "/cpu/classes/user:cpu-seconds"
+	metrics.Read(samples)
+	cpuSeconds := samples[0].Value.Float64()
+
+	fmt.Printf("\r\n* RESOURCE USAGE:"+
+		"\r\n  * Memory usage: %s"+
+		"\r\n  * Goroutines: %d active"+
+		"\r\n  * CPU time used: %s\r\n\r\n",
+		byteCountIEC(m.Alloc),
+		runtime.NumGoroutine(),
+		formatDuration(cpuSeconds))
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1792,6 +1809,57 @@ func max(a, b int) int {
 		return a
 	}
 	return b
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func byteCountIEC(b uint64) string {
+	const unit = 1024
+
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+
+	div, exp := uint64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %ciB", float64(b)/float64(div), "KMGTPE"[exp])
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func formatDuration(seconds float64) string {
+	d := time.Duration(seconds * float64(time.Second))
+	days := int(d / (24 * time.Hour))
+
+	d = d % (24 * time.Hour)
+	hours := int(d / time.Hour)
+
+	d = d % time.Hour
+	minutes := int(d / time.Minute)
+
+	d = d % time.Minute
+	seconds = d.Seconds()
+
+	var parts []string
+	if days > 0 {
+		parts = append(parts, fmt.Sprintf("%dd", days))
+	}
+
+	if hours > 0 {
+		parts = append(parts, fmt.Sprintf("%dh", hours))
+	}
+
+	if minutes > 0 {
+		parts = append(parts, fmt.Sprintf("%dm", minutes))
+	}
+
+	if seconds > 0 || len(parts) == 0 {
+		parts = append(parts, fmt.Sprintf("%.0fs", seconds))
+	}
+	return strings.Join(parts, " ")
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
