@@ -26,9 +26,9 @@ to anyone who wants to provide modern SSH access to legacy systems.
 * ✅ Banners for accepted, denied, and blocked connections
 * ✅ Session connection monitoring with idle time tracking (and optional timeouts)
 * ✅ Interactive connection management for administrators
-* ✅ User access to **TELNET** features (*e.g.* line BREAK) and statistics
-* ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
+* ✅ User access to **TELNET** features (*e.g.* line BREAK, AYT) and statistics
 * ✅ Link filtering
+* ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
 * ✅ Live streaming connection sharing (read-only)
   * 🤝 Allows users to share their session with one or more viewers
 
@@ -252,7 +252,7 @@ a session to access the following menu:
   ```sh
   $ ssh _gRSyWHxPcMp2MWvtmWWF@proxybox
 
-  CONNECTION from remote.com [18.17.16.15] started at 2025/07/14 08:22:55.
+  CONNECTION from remote.com [18.17.16.15] started at 2025/07/15 08:22:55.
   This is a READ-ONLY shared monitoring session.
   Send Control-] to disconnect.
   ```
