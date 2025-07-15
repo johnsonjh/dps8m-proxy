@@ -67,6 +67,9 @@ var (
 	connections            = make(map[string]*Connection)
 	connectionsMutex       sync.Mutex
 	consoleInputActive     atomic.Bool
+	consoleLogFile         *os.File
+	consoleLogMutex        sync.Mutex
+	consoleLog             string
 	debugNegotiation       bool
 	denyNewConnectionsMode atomic.Bool
 	gracefulShutdownMode   atomic.Bool
@@ -162,7 +165,7 @@ func init() {
 		"debug", false, "Debug TELNET negotiation")
 
 	flag.StringVar(&logDir,
-		"log-dir", "./log", "Base directory for session logs")
+		"log-dir", "./log", "Base directory for logs")
 
 	flag.BoolVar(&noCompress,
 		"no-compress", false, "Disable gzip session log compression")
@@ -194,6 +197,9 @@ func init() {
 	flag.BoolVar(&showVersion,
 		"version", false, "Show version information")
 
+	flag.StringVar(&consoleLog,
+		"console-log", "", "Enable console logging [requires 'quiet' or 'noquiet' argument]")
+
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
@@ -212,6 +218,12 @@ func main() {
 
 	if os.Getuid() == 0 && !allowRoot {
 		log.Fatalf("ERROR: Running as root is strongly discouraged.  Use -allow-root to override.")
+	}
+
+	setupConsoleLogging()
+
+	if err := os.MkdirAll(logDir, 0o755); err != nil {
+		log.Fatalf("Failed to create log directory: %v", err)
 	}
 
 	reloadLists()
@@ -243,11 +255,15 @@ func main() {
 	defer listener.Close()
 
 	pid := os.Getpid()
+	var startMsg string
 	if pid != 0 {
-		log.Printf("STARTING PROXY [PID %d]", pid)
+		startMsg = fmt.Sprintf("STARTING PROXY [PID %d]", pid)
 	} else {
-		log.Printf("STARTING PROXY")
+		startMsg = "STARTING PROXY"
 	}
+
+	fmt.Fprintf(os.Stderr, "%s %s\n", nowStamp(), startMsg)
+	log.Printf("%s", startMsg)
 
 	log.Printf("SSH LISTEN ON %s", sshAddr)
 
@@ -260,8 +276,6 @@ func main() {
 	for user, hostPort := range altHosts {
 		log.Printf("ALT TARGET: %s [%s]", hostPort, user)
 	}
-
-	log.Printf("Type '?' for help.")
 
 	setupSignalHandlers()
 
@@ -572,7 +586,16 @@ func listConnections() {
 
 func listConfiguration() {
 	fmt.Println("")
+	originalWriter := log.Writer()
+
+	if consoleLogFile != nil {
+		log.SetOutput(io.MultiWriter(os.Stdout))
+	} else {
+		log.SetOutput(os.Stdout)
+	}
+
 	printVersion()
+	log.SetOutput(originalWriter)
 	fmt.Println("\r\n\rConfiguration")
 	fmt.Println("\r=============")
 	fmt.Printf("\r* SSH LISTEN ON: %s\r\n", sshAddr)
@@ -593,6 +616,18 @@ func listConfiguration() {
 	fmt.Printf("\r* LOG DIR: %s\r\n", logDir)
 	fmt.Printf("\r* NO LOG COMPRESS: %t\r\n", noCompress)
 	fmt.Printf("\r* DEBUG: %t\r\n", debugNegotiation)
+
+	if consoleLog != "" {
+		logPath := getConsoleLogPath(time.Now())
+		quietMode := ""
+		if strings.ToLower(consoleLog) == "quiet" {
+			quietMode = " (quiet mode)"
+		}
+		fmt.Printf("\r* CONSOLE LOG: %s%s\r\n", logPath, quietMode)
+	} else {
+		fmt.Printf("\r* CONSOLE LOG: Disabled\r\n")
+	}
+
 	fmt.Printf("\r* GRACEFUL SHUTDOWN: %t\r\n", gracefulShutdownMode.Load())
 	fmt.Printf("\r* DENY NEW CONNECTIONS: %t\r\n", denyNewConnectionsMode.Load())
 
@@ -1568,8 +1603,11 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 		fmt.Sprintf("%04d", now.Year()),
 		fmt.Sprintf("%02d", now.Month()),
 		fmt.Sprintf("%02d", now.Day()),
-		ipDir,
 	)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return nil, "", err
+	}
+	dir = filepath.Join(dir, ipDir)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, "", err
 	}
@@ -1704,6 +1742,119 @@ func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex)
 
 func nowStamp() string {
 	return time.Now().Format("2006/01/02 15:04:05")
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func getConsoleLogPath(t time.Time) string {
+	return filepath.Join(
+		logDir,
+		fmt.Sprintf("%04d", t.Year()),
+		fmt.Sprintf("%02d", t.Month()),
+		fmt.Sprintf("%02d", t.Day()),
+		"console.log",
+	)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func setupConsoleLogging() {
+	if consoleLog == "" {
+		return
+	}
+
+	// Initial setup and compression of yesterday's log
+	rotateConsoleLog()
+
+	// Schedule daily log rotation
+	go func() {
+		for {
+			now := time.Now()
+			// Calculate time until next midnight
+			nextMidnight := now.Add(24 * time.Hour).Truncate(24 * time.Hour)
+			time.Sleep(time.Until(nextMidnight))
+
+			rotateConsoleLog()
+		}
+	}()
+}
+
+func rotateConsoleLog() {
+	consoleLogMutex.Lock()
+	defer consoleLogMutex.Unlock()
+
+	// Close existing log file if open
+	if consoleLogFile != nil {
+		if !noCompress {
+			// Compress the log file that was just closed (yesterday's log)
+			yesterdayLogPath := getConsoleLogPath(time.Now().AddDate(0, 0, -1))
+			compressLogFile(yesterdayLogPath)
+		}
+		consoleLogFile.Close()
+	}
+
+	// Open new log file for today
+	logPath := getConsoleLogPath(time.Now())
+	logDir := filepath.Dir(logPath)
+
+	if err := os.MkdirAll(logDir, 0o755); err != nil {
+		log.Fatalf("Failed to create console log directory: %v", err)
+	}
+
+	var err error
+	consoleLogFile, err = os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
+	if err != nil {
+		log.Fatalf("Failed to open console log file: %v", err)
+	}
+
+	if consoleLog == "quiet" {
+		log.SetOutput(consoleLogFile)
+	} else {
+		log.SetOutput(io.MultiWriter(os.Stdout, consoleLogFile))
+	}
+}
+
+func compressLogFile(logFilePath string) {
+	if _, err := os.Stat(logFilePath); os.IsNotExist(err) {
+		return // File doesn't exist, nothing to compress
+	}
+
+	data, err := ioutil.ReadFile(logFilePath)
+	if err != nil {
+		log.Printf("Failed to read log %q for compression: %v", logFilePath, err)
+		return
+	}
+
+	compressedFilePath := logFilePath + ".gz"
+	gzFile, err := os.Create(compressedFilePath)
+	if err != nil {
+		log.Printf("Failed to create compressed file %q: %v", compressedFilePath, err)
+		return
+	}
+	defer gzFile.Close()
+
+	gzipWriter, err := gzip.NewWriterLevel(gzFile, gzip.BestCompression)
+	if err != nil {
+		log.Printf("Error creating gzip writer for %q: %v", compressedFilePath, err)
+		return
+	}
+
+	_, err = gzipWriter.Write(data)
+	if err != nil {
+		log.Printf("Error writing to compressed file %q: %v", compressedFilePath, err)
+		return
+	}
+
+	err = gzipWriter.Close()
+	if err != nil {
+		log.Printf("Error closing gzip writer for %q: %v", compressedFilePath, err)
+		return
+	}
+
+	err = os.Remove(logFilePath)
+	if err != nil {
+		log.Printf("Error removing original log %q after compression: %v", logFilePath, err)
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
