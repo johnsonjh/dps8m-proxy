@@ -11,7 +11,6 @@ package main
 
 import (
 	"bufio"
-	"compress/gzip"
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
@@ -36,6 +35,9 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/klauspost/compress/gzip"
+	"github.com/klauspost/compress/zstd"
+	"github.com/ulikunitz/xz"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -93,6 +95,7 @@ var (
 	issueFile              = "issue.txt"
 	denyFile               = "deny.txt"
 	blockFile              = "block.txt"
+	compressAlgo           string
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,6 +206,9 @@ func init() {
 	flag.StringVar(&consoleLog,
 		"console-log", "", "Enable console logging [requires 'quiet' or 'noquiet' argument]")
 
+	flag.StringVar(&compressAlgo,
+		"compress-algo", "gzip", "Compression algorithm [gzip, xz, zstd]")
+
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
@@ -221,6 +227,12 @@ func main() {
 
 	if os.Getuid() == 0 && !allowRoot {
 		log.Fatalf("ERROR: Running as root is strongly discouraged!  Use -allow-root to override.")
+	}
+
+	switch compressAlgo {
+	case "gzip", "xz", "zstd":
+	default:
+		log.Fatalf("ERROR: Invalid -compress-algo: %s", compressAlgo)
 	}
 
 	setupConsoleLogging()
@@ -618,6 +630,7 @@ func listConfiguration() {
 	fmt.Printf("\r* NO LOG: %t\r\n", noLog)
 	fmt.Printf("\r* LOG DIR: %s\r\n", logDir)
 	fmt.Printf("\r* NO LOG COMPRESS: %t\r\n", noCompress)
+	fmt.Printf("\r* COMPRESS ALGO: %s\r\n", compressAlgo)
 	fmt.Printf("\r* DEBUG: %t\r\n", debugNegotiation)
 
 	if consoleLog != "" {
@@ -1640,42 +1653,7 @@ func closeAndCompressLog(logfile *os.File, logFilePath string) {
 		return
 	}
 
-	compressedFilePath := logFilePath + ".gz"
-
-	data, err := ioutil.ReadFile(logFilePath)
-	if err != nil {
-		log.Printf("Error reading log '%s' for compression: %v", logFilePath, err)
-		return
-	}
-
-	gzFile, err := os.Create(compressedFilePath)
-	if err != nil {
-		log.Printf("Error creating compressed file '%s': %v", compressedFilePath, err)
-		return
-	}
-	defer gzFile.Close()
-
-	gzipWriter, err := gzip.NewWriterLevel(gzFile, gzip.BestCompression)
-	if err != nil {
-		log.Printf("Error creating gzip writer for '%s': %v", compressedFilePath, err)
-	}
-
-	_, err = gzipWriter.Write(data)
-	if err != nil {
-		log.Printf("Error writing to compressed file '%s': %v", compressedFilePath, err)
-		return
-	}
-
-	err = gzipWriter.Close()
-	if err != nil {
-		log.Printf("Error closing gzip writer for '%s': %v", compressedFilePath, err)
-		return
-	}
-
-	err = os.Remove(logFilePath)
-	if err != nil {
-		log.Printf("Error removing original log '%s' after compression: %v", logFilePath, err)
-	}
+	compressLogFile(logFilePath)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1807,7 +1785,7 @@ func rotateConsoleLog() {
 		log.Fatalf("Failed to open console log file: %v", err)
 	}
 
-	fmt.Fprintf(os.Stderr, "%s CONSOLE LOG ENABLED: %s\n", nowStamp(), logPath)
+	fmt.Fprintf(os.Stderr, "%s CONSOLE LOG: %s\n", nowStamp(), logPath)
 
 	if consoleLog == "quiet" {
 		log.SetOutput(consoleLogFile)
@@ -1820,7 +1798,7 @@ func rotateConsoleLog() {
 
 func compressLogFile(logFilePath string) {
 	if _, err := os.Stat(logFilePath); os.IsNotExist(err) {
-		return // File doesn't exist, nothing to compress
+		return
 	}
 
 	data, err := ioutil.ReadFile(logFilePath)
@@ -1829,29 +1807,73 @@ func compressLogFile(logFilePath string) {
 		return
 	}
 
-	compressedFilePath := logFilePath + ".gz"
-	gzFile, err := os.Create(compressedFilePath)
-	if err != nil {
-		log.Printf("Failed to create compressed file %q: %v", compressedFilePath, err)
+	var compressedFilePath string
+	var compressedFile *os.File
+	var writer io.WriteCloser
+
+	switch compressAlgo {
+	case "gzip":
+		compressedFilePath = logFilePath + ".gz"
+		compressedFile, err = os.Create(compressedFilePath)
+		if err != nil {
+			log.Printf("Failed to create compressed file %q: %v", compressedFilePath, err)
+			return
+		}
+		writer, err = gzip.NewWriterLevel(compressedFile, gzip.BestCompression)
+		if err != nil {
+			log.Printf("Error creating gzip writer for %q: %v", compressedFilePath, err)
+			compressedFile.Close()
+			return
+		}
+	case "xz":
+		compressedFilePath = logFilePath + ".xz"
+		compressedFile, err = os.Create(compressedFilePath)
+		if err != nil {
+			log.Printf("Failed to create compressed file %q: %v", compressedFilePath, err)
+			return
+		}
+		writer, err = xz.NewWriter(compressedFile)
+		if err != nil {
+			log.Printf("Error creating xz writer for %q: %v", compressedFilePath, err)
+			compressedFile.Close()
+			return
+		}
+	case "zstd":
+		compressedFilePath = logFilePath + ".zst"
+		compressedFile, err = os.Create(compressedFilePath)
+		if err != nil {
+			log.Printf("Failed to create compressed file %q: %v", compressedFilePath, err)
+			return
+		}
+		writer, err = zstd.NewWriter(compressedFile, zstd.WithEncoderLevel(zstd.SpeedBestCompression))
+		if err != nil {
+			log.Printf("Error creating zstd writer for %q: %v", compressedFilePath, err)
+			compressedFile.Close()
+			return
+		}
+	default:
+		log.Printf("Unknown compression algorithm: %s", compressAlgo)
 		return
 	}
-	defer gzFile.Close()
 
-	gzipWriter, err := gzip.NewWriterLevel(gzFile, gzip.BestCompression)
-	if err != nil {
-		log.Printf("Error creating gzip writer for %q: %v", compressedFilePath, err)
-		return
-	}
+	defer compressedFile.Close()
+	defer writer.Close()
 
-	_, err = gzipWriter.Write(data)
+	_, err = writer.Write(data)
 	if err != nil {
 		log.Printf("Error writing to compressed file %q: %v", compressedFilePath, err)
 		return
 	}
 
-	err = gzipWriter.Close()
+	err = writer.Close()
 	if err != nil {
-		log.Printf("Error closing gzip writer for %q: %v", compressedFilePath, err)
+		log.Printf("Error closing writer for %q: %v", compressedFilePath, err)
+		return
+	}
+
+	err = compressedFile.Close()
+	if err != nil {
+		log.Printf("Error closing compressed file %q: %v", compressedFilePath, err)
 		return
 	}
 
