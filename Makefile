@@ -24,11 +24,12 @@ proxy:
 	@env CGO_ENABLED=0 go build -trimpath -v
 	@test -x proxy 2> /dev/null && \
 		{ \
-			printf '%s\n' "Build successful:"; \
+			printf '\n%s\n' "Build successful:"; \
 			go version -m proxy 2> /dev/null | \
 				grep -E "$$(printf '\t')(mod|dep)$$(printf '\t')" \
 					2> /dev/null; \
 		}
+	@printf '%s\n' ""
 
 ##############################################################################
 # Target: clean

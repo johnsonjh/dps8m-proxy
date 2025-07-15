@@ -98,6 +98,22 @@ var (
 	denyFile               = "deny.txt"
 	blockFile              = "block.txt"
 	compressAlgo           string
+	emacsKeymap            = map[string]string{
+		"\x1b[1;5A": "\x1b\x5b", //    C-Arrow_Up -> Escape, [
+		"\x1b[1;5B": "\x1b\x5d", // C-Arrrow_Down -> Escape, ]
+		"\x1b[1;5C": "\x1b\x66", // C-Arrow_Right -> Escape, f
+		"\x1b[1;5D": "\x1b\x62", //  C-Arrow_Left -> Escape, b
+		"\x1b[1~":   "\x01",     //          Home -> Control-A
+		"\x1b[3~":   "\x04",     //        Delete -> Control-D
+		"\x1b[4~":   "\x05",     //           End -> Control-E
+		"\x1b[5~":   "\x1b\x76", //       Page_Up -> Escape, v
+		"\x1b[6~":   "\x16",     //     Page_Down -> Control-V
+		"\x1b[A":    "\x10",     //      Arrow_Up -> Control-P
+		"\x1b[B":    "\x0e",     //    Arrow_Down -> Control-N
+		"\x1b[C":    "\x06",     //   Arrow_Right -> Control-F
+		"\x1b[D":    "\x02",     //    Arrow_Left -> Control-B
+	}
+	emacsKeymapPrefixes = make(map[string]bool)
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,6 +139,7 @@ type Connection struct {
 	targetPort          int
 	totalMonitors       uint64
 	userName            string
+	emacsKeymapEnabled  bool
 	wasMonitored        bool
 }
 
@@ -130,11 +147,17 @@ type Connection struct {
 
 type altHostFlag struct{}
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 type stringSliceFlag []string
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (s *stringSliceFlag) String() string {
 	return strings.Join(*s, ", ")
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (s *stringSliceFlag) Set(value string) error {
 	*s = append(*s, value)
@@ -187,7 +210,7 @@ func init() {
 		"log-dir", "./log", "Base directory for logs")
 
 	flag.BoolVar(&noCompress,
-		"no-compress", false, "Disable gzip session log compression")
+		"no-compress", false, "Disable session and console log compression")
 
 	flag.BoolVar(&noLog,
 		"no-log", false, "Disable all session logging")
@@ -225,6 +248,12 @@ func init() {
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
+
+	for k := range emacsKeymap {
+		for i := 1; i < len(k); i++ {
+			emacsKeymapPrefixes[k[:i]] = true
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -406,8 +435,10 @@ func printVersion() {
 			switch setting.Key {
 			case "vcs.time":
 				date = setting.Value
+
 			case "vcs.revision":
 				commit = setting.Value
+
 			case "vcs.modified":
 				modified = (setting.Value == "true")
 			}
@@ -1292,35 +1323,115 @@ func handleSession(
 
 	go func() {
 		defer wg.Done()
-		buf := make([]byte, 1)
+
+		var menuMode bool
+		var escSequence []byte
+		var escTimer <-chan time.Time
+		reader := bufio.NewReader(channel)
+
+		byteChan := make(chan byte)
+		errorChan := make(chan error)
+
+		go func() {
+			for {
+				select {
+				case <-ctx.Done():
+					close(byteChan)
+					close(errorChan)
+					return
+				default:
+					b, err := reader.ReadByte()
+					if err != nil {
+						errorChan <- err
+						close(byteChan)
+						close(errorChan)
+						return
+					}
+					byteChan <- b
+				}
+			}
+		}()
 
 		for {
 			select {
 			case <-ctx.Done():
+				if len(escSequence) > 0 {
+					remote.Write(escSequence)
+					logwriter.Write(escSequence)
+				}
 				return
-			default:
-			}
-			n, err := channel.Read(buf)
-			if n > 0 {
-				atomic.AddUint64(&sshIn, uint64(n))
-				atomic.AddUint64(&conn.sshInTotal, uint64(n))
-				if buf[0] == 0x1D { // Ctrl-]
-					showMenu(conn, channel, remote, logwriter, &sshIn,
-						&sshOut, &telnetIn, &telnetOut, start)
+
+			case <-escTimer:
+				m, _ := remote.Write(escSequence)
+				atomic.AddUint64(&telnetOut, uint64(m))
+				logwriter.Write(escSequence)
+				escSequence = nil
+				escTimer = nil
+
+			case b := <-byteChan:
+				conn.lastActivityTime = time.Now()
+				atomic.AddUint64(&sshIn, 1)
+				atomic.AddUint64(&conn.sshInTotal, 1)
+
+				if menuMode {
+					handleMenuSelection(b, conn, channel, remote, logwriter,
+						&sshIn, &sshOut, &telnetIn, &telnetOut, start)
+					menuMode = false
 					continue
 				}
-				m, err2 := remote.Write(buf[:n])
-				atomic.AddUint64(&telnetOut, uint64(m))
-				atomic.AddUint64(&conn.sshOutTotal, uint64(m))
-				logwriter.Write(buf[:n])
-				conn.lastActivityTime = time.Now()
-				if err2 != nil {
-					channel.Close()
-					return
+
+				if b == 0x1d { // Ctrl-]
+					showMenu(channel)
+					menuMode = true
+					escSequence = nil
+					escTimer = nil
+					continue
 				}
-			}
-			if err != nil {
-				remote.Close()
+
+				if len(escSequence) > 0 {
+					escSequence = append(escSequence, b)
+					if conn.emacsKeymapEnabled {
+						if replacement, ok :=
+							emacsKeymap[string(escSequence)]; ok {
+							m, _ := remote.Write([]byte(replacement))
+							atomic.AddUint64(&telnetOut, uint64(m))
+							logwriter.Write([]byte(replacement))
+							escSequence = nil
+							escTimer = nil
+						} else if _, isPrefix :=
+							emacsKeymapPrefixes[string(escSequence)]; isPrefix {
+							escTimer = time.After(50 * time.Millisecond)
+						} else {
+							m, _ := remote.Write(escSequence)
+							atomic.AddUint64(&telnetOut, uint64(m))
+							logwriter.Write(escSequence)
+							escSequence = nil
+							escTimer = nil
+						}
+					} else {
+						m, _ := remote.Write(escSequence)
+						atomic.AddUint64(&telnetOut, uint64(m))
+						logwriter.Write(escSequence)
+						escSequence = nil
+						escTimer = nil
+					}
+				} else if b == 0x1b && conn.emacsKeymapEnabled {
+					escSequence = append(escSequence, b)
+					escTimer = time.After(50 * time.Millisecond)
+				} else {
+					m, _ := remote.Write([]byte{b})
+					atomic.AddUint64(&telnetOut, uint64(m))
+					logwriter.Write([]byte{b})
+				}
+
+			case err := <-errorChan:
+				if len(escSequence) > 0 {
+					remote.Write(escSequence)
+					logwriter.Write(escSequence)
+				}
+				if err != io.EOF {
+					log.Printf("SSH channel read error: %v", err)
+				}
 				return
 			}
 		}
@@ -1330,60 +1441,71 @@ func handleSession(
 		defer wg.Done()
 		buf := make([]byte, 1024)
 		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-			}
+			remote.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
 			n, err := remote.Read(buf)
+			if err != nil {
+				if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+					select {
+					case <-ctx.Done():
+						return
+					default:
+					}
+					continue
+				} else {
+					dur := time.Since(start)
+					log.Printf("DETACHED [%s] %s@%s (link time %s)",
+						conn.ID, conn.userName, conn.hostName, dur.Round(time.Second))
+					channel.Write([]byte(fmt.Sprintf(
+						"\r\nCONNECTION CLOSED (link time %s)\r\n\r\n",
+						dur.Round(time.Second))))
+
+					inRateSSH := uint64(float64(atomic.LoadUint64(&sshIn)) / dur.Seconds())
+					outRateSSH := uint64(float64(atomic.LoadUint64(&sshOut)) / dur.Seconds())
+					inRateNVT := uint64(float64(atomic.LoadUint64(&telnetIn)) / dur.Seconds())
+					outRateNVT := uint64(float64(atomic.LoadUint64(&telnetOut)) / dur.Seconds())
+
+					channel.Write([]byte(fmt.Sprintf(
+						">> SSH - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
+						atomic.LoadUint64(&sshIn), atomic.LoadUint64(&sshOut),
+						inRateSSH, outRateSSH)))
+					channel.Write([]byte(fmt.Sprintf(
+						">> NVT - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
+						atomic.LoadUint64(&telnetIn), atomic.LoadUint64(&telnetOut),
+						inRateNVT, outRateNVT)))
+					channel.Write([]byte("\r\n"))
+
+					channel.Close()
+					conn.sshInTotal = sshIn
+					conn.sshOutTotal = sshOut
+					return
+				}
+			}
+
 			if n > 0 {
 				atomic.AddUint64(&telnetIn, uint64(n))
 				atomic.AddUint64(&conn.sshInTotal, uint64(n))
 				fwd := buf[:0]
+
 				for i := 0; i < n; i++ {
 					if buf[i] != 0 {
 						fwd = append(fwd, buf[i])
 					}
 				}
+
 				atomic.AddUint64(&sshOut, uint64(len(fwd)))
 				atomic.AddUint64(&conn.sshOutTotal, uint64(len(fwd)))
 				channel.Write(fwd)
 				connectionsMutex.Lock()
+
 				for _, c := range connections {
 					if c.monitoring && c.monitoredConnection.ID == conn.ID {
 						c.channel.Write(fwd)
 					}
 				}
+
 				connectionsMutex.Unlock()
 				logwriter.Write(buf[:n])
 				conn.lastActivityTime = time.Now()
-			}
-			if err != nil {
-				dur := time.Since(start)
-				log.Printf("DETACHED [%s] %s@%s (link time %s)",
-					conn.ID, conn.userName, conn.hostName, dur.Round(time.Second))
-				channel.Write([]byte(fmt.Sprintf("\r\nCONNECTION CLOSED (link time %s)\r\n\r\n",
-					dur.Round(time.Second))))
-
-				inRateSSH := uint64(float64(atomic.LoadUint64(&sshIn)) / dur.Seconds())
-				outRateSSH := uint64(float64(atomic.LoadUint64(&sshOut)) / dur.Seconds())
-				inRateNVT := uint64(float64(atomic.LoadUint64(&telnetIn)) / dur.Seconds())
-				outRateNVT := uint64(float64(atomic.LoadUint64(&telnetOut)) / dur.Seconds())
-
-				channel.Write([]byte(fmt.Sprintf(
-					">> SSH - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-					atomic.LoadUint64(&sshIn), atomic.LoadUint64(&sshOut),
-					inRateSSH, outRateSSH)))
-				channel.Write([]byte(fmt.Sprintf(
-					">> NVT - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-					atomic.LoadUint64(&telnetIn), atomic.LoadUint64(&telnetOut),
-					inRateNVT, outRateNVT)))
-				channel.Write([]byte("\r\n"))
-
-				channel.Close()
-				conn.sshInTotal = sshIn
-				conn.sshOutTotal = sshOut
-				return
 			}
 		}
 	}()
@@ -1421,7 +1543,7 @@ func sendBanner(sid string, sshConn *ssh.ServerConn, ch ssh.Channel, conn *Conne
 		fmt.Fprint(ch, "Send Control-] to disconnect.\r\n")
 	} else {
 		if conn.invalidShare {
-			fmt.Fprintf(ch, "The username '%s' was not active for session sharing.\r\n",
+			fmt.Fprintf(ch, "The username '%s' was NOT active for session sharing!\r\n",
 				conn.userName)
 		}
 	}
@@ -1448,7 +1570,8 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 		for i < n {
 			if buf[i] == IAC && i+2 < n {
 				cmd, opt := buf[i+1], buf[i+2]
-				writeNegotiation(ch, logw, "[RCVD "+cmdName(cmd)+" "+optName(opt)+"]")
+				writeNegotiation(ch, logw,
+					"[RCVD "+cmdName(cmd)+" "+optName(opt)+"]")
 				var reply byte
 				switch cmd {
 				case WILL:
@@ -1468,7 +1591,8 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 					continue
 				}
 				sendIAC(remote, reply, opt)
-				writeNegotiation(ch, logw, "[SENT "+cmdName(reply)+" "+optName(opt)+"]")
+				writeNegotiation(ch, logw,
+					"[SENT "+cmdName(reply)+" "+optName(opt)+"]")
 				i += 3
 			} else {
 				ch.Write(buf[i : i+1])
@@ -1532,95 +1656,110 @@ func optName(b byte) string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func showMenu(conn *Connection, ch ssh.Channel, remote net.Conn, logw io.Writer,
-	sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) {
+func showMenu(ch ssh.Channel) {
 	menu := "\r\n" +
-		"\r+====== MENU =======+\r\n" +
-		"\r|                   |\r\n" +
-		"\r|  A - Send AYT     |\r\n" +
-		"\r|  B - Send Break   |\r\n" +
-		"\r|  N - Send NOP     |\r\n" +
-		"\r|  S - Show Status  |\r\n" +
-		"\r|  X - Disconnect   |\r\n" +
-		"\r|                   |\r\n" +
-		"\r+===================+\r\n"
-
+		"\r+======= MENU ========+\r\n" +
+		"\r|                     |\r\n" +
+		"\r|  A - Send AYT       |\r\n" +
+		"\r|  B - Send Break     |\r\n" +
+		"\r|  K - Toggle Keymap  |\r\n" +
+		"\r|  N - Send NOP       |\r\n" +
+		"\r|  S - Show Status    |\r\n" +
+		"\r|  X - Disconnect     |\r\n" +
+		"\r|                     |\r\n" +
+		"\r+=====================+\r\n"
 	ch.Write([]byte(menu))
-	sel := make([]byte, 1)
+}
 
-	if _, err := ch.Read(sel); err == nil {
-		switch sel[0] {
-		case 'a', 'A':
-			remote.Write([]byte{IAC, AYT}) // AYT
-			logw.Write([]byte{IAC, AYT})
-			ch.Write([]byte("\r\n>> Sent AYT (Are You There)\r\n"))
-			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
-		case 'b', 'B':
-			remote.Write([]byte{IAC, 243}) // BREAK
-			logw.Write([]byte{IAC, 243})
-			ch.Write([]byte("\r\n>> Sent BREAK\r\n"))
-			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
-		case 'n', 'N':
-			remote.Write([]byte{IAC, NOP}) // NOP
-			logw.Write([]byte{IAC, NOP})
-			ch.Write([]byte("\r\n>> Sent NOP (No Operation)\r\n"))
-			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
-		case 's', 'S':
-			dur := time.Since(start)
-			ch.Write([]byte("\r\n"))
-			ch.Write([]byte(fmt.Sprintf(
-				">> LNK - Username '%s' can be used to share this session.\r\n",
-				conn.shareableUsername)))
-			if conn.wasMonitored {
-				connectionsMutex.Lock()
-				currentMonitors := 0
-				for _, c := range connections {
-					if c.monitoring && c.monitoredConnection.ID == conn.ID {
-						currentMonitors++
-					}
-				}
-				connectionsMutex.Unlock()
-				timesStr := "times"
-				if conn.totalMonitors == 1 {
-					timesStr = "time"
-				}
-				userStr := "users"
-				if currentMonitors == 1 {
-					userStr = "user"
-				}
-				ch.Write([]byte(fmt.Sprintf(
-					">> MON - Shared session has been viewed %d %s; %d %s currently online.\r\n",
-					conn.totalMonitors, timesStr, currentMonitors, userStr)))
-			}
+func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.Conn,
+	logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) {
+	switch sel {
+	case 'a', 'A':
+		remote.Write([]byte{IAC, AYT}) // AYT
+		logw.Write([]byte{IAC, AYT})
+		ch.Write([]byte("\r\n>> Sent AYT\r\n"))
+		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
-			inSSH := atomic.LoadUint64(sshIn)
-			outSSH := atomic.LoadUint64(sshOut)
-			inNVT := atomic.LoadUint64(telnetIn)
-			outNVT := atomic.LoadUint64(telnetOut)
+	case 'b', 'B':
+		remote.Write([]byte{IAC, 243}) // BREAK
+		logw.Write([]byte{IAC, 243})
+		ch.Write([]byte("\r\n>> Sent BREAK\r\n"))
+		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
-			inRateSSH := uint64(float64(atomic.LoadUint64(sshIn)) / dur.Seconds())
-			outRateSSH := uint64(float64(atomic.LoadUint64(sshOut)) / dur.Seconds())
-			inRateNVT := uint64(float64(atomic.LoadUint64(telnetIn)) / dur.Seconds())
-			outRateNVT := uint64(float64(atomic.LoadUint64(telnetOut)) / dur.Seconds())
-
-			ch.Write([]byte(fmt.Sprintf(
-				">> SSH - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-				inSSH, outSSH, inRateSSH, outRateSSH)))
-			ch.Write([]byte(fmt.Sprintf(
-				">> NVT - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-				inNVT, outNVT, inRateNVT, outRateNVT)))
-
-			ch.Write([]byte(fmt.Sprintf(
-				">> LNK - link time: %s\r\n", dur.Round(time.Second).String())))
-			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
-
-		case 'x', 'X':
-			ch.Write([]byte("\r\n>> DISCONNECTING...\r\n"))
-			ch.Close()
-
-		default:
-			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+	case 'k', 'K':
+		conn.emacsKeymapEnabled = !conn.emacsKeymapEnabled
+		if conn.emacsKeymapEnabled {
+			ch.Write([]byte("\r\n>> EMACS KEYMAP ENABLED\r\n"))
+		} else {
+			ch.Write([]byte("\r\n>> EMACS KEYMAP DISABLED\r\n"))
 		}
+		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+
+	case 'n', 'N':
+		remote.Write([]byte{IAC, NOP}) // NOP
+		logw.Write([]byte{IAC, NOP})
+		ch.Write([]byte("\r\n>> Sent NOP\r\n"))
+		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+
+	case 's', 'S':
+		dur := time.Since(start)
+		ch.Write([]byte("\r\n"))
+		ch.Write([]byte(fmt.Sprintf(
+			">> LNK - Username '%s' can be used to share this session.\r\n",
+			conn.shareableUsername)))
+		if conn.wasMonitored {
+			connectionsMutex.Lock()
+			currentMonitors := 0
+			for _, c := range connections {
+				if c.monitoring && c.monitoredConnection.ID == conn.ID {
+					currentMonitors++
+				}
+			}
+			connectionsMutex.Unlock()
+			timesStr := "times"
+			if conn.totalMonitors == 1 {
+				timesStr = "time"
+			}
+			userStr := "users"
+			if currentMonitors == 1 {
+				userStr = "user"
+			}
+			ch.Write([]byte(fmt.Sprintf(
+				">> MON - Shared session has been viewed %d %s; %d %s currently online.\r\n",
+				conn.totalMonitors, timesStr, currentMonitors, userStr)))
+		}
+
+		inSSH := atomic.LoadUint64(sshIn)
+		outSSH := atomic.LoadUint64(sshOut)
+		inNVT := atomic.LoadUint64(telnetIn)
+		outNVT := atomic.LoadUint64(telnetOut)
+
+		inRateSSH := uint64(float64(atomic.LoadUint64(sshIn)) / dur.Seconds())
+		outRateSSH := uint64(float64(atomic.LoadUint64(sshOut)) / dur.Seconds())
+		inRateNVT := uint64(float64(atomic.LoadUint64(telnetIn)) / dur.Seconds())
+		outRateNVT := uint64(float64(atomic.LoadUint64(telnetOut)) / dur.Seconds())
+
+		ch.Write([]byte(fmt.Sprintf(
+			">> SSH - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
+			inSSH, outSSH, inRateSSH, outRateSSH)))
+		ch.Write([]byte(fmt.Sprintf(
+			">> NVT - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
+			inNVT, outNVT, inRateNVT, outRateNVT)))
+
+		keymapStatus := ""
+		if conn.emacsKeymapEnabled {
+			keymapStatus = " (Emacs keymap enabled)"
+		}
+		ch.Write([]byte(fmt.Sprintf(
+			">> LNK - link time: %s%s\r\n", dur.Round(time.Second).String(), keymapStatus)))
+		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+
+	case 'x', 'X':
+		ch.Write([]byte("\r\n>> DISCONNECTING...\r\n"))
+		ch.Close()
+
+	default:
+		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 	}
 }
 
@@ -1648,6 +1787,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, "", err
 	}
+
 	dir = filepath.Join(dir, ipDir)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, "", err
@@ -1657,6 +1797,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	files, _ := ioutil.ReadDir(dir)
 	maxSeq := 0
 	prefix := ts + "_" + sid + "_"
+
 	for _, f := range files {
 		if strings.HasPrefix(f.Name(), prefix) {
 			parts := strings.SplitN(f.Name()[len(prefix):], ".", 2)
@@ -1719,7 +1860,7 @@ func newSessionID(connections map[string]*Connection, mutex *sync.Mutex) string 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex) string {
-	const chars = "abcdfghjkmnprstvwxyzACDFGHJKMNPRSTVWXYZ2345679" // LOL
+	const chars = "abcdghkmnprsvwxyzACDFGJKMNPRSTVXY345679" // LOL
 	for {
 		b := make([]byte, 20)
 		rand.Read(b)
@@ -1884,7 +2025,8 @@ func compressLogFile(logFilePath string) {
 			log.Printf("Failed to create compressed file %q: %v", compressedFilePath, err)
 			return
 		}
-		writer, err = zstd.NewWriter(compressedFile, zstd.WithEncoderLevel(zstd.SpeedBestCompression))
+		writer, err = zstd.NewWriter(
+			compressedFile, zstd.WithEncoderLevel(zstd.SpeedBestCompression))
 		if err != nil {
 			log.Printf("Error creating zstd writer for %q: %v", compressedFilePath, err)
 			compressedFile.Close()
