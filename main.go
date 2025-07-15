@@ -1129,7 +1129,7 @@ func handleSession(
 		return
 	}
 
-	if raw, err := ioutil.ReadFile("motd.txt"); err == nil {
+	if raw, err := ioutil.ReadFile("issue.txt"); err == nil {
 		txt := strings.ReplaceAll(
 			strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
 		channel.Write([]byte(txt + "\r\n"))
