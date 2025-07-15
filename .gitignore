@@ -3,8 +3,11 @@
 *~
 *.bak
 blacklist.txt
+block-*.txt
 cross.bin/
+deny-*.txt
 dps8m-proxy
+issue-*.txt
 *.log
 log
 *.o
