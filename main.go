@@ -65,7 +65,8 @@ const (
 
 var (
 	allowRoot              bool
-	altHosts               = make(map[string]string)
+	logPerm                uint = 0o600
+	altHosts                    = make(map[string]string)
 	blacklistedNetworks    []*net.IPNet
 	blacklistFile          string
 	connections            = make(map[string]*Connection)
@@ -196,6 +197,23 @@ func (a *altHostFlag) Set(value string) error {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+type octalPermValue uint
+
+func (op *octalPermValue) String() string {
+	return fmt.Sprintf("%o", *op)
+}
+
+func (op *octalPermValue) Set(s string) error {
+	v, err := strconv.ParseUint(s, 8, 32)
+	if err != nil {
+		return fmt.Errorf("invalid octal permission value: %w", err)
+	}
+	*op = octalPermValue(v)
+	return nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func init() {
 	flag.Var(&sshAddr,
 		"ssh-addr", "SSH listener address [allowed multiple times]")
@@ -234,7 +252,7 @@ func init() {
 		"whitelist", "", "Whitelist file (optional)")
 
 	flag.BoolVar(&allowRoot,
-		"allow-root", false, "Allow running as root (UID 0) [strongly discouraged]")
+		"allow-root", false, "Allow running as root (UID 0) [strongly discouraged!]")
 
 	flag.BoolVar(&showVersion,
 		"version", false, "Show version information")
@@ -244,6 +262,9 @@ func init() {
 
 	flag.StringVar(&compressAlgo,
 		"compress-algo", "gzip", "Compression algorithm [gzip, xz, zstd]")
+
+	flag.Var((*octalPermValue)(&logPerm),
+		"log-perm", "Permissions for log files (umask, e.g., 0600, 0644)")
 
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
@@ -687,6 +708,7 @@ func listConfiguration() {
 	fmt.Printf("\r* LOG DIR: %s\r\n", logDir)
 	fmt.Printf("\r* NO LOG COMPRESS: %t\r\n", noCompress)
 	fmt.Printf("\r* COMPRESS ALGO: %s\r\n", compressAlgo)
+	fmt.Printf("\r* LOG PERMISSIONS: %04o\r\n", logPerm)
 	fmt.Printf("\r* DEBUG: %t\r\n", debugNegotiation)
 
 	if consoleLog != "" {
@@ -1813,7 +1835,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	base := fmt.Sprintf("%s_%s_%d", ts, sid, seq)
 	pathBase := filepath.Join(dir, base)
 	f, err := os.OpenFile(pathBase+".log",
-		os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
+		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm))
 	return f, pathBase, err
 }
 
@@ -1958,7 +1980,8 @@ func rotateConsoleLog() {
 	}
 
 	var err error
-	consoleLogFile, err = os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
+	consoleLogFile, err = os.OpenFile(logPath,
+		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm))
 	if err != nil {
 		log.Fatalf("Failed to open console log file: %v", err)
 	}
