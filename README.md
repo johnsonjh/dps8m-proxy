@@ -144,40 +144,34 @@ proxied to port `9998` on the host `mainframe`.
 $ dps8-proxy -telnet-host "legacybox:6180" -alt-host "elsewhere@mainframe:9998"  
 
 > c
-2025/07/15 23:20:00 DPS8M Proxy (2025-JUL-15) [linux/amd64]
+2025/07/15 23:20:00 DPS8M Proxy (2025-Jul-15) [linux/amd64]
 
 DPS8M PROXY Configuration
 =========================
-
 * SSH LISTEN ON: :2222, :2223, localhost:8000
-
 * DEFAULT TARGET: 127.0.0.1:6180
 * ALT TARGETS:
   * 127.0.2.1:9998 [opcon]
   * 127.0.0.1:9999 [banai]
-
 * TIME MAX: 0 seconds
 * IDLE MAX: 0 seconds
-
 * LOG DIR: ./log
 * NO SESSION LOG: false
 * CONSOLE LOG: log/2025/07/15/console.log
 * NO LOG COMPRESS: false
 * COMPRESS ALGO: gzip
 * LOG PERMISSIONS: 0600
-
 * GRACEFUL SHUTDOWN: false
 * DENY NEW CONNECTIONS: false
-
 * BLACKLIST: disabled
 * WHITELIST: disabled
-
 * DEBUG: false
-
 * RESOURCE USAGE:
-  * Memory usage: 696.6 KiB
-  * Goroutines: 9 active
-  * CPU time used: 1s
+  * MEMORY USAGE: 696.7 KiB
+  * GOROUTINES: 9 active
+  * CPU TIME USED: 0s
+* CONNECTIONS (CUM.): 0 SSH, 0 TELNET
+
 
 2025/07/15 23:20:00 INITIATE [d4fcab] 23.45.67.89
 2025/07/15 23:20:00 VALIDATE [d4fcab] elsewhere@23.45.67.89:22139

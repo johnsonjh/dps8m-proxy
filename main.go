@@ -67,7 +67,9 @@ const (
 var (
 	allowRoot              bool
 	logPerm                uint = 0o600
-	altHosts                    = make(map[string]string)
+	sshSessionsTotal       atomic.Uint64
+	telnetConnectionsTotal atomic.Uint64
+	altHosts               = make(map[string]string)
 	blacklistedNetworks    []*net.IPNet
 	blacklistFile          string
 	connections            = make(map[string]*Connection)
@@ -692,7 +694,7 @@ func listConfiguration() {
 	fmt.Println("\r\n\rDPS8M PROXY Configuration")
 	fmt.Println("\r=========================")
 	fmt.Printf("\r\n* SSH LISTEN ON: %s\r\n", strings.Join(sshAddr, ", "))
-	fmt.Printf("\r\n* DEFAULT TARGET: %s\r\n", telnetHostPort)
+	fmt.Printf("\r* DEFAULT TARGET: %s\r\n", telnetHostPort)
 
 	if len(altHosts) > 0 {
 		fmt.Println("\r* ALT TARGETS:")
@@ -703,10 +705,10 @@ func listConfiguration() {
 		fmt.Println("\r* ALT TARGETS: None configured")
 	}
 
-	fmt.Printf("\r\n* TIME MAX: %d seconds\r\n", timeMax)
+	fmt.Printf("\r* TIME MAX: %d seconds\r\n", timeMax)
 	fmt.Printf("\r* IDLE MAX: %d seconds\r\n", idleMax)
 
-	fmt.Printf("\r\n* LOG DIR: %s\r\n", logDir)
+	fmt.Printf("\r* LOG DIR: %s\r\n", logDir)
 	fmt.Printf("\r* NO SESSION LOG: %t\r\n", noLog)
 	if consoleLog != "" {
 		logPath := getConsoleLogPath(time.Now())
@@ -722,11 +724,11 @@ func listConfiguration() {
 	fmt.Printf("\r* COMPRESS ALGO: %s\r\n", compressAlgo)
 	fmt.Printf("\r* LOG PERMISSIONS: %04o\r\n", logPerm)
 
-	fmt.Printf("\r\n* GRACEFUL SHUTDOWN: %t\r\n", gracefulShutdownMode.Load())
+	fmt.Printf("\r* GRACEFUL SHUTDOWN: %t\r\n", gracefulShutdownMode.Load())
 	fmt.Printf("\r* DENY NEW CONNECTIONS: %t\r\n", denyNewConnectionsMode.Load())
 
 	if blacklistFile == "" && len(blacklistedNetworks) == 0 {
-		fmt.Printf("\r\n* BLACKLIST: disabled\r\n")
+		fmt.Printf("\r* BLACKLIST: disabled\r\n")
 	} else if whitelistFile != "" && blacklistFile == "" {
 		fmt.Printf("\r* BLACKLIST: deny all (due to whitelist only)\r\n")
 	} else {
@@ -749,7 +751,7 @@ func listConfiguration() {
 		}
 	}
 
-	fmt.Printf("\r\n* DEBUG: %t\r\n", debugNegotiation)
+	fmt.Printf("\r* DEBUG: %t\r\n", debugNegotiation)
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 
@@ -758,13 +760,16 @@ func listConfiguration() {
 	metrics.Read(samples)
 	cpuSeconds := samples[0].Value.Float64()
 
-	fmt.Printf("\r\n* RESOURCE USAGE:"+
-		"\r\n  * Memory usage: %s"+
-		"\r\n  * Goroutines: %d active"+
-		"\r\n  * CPU time used: %s\r\n\r\n",
+	fmt.Printf("\r* RESOURCE USAGE:"+
+		"\r\n  * MEMORY USAGE: %s"+
+		"\r\n  * GOROUTINES: %d active"+
+		"\r\n  * CPU TIME USED: %s"+
+		"\r\n* CONNECTIONS (CUM.): %d SSH, %d TELNET\r\n\r\n",
 		byteCountIEC(m.Alloc),
 		runtime.NumGoroutine(),
-		formatDuration(cpuSeconds))
+		formatDuration(cpuSeconds),
+		sshSessionsTotal.Load(),
+		telnetConnectionsTotal.Load())
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -978,6 +983,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 	if !suppressLogs {
 		log.Printf("INITIATE [%s] %s", sid, host)
+		sshSessionsTotal.Add(1)
 	}
 
 	config := &ssh.ServerConfig{
@@ -1348,6 +1354,7 @@ func handleSession(
 		channel.Close()
 		return
 	}
+	telnetConnectionsTotal.Add(1)
 
 	if tcp2, ok := remote.(*net.TCPConn); ok {
 		tcp2.SetNoDelay(true)
