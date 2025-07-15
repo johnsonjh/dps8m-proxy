@@ -216,7 +216,7 @@ func (op *octalPermValue) Set(s string) error {
 
 func init() {
 	flag.Var(&sshAddr,
-		"ssh-addr", "SSH listener address [allowed multiple times]")
+		"ssh-addr", "SSH listener address (e.g.: \":2222\", \"[::1]:8000\") [allowed multiple times]")
 
 	flag.StringVar(&telnetHostPort,
 		"telnet-host", "127.0.0.1:6180", "Default TELNET target (host:port)")

@@ -22,11 +22,12 @@ to anyone who wants to provide modern SSH access to legacy systems.
 * ✅ Full IPv6 support
 * ✅ Access control whitelist/blacklist (by IP address or CIDR block)
 * ✅ Session monitoring and logging (by date/time and host)
-* ✅ Automatic log compression (gzip, xz, zstandard)
+* ✅ Automatic logfile compression (gzip, xz, zstandard)
 * ✅ Banners for accepted, denied, and blocked connections
 * ✅ Session connection monitoring with idle time tracking (and optional timeouts)
 * ✅ Interactive connection management for administrators
 * ✅ User access to **TELNET** features (*e.g.* line BREAK) and statistics
+* ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
 * ✅ Link filtering
 * ✅ Live streaming connection sharing (read-only)
   * 🤝 Allows users to share their session with one or more viewers
@@ -61,7 +62,7 @@ to anyone who wants to provide modern SSH access to legacy systems.
 ```
 Usage of proxy:
   -allow-root
-        Allow running as root (UID 0) [strongly discouraged]
+        Allow running as root (UID 0) [strongly discouraged!]
   -alt-host value
         Alternate TELNET targets (username@host:port) [allowed multiple times]
   -blacklist string
@@ -76,14 +77,16 @@ Usage of proxy:
         Maximum connection idle time in seconds
   -log-dir string
         Base directory for logs (default "./log")
+  -log-perm value
+        Permissions for log files (umask, e.g., 0600, 0644) (default 600)
   -no-banner
         Disable SSH connection banner
   -no-compress
-        Disable gzip session log compression
+        Disable session and console log compression
   -no-log
         Disable all session logging
-  -ssh-addr string
-        SSH listen address (default ":2222")
+  -ssh-addr value
+        SSH listener address [allowed multiple times]
   -telnet-host string
         Default TELNET target (host:port) (default "127.0.0.1:6180")
   -time-max int
@@ -152,12 +155,14 @@ Configuration
 * NO LOG: false
 * LOG DIR: ./log
 * NO LOG COMPRESS: false
+* COMPRESS ALGO: gzip
+* LOG PERMISSIONS: 0600
 * DEBUG: false
 * CONSOLE LOG: ./log/2025/07/13/console.log
 * GRACEFUL SHUTDOWN: false
 * DENY NEW CONNECTIONS: false
-* BLACKLIST: 0 entries loaded
-* WHITELIST: 0 entries loaded
+* BLACKLIST: disabled
+* WHITELIST: disabled
 
 2025/07/13 23:20:00 INITIATE [d4fcab] 23.45.67.89
 2025/07/13 23:20:00 VALIDATE [d4fcab] elsewhere@23.45.67.89:22139
@@ -185,24 +190,44 @@ Users connected via SSH can send `^]` (*i.e.* `Control + ]`) during
 a session to access the following menu:
 
 ```
-+====== MENU =======+
-|                   |
-|  B - Send Break   |
-|  S - Show Status  |
-|  X - Disconnect   |
-|                   |
-+===================+
++======= MENU ========+
+|                     |
+|  A - Send AYT       |
+|  B - Send Break     |
+|  K - Toggle Keymap  |
+|  N - Send NOP       |
+|  S - Show Status    |
+|  X - Disconnect     |
+|                     |
++=====================+
 ```
 
-* `X` disconnects from the remote host (and ends the SSH session)
+* `A` sends an IAC `AYT` (*Are You There?*) to the remote host
 * `B` sends an IAC `BREAK` signal to the remote host
-* `S` displays some session statistics:
+* `K` toggles the transparent key remapping mode, which translates
+  modern `xterm`/`VT320` movement key inputs to Emacs sequences:
+  * `Control-Arrow_Up` ⟶ `Escape [`
+  * `C-Arrrow_Down` ⟶ `Escape, ]`
+  * `C-Arrow_Right` ⟶ `Escape, f`
+  * `C-Arrow_Left` ⟶ `Escape, b`
+  * `Home` ⟶ `Control-A`
+  * `Delete` ⟶ `Control-D`
+  * `End` ⟶ `Control-E`
+  * `Page_Up` ⟶ `Escape, v`
+  * `Page_Down` ⟶ `Control-V`
+  * `Arrow_Up` ⟶ `Control-P`
+  * `Arrow_Down` ⟶ `Control-N`
+  * `Arrow_Right` ⟶ `Control-F`
+  * `Arrow_Left` ⟶ `Control-B`
+* `N` sends an IAC `NOP` (*No Operation*) to the remote host
+* `S` displays the status the session and some statistics:
   ```
   >> LNK - The username '_gRSyWHxPcMp2MWvtmWWF' can be used to share this session.
   >> SSH - in:   58 B,   out: 4.82 KiB, in rate:   4 B/s, out rate: 381 B/s
   >> NVT - in: 4.82 KiB, out:   57 B,   in rate: 381 B/s, out rate:   4 B/s
-  >> LNK - link time: 13s
+  >> LNK - link time: 13s (Emacs keymap enabled)
   ```
+* `X` disconnects from the remote host (and ends the SSH session)
 
 ### Connection sharing
 
@@ -245,8 +270,8 @@ Some features are still missing in this implementation and will be
 added in future updates:
 
 * The original software has features we have not yet re-implemented
-  such as admin messaging, key remapping, pre-connect CAPTCHAs,
-  link throttling, and RFC-1372 flow control.
+  such as admin messaging, pre-connect CAPTCHAs, link throttling,
+  and RFC-1372 flow control.
 * The **TELNET** features currently implemented are minimal—enough for
   supporting **DPS8M**.  Improved protocol support is planned.
 
