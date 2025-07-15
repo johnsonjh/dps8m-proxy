@@ -220,7 +220,7 @@ func main() {
 	}
 
 	if os.Getuid() == 0 && !allowRoot {
-		log.Fatalf("ERROR: Running as root is strongly discouraged.  Use -allow-root to override.")
+		log.Fatalf("ERROR: Running as root is strongly discouraged!  Use -allow-root to override.")
 	}
 
 	setupConsoleLogging()
@@ -451,7 +451,7 @@ func handleConsoleInput() {
 
 		case "R", "r":
 			if blacklistFile == "" && whitelistFile == "" {
-				log.Printf("NO ACCESS CONTROL LISTS ENABLED")
+				log.Printf("NO ACCESS CONTROL LISTS ARE ENABLED.")
 			} else {
 				reloadLists()
 			}
@@ -1199,17 +1199,6 @@ func handleSession(
 		}
 	}()
 
-	if conn.monitoring {
-		if !suppressLogs { // XXX 937
-			log.Printf("UMONITOR [%s] %s -> %s",
-				conn.ID, conn.userName, conn.monitoredConnection.ID)
-		}
-		go io.Copy(ioutil.Discard, channel)
-		<-conn.monitoredConnection.cancelCtx.Done()
-		channel.Close()
-		return
-	}
-
 	var targetHost string
 	var targetPort int
 
@@ -1791,6 +1780,8 @@ func setupConsoleLogging() {
 	}()
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func rotateConsoleLog() {
 	consoleLogMutex.Lock()
 	defer consoleLogMutex.Unlock()
@@ -1816,12 +1807,16 @@ func rotateConsoleLog() {
 		log.Fatalf("Failed to open console log file: %v", err)
 	}
 
+	fmt.Fprintf(os.Stderr, "%s CONSOLE LOG ENABLED: %s\n", nowStamp(), logPath)
+
 	if consoleLog == "quiet" {
 		log.SetOutput(consoleLogFile)
 	} else {
 		log.SetOutput(io.MultiWriter(os.Stdout, consoleLogFile))
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func compressLogFile(logFilePath string) {
 	if _, err := os.Stat(logFilePath); os.IsNotExist(err) {
