@@ -24,7 +24,7 @@ import (
 func setupSignalHandlers() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan,
-		syscall.SIGINT, syscall.SIGTERM,
+		syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT,
 		syscall.SIGHUP, syscall.SIGUSR1,
 		syscall.SIGUSR2)
 
@@ -53,7 +53,7 @@ func setupSignalHandlers() {
 				log.Println("SIGUSR2 received: Denying new connections.")
 				denyNewConnectionsMode.Store(true)
 
-			case syscall.SIGINT, syscall.SIGTERM:
+			case syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
 				immediateShutdown()
 			}
 		}
