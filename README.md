@@ -82,8 +82,8 @@ Usage of proxy:
         Disable gzip session log compression
   -no-log
         Disable all session logging
-  -ssh-addr string
-        SSH listen address (default ":2222")
+  -ssh-addr value
+        SSH listener address [allowed multiple times]
   -telnet-host string
         Default TELNET target (host:port) (default "127.0.0.1:6180")
   -time-max int
