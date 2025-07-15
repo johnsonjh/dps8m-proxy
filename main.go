@@ -471,7 +471,7 @@ func printVersion() {
 			t = time.Now()
 		}
 
-		tdate := t.Format("2006-JAN-02")
+		tdate := t.Format("2006-Jan-02")
 
 		if commit != "" && isGitSHA(commit) {
 			commit = commit[:7]
