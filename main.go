@@ -332,7 +332,7 @@ func main() {
 
 					if idleMax > 0 && idleTime > time.Duration(idleMax)*time.Second {
 						connUptime := time.Since(conn.startTime)
-						log.Printf("IDLEKICK [%s] %s@%s (idle %s, link %s)",
+						log.Printf("IDLEKILL [%s] %s@%s (idle %s, link %s)",
 							id, conn.userName, conn.hostName, idleTime.Round(time.Second),
 							connUptime.Round(time.Second))
 						conn.channel.Write([]byte(fmt.Sprintf(
@@ -342,7 +342,7 @@ func main() {
 						delete(connections, id)
 					} else if timeMax > 0 && connUptime > time.Duration(timeMax)*time.Second {
 						connUptime := time.Since(conn.startTime)
-						log.Printf("TIMEKICK [%s] %s@%s (link time %s)",
+						log.Printf("TIMEKILL [%s] %s@%s (link time %s)",
 							id, conn.userName, conn.hostName, connUptime.Round(time.Second))
 						conn.channel.Write([]byte(fmt.Sprintf(
 							"\r\n\r\nCONNECTION TIMEOUT (link time %s)\r\n\r\n",
