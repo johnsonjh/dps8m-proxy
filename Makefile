@@ -20,7 +20,7 @@ all: proxy
 
 .PHONY: proxy
 proxy:
-	@go build -trimpath -v
+	@env CGO_ENABLED=0 go build -trimpath -v
 
 ##############################################################################
 # Target: clean

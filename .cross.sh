@@ -31,7 +31,7 @@ _S=$(go tool dist list \
   | xargs -I{} printf '%s\n' '
         export {}; printf "%s/%s\n" "${GOOS:?}" "${GOARCH:?}";
         go build -trimpath -o ./cross.bin/proxy."${GOOS:?}"."${GOARCH:?}";')
-echo "$_S"
+
 ##############################################################################
 # Disable strict
 
