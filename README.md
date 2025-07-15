@@ -6,7 +6,7 @@
 
 ## Overview
 
-The `proxy` (or `dps8m-proxy`) program acts as a multi-user
+The **`proxy`** (or **`dps8m-proxy`**) program acts as a multi-user
 *terminal server* and proxy, accepting incoming **SSH** connections on
 the front-end and relaying (*or proxying*) these connections to one or
 more **TELNET** connections on the back-end.
@@ -244,7 +244,7 @@ a session to access the following menu:
 
 ## History
 
-This version of the `dps8m-proxy` program is a from-scratch
+This version of the `proxy` program is a from-scratch
 [Golang](https://go.dev/) re-implementation of an older legacy program
 of the same name, the original being an over-engineered and complex
 multi-process application of more than 10,000 SLOC: ≅8,000 lines of
@@ -269,47 +269,32 @@ original legacy codebase.
 Some features are still missing in this implementation and will be
 added in future updates:
 
-* The original software has features we have not yet re-implemented
-  such as admin messaging, pre-connect CAPTCHAs, link throttling,
-  and RFC-1372 flow control.
-* The **TELNET** features currently implemented are minimal—enough for
-  supporting **DPS8M**.  Improved protocol support is planned.
+* The original legacy software has features not yet re-implemented
+  CAPTCHAs, throttling, and **TELNET** flow control support.
+* The **TELNET** features currently implemented are minimal—enough
+  for supporting **DPS8M**.  Improved protocol support is planned.
 
 ## Not planned
 
-The original software “grew” many features that are difficult to
-re-implement and had very little actual usage.  The following are
-some of these features, which may be added at a later date but are
-considered to be ***very low priority*** (*some with notes explaining
-why*):
+The original legacy software “grew” many features that would be
+difficult to re-implement but also had very little actual usage.
+The following are some of these features, which *may* be added at a
+later date, but are considered to be ***very low priority***:
 
-* **TELNET**, **SUPDUP**, and **TN3370** listener/target support:
-  * **TELNET** listener attracted mostly abusive bots and scanners.
-  * **SUPDUP** listener was based on a buggy 4.2BSD implementation
-    from 1984 and was barely tested (or used).
-  * **TN3270** listener could actually make a return.  A decent
-    [Go 3270 Server Library](https://github.com/racingmars/go3270)
-    exists.  If you need **TN3270** proxy functionality, use
-    [Proxy3270](https://github.com/racingmars/proxy3270) for now.
-* **DECnet**/**CTERM** listener/targets:
-  * The legacy program did **DECnet** using an obsolete and *very*
-    buggy fork of the Linux kernel **DECnet**implementation.
-    Interfacing with Paul Koning’s
-    [PyDECnet](https://github.com/pkoning2/pydecnet) stack might be
-    a possibility for the future.
+* **TELNET**, **SUPDUP**, and **TN3370** listener/target support
+* **DECnet**/**CTERM** listener/target support
 * Ability for users to download
-  [ttyrec](https://nethackwiki.com/wiki/Ttyrec) format session logs.
-* Remote administrative access for monitoring and reconfiguration.
+  [ttyrec](https://nethackwiki.com/wiki/Ttyrec) format session logs
 
 ## Searching compressed logs
 
-By default, session log files are compressed automatically when the
-session terminates.  When reviewing the logs, administrators often
-need to grep through all entries, including the compressed files.
-
-We recommend using
+By default, session logfiles are compressed automatically when the
+session terminates, and console log files are compressed when the
+log rolls over to a new day.  When reviewing logs, administrators
+often need to grep through all the past data, including the
+compressed files. We recommend using
 [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the `-z`
-option) or the [`zgrep`](https://www.gzip.org/) tool for this task.
+option) for this task.
 
 ## Using OpenSSH host keys
 
@@ -344,7 +329,7 @@ or send an [e-mail](mailto:trnsz@pobox.com) to the author.
 
 ## License
 
-* The `dps8m-proxy` program is made available under the terms of the
+* The `proxy` program is made available under the terms of the
 [MIT License](https://opensource.org/license/mit), with some bundled
 example and miscellaneous files distributed under the terms of the
 [MIT No Attribution License](https://opensource.org/license/mit-0).
