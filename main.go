@@ -44,6 +44,8 @@ import (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 const (
+	NOP  = 241
+	AYT  = 246
 	IAC  = 255
 	DONT = 254
 	DO   = 253
@@ -87,7 +89,7 @@ var (
 	showVersion            bool
 	shutdownOnce           sync.Once
 	shutdownSignal         chan struct{}
-	sshAddr                string
+	sshAddr                stringSliceFlag
 	telnetHostPort         string
 	timeMax                int
 	whitelistedNetworks    []*net.IPNet
@@ -128,6 +130,17 @@ type Connection struct {
 
 type altHostFlag struct{}
 
+type stringSliceFlag []string
+
+func (s *stringSliceFlag) String() string {
+	return strings.Join(*s, ", ")
+}
+
+func (s *stringSliceFlag) Set(value string) error {
+	*s = append(*s, value)
+	return nil
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (a *altHostFlag) String() string {
@@ -161,8 +174,8 @@ func (a *altHostFlag) Set(value string) error {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func init() {
-	flag.StringVar(&sshAddr,
-		"ssh-addr", ":2222", "SSH listen address")
+	flag.Var(&sshAddr,
+		"ssh-addr", "SSH listener address [allowed multiple times]")
 
 	flag.StringVar(&telnetHostPort,
 		"telnet-host", "127.0.0.1:6180", "Default TELNET target (host:port)")
@@ -263,11 +276,31 @@ func main() {
 		log.Fatalf("RSA host key error: %v", err)
 	}
 
-	listener, err := net.Listen("tcp", sshAddr)
-	if err != nil {
-		log.Fatalf("LISTEN %s: %v", sshAddr, err)
+	if len(sshAddr) == 0 {
+		sshAddr = []string{":2222"}
 	}
-	defer listener.Close()
+
+	for _, addr := range sshAddr {
+		go func(addr string) {
+			listener, err := net.Listen("tcp", addr)
+			if err != nil {
+				log.Fatalf("LISTEN %s: %v", addr, err)
+			}
+			defer listener.Close()
+
+			for {
+				rawConn, err := listener.Accept()
+				if err != nil {
+					if gracefulShutdownMode.Load() {
+						return
+					}
+					log.Printf("ACCEPT ERROR: %v", err)
+					continue
+				}
+				go handleConn(rawConn, edSigner, rsaSigner)
+			}
+		}(addr)
+	}
 
 	pid := os.Getpid()
 	var startMsg string
@@ -280,7 +313,9 @@ func main() {
 	fmt.Fprintf(os.Stderr, "%s %s\n", nowStamp(), startMsg)
 	log.Printf("%s", startMsg)
 
-	log.Printf("SSH LISTEN ON %s", sshAddr)
+	for _, addr := range sshAddr {
+		log.Printf("SSH LISTEN ON %s", addr)
+	}
 
 	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
 	if err != nil {
@@ -348,17 +383,7 @@ func main() {
 		}
 	}()
 
-	for {
-		rawConn, err := listener.Accept()
-		if err != nil {
-			if gracefulShutdownMode.Load() {
-				return
-			}
-			log.Printf("ACCEPT ERROR: %v", err)
-			continue
-		}
-		go handleConn(rawConn, edSigner, rsaSigner)
-	}
+	select {}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -613,7 +638,7 @@ func listConfiguration() {
 	log.SetOutput(originalWriter)
 	fmt.Println("\r\n\rConfiguration")
 	fmt.Println("\r=============")
-	fmt.Printf("\r* SSH LISTEN ON: %s\r\n", sshAddr)
+	fmt.Printf("\r* SSH LISTEN ON: %s\r\n", strings.Join(sshAddr, ", "))
 	fmt.Printf("\r* DEFAULT TARGET: %s\r\n", telnetHostPort)
 
 	if len(altHosts) > 0 {
@@ -1512,7 +1537,9 @@ func showMenu(conn *Connection, ch ssh.Channel, remote net.Conn, logw io.Writer,
 	menu := "\r\n" +
 		"\r+====== MENU =======+\r\n" +
 		"\r|                   |\r\n" +
+		"\r|  A - Send AYT     |\r\n" +
 		"\r|  B - Send Break   |\r\n" +
+		"\r|  N - Send NOP     |\r\n" +
 		"\r|  S - Show Status  |\r\n" +
 		"\r|  X - Disconnect   |\r\n" +
 		"\r|                   |\r\n" +
@@ -1523,12 +1550,21 @@ func showMenu(conn *Connection, ch ssh.Channel, remote net.Conn, logw io.Writer,
 
 	if _, err := ch.Read(sel); err == nil {
 		switch sel[0] {
+		case 'a', 'A':
+			remote.Write([]byte{IAC, AYT}) // AYT
+			logw.Write([]byte{IAC, AYT})
+			ch.Write([]byte("\r\n>> Sent AYT (Are You There)\r\n"))
+			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 		case 'b', 'B':
 			remote.Write([]byte{IAC, 243}) // BREAK
 			logw.Write([]byte{IAC, 243})
 			ch.Write([]byte("\r\n>> Sent BREAK\r\n"))
 			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
-
+		case 'n', 'N':
+			remote.Write([]byte{IAC, NOP}) // NOP
+			logw.Write([]byte{IAC, NOP})
+			ch.Write([]byte("\r\n>> Sent NOP (No Operation)\r\n"))
+			ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 		case 's', 'S':
 			dur := time.Since(start)
 			ch.Write([]byte("\r\n"))
@@ -1717,7 +1753,8 @@ func nowStamp() string {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func getFileContent(baseFilename, username string) ([]byte, error) {
-	userSpecificFile := fmt.Sprintf("%s-%s.txt", strings.TrimSuffix(baseFilename, ".txt"), username)
+	userSpecificFile := fmt.Sprintf(
+		"%s-%s.txt", strings.TrimSuffix(baseFilename, ".txt"), username)
 	content, err := os.ReadFile(userSpecificFile)
 	if err == nil {
 		return content, nil
@@ -1825,6 +1862,7 @@ func compressLogFile(logFilePath string) {
 			compressedFile.Close()
 			return
 		}
+
 	case "xz":
 		compressedFilePath = logFilePath + ".xz"
 		compressedFile, err = os.Create(compressedFilePath)
@@ -1838,6 +1876,7 @@ func compressLogFile(logFilePath string) {
 			compressedFile.Close()
 			return
 		}
+
 	case "zstd":
 		compressedFilePath = logFilePath + ".zst"
 		compressedFile, err = os.Create(compressedFilePath)
@@ -1851,6 +1890,7 @@ func compressLogFile(logFilePath string) {
 			compressedFile.Close()
 			return
 		}
+
 	default:
 		log.Printf("Unknown compression algorithm: %s", compressAlgo)
 		return
@@ -1895,6 +1935,7 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 	var networks []*net.IPNet
 	scanner := bufio.NewScanner(file)
 	lineNumber := 0
+
 	for scanner.Scan() {
 		lineNumber++
 
