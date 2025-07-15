@@ -206,8 +206,9 @@ func init() {
 func main() {
 	flag.Parse()
 
+	printVersion()
+
 	if showVersion {
-		printVersion()
 		os.Exit(0)
 	}
 
@@ -378,7 +379,7 @@ func isGitSHA(s string) bool {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func printVersion() {
-	fmt.Printf("DPS8M Proxy")
+	versionString := "DPS8M Proxy"
 
 	if info, ok := debug.ReadBuildInfo(); ok {
 		var date, commit string
@@ -408,14 +409,20 @@ func printVersion() {
 
 		if date != "" && commit != "" {
 			if modified == true {
-				fmt.Printf(" (%s g%s+)", tdate, commit)
+				versionString += fmt.Sprintf(" (%s g%s+)", tdate, commit)
 			} else {
-				fmt.Printf(" (%s g%s)", tdate, commit)
+				versionString += fmt.Sprintf(" (%s g%s)", tdate, commit)
 			}
 		}
 	}
 
-	fmt.Printf(" [%s/%s]\n", runtime.GOOS, runtime.GOARCH)
+	versionString += fmt.Sprintf(" [%s/%s]", runtime.GOOS, runtime.GOARCH)
+
+	if showVersion {
+		fmt.Println(versionString)
+	} else {
+		log.Println(versionString)
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
