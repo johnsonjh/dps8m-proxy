@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// DPS8M Proxy
+// DPS8M Proxy - main.go
 // Copyright (c) 2025 Jeffrey H. Johnson
 // Copyright (c) 2025 The DPS8M Development Team
 // SPDX-License-Identifier: MIT
@@ -26,7 +26,6 @@ import (
 	"log"
 	"net"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -35,7 +34,6 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
-	"syscall"
 	"time"
 
 	"golang.org/x/crypto/ssh"
@@ -265,44 +263,9 @@ func main() {
 
 	log.Printf("Type '?' for help.")
 
+	setupSignalHandlers()
+
 	go handleConsoleInput()
-
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan,
-		syscall.SIGINT, syscall.SIGTERM,
-		syscall.SIGHUP, syscall.SIGUSR1,
-		syscall.SIGUSR2)
-
-	go func() {
-		for s := range sigChan {
-			switch s {
-			case syscall.SIGHUP:
-				log.Println("SIGHUP received: Reloading whitelist and/or blacklist.")
-				reloadLists()
-
-			case syscall.SIGUSR1:
-				log.Println("SIGUSR1 received: Initiating graceful shutdown.")
-				gracefulShutdownMode.Store(true)
-				connectionsMutex.Lock()
-				if len(connections) == 0 {
-					connectionsMutex.Unlock()
-					select {
-					case shutdownSignal <- struct{}{}:
-					default:
-					}
-				} else {
-					connectionsMutex.Unlock()
-				}
-
-			case syscall.SIGUSR2:
-				log.Println("SIGUSR2 received: Denying new connections.")
-				denyNewConnectionsMode.Store(true)
-
-			case syscall.SIGINT, syscall.SIGTERM:
-				immediateShutdown()
-			}
-		}
-	}()
 
 	go func() {
 		<-shutdownSignal

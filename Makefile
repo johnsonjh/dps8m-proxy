@@ -19,8 +19,8 @@ all: proxy
 # Target: proxy
 
 .PHONY: proxy
-proxy: main.go
-	@go build -v
+proxy:
+	@go build -trimpath -v
 
 ##############################################################################
 # Target: clean
@@ -28,6 +28,7 @@ proxy: main.go
 .PHONY: clean
 clean:
 	go clean -v
+	$(RM) -r ./cross.bin/
 
 ##############################################################################
 # Target: tidy
@@ -63,8 +64,8 @@ reuse:
 # Target: gofmt
 
 .PHONY: gofmt
-gofmt: main.go
-	gofmt -d -e -s main.go
+gofmt:
+	gofmt -d -e -s .
 
 ##############################################################################
 # Target: goverify
@@ -84,18 +85,25 @@ gotidydiff: go.mod
 # Target: gofumpt
 
 .PHONY: gofumpt
-gofumpt: main.go
+gofumpt:
 	@$$(command -v gofumpt > /dev/null 2>&1) || \
 		{ printf '%s\n' "⚠️ gofumpt not found!"; exit 0; } ; \
-		set -x; gofumpt -d -e -s main.go
+		set -x; gofumpt -d -e -s .
 
 ##############################################################################
 # Target: govet
 
 .PHONY: govet
-govet: main.go
+govet:
 	go vet
 
 ##############################################################################
-# vim: set ft=make expandtab tabstop=4 cc=78 :
+# Target: cross
+
+.PHONY: cross
+cross:
+	-@./.cross.sh
+
+##############################################################################
+# vim: set ft=make noexpandtab tabstop=4 cc=78 :
 ##############################################################################

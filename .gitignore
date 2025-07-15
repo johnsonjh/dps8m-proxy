@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: MIT-0
 *~
 *.bak
+blacklist.txt
+cross.bin/
 dps8m-proxy
 *.log
 log
@@ -10,4 +12,3 @@ proxy
 ssh_host_ed25519_key.pem
 ssh_host_rsa_key.pem
 whitelist.txt
-blacklist.txt
