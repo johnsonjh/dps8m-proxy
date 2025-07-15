@@ -22,7 +22,7 @@ to anyone who wants to provide modern SSH access to legacy systems.
 * ✅ Full IPv6 support
 * ✅ Access control whitelist/blacklist (by IP address or CIDR block)
 * ✅ Session monitoring and logging (by date/time and host)
-* ✅ Automatic log compression
+* ✅ Automatic log compression (gzip, xz, zstandard)
 * ✅ Banners for accepted, denied, and blocked connections
 * ✅ Session connection monitoring with idle time tracking (and optional timeouts)
 * ✅ Interactive connection management for administrators
@@ -63,9 +63,11 @@ Usage of proxy:
   -allow-root
         Allow running as root (UID 0) [strongly discouraged]
   -alt-host value
-        Alternate TELNET targets (user@host:port) [allowed multiple times]
+        Alternate TELNET targets (username@host:port) [allowed multiple times]
   -blacklist string
         Blacklist file (optional)
+  -compress-algo string
+        Compression algorithm [gzip, xz, zstd] (default "gzip")
   -console-log string
         Enable console logging [requires 'quiet' or 'noquiet' argument]
   -debug
