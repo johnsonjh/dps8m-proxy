@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: MIT
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// DPS8M Proxy
 package main
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,10 +49,10 @@ const (
 	TelcmdNOP  = 241 // No operation
 	TelcmdAYT  = 246 // Are You There?
 	TelcmdIAC  = 255 // Interpret As Command
-	TelcmdDONT = 254
-	TelcmdDO   = 253
-	TelcmdWONT = 252
-	TelcmdWILL = 251
+	TelcmdDONT = 254 // DONT
+	TelcmdDO   = 253 // DO
+	TelcmdWONT = 252 // WONT
+	TelcmdWILL = 251 // WILL
 
 	// TELNET Command Options
 	TeloptBinary          = 0
@@ -835,7 +836,7 @@ func listConfiguration() {
 	if consoleLog != "" {
 		logPath := getConsoleLogPath(time.Now())
 		logPath = filepath.Clean(logPath)
-		quietMode := ""
+		var quietMode string
 		if strings.ToLower(consoleLog) == "quiet" {
 			quietMode = "\r\n* Console Logging Mode: Quiet"
 		} else {
@@ -1045,6 +1046,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	}
 
 	config := &ssh.ServerConfig{
+		//revive:disable:unused-parameter
 		PasswordCallback: func(
 			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) {
 			return &ssh.Permissions{
@@ -1071,6 +1073,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 				Extensions: map[string]string{"auth-method": "keyboard-interactive"},
 			}, nil
 		},
+		//revive:enable:unused-parameter
 	}
 	config.AddHostKey(edSigner)
 	config.AddHostKey(rsaSigner)
@@ -1199,7 +1202,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 			continue
 		}
 		conn.channel = ch
-		go handleSession(conn, ch, requests, keyLog, conn.cancelCtx)
+		go handleSession(conn.cancelCtx, conn, ch, requests, keyLog)
 	}
 }
 
@@ -1220,8 +1223,8 @@ func parseHostPort(hostPort string) (string, int, error) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func handleSession(conn *Connection, channel ssh.Channel, requests <-chan *ssh.Request,
-	keyLog []string, ctx context.Context) {
+func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
+	requests <-chan *ssh.Request, keyLog []string) {
 	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
 
 	remoteHost, _, err := net.SplitHostPort(conn.sshConn.RemoteAddr().String())
@@ -1282,7 +1285,7 @@ func handleSession(conn *Connection, channel ssh.Channel, requests <-chan *ssh.R
 		}
 	}
 
-	sendBanner(conn.ID, conn.sshConn, channel, conn)
+	sendBanner(conn.sshConn, channel, conn)
 	if conn.monitoring {
 		if !suppressLogs {
 			log.Printf("UMONITOR [%s] %s -> %s",
@@ -1577,35 +1580,34 @@ func handleSession(conn *Connection, channel ssh.Channel, requests <-chan *ssh.R
 					}
 
 					continue
-				} else {
-					dur := time.Since(start)
-					log.Printf("DETACHED [%s] %s@%s (link time %s)",
-						conn.ID, conn.userName, conn.hostName, dur.Round(time.Second))
-					channel.Write([]byte(fmt.Sprintf(
-						"\r\nCONNECTION CLOSED (link time %s)\r\n\r\n",
-						dur.Round(time.Second))))
-
-					inRateSSH := uint64(float64(atomic.LoadUint64(&sshIn)) / dur.Seconds())
-					outRateSSH := uint64(float64(atomic.LoadUint64(&sshOut)) / dur.Seconds())
-					inRateNVT := uint64(float64(atomic.LoadUint64(&telnetIn)) / dur.Seconds())
-					outRateNVT := uint64(float64(atomic.LoadUint64(&telnetOut)) / dur.Seconds())
-
-					channel.Write([]byte(fmt.Sprintf(
-						">> SSH - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-						atomic.LoadUint64(&sshIn), atomic.LoadUint64(&sshOut),
-						inRateSSH, outRateSSH)))
-					channel.Write([]byte(fmt.Sprintf(
-						">> NVT - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-						atomic.LoadUint64(&telnetIn), atomic.LoadUint64(&telnetOut),
-						inRateNVT, outRateNVT)))
-					channel.Write([]byte("\r\n"))
-
-					channel.Close()
-					conn.sshInTotal = sshIn
-					conn.sshOutTotal = sshOut
-
-					return
 				}
+				dur := time.Since(start)
+				log.Printf("DETACHED [%s] %s@%s (link time %s)",
+					conn.ID, conn.userName, conn.hostName, dur.Round(time.Second))
+				channel.Write([]byte(fmt.Sprintf(
+					"\r\nCONNECTION CLOSED (link time %s)\r\n\r\n",
+					dur.Round(time.Second))))
+
+				inRateSSH := uint64(float64(atomic.LoadUint64(&sshIn)) / dur.Seconds())
+				outRateSSH := uint64(float64(atomic.LoadUint64(&sshOut)) / dur.Seconds())
+				inRateNVT := uint64(float64(atomic.LoadUint64(&telnetIn)) / dur.Seconds())
+				outRateNVT := uint64(float64(atomic.LoadUint64(&telnetOut)) / dur.Seconds())
+
+				channel.Write([]byte(fmt.Sprintf(
+					">> SSH - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
+					atomic.LoadUint64(&sshIn), atomic.LoadUint64(&sshOut),
+					inRateSSH, outRateSSH)))
+				channel.Write([]byte(fmt.Sprintf(
+					">> NVT - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
+					atomic.LoadUint64(&telnetIn), atomic.LoadUint64(&telnetOut),
+					inRateNVT, outRateNVT)))
+				channel.Write([]byte("\r\n"))
+
+				channel.Close()
+				conn.sshInTotal = sshIn
+				conn.sshOutTotal = sshOut
+
+				return
 			}
 
 			if n > 0 {
@@ -1636,7 +1638,7 @@ func handleSession(conn *Connection, channel ssh.Channel, requests <-chan *ssh.R
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func sendBanner(sid string, sshConn *ssh.ServerConn, ch ssh.Channel, conn *Connection) {
+func sendBanner(sshConn *ssh.ServerConn, ch ssh.Channel, conn *Connection) {
 	if noBanner {
 		return
 	}
