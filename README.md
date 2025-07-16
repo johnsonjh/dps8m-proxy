@@ -4,6 +4,8 @@
 <!-- vim: set ft=markdown expandtab cc=72 : -->
 # dps8m-proxy
 
+[![Go Report Card](https://goreportcard.com/badge/gitlab.com/dps8m/proxy)](https://goreportcard.com/report/gitlab.com/dps8m/proxy)
+
 ## Overview
 
 The **`proxy`** (or **`dps8m-proxy`**) program acts as a multi-user
@@ -127,67 +129,6 @@ Usage of proxy:
   * `SIGUSR2` - enables the *Deny new connections* mode
   * `SIGHUP` - reloads *access control lists*
     (`-whitelist`, `-blacklist`)
-
-### Example setup
-
-* 🚧 A complete example of a production installation for Linux, with
-  the proxy on port 22, running as an unprivileged user, and managed
-  with a `tmux` session *is coming soon*.
-
-#### Example admin session
-
-The following example shows the proxy listening on `*:2222` (the
-default) for SSH connections (with any username), proxying them via
-TELNET to port `6180` on the host `legacybox`.  Users who supply the
-username `elsewhere` (*e.g.* `ssh -oPort=2222 elsewhere@proxybox`) are
-proxied to port `9998` on the host `mainframe`.
-
-```
-$ dps8-proxy -telnet-host "legacybox:6180" -alt-host "elsewhere@mainframe:9998"  
-
-> c
-2025/07/15 23:20:00 DPS8M Proxy (2025-Jul-15) [linux/amd64]
-
-DPS8M PROXY Configuration
-=========================
-
-* SSH LISTEN ON: :2222, :2223, localhost:8000
-* DEFAULT TARGET: legacybox:6180
-* ALT TARGETS:
-  * mainframe:9998 [elsewhere]
-* TIME MAX: 0 seconds
-* IDLE MAX: 0 seconds
-* LOG DIR: ./log
-* NO SESSION LOG: false
-* CONSOLE LOG: log/2025/07/15/console.log
-* NO LOG COMPRESS: false
-* COMPRESS ALGO: gzip
-* LOG PERMISSIONS: 0600
-* GRACEFUL SHUTDOWN: false
-* DENY NEW CONNECTIONS: false
-* BLACKLIST: disabled
-* WHITELIST: disabled
-* DEBUG: false
-
-2025/07/15 23:20:00 INITIATE [d4fcab] 23.45.67.89
-2025/07/15 23:20:00 VALIDATE [d4fcab] elsewhere@23.45.67.89:22139
-2025/07/15 23:20:00 ALTROUTE [d4fcab] elsewhere -> mainframe:9998
-
-2025/07/15 23:20:03 INITIATE [08d679] 45.67.89.111
-2025/07/15 23:20:03 VALIDATE [08d679] john@45.67.89.111:39969
-
-> l
-Active Connections
-==================
-* ID d4fcab: elsewhere@23.45.67.89:22139 -> mainframe:9998 [Link: 5s, Idle: 5s]
-* ID 08d679: john@45.67.89.111:39969 [Link: 2s, Idle: 2s]
-
-> k
-Enter session ID to kill: 08d679
-Killing connection 08d679...
-2025/07/15 23:20:21 TEARDOWN [08d679] john@45.67.89.111
-2025/07/15 23:20:21 DETACHED [08d679] john@45.67.89.111:39969 (link time 18s)
-```
 
 ### User interaction
 
