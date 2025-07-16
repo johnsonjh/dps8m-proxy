@@ -58,7 +58,7 @@ distclean: clean
 
 .PHONY: lint
 lint: reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
-	revive errcheck
+	revive errcheck shellcheck
 
 ##############################################################################
 # Target: reuse
@@ -127,6 +127,15 @@ gofumpt:
 		set -x; gofumpt -d -e -s .
 
 ##############################################################################
+# Target: shellcheck
+
+.PHONY: shellcheck
+shellcheck: .cross.sh
+	@$$(command -v shellcheck > /dev/null 2>&1) || \
+		{ printf '%s\n' "⚠️ shellcheck not found!"; exit 0; } ; \
+		set -x; shellcheck -o any,all .cross.sh
+
+##############################################################################
 # Target: govet
 
 .PHONY: govet
@@ -137,8 +146,9 @@ govet:
 # Target: cross
 
 .PHONY: cross
-cross:
+cross: .cross.sh
 	-@./.cross.sh
+
 
 ##############################################################################
 # vim: set ft=make noexpandtab tabstop=4 cc=78 :
