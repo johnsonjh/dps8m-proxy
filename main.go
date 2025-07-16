@@ -225,7 +225,8 @@ func init() {
 
 	pflag.StringSliceVarP(&sshAddr,
 		"ssh-addr", "l", []string{":2222"},
-		"SSH listener address\n  [e.g., :2222, [::1]:8000] (multiple allowed)\n ")
+		"SSH listener address\n   [e.g., \":2222\", \"[::1]:8000\"]\n   (multiple allowed)")
+	pflag.Lookup("ssh-addr").DefValue = "\":2222\""
 
 	pflag.BoolVarP(&noBanner,
 		"no-banner", "n", false,
@@ -249,19 +250,19 @@ func init() {
 
 	pflag.BoolVarP(&noLog,
 		"no-log", "o", false,
-		"Disable session logging")
+		"Disable all session logging\n   (for console logging, see \"-console-log\")")
 
 	pflag.StringVarP(&consoleLog,
 		"console-log", "c", "",
-		"Enable console logging [quiet, noquiet]\n   (no default)")
+		"Enable console logging [\"quiet\", \"noquiet\"]")
 
 	pflag.StringVarP(&compressAlgo,
 		"compress-algo", "C", "gzip",
-		"Compression algorithm [gzip, xz, zstd]\n  ")
+		"Compression algorithm [\"gzip\", \"xz\", \"zstd\"]\n  ")
 
 	pflag.StringVarP(&compressLevel,
 		"compress-level", "s", "normal",
-		"Compression level for gzip and zstd\n   [fast, normal, high]")
+		"Compression level for gzip and zstd algorithms\n   [\"fast\", \"normal\", \"high\"]\n  ")
 
 	pflag.BoolVarP(&noCompress,
 		"no-compress", "x", false,
@@ -269,11 +270,13 @@ func init() {
 
 	pflag.VarP((*octalPermValue)(&logPerm),
 		"log-perm", "p",
-		"Permissions for log files\n   [umask, e.g., 600, 644]")
+		"Permissions for new log files\n   [umask, e.g., \"600\", \"644\"]")
+	pflag.Lookup("log-perm").DefValue = "\"600\""
 
 	pflag.VarP((*octalPermValue)(&logDirPerm),
 		"log-dir-perm", "P",
-		"Permissions for log directories\n   [umask, e.g., 755, 750]")
+		"Permissions for new log directories\n   [umask, e.g., \"755\", \"750\"]")
+	pflag.Lookup("log-dir-perm").DefValue = "\"750\""
 
 	pflag.IntVarP(&idleMax,
 		"idle-max", "i", 0,
@@ -479,7 +482,8 @@ func main() {
 						if _, err := conn.channel.Write([]byte(fmt.Sprintf(
 							"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
 							connUptime.Round(time.Second)))); err != nil {
-							log.Printf("Error writing idle timeout message to channel for %s: %v",
+							log.Printf(
+								"Error writing idle timeout message to channel for %s: %v",
 								id, err)
 						}
 						if err := conn.sshConn.Close(); err != nil {
@@ -678,17 +682,20 @@ func toggleGracefulShutdown() {
 		gracefulShutdownMode.Store(false)
 		log.Println("Graceful shutdown cancelled.")
 		if strings.ToLower(consoleLog) == "quiet" {
-			fmt.Fprintf(os.Stderr, "%s Graceful shutdown cancelled.\r\n", nowStamp())
+			fmt.Fprintf(os.Stderr,
+				"%s Graceful shutdown cancelled.\r\n", nowStamp())
 		}
 	} else {
 		gracefulShutdownMode.Store(true)
 		log.Println("No new connections will be accepted.")
 		if strings.ToLower(consoleLog) == "quiet" {
-			fmt.Fprintf(os.Stderr, "%s No new connections will be accepted.\r\n", nowStamp())
+			fmt.Fprintf(os.Stderr,
+				"%s No new connections will be accepted.\r\n", nowStamp())
 		}
 		log.Println("Graceful shutdown initiated.")
 		if strings.ToLower(consoleLog) == "quiet" {
-			fmt.Fprintf(os.Stderr, "%s Graceful shutdown initiated.\r\n", nowStamp())
+			fmt.Fprintf(os.Stderr,
+				"%s Graceful shutdown initiated.\r\n", nowStamp())
 		}
 		connectionsMutex.Lock()
 		if len(connections) == 0 {
@@ -711,13 +718,15 @@ func toggleDenyNewConnections() {
 		denyNewConnectionsMode.Store(false)
 		log.Println("Deny connections cancelled.")
 		if strings.ToLower(consoleLog) == "quiet" {
-			fmt.Fprintf(os.Stderr, "%s Deny connections cancelled.\r\n", nowStamp())
+			fmt.Fprintf(os.Stderr,
+				"%s Deny connections cancelled.\r\n", nowStamp())
 		}
 	} else {
 		denyNewConnectionsMode.Store(true)
 		log.Println("No new connections will be accepted.")
 		if strings.ToLower(consoleLog) == "quiet" {
-			fmt.Fprintf(os.Stderr, "%s No new connections will be accepted.\r\n", nowStamp())
+			fmt.Fprintf(os.Stderr,
+				"%s No new connections will be accepted.\r\n", nowStamp())
 		}
 	}
 }
