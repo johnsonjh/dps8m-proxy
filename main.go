@@ -20,7 +20,6 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/pem"
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -39,6 +38,7 @@ import (
 	"github.com/klauspost/compress/gzip"
 	"github.com/klauspost/compress/zstd"
 	"github.com/pierrec/lz4/v4"
+	"github.com/spf13/pflag"
 	"github.com/ulikunitz/xz"
 	"golang.org/x/crypto/ssh"
 )
@@ -87,18 +87,15 @@ var (
 	denyNewConnectionsMode atomic.Bool
 	gracefulShutdownMode   atomic.Bool
 	idleMax                int
-	logBufferMutex         sync.Mutex       //lint:ignore U1000 FP
-	logBuffer              *strings.Builder //lint:ignore U1000 FP
 	logDir                 string
 	loggingWg              sync.WaitGroup
 	noBanner               bool
 	noCompress             bool
 	noLog                  bool
-	originalLogOutput      io.Writer //lint:ignore U1000 FP
 	showVersion            bool
 	shutdownOnce           sync.Once
 	shutdownSignal         chan struct{}
-	sshAddr                stringSliceFlag
+	sshAddr                []string
 	telnetHostPort         string
 	timeMax                int
 	whitelistedNetworks    []*net.IPNet
@@ -159,21 +156,6 @@ type altHostFlag struct{}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-type stringSliceFlag []string
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-func (s *stringSliceFlag) String() string {
-	return strings.Join(*s, ", ")
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-func (s *stringSliceFlag) Set(value string) error {
-	*s = append(*s, value)
-	return nil
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (a *altHostFlag) String() string {
@@ -205,6 +187,10 @@ func (a *altHostFlag) Set(value string) error {
 	return nil
 }
 
+func (a *altHostFlag) Type() string {
+	return "string"
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 type octalPermValue uint
@@ -225,87 +211,91 @@ func (op *octalPermValue) Set(s string) error {
 	return nil
 }
 
+func (op *octalPermValue) Type() string {
+	return "octal"
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func init() {
-	flag.Var(&sshAddr,
-		"ssh-addr",
-		"SSH listener address [e.g.: \":2222\", \"[::1]:8000\"] (allowed multiple times)")
+	pflag.CommandLine.SortFlags = false
 
-	flag.StringVar(&telnetHostPort,
+	pflag.BoolVar(&allowRoot,
+		"allow-root", false,
+		"Allow running as root (UID 0)")
+
+	pflag.StringSliceVar(&sshAddr,
+		"ssh-addr", []string{":2222"},
+		"SSH listener address\n  [e.g., :2222, [::1]:8000] (multiple allowed)\n  ")
+
+	pflag.StringVar(&telnetHostPort,
 		"telnet-host", "127.0.0.1:6180",
-		"Default TELNET target [host:port]")
+		"Default TELNET target [host:port]\n  ")
 
-	flag.BoolVar(&debugNegotiation,
+	pflag.Var(&altHostFlag{},
+		"alt-host",
+		"Alternate TELNET targets [username@host:port]\n   (multiple allowed)")
+
+	pflag.BoolVar(&debugNegotiation,
 		"debug", false,
 		"Debug TELNET negotiation")
 
-	flag.StringVar(&logDir,
+	pflag.StringVar(&logDir,
 		"log-dir", "./log",
 		"Base directory for logs")
 
-	flag.BoolVar(&noCompress,
+	pflag.BoolVar(&noLog,
+		"no-log", false,
+		"Disable session logging")
+
+	pflag.StringVar(&consoleLog,
+		"console-log", "",
+		"Enable console logging [quiet, noquiet]\n   (no default)")
+
+	pflag.StringVar(&compressAlgo,
+		"compress-algo", "gzip",
+		"Compression algorithm [gzip, lz4, xz, zstd]\n  ")
+
+	pflag.StringVar(&compressLevel,
+		"compress-level", "normal",
+		"Compression level for gzip, lz4, and zstd\n   [fast, normal, high]")
+
+	pflag.BoolVar(&noCompress,
 		"no-compress", false,
 		"Disable session and console log compression")
 
-	flag.BoolVar(&noLog,
-		"no-log", false,
-		"Disable all session logging")
+	pflag.Var((*octalPermValue)(&logPerm),
+		"log-perm",
+		"Permissions for log files\n   [umask, e.g., 600, 644]")
 
-	flag.IntVar(&idleMax,
+	pflag.Var((*octalPermValue)(&logDirPerm),
+		"log-dir-perm",
+		"Permissions for log directories\n   [umask, e.g., 755, 750]")
+
+	pflag.IntVar(&idleMax,
 		"idle-max", 0,
-		"Maximum connection idle time allowed [seconds] (no default)")
+		"Maximum connection idle time allowed [seconds]")
 
-	flag.IntVar(&timeMax,
+	pflag.IntVar(&timeMax,
 		"time-max", 0,
-		"Maximum connection link time allowed [seconds] (no default)")
+		"Maximum connection link time allowed [seconds]")
 
-	flag.Var(&altHostFlag{},
-		"alt-host",
-		"Alternate TELNET targets [username@host:port] (allowed multiple times)")
-
-	flag.BoolVar(&noBanner,
+	pflag.BoolVar(&noBanner,
 		"no-banner", false,
 		"Disable SSH connection banner")
 
-	flag.StringVar(&blacklistFile,
+	pflag.StringVar(&blacklistFile,
 		"blacklist", "",
 		"Enable blacklist [filename] (no default)")
 
-	flag.StringVar(&whitelistFile,
+	pflag.StringVar(&whitelistFile,
 		"whitelist", "",
 		"Enable whitelist [filename] (no default)")
 
-	flag.BoolVar(&allowRoot,
-		"allow-root", false,
-		"Allow running as root/UID 0 (strongly discouraged)")
-
-	flag.BoolVar(&showVersion,
+	pflag.BoolVar(&showVersion,
 		"version", false,
 		"Show version information")
 
-	flag.StringVar(&consoleLog,
-		"console-log", "",
-		"Enable console logging [quiet, noquiet] (no default)")
-
-	flag.StringVar(&compressAlgo,
-		"compress-algo", "gzip",
-		"Compression algorithm [gzip, lz4, xz, zstd]")
-
-	flag.StringVar(&compressLevel,
-		"compress-level", "normal",
-		"Compression level [fast, normal, high]")
-
-	flag.Var((*octalPermValue)(&logPerm),
-		"log-perm",
-		"Permissions for log files [umask, e.g., 0600, 0644]")
-
-	flag.Var((*octalPermValue)(&logDirPerm),
-		"log-dir-perm",
-		"Permissions for log directories [umask, e.g., 0755, 0750]")
-
-	originalLogOutput = log.Writer()
-	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
 
 	for k := range emacsKeymap {
@@ -330,7 +320,7 @@ func shutdownWatchdog() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func main() {
-	flag.Parse()
+	pflag.Parse()
 
 	if consoleLog != "" {
 		cl := strings.ToLower(consoleLog)
@@ -400,10 +390,6 @@ func main() {
 	rsaSigner, err := loadOrCreateHostKey("ssh_host_rsa_key.pem", "rsa")
 	if err != nil {
 		log.Fatalf("RSA host key error: %v", err)
-	}
-
-	if len(sshAddr) == 0 {
-		sshAddr = []string{":2222"}
 	}
 
 	for _, addr := range sshAddr {
@@ -1014,7 +1000,8 @@ func killConnection(id string) {
 			log.Printf("Error writing to stderr: %v", err)
 		}
 	}
-	if _, err := conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n")); err != nil {
+	if _, err := conn.channel.Write(
+		[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n")); err != nil {
 		log.Printf("Error writing to channel for %s: %v", conn.ID, err)
 	}
 	connUptime := time.Since(conn.startTime)
@@ -1241,7 +1228,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 	for newCh := range chans {
 		if newCh.ChannelType() != "session" {
-			if err := newCh.Reject(ssh.UnknownChannelType, "only session allowed"); err != nil {
+			if err := newCh.Reject(
+				ssh.UnknownChannelType, "only session allowed"); err != nil {
 				log.Printf("Error rejecting channel: %v", err)
 			}
 
@@ -1329,11 +1317,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			if raw, err := getFileContent(blockFile, conn.userName); err == nil {
 				blockMessageContent := strings.ReplaceAll(
 					strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
-				if _, err := channel.Write([]byte(blockMessageContent + "\r\n")); err != nil {
+				if _, err := channel.Write(
+					[]byte(blockMessageContent + "\r\n")); err != nil {
 					log.Printf("Error writing to channel for %s: %v", conn.ID, err)
 				}
 			} else {
-				if _, err := channel.Write([]byte("Connection blocked.\r\n")); err != nil {
+				if _, err := channel.Write(
+					[]byte("Connection blocked.\r\n")); err != nil {
 					log.Printf("Error writing to channel for %s: %v", conn.ID, err)
 				}
 			}
@@ -1721,7 +1711,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		defer wg.Done()
 		buf := make([]byte, 1024)
 		for {
-			if err := remote.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
+			if err := remote.SetReadDeadline(
+				time.Now().Add(100 * time.Millisecond)); err != nil {
 				log.Printf("Error setting read deadline for %s: %v", conn.ID, err)
 			}
 			n, err := remote.Read(buf)
