@@ -539,36 +539,36 @@ func handleConsoleInput() {
 		}
 		cmd := parts[0]
 
-		switch strings.ToLower(cmd) {
-		case "?", "h":
+		switch cmd {
+		case "?", "h", "H":
 			showHelp()
 
 		case "q":
 			toggleGracefulShutdown()
 
-		case "d":
+		case "d", "D":
 			toggleDenyNewConnections()
 
 		case "Q":
 			immediateShutdown()
 
-		case "l":
+		case "l", "L":
 			listConnections()
 
-		case "c":
+		case "c", "C":
 			listConfiguration()
 
-		case "cg":
+		case "cg", "CG", "cG", "Cg":
 			listGoroutines()
 
-		case "k":
+		case "k", "K":
 			if len(parts) < 2 {
 				fmt.Fprintf(os.Stderr, "%s Error: session ID required for 'k' command.\r\n", nowStamp())
 				continue
 			}
 			killConnection(parts[1])
 
-		case "r":
+		case "r", "R":
 			if blacklistFile == "" && whitelistFile == "" {
 				log.Printf("NO ACCESS CONTROL LISTS ARE ENABLED.")
 			} else {
@@ -705,7 +705,7 @@ func listConnections() {
 	fmt.Println("\r\n\rActive Connections")
 	fmt.Println("\r==================")
 	if len(connections) == 0 {
-		fmt.Println("\r* None!")
+		fmt.Printf("\r* None!\r\n\r\n")
 		return
 	}
 	for id, conn := range connections {
@@ -724,6 +724,7 @@ func listConnections() {
 				time.Since(conn.lastActivityTime).Round(time.Second))
 		}
 	}
+	fmt.Printf("\r\n")
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1709,9 +1710,9 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 	case 'k', 'K':
 		conn.emacsKeymapEnabled = !conn.emacsKeymapEnabled
 		if conn.emacsKeymapEnabled {
-			ch.Write([]byte("\r\n>> EMACS KEYMAP ENABLED\r\n"))
+			ch.Write([]byte("\r\n>> Emacs keymap ENABLED\r\n"))
 		} else {
-			ch.Write([]byte("\r\n>> EMACS KEYMAP DISABLED\r\n"))
+			ch.Write([]byte("\r\n>> Emacs keymap DISABLED\r\n"))
 		}
 		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
