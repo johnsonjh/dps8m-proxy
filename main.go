@@ -29,7 +29,6 @@ import (
 	"regexp"
 	"runtime"
 	"runtime/debug"
-	"runtime/metrics"
 	"strconv"
 	"strings"
 	"sync"
@@ -82,27 +81,30 @@ var (
 	denyNewConnectionsMode atomic.Bool
 	gracefulShutdownMode   atomic.Bool
 	idleMax                int
-	logBufferMutex         sync.Mutex
-	logBuffer              *strings.Builder
-	logDir                 string
-	loggingWg              sync.WaitGroup
-	noBanner               bool
-	noCompress             bool
-	noLog                  bool
-	originalLogOutput      io.Writer
-	showVersion            bool
-	shutdownOnce           sync.Once
-	shutdownSignal         chan struct{}
-	sshAddr                stringSliceFlag
-	telnetHostPort         string
-	timeMax                int
-	whitelistedNetworks    []*net.IPNet
-	whitelistFile          string
-	issueFile              = "issue.txt"
-	denyFile               = "deny.txt"
-	blockFile              = "block.txt"
-	compressAlgo           string
-	emacsKeymap            = map[string]string{
+	//lint:ignore U1000 FP
+	logBufferMutex sync.Mutex
+	//lint:ignore U1000 FP
+	logBuffer  *strings.Builder
+	logDir     string
+	loggingWg  sync.WaitGroup
+	noBanner   bool
+	noCompress bool
+	noLog      bool
+	//lint:ignore U1000 FP
+	originalLogOutput   io.Writer
+	showVersion         bool
+	shutdownOnce        sync.Once
+	shutdownSignal      chan struct{}
+	sshAddr             stringSliceFlag
+	telnetHostPort      string
+	timeMax             int
+	whitelistedNetworks []*net.IPNet
+	whitelistFile       string
+	issueFile           = "issue.txt"
+	denyFile            = "deny.txt"
+	blockFile           = "block.txt"
+	compressAlgo        string
+	emacsKeymap         = map[string]string{
 		"\x1b[1;5A": "\x1b\x5b", //    C-Arrow_Up -> Escape, [
 		"\x1b[1;5B": "\x1b\x5d", // C-Arrrow_Down -> Escape, ]
 		"\x1b[1;5C": "\x1b\x66", // C-Arrow_Right -> Escape, f
@@ -282,6 +284,18 @@ func init() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+func shutdownWatchdog() {
+	<-shutdownSignal
+	loggingWg.Wait()
+	if strings.ToLower(consoleLog) == "quiet" {
+		fmt.Fprintf(os.Stderr, "%s All connections closed. Exiting.\r\n", nowStamp())
+	}
+	log.Println("All connections closed. Exiting.")
+	os.Exit(0)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func main() {
 	flag.Parse()
 
@@ -363,7 +377,9 @@ func main() {
 		startMsg = "STARTING PROXY"
 	}
 
-	fmt.Fprintf(os.Stderr, "%s %s\n", nowStamp(), startMsg)
+	if strings.ToLower(consoleLog) == "quiet" {
+		fmt.Fprintf(os.Stderr, "%s %s\r\n", nowStamp(), startMsg)
+	}
 	log.Printf("%s", startMsg)
 
 	for _, addr := range sshAddr {
@@ -380,16 +396,11 @@ func main() {
 		log.Printf("ALT TARGET: %s [%s]", hostPort, user)
 	}
 
-	setupSignalHandlers()
+	runSignalHandlers()
 
 	go handleConsoleInput()
 
-	go func() {
-		<-shutdownSignal
-		loggingWg.Wait()
-		log.Println("All connections closed. Exiting.")
-		os.Exit(0)
-	}()
+	go shutdownWatchdog()
 
 	go func() {
 		if idleMax == 0 {
@@ -500,12 +511,12 @@ func printVersion() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func handleConsoleInput() {
-	reader := bufio.NewReader(os.Stdin)
 	for {
 		if consoleInputActive.Load() {
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}
+		reader := bufio.NewReader(os.Stdin)
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
@@ -518,40 +529,41 @@ func handleConsoleInput() {
 			log.Printf("Console read error: %v", err)
 			return
 		}
-		cmd := strings.TrimSpace(input)
-		switch cmd {
-		case "?", "h", "H":
-			showHelp()
 
+		parts := strings.Fields(input)
+		if len(parts) == 0 {
+			continue
+		}
+		cmd := parts[0]
+
+		switch strings.ToLower(cmd) {
+		case "?", "h":
+			showHelp()
 		case "q":
 			toggleGracefulShutdown()
-
-		case "d", "D":
+		case "d":
 			toggleDenyNewConnections()
-
 		case "Q":
 			immediateShutdown()
-
-		case "l", "L":
+		case "l":
 			listConnections()
-
-		case "c", "C":
+		case "c":
 			listConfiguration()
-
-		case "k", "K":
-			killConnection()
-
-		case "R", "r":
+		case "k":
+			if len(parts) < 2 {
+				fmt.Fprintf(os.Stderr, "%s Error: session ID required for 'k' command.\r\n", nowStamp())
+				continue
+			}
+			killConnection(parts[1])
+		case "r":
 			if blacklistFile == "" && whitelistFile == "" {
 				log.Printf("NO ACCESS CONTROL LISTS ARE ENABLED.")
 			} else {
 				reloadLists()
 			}
-
 		case "":
-
 		default:
-			log.Printf("Unknown command: %s", cmd)
+			fmt.Fprintf(os.Stdout, "Unknown command: %s\r\n", cmd)
 		}
 	}
 }
@@ -580,10 +592,19 @@ func toggleGracefulShutdown() {
 	if gracefulShutdownMode.Load() {
 		gracefulShutdownMode.Store(false)
 		log.Println("Graceful shutdown cancelled.")
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr, "%s Graceful shutdown cancelled.\r\n", nowStamp())
+		}
 	} else {
 		gracefulShutdownMode.Store(true)
 		log.Println("No new connections will be accepted.")
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr, "%s No new connections will be accepted.\r\n", nowStamp())
+		}
 		log.Println("Graceful shutdown initiated.")
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr, "%s Graceful shutdown initiated.\r\n", nowStamp())
+		}
 		connectionsMutex.Lock()
 		if len(connections) == 0 {
 			connectionsMutex.Unlock()
@@ -603,9 +624,15 @@ func toggleDenyNewConnections() {
 	if denyNewConnectionsMode.Load() {
 		denyNewConnectionsMode.Store(false)
 		log.Println("Deny connections cancelled.")
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr, "%s Deny connections cancelled.\r\n", nowStamp())
+		}
 	} else {
 		denyNewConnectionsMode.Store(true)
 		log.Println("No new connections will be accepted.")
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr, "%s No new connections will be accepted.\r\n", nowStamp())
+		}
 	}
 }
 
@@ -614,6 +641,9 @@ func toggleDenyNewConnections() {
 func immediateShutdown() {
 	shutdownOnce.Do(func() {
 		log.Println("Immediate shutdown initiated.")
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr, "%s Immediate shutdown initiated.\r\n", nowStamp())
+		}
 		connectionsMutex.Lock()
 		for _, conn := range connections {
 			if conn.channel != nil {
@@ -643,6 +673,9 @@ func immediateShutdown() {
 		}
 
 		loggingWg.Wait()
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr, "%s Exiting.\r\n", nowStamp())
+		}
 		log.Println("Exiting.")
 		os.Exit(0)
 	})
@@ -751,25 +784,9 @@ func listConfiguration() {
 		}
 	}
 
-	fmt.Printf("\r* DEBUG: %t\r\n", debugNegotiation)
+	fmt.Printf("\r* DEBUG: %t\r\n\r\n", debugNegotiation)
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-
-	samples := make([]metrics.Sample, 1)
-	samples[0].Name = "/cpu/classes/user:cpu-seconds"
-	metrics.Read(samples)
-	cpuSeconds := samples[0].Value.Float64()
-
-	fmt.Printf("\r* RESOURCE USAGE:"+
-		"\r\n  * MEMORY USAGE: %s"+
-		"\r\n  * GOROUTINES: %d active"+
-		"\r\n  * CPU TIME USED: %s"+
-		"\r\n* CONNECTIONS (CUM.): %d SSH, %d TELNET\r\n\r\n",
-		byteCountIEC(m.Alloc),
-		runtime.NumGoroutine(),
-		formatDuration(cpuSeconds),
-		sshSessionsTotal.Load(),
-		telnetConnectionsTotal.Load())
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -843,75 +860,19 @@ func reloadLists() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func startBufferingLogs() {
-	logBufferMutex.Lock()
-	defer logBufferMutex.Unlock()
-	logBuffer.Reset()
-	log.SetOutput(io.MultiWriter(originalLogOutput, logBuffer))
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-func stopBufferingLogs() {
-	logBufferMutex.Lock()
-	defer logBufferMutex.Unlock()
-	log.SetOutput(originalLogOutput)
-	if logBuffer.Len() > 0 {
-		fmt.Print(logBuffer.String())
-		logBuffer.Reset()
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-func killConnection() {
-	consoleInputActive.Store(true)
-	defer consoleInputActive.Store(false)
-
-	fmt.Print("Enter session ID to kill: ")
-	reader := bufio.NewReader(os.Stdin)
-
-	var input string
-
-	inputChan := make(chan string, 1)
-
-	go func() {
-		line, readErr := reader.ReadString('\n')
-		if readErr != nil {
-			log.Printf("Error reading session ID: %v", readErr)
-			close(inputChan)
-			return
-		}
-		inputChan <- line
-	}()
-
-	select {
-	case line, ok := <-inputChan:
-		if !ok {
-			return
-		}
-		input = line
-
-	case <-time.After(10 * time.Second):
-		fmt.Println("\nPrompt timed out.")
-		return
-	}
-
-	id := strings.TrimSpace(input)
-	if id == "" {
-		fmt.Println("Aborted.")
-		return
-	}
-
+func killConnection(id string) {
 	connectionsMutex.Lock()
 	conn, ok := connections[id]
 	connectionsMutex.Unlock()
 
 	if !ok {
-		fmt.Printf("Session ID '%s' not found.\r\n", id)
+		fmt.Fprintf(os.Stderr, "%s Session ID '%s' not found.\r\n", nowStamp(), id)
 		return
 	}
 
+	if strings.ToLower(consoleLog) == "quiet" {
+		fmt.Fprintf(os.Stderr, "%s Killing connection %s...\r\n", nowStamp(), id)
+	}
 	conn.channel.Write([]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
 	connUptime := time.Since(conn.startTime)
 	log.Printf("TERMKILL [%s] %s@%s (link time %s)",
@@ -1807,66 +1768,6 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 	default:
 		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-func byteCountIEC(b uint64) string {
-	const unit = 1024
-
-	if b < unit {
-		return fmt.Sprintf("%d B", b)
-	}
-
-	div, exp := uint64(unit), 0
-	for n := b / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f %ciB", float64(b)/float64(div), "KMGTPE"[exp])
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-func formatDuration(seconds float64) string {
-	d := time.Duration(seconds * float64(time.Second))
-	days := int(d / (24 * time.Hour))
-
-	d = d % (24 * time.Hour)
-	hours := int(d / time.Hour)
-
-	d = d % time.Hour
-	minutes := int(d / time.Minute)
-
-	d = d % time.Minute
-	seconds = d.Seconds()
-
-	var parts []string
-	if days > 0 {
-		parts = append(parts, fmt.Sprintf("%dd", days))
-	}
-
-	if hours > 0 {
-		parts = append(parts, fmt.Sprintf("%dh", hours))
-	}
-
-	if minutes > 0 {
-		parts = append(parts, fmt.Sprintf("%dm", minutes))
-	}
-
-	if seconds > 0 || len(parts) == 0 {
-		parts = append(parts, fmt.Sprintf("%.0fs", seconds))
-	}
-	return strings.Join(parts, " ")
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

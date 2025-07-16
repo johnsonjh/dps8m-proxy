@@ -57,7 +57,7 @@ distclean: clean
 # Target: lint
 
 .PHONY: lint
-lint: reuse gofumpt gofmt goverify gotidydiff govet
+lint: reuse gofumpt gofmt goverify gotidydiff govet staticcheck
 
 ##############################################################################
 # Target: reuse
@@ -88,6 +88,15 @@ goverify: go.mod
 .PHONY: gotidydiff
 gotidydiff: go.mod
 	go mod tidy -diff
+
+##############################################################################
+# Target: staticcheck
+
+.PHONY: staticcheck
+staticcheck:
+	@$$(command -v staticcheck > /dev/null 2>&1) || \
+		{ printf '%s\n' "⚠️ staticcheck not found!"; exit 0; } ; \
+		set -x; staticcheck .
 
 ##############################################################################
 # Target: gofumpt

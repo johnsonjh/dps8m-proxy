@@ -21,7 +21,7 @@ import (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func setupSignalHandlers() {
+func runSignalHandlers() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan,
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT,
