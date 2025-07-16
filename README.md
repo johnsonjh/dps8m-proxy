@@ -74,7 +74,7 @@ to anyone who wants to provide modern SSH access to legacy systems.
 -d, --debug                   Debug TELNET negotiation
 -L, --log-dir string          Base directory for logs (default "./log")
 -o, --no-log                  Disable all session logging
-                                 (for console logging, see "-console-log")
+                                 (for console logging, see "--console-log")
 -c, --console-log string      Enable console logging ["quiet", "noquiet"]
 -C, --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
                                  (default "gzip")
@@ -82,9 +82,9 @@ to anyone who wants to provide modern SSH access to legacy systems.
                                  ["fast", "normal", "high"]
                                  (default "normal")
 -x, --no-compress             Disable session and console log compression
--p, --log-perm octal          Permissions for log files
+-p, --log-perm octal          Permissions for new log files
                                  [umask, e.g., "600", "644"] (default "600")
--P, --log-dir-perm octal      Permissions for log directories
+-P, --log-dir-perm octal      Permissions for new log directories
                                  [umask, e.g., "755", "750"] (default "750")
 -i, --idle-max int            Maximum connection idle time allowed [seconds]
 -m, --time-max int            Maximum connection link time allowed [seconds]

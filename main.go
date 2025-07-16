@@ -250,7 +250,7 @@ func init() {
 
 	pflag.BoolVarP(&noLog,
 		"no-log", "o", false,
-		"Disable all session logging\n   (for console logging, see \"-console-log\")")
+		"Disable all session logging\n   (for console logging, see \"--console-log\")")
 
 	pflag.StringVarP(&consoleLog,
 		"console-log", "c", "",
