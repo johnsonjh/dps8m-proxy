@@ -105,19 +105,19 @@ var (
 	blockFile           = "block.txt"
 	compressAlgo        string
 	emacsKeymap         = map[string]string{
-		"\x1b[1;5A": "\x1b\x5b", //    C-Arrow_Up -> Escape, [
-		"\x1b[1;5B": "\x1b\x5d", // C-Arrrow_Down -> Escape, ]
-		"\x1b[1;5C": "\x1b\x66", // C-Arrow_Right -> Escape, f
-		"\x1b[1;5D": "\x1b\x62", //  C-Arrow_Left -> Escape, b
-		"\x1b[1~":   "\x01",     //          Home -> Control-A
-		"\x1b[3~":   "\x04",     //        Delete -> Control-D
-		"\x1b[4~":   "\x05",     //           End -> Control-E
-		"\x1b[5~":   "\x1b\x76", //       Page_Up -> Escape, v
-		"\x1b[6~":   "\x16",     //     Page_Down -> Control-V
-		"\x1b[A":    "\x10",     //      Arrow_Up -> Control-P
-		"\x1b[B":    "\x0e",     //    Arrow_Down -> Control-N
-		"\x1b[C":    "\x06",     //   Arrow_Right -> Control-F
-		"\x1b[D":    "\x02",     //    Arrow_Left -> Control-B
+		"\x1b[1;5A": "\x1b\x5b", //    Control-Arrow_Up -> Escape, [
+		"\x1b[1;5B": "\x1b\x5d", // Control-Arrrow_Down -> Escape, ]
+		"\x1b[1;5C": "\x1b\x66", // Control-Arrow_Right -> Escape, f
+		"\x1b[1;5D": "\x1b\x62", //  Control-Arrow_Left -> Escape, b
+		"\x1b[1~":   "\x01",     //                Home -> Control-A
+		"\x1b[3~":   "\x04",     //              Delete -> Control-D
+		"\x1b[4~":   "\x05",     //                 End -> Control-E
+		"\x1b[5~":   "\x1b\x76", //             Page_Up -> Escape, v
+		"\x1b[6~":   "\x16",     //           Page_Down -> Control-V
+		"\x1b[A":    "\x10",     //            Arrow_Up -> Control-P
+		"\x1b[B":    "\x0e",     //          Arrow_Down -> Control-N
+		"\x1b[C":    "\x06",     //         Arrow_Right -> Control-F
+		"\x1b[D":    "\x02",     //          Arrow_Left -> Control-B
 	}
 	emacsKeymapPrefixes = make(map[string]bool)
 )
@@ -324,6 +324,16 @@ func main() {
 		log.Fatalf("Failed to create log directory: %v", err)
 	}
 
+	if p, err := filepath.EvalSymlinks(logDir); err == nil {
+		logDir = p
+	}
+
+	if p, err := filepath.Abs(logDir); err == nil {
+		logDir = p
+	}
+
+	logDir = filepath.Clean(logDir)
+
 	reloadLists()
 
 	if strings.Contains(telnetHostPort, "@") {
@@ -391,9 +401,9 @@ func main() {
 
 	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
 	if err != nil {
-		log.Fatalf("Error parsing default telnet-host: %v", err)
+		log.Fatalf("Error parsing default TELNET target: %v", err)
 	}
-	log.Printf("Default target: %s:%d", defaultHost, defaultPort)
+	log.Printf("Default TELNET target: %s:%d", defaultHost, defaultPort)
 
 	for user, hostPort := range altHosts {
 		log.Printf("Alt target: %s [%s]", hostPort, user)
@@ -744,7 +754,16 @@ func listConfiguration() {
 	log.SetOutput(originalWriter)
 	fmt.Println("\r\n\rDPS8M PROXY Configuration")
 	fmt.Println("\r=========================")
-	fmt.Printf("\r\n* SSH listener on: %s\r\n", strings.Join(sshAddr, ", "))
+
+	if len(sshAddr) == 1 {
+		fmt.Printf("\r\n* SSH listener on: %s\r\n", sshAddr[0])
+	} else {
+		fmt.Println("\r\n* SSH listeners on:")
+		for _, addr := range sshAddr {
+			fmt.Printf("\r  * %s\r\n", addr)
+		}
+	}
+
 	fmt.Printf("\r* Default Target: %s\r\n", telnetHostPort)
 
 	if len(altHosts) > 0 {
@@ -756,20 +775,34 @@ func listConfiguration() {
 		fmt.Println("\r* Alt Targets: None configured")
 	}
 
-	fmt.Printf("\r* Time Max: %d seconds\r\n", timeMax)
-	fmt.Printf("\r* Idle Max: %d seconds\r\n", idleMax)
+	fmt.Printf("\r* Time Max: %s\r\n", func(t int) string {
+		if t == 0 {
+			return "disabled"
+		}
+		return fmt.Sprintf("%d seconds", t)
+	}(timeMax))
+
+	fmt.Printf("\r* Idle Max: %s\r\n", func(t int) string {
+		if t == 0 {
+			return "disabled"
+		}
+		return fmt.Sprintf("%d seconds", t)
+	}(idleMax))
 
 	fmt.Printf("\r* Log Base Directory: %s\r\n", logDir)
 	fmt.Printf("\r* No Session Logging: %t\r\n", noLog)
 	if consoleLog != "" {
 		logPath := getConsoleLogPath(time.Now())
+		logPath = filepath.Clean(logPath)
 		quietMode := ""
 		if strings.ToLower(consoleLog) == "quiet" {
-			quietMode = " (quiet mode)"
+			quietMode = "\r\n* Console Logging Mode: Quiet"
+		} else {
+			quietMode = "\r\n* Console Logging Mode: Normal (noquiet)"
 		}
-		fmt.Printf("\r* Console Log: %s%s\r\n", logPath, quietMode)
+		fmt.Printf("\r* Console Logging: %s%s\r\n", logPath, quietMode)
 	} else {
-		fmt.Printf("\r* Console Log: disabled\r\n")
+		fmt.Printf("\r* Console Logging: disabled\r\n")
 	}
 	fmt.Printf("\r* No Log Compression: %t\r\n", noCompress)
 	fmt.Printf("\r* Compression Algorithm: %s\r\n", compressAlgo)
@@ -1976,7 +2009,7 @@ func rotateConsoleLog() {
 		log.Fatalf("Failed to open console log file: %v", err)
 	}
 
-	fmt.Fprintf(os.Stderr, "%s Console Log enabled: suppressing messages!\n", nowStamp())
+	fmt.Fprintf(os.Stderr, "%s Console Logging enabled (suppressing most output)\n", nowStamp())
 
 	if consoleLog == "quiet" {
 		log.SetOutput(consoleLogFile)
