@@ -38,6 +38,7 @@ import (
 
 	"github.com/klauspost/compress/gzip"
 	"github.com/klauspost/compress/zstd"
+	"github.com/pierrec/lz4/v4"
 	"github.com/ulikunitz/xz"
 	"golang.org/x/crypto/ssh"
 )
@@ -86,30 +87,28 @@ var (
 	denyNewConnectionsMode atomic.Bool
 	gracefulShutdownMode   atomic.Bool
 	idleMax                int
-	//lint:ignore U1000 FP
-	logBufferMutex sync.Mutex
-	//lint:ignore U1000 FP
-	logBuffer  *strings.Builder
-	logDir     string
-	loggingWg  sync.WaitGroup
-	noBanner   bool
-	noCompress bool
-	noLog      bool
-	//lint:ignore U1000 FP
-	originalLogOutput   io.Writer
-	showVersion         bool
-	shutdownOnce        sync.Once
-	shutdownSignal      chan struct{}
-	sshAddr             stringSliceFlag
-	telnetHostPort      string
-	timeMax             int
-	whitelistedNetworks []*net.IPNet
-	whitelistFile       string
-	issueFile           = "issue.txt"
-	denyFile            = "deny.txt"
-	blockFile           = "block.txt"
-	compressAlgo        string
-	emacsKeymap         = map[string]string{
+	logBufferMutex         sync.Mutex       //lint:ignore U1000 FP
+	logBuffer              *strings.Builder //lint:ignore U1000 FP
+	logDir                 string
+	loggingWg              sync.WaitGroup
+	noBanner               bool
+	noCompress             bool
+	noLog                  bool
+	originalLogOutput      io.Writer //lint:ignore U1000 FP
+	showVersion            bool
+	shutdownOnce           sync.Once
+	shutdownSignal         chan struct{}
+	sshAddr                stringSliceFlag
+	telnetHostPort         string
+	timeMax                int
+	whitelistedNetworks    []*net.IPNet
+	whitelistFile          string
+	issueFile              = "issue.txt"
+	denyFile               = "deny.txt"
+	blockFile              = "block.txt"
+	compressAlgo           string
+	compressLevel          string
+	emacsKeymap            = map[string]string{
 		"\x1b[1;5A": "\x1b\x5b", //    Control-Arrow_Up -> Escape, [
 		"\x1b[1;5B": "\x1b\x5d", // Control-Arrrow_Down -> Escape, ]
 		"\x1b[1;5C": "\x1b\x66", // Control-Arrow_Right -> Escape, f
@@ -291,7 +290,11 @@ func init() {
 
 	flag.StringVar(&compressAlgo,
 		"compress-algo", "gzip",
-		"Compression algorithm [gzip, xz, zstd]")
+		"Compression algorithm [gzip, lz4, xz, zstd]")
+
+	flag.StringVar(&compressLevel,
+		"compress-level", "normal",
+		"Compression level [fast, normal, high]")
 
 	flag.Var((*octalPermValue)(&logPerm),
 		"log-perm",
@@ -348,10 +351,17 @@ func main() {
 	}
 
 	switch compressAlgo {
-	case "gzip", "xz", "zstd":
+	case "gzip", "xz", "zstd", "lz4":
 
 	default:
 		log.Fatalf("ERROR: Invalid -compress-algo: %s", compressAlgo)
+	}
+
+	switch compressLevel {
+	case "fast", "normal", "high":
+
+	default:
+		log.Fatalf("ERROR: Invalid -compress-level: %s", compressLevel)
 	}
 
 	setupConsoleLogging()
@@ -879,6 +889,7 @@ func listConfiguration() {
 	}
 	fmt.Printf("\r* No Log Compression: %t\r\n", noCompress)
 	fmt.Printf("\r* Compression Algorithm: %s\r\n", compressAlgo)
+	fmt.Printf("\r* Compression Level: %s\r\n", compressLevel)
 	fmt.Printf("\r* Log Permissions: Files: %04o, Dirs: %04o\r\n", logPerm, logDirPerm)
 
 	fmt.Printf("\r* Graceful Shutdown: %t\r\n", gracefulShutdownMode.Load())
@@ -2359,6 +2370,42 @@ func compressLogFile(logFilePath string) {
 	var compressedFile *os.File
 	var writer io.WriteCloser
 
+	var gzipLevel int
+	switch compressLevel {
+	case "fast":
+		gzipLevel = gzip.BestSpeed
+
+	case "normal":
+		gzipLevel = gzip.DefaultCompression
+
+	case "high":
+		gzipLevel = gzip.BestCompression
+	}
+
+	var zstdLevel zstd.EncoderLevel
+	switch compressLevel {
+	case "fast":
+		zstdLevel = zstd.SpeedFastest
+
+	case "normal":
+		zstdLevel = zstd.SpeedDefault
+
+	case "high":
+		zstdLevel = zstd.SpeedBestCompression
+	}
+
+	var lz4Level lz4.CompressionLevel
+	switch compressLevel {
+	case "fast":
+		lz4Level = lz4.Fast
+
+	case "normal":
+		lz4Level = lz4.Level5
+
+	case "high":
+		lz4Level = lz4.Level9
+	}
+
 	switch compressAlgo {
 	case "gzip":
 		compressedFilePath = logFilePath + ".gz"
@@ -2368,7 +2415,7 @@ func compressLogFile(logFilePath string) {
 
 			return
 		}
-		writer, err = gzip.NewWriterLevel(compressedFile, gzip.BestCompression)
+		writer, err = gzip.NewWriterLevel(compressedFile, gzipLevel)
 		if err != nil {
 			log.Printf("Error creating gzip writer for %q: %v", compressedFilePath, err)
 			if err := compressedFile.Close(); err != nil {
@@ -2405,7 +2452,7 @@ func compressLogFile(logFilePath string) {
 			return
 		}
 		writer, err = zstd.NewWriter(
-			compressedFile, zstd.WithEncoderLevel(zstd.SpeedBestCompression))
+			compressedFile, zstd.WithEncoderLevel(zstdLevel))
 		if err != nil {
 			log.Printf("Error creating zstd writer for %q: %v", compressedFilePath, err)
 			if err := compressedFile.Close(); err != nil {
@@ -2414,6 +2461,24 @@ func compressLogFile(logFilePath string) {
 
 			return
 		}
+
+	case "lz4":
+		compressedFilePath = logFilePath + ".lz4"
+		compressedFile, err = os.Create(compressedFilePath)
+		if err != nil {
+			log.Printf("Failed to create compressed file %q: %v", compressedFilePath, err)
+
+			return
+		}
+		lz4Writer := lz4.NewWriter(compressedFile)
+		if err := lz4Writer.Apply(lz4.CompressionLevelOption(lz4Level)); err != nil {
+			log.Printf("Error applying lz4 compression level for %q: %v", compressedFilePath, err)
+			if err := compressedFile.Close(); err != nil {
+				log.Printf("Error closing compressed file after lz4 writer error: %v", err)
+			}
+			return
+		}
+		writer = lz4Writer
 
 	default:
 		log.Printf("Unknown compression algorithm: %s", compressAlgo)
