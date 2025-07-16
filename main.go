@@ -11,6 +11,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
@@ -208,6 +209,8 @@ func (op *octalPermValue) String() string {
 	return fmt.Sprintf("%o", *op)
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func (op *octalPermValue) Set(s string) error {
 	v, err := strconv.ParseUint(s, 8, 32)
 	if err != nil {
@@ -311,6 +314,7 @@ func main() {
 
 	switch compressAlgo {
 	case "gzip", "xz", "zstd":
+
 	default:
 		log.Fatalf("ERROR: Invalid -compress-algo: %s", compressAlgo)
 	}
@@ -539,29 +543,41 @@ func handleConsoleInput() {
 		switch strings.ToLower(cmd) {
 		case "?", "h":
 			showHelp()
+
 		case "q":
 			toggleGracefulShutdown()
+
 		case "d":
 			toggleDenyNewConnections()
+
 		case "Q":
 			immediateShutdown()
+
 		case "l":
 			listConnections()
+
 		case "c":
 			listConfiguration()
+
+		case "cg":
+			listGoroutines()
+
 		case "k":
 			if len(parts) < 2 {
 				fmt.Fprintf(os.Stderr, "%s Error: session ID required for 'k' command.\r\n", nowStamp())
 				continue
 			}
 			killConnection(parts[1])
+
 		case "r":
 			if blacklistFile == "" && whitelistFile == "" {
 				log.Printf("NO ACCESS CONTROL LISTS ARE ENABLED.")
 			} else {
 				reloadLists()
 			}
+
 		case "":
+
 		default:
 			fmt.Fprintf(os.Stdout, "Unknown command: %s\r\n", cmd)
 		}
@@ -610,6 +626,7 @@ func toggleGracefulShutdown() {
 			connectionsMutex.Unlock()
 			select {
 			case shutdownSignal <- struct{}{}:
+
 			default:
 			}
 		} else {
@@ -784,9 +801,10 @@ func listConfiguration() {
 		}
 	}
 
-	fmt.Printf("\r* DEBUG: %t\r\n\r\n", debugNegotiation)
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
+	fmt.Printf("\r* DEBUG: %t\r\n", debugNegotiation)
+
+	fmt.Printf("\r* RUNTIME: %d Goroutines (use 'cg' for details)\n\r\n",
+		runtime.NumGoroutine())
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1042,6 +1060,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 			connectionsMutex.Unlock()
 			select {
 			case shutdownSignal <- struct{}{}:
+
 			default:
 			}
 		} else {
@@ -1346,6 +1365,7 @@ func handleSession(
 					close(byteChan)
 					close(errorChan)
 					return
+
 				default:
 					b, err := reader.ReadByte()
 					if err != nil {
@@ -1455,6 +1475,7 @@ func handleSession(
 					select {
 					case <-ctx.Done():
 						return
+
 					default:
 					}
 					continue
@@ -1677,6 +1698,8 @@ func showMenu(ch ssh.Channel) {
 		"\r+=====================+\r\n"
 	ch.Write([]byte(menu))
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.Conn,
 	logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) {
@@ -2110,6 +2133,52 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 	}
 
 	return networks, nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func listGoroutines() {
+	buf := make([]byte, 1<<20)
+	n := runtime.Stack(buf, true)
+	stacks := bytes.Split(buf[:n], []byte("\n\n"))
+
+	for i, stack := range stacks {
+		lines := bytes.Split(stack, []byte("\n"))
+
+		if len(lines) < 2 {
+			continue
+		}
+
+		header := string(lines[0]) // L1: header
+		entry := string(lines[1])  // L2: entry point
+		caller := ""               // L3: caller
+
+		if len(lines) > 2 {
+			caller = string(lines[2])
+		}
+
+		fmt.Printf("* Goroutine #%d:\n", i+1)
+
+		fmt.Printf("  * Name/State: %s\n", func(s string) string {
+			s = strings.TrimSpace(strings.ReplaceAll(s, "\t", " "))
+			if strings.HasSuffix(s, ":") {
+				s = s[:len(s)-1]
+			}
+			return s
+		}(header))
+
+		fmt.Printf("  * Entrypoint: %s\n", func(s string) string {
+			return strings.TrimSpace(strings.ReplaceAll(s, "\t", " "))
+		}(entry))
+
+		if caller != "" {
+			fmt.Printf("  * Caller:     %s\n", func(s string) string {
+				return strings.TrimSpace(strings.ReplaceAll(s, "\t", " "))
+			}(caller))
+		}
+
+		fmt.Println()
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
