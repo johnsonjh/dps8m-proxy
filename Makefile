@@ -57,7 +57,8 @@ distclean: clean
 # Target: lint
 
 .PHONY: lint
-lint: reuse gofumpt gofmt goverify gotidydiff govet staticcheck revive
+lint: reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
+	revive errcheck
 
 ##############################################################################
 # Target: reuse
@@ -106,6 +107,15 @@ revive:
 	@$$(command -v revive > /dev/null 2>&1) || \
 		{ printf '%s\n' "⚠️ revive not found!"; exit 0; } ; \
 		set -x; revive ./...
+
+##############################################################################
+# Target: errcheck
+
+.PHONY: errcheck
+errcheck:
+	@$$(command -v errcheck > /dev/null 2>&1) || \
+		{ printf '%s\n' "⚠️ errcheck not found!"; exit 0; } ; \
+		set -x; errcheck
 
 ##############################################################################
 # Target: gofumpt
