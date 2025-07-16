@@ -495,7 +495,7 @@ func printVersion() {
 		}
 
 		if date != "" && commit != "" {
-			if modified == true {
+			if modified {
 				versionString += fmt.Sprintf(" (%s g%s+)", tdate, commit)
 			} else {
 				versionString += fmt.Sprintf(" (%s g%s)", tdate, commit)
@@ -1512,13 +1512,7 @@ func handleSession(
 			if n > 0 {
 				atomic.AddUint64(&telnetIn, uint64(n))
 				atomic.AddUint64(&conn.sshInTotal, uint64(n))
-				fwd := buf[:0]
-
-				for i := 0; i < n; i++ {
-					if buf[i] != 0 {
-						fwd = append(fwd, buf[i])
-					}
-				}
+				fwd := bytes.ReplaceAll(buf[:n], []byte{0}, []byte{})
 
 				atomic.AddUint64(&sshOut, uint64(len(fwd)))
 				atomic.AddUint64(&conn.sshOutTotal, uint64(len(fwd)))
@@ -1548,7 +1542,6 @@ func sendBanner(sid string, sshConn *ssh.ServerConn, ch ssh.Channel, conn *Conne
 		return
 	}
 
-	user := sshConn.User()
 	host, _, _ := net.SplitHostPort(sshConn.RemoteAddr().String())
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -1557,8 +1550,6 @@ func sendBanner(sid string, sshConn *ssh.ServerConn, ch ssh.Channel, conn *Conne
 	var origin string
 	if len(names) > 0 {
 		origin = fmt.Sprintf("%s [%s]", strings.TrimSuffix(names[0], "."), host)
-	} else if user != "" {
-		origin = fmt.Sprintf("%s", host)
 	} else {
 		origin = host
 	}
@@ -1780,8 +1771,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		if conn.emacsKeymapEnabled {
 			keymapStatus = " (Emacs keymap enabled)"
 		}
-		ch.Write([]byte(fmt.Sprintf(
-			">> LNK - link time: %s%s\r\n", dur.Round(time.Second).String(), keymapStatus)))
+		ch.Write([]byte(">> LNK - link time: " + dur.Round(time.Second).String() + keymapStatus + "\r\n"))
 		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
 	case 'x', 'X':
