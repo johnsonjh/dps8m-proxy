@@ -70,6 +70,7 @@ const (
 var (
 	allowRoot              bool
 	logPerm                uint = 0o600
+	logDirPerm             uint = 0o750
 	sshSessionsTotal       atomic.Uint64
 	telnetConnectionsTotal atomic.Uint64
 	altHosts               = make(map[string]string)
@@ -296,6 +297,10 @@ func init() {
 		"log-perm",
 		"Permissions for log files [umask, e.g., 0600, 0644]")
 
+	flag.Var((*octalPermValue)(&logDirPerm),
+		"log-dir-perm",
+		"Permissions for log directories [umask, e.g., 0755, 0750]")
+
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
 	shutdownSignal = make(chan struct{})
@@ -351,7 +356,7 @@ func main() {
 
 	setupConsoleLogging()
 
-	if err := os.MkdirAll(logDir, 0o750); err != nil {
+	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil {
 		log.Fatalf("Failed to create log directory: %v", err)
 	}
 
@@ -428,9 +433,9 @@ func main() {
 	}
 
 	if strings.ToLower(consoleLog) == "quiet" {
-		fmt.Fprintf(os.Stderr, "%s %s\r\n", nowStamp(), startMsg)
+		fmt.Fprintf(os.Stderr, "%s %s - Type '?' for help\r\n", nowStamp(), startMsg)
 	}
-	log.Printf("%s", startMsg)
+	log.Printf("%s - Type '?' for help", startMsg)
 
 	for _, addr := range sshAddr {
 		log.Printf("SSH listener on %s", addr)
@@ -874,7 +879,7 @@ func listConfiguration() {
 	}
 	fmt.Printf("\r* No Log Compression: %t\r\n", noCompress)
 	fmt.Printf("\r* Compression Algorithm: %s\r\n", compressAlgo)
-	fmt.Printf("\r* Log Permissions: %04o\r\n", logPerm)
+	fmt.Printf("\r* Log Permissions: Files: %04o, Dirs: %04o\r\n", logPerm, logDirPerm)
 
 	fmt.Printf("\r* Graceful Shutdown: %t\r\n", gracefulShutdownMode.Load())
 	fmt.Printf("\r* Deny New Connections: %t\r\n", denyNewConnectionsMode.Load())
@@ -2138,12 +2143,12 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 		fmt.Sprintf("%02d", now.Month()),
 		fmt.Sprintf("%02d", now.Day()),
 	)
-	if err := os.MkdirAll(dir, 0o750); err != nil {
+	if err := os.MkdirAll(dir, os.FileMode(logDirPerm)); err != nil {
 		return nil, "", err
 	}
 
 	dir = filepath.Join(dir, ipDir)
-	if err := os.MkdirAll(dir, 0o750); err != nil {
+	if err := os.MkdirAll(dir, os.FileMode(logDirPerm)); err != nil {
 		return nil, "", err
 	}
 
@@ -2315,7 +2320,7 @@ func rotateConsoleLog() {
 	logPath := getConsoleLogPath(time.Now())
 	logDir := filepath.Dir(logPath)
 
-	if err := os.MkdirAll(logDir, 0o750); err != nil {
+	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil {
 		consoleLogMutex.Unlock()
 		log.Fatalf("Failed to create console log directory: %v", err)
 	}
