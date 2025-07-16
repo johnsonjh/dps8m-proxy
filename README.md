@@ -105,7 +105,8 @@ to anyone who wants to provide modern SSH access to legacy systems.
 
 ### Admin interaction
 
-* The running proxy can be controlled with the following commands:
+* The running proxy can be controlled with the following console
+  commands:
   * `?` - Show help text
   * `c` - Show proxy configuration
   * `l` - List active connections
