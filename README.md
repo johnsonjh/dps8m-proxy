@@ -62,41 +62,34 @@ to anyone who wants to provide modern SSH access to legacy systems.
 * The proxy can be invoked with the following command-line arguments:
 
 ```
-Usage of proxy:
-  -allow-root
-        Allow running as root (UID 0) [strongly discouraged!]
-  -alt-host value
-        Alternate TELNET targets (username@host:port) [allowed multiple times]
-  -blacklist string
-        Blacklist file (optional)
-  -compress-algo string
-        Compression algorithm [gzip, xz, zstd] (default "gzip")
-  -console-log string
-        Enable console logging [requires 'quiet' or 'noquiet' argument]
-  -debug
-        Debug TELNET negotiation
-  -idle-max int
-        Maximum connection idle time in seconds
-  -log-dir string
-        Base directory for logs (default "./log")
-  -log-perm value
-        Permissions for log files (umask, e.g., 0600, 0644) (default 600)
-  -no-banner
-        Disable SSH connection banner
-  -no-compress
-        Disable session and console log compression
-  -no-log
-        Disable all session logging
-  -ssh-addr value
-        SSH listener address (e.g.: ":2222", "[::1]:8000") [allowed multiple times]
-  -telnet-host string
-        Default TELNET target (host:port) (default "127.0.0.1:6180")
-  -time-max int
-        Maximum connection link time in seconds
-  -version
-        Show version information
-  -whitelist string
-        Whitelist file (optional)
+      --allow-root              Allow running as root (UID 0)
+      --ssh-addr strings        SSH listener address
+                                  [e.g., :2222, [::1]:8000] (multiple allowed)
+                                   (default [:2222])
+      --no-banner               Disable SSH connection banner
+      --telnet-host string      Default TELNET target [host:port]
+                                   (default "127.0.0.1:6180")
+      --alt-host string         Alternate TELNET targets [username@host:port]
+                                   (multiple allowed)
+      --debug                   Debug TELNET negotiation
+      --log-dir string          Base directory for logs (default "./log")
+      --no-log                  Disable session logging
+      --console-log string      Enable console logging [quiet, noquiet]
+                                   (no default)
+      --compress-algo string    Compression algorithm [gzip, lz4, xz, zstd]
+                                   (default "gzip")
+      --compress-level string   Compression level for gzip, lz4, and zstd
+                                   [fast, normal, high] (default "normal")
+      --no-compress             Disable session and console log compression
+      --log-perm octal          Permissions for log files
+                                   [umask, e.g., 600, 644] (default 600)
+      --log-dir-perm octal      Permissions for log directories
+                                   [umask, e.g., 755, 750] (default 750)
+      --idle-max int            Maximum connection idle time allowed [seconds]
+      --time-max int            Maximum connection link time allowed [seconds]
+      --blacklist string        Enable blacklist [filename] (no default)
+      --whitelist string        Enable whitelist [filename] (no default)
+      --version                 Show version information
 ```
 
 ### Port binding
