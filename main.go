@@ -375,9 +375,9 @@ func main() {
 	pid := os.Getpid()
 	var startMsg string
 	if pid != 0 {
-		startMsg = fmt.Sprintf("STARTING PROXY [PID %d]", pid)
+		startMsg = fmt.Sprintf("Starting proxy [PID %d]", pid)
 	} else {
-		startMsg = "STARTING PROXY"
+		startMsg = "Starting proxy"
 	}
 
 	if strings.ToLower(consoleLog) == "quiet" {
@@ -386,17 +386,17 @@ func main() {
 	log.Printf("%s", startMsg)
 
 	for _, addr := range sshAddr {
-		log.Printf("SSH LISTEN ON %s", addr)
+		log.Printf("SSH listener on %s", addr)
 	}
 
 	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
 	if err != nil {
 		log.Fatalf("Error parsing default telnet-host: %v", err)
 	}
-	log.Printf("DEFAULT TARGET: %s:%d", defaultHost, defaultPort)
+	log.Printf("Default target: %s:%d", defaultHost, defaultPort)
 
 	for user, hostPort := range altHosts {
-		log.Printf("ALT TARGET: %s [%s]", hostPort, user)
+		log.Printf("Alt target: %s [%s]", hostPort, user)
 	}
 
 	runSignalHandlers()
@@ -563,22 +563,23 @@ func handleConsoleInput() {
 
 		case "k", "K":
 			if len(parts) < 2 {
-				fmt.Fprintf(os.Stderr, "%s Error: session ID required for 'k' command.\r\n", nowStamp())
+				fmt.Fprintf(os.Stderr, "%s Error: session ID required for 'k' command.\r\n",
+					nowStamp())
 				continue
 			}
 			killConnection(parts[1])
 
 		case "r", "R":
-			if blacklistFile == "" && whitelistFile == "" {
-				log.Printf("NO ACCESS CONTROL LISTS ARE ENABLED.")
-			} else {
-				reloadLists()
+			if blacklistFile == "" || whitelistFile == "" {
+				fmt.Fprintf(os.Stdout, "%s Reload requested but no lists enabled.\r\n",
+					nowStamp())
 			}
+			reloadLists()
 
 		case "":
 
 		default:
-			fmt.Fprintf(os.Stdout, "Unknown command: %s\r\n", cmd)
+			fmt.Fprintf(os.Stdout, "%s Unknown command: %s\r\n", nowStamp(), cmd)
 		}
 	}
 }
@@ -743,67 +744,67 @@ func listConfiguration() {
 	log.SetOutput(originalWriter)
 	fmt.Println("\r\n\rDPS8M PROXY Configuration")
 	fmt.Println("\r=========================")
-	fmt.Printf("\r\n* SSH LISTEN ON: %s\r\n", strings.Join(sshAddr, ", "))
-	fmt.Printf("\r* DEFAULT TARGET: %s\r\n", telnetHostPort)
+	fmt.Printf("\r\n* SSH listener on: %s\r\n", strings.Join(sshAddr, ", "))
+	fmt.Printf("\r* Default Target: %s\r\n", telnetHostPort)
 
 	if len(altHosts) > 0 {
-		fmt.Println("\r* ALT TARGETS:")
+		fmt.Println("\r* Alt Targets:")
 		for user, hostPort := range altHosts {
 			fmt.Printf("\r  * %s [%s]\r\n", hostPort, user)
 		}
 	} else {
-		fmt.Println("\r* ALT TARGETS: None configured")
+		fmt.Println("\r* Alt Targets: None configured")
 	}
 
-	fmt.Printf("\r* TIME MAX: %d seconds\r\n", timeMax)
-	fmt.Printf("\r* IDLE MAX: %d seconds\r\n", idleMax)
+	fmt.Printf("\r* Time Max: %d seconds\r\n", timeMax)
+	fmt.Printf("\r* Idle Max: %d seconds\r\n", idleMax)
 
-	fmt.Printf("\r* LOG DIR: %s\r\n", logDir)
-	fmt.Printf("\r* NO SESSION LOG: %t\r\n", noLog)
+	fmt.Printf("\r* Log Base Directory: %s\r\n", logDir)
+	fmt.Printf("\r* No Session Logging: %t\r\n", noLog)
 	if consoleLog != "" {
 		logPath := getConsoleLogPath(time.Now())
 		quietMode := ""
 		if strings.ToLower(consoleLog) == "quiet" {
 			quietMode = " (quiet mode)"
 		}
-		fmt.Printf("\r* CONSOLE LOG: %s%s\r\n", logPath, quietMode)
+		fmt.Printf("\r* Console Log: %s%s\r\n", logPath, quietMode)
 	} else {
-		fmt.Printf("\r* CONSOLE LOG: Disabled\r\n")
+		fmt.Printf("\r* Console Log: disabled\r\n")
 	}
-	fmt.Printf("\r* NO LOG COMPRESS: %t\r\n", noCompress)
-	fmt.Printf("\r* COMPRESS ALGO: %s\r\n", compressAlgo)
-	fmt.Printf("\r* LOG PERMISSIONS: %04o\r\n", logPerm)
+	fmt.Printf("\r* No Log Compression: %t\r\n", noCompress)
+	fmt.Printf("\r* Compression Algorithm: %s\r\n", compressAlgo)
+	fmt.Printf("\r* Log Permissions: %04o\r\n", logPerm)
 
-	fmt.Printf("\r* GRACEFUL SHUTDOWN: %t\r\n", gracefulShutdownMode.Load())
-	fmt.Printf("\r* DENY NEW CONNECTIONS: %t\r\n", denyNewConnectionsMode.Load())
+	fmt.Printf("\r* Graceful Shutdown: %t\r\n", gracefulShutdownMode.Load())
+	fmt.Printf("\r* Deny New Connections: %t\r\n", denyNewConnectionsMode.Load())
 
 	if blacklistFile == "" && len(blacklistedNetworks) == 0 {
-		fmt.Printf("\r* BLACKLIST: disabled\r\n")
+		fmt.Printf("\r* Blacklist: disabled\r\n")
 	} else if whitelistFile != "" && blacklistFile == "" {
-		fmt.Printf("\r* BLACKLIST: deny all (due to whitelist only)\r\n")
+		fmt.Printf("\r* Blacklist: Deny all (due to whitelist only)\r\n")
 	} else {
 		if len(blacklistedNetworks) == 1 {
-			fmt.Printf("\r* BLACKLIST: 1 entry loaded\r\n")
+			fmt.Printf("\r* Blacklist: 1 entry active\r\n")
 		} else {
-			fmt.Printf("\r* BLACKLIST: %d entries loaded\r\n",
+			fmt.Printf("\r* Blacklist: %d entries active\r\n",
 				len(blacklistedNetworks))
 		}
 	}
 
 	if whitelistFile == "" {
-		fmt.Printf("\r* WHITELIST: disabled\r\n")
+		fmt.Printf("\r* Whitelist: disabled\r\n")
 	} else {
 		if len(whitelistedNetworks) == 1 {
-			fmt.Printf("\r* WHITELIST: 1 entry loaded\r\n")
+			fmt.Printf("\r* Whitelist: 1 entry active\r\n")
 		} else {
-			fmt.Printf("\r* WHITELIST: %d entries loaded\r\n",
+			fmt.Printf("\r* Whitelist: %d entries active\r\n",
 				len(whitelistedNetworks))
 		}
 	}
 
-	fmt.Printf("\r* DEBUG: %t\r\n", debugNegotiation)
+	fmt.Printf("\r* Debug: %t\r\n", debugNegotiation)
 
-	fmt.Printf("\r* RUNTIME: %d Goroutines (use 'cg' for details)\n\r\n",
+	fmt.Printf("\r* Runtime: %d active Goroutines (use 'cg' for details)\n\r\n",
 		runtime.NumGoroutine())
 }
 
@@ -821,7 +822,7 @@ func reloadLists() {
 		networks, err := parseIPListFile(blacklistFile)
 		if err != nil {
 			reloadErrors = append(
-				reloadErrors, fmt.Sprintf("BLACKLIST REJECTED: %v", err))
+				reloadErrors, fmt.Sprintf("Blacklist rejected: %v", err))
 		} else {
 			newBlacklistedNetworks = networks
 			blacklistReloaded = true
@@ -832,7 +833,7 @@ func reloadLists() {
 		networks, err := parseIPListFile(whitelistFile)
 		if err != nil {
 			reloadErrors = append(
-				reloadErrors, fmt.Sprintf("WHITELIST REJECTED: %v", err))
+				reloadErrors, fmt.Sprintf("Whitelist rejected: %v", err))
 		} else {
 			newWhitelistedNetworks = networks
 			whitelistReloaded = true
@@ -849,10 +850,10 @@ func reloadLists() {
 	if blacklistReloaded {
 		blacklistedNetworks = newBlacklistedNetworks
 		if len(blacklistedNetworks) == 1 {
-			log.Printf("BLACKLIST: 1 ENTRY LOADED [%s]",
+			log.Printf("Blacklist: 1 entry loaded [%s]",
 				blacklistFile)
 		} else {
-			log.Printf("BLACKLIST: %d ENTRIES LOADED [%s]",
+			log.Printf("Blacklist: %d entries loaded [%s]",
 				len(blacklistedNetworks), blacklistFile)
 		}
 	}
@@ -860,10 +861,10 @@ func reloadLists() {
 	if whitelistReloaded {
 		whitelistedNetworks = newWhitelistedNetworks
 		if len(whitelistedNetworks) == 1 {
-			log.Printf("WHITELIST: 1 ENTRY LOADED [%s]",
+			log.Printf("Whitelist: 1 entry loaded [%s]",
 				whitelistFile)
 		} else {
-			log.Printf("WHITELIST: %d ENTRIES LOADED [%s]",
+			log.Printf("Whitelist: %d entries loaded [%s]",
 				len(whitelistedNetworks), whitelistFile)
 		}
 	}
@@ -872,7 +873,7 @@ func reloadLists() {
 		_, ipv4Net, _ := net.ParseCIDR("0.0.0.0/0")
 		_, ipv6Net, _ := net.ParseCIDR("::/0")
 		blacklistedNetworks = append(blacklistedNetworks, ipv4Net, ipv6Net)
-		log.Println("NO BLACKLIST: BLACKLISTING ALL BY DEFAULT")
+		log.Println("Blacklist: Blacklisting all host by default")
 	}
 }
 
@@ -1555,7 +1556,7 @@ func sendBanner(sid string, sshConn *ssh.ServerConn, ch ssh.Channel, conn *Conne
 	}
 
 	now := nowStamp()
-	fmt.Fprintf(ch, "CONNECTION from %s started at %s.\r\n", origin, now)
+	fmt.Fprintf(ch, "Session with %s active at %s.\r\n", origin, now)
 
 	if conn.monitoring {
 		fmt.Fprint(ch, "This is a READ-ONLY shared monitoring session.\r\n")
@@ -1975,7 +1976,7 @@ func rotateConsoleLog() {
 		log.Fatalf("Failed to open console log file: %v", err)
 	}
 
-	fmt.Fprintf(os.Stderr, "%s CONSOLE LOG: %s\n", nowStamp(), logPath)
+	fmt.Fprintf(os.Stderr, "%s Console Log enabled: suppressing messages!\n", nowStamp())
 
 	if consoleLog == "quiet" {
 		log.SetOutput(consoleLogFile)
@@ -2132,6 +2133,11 @@ func listGoroutines() {
 	n := runtime.Stack(buf, true)
 	stacks := bytes.Split(buf[:n], []byte("\n\n"))
 
+	fmt.Printf("\r\n")
+	fmt.Printf("Active Goroutines\r\n")
+	fmt.Printf("=================\r\n")
+	fmt.Printf("\r\n")
+
 	for i, stack := range stacks {
 		lines := bytes.Split(stack, []byte("\n"))
 
@@ -2152,6 +2158,7 @@ func listGoroutines() {
 		fmt.Printf("  * Name/State: %s\n", func(s string) string {
 			s = strings.TrimSpace(strings.ReplaceAll(s, "\t", " "))
 			s = strings.TrimSuffix(s, ":")
+			s = regexp.MustCompile(`goroutine \d+ `).ReplaceAllString(s, "")
 			return s
 		}(header))
 
