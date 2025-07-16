@@ -62,34 +62,34 @@ to anyone who wants to provide modern SSH access to legacy systems.
 * The proxy can be invoked with the following command-line arguments:
 
 ```
-      --allow-root              Allow running as root (UID 0)
-      --ssh-addr strings        SSH listener address
-                                  [e.g., :2222, [::1]:8000] (multiple allowed)
-                                   (default [:2222])
-      --no-banner               Disable SSH connection banner
-      --telnet-host string      Default TELNET target [host:port]
-                                   (default "127.0.0.1:6180")
-      --alt-host string         Alternate TELNET targets [username@host:port]
-                                   (multiple allowed)
-      --debug                   Debug TELNET negotiation
-      --log-dir string          Base directory for logs (default "./log")
-      --no-log                  Disable session logging
-      --console-log string      Enable console logging [quiet, noquiet]
-                                   (no default)
-      --compress-algo string    Compression algorithm [gzip, lz4, xz, zstd]
-                                   (default "gzip")
-      --compress-level string   Compression level for gzip, lz4, and zstd
-                                   [fast, normal, high] (default "normal")
-      --no-compress             Disable session and console log compression
-      --log-perm octal          Permissions for log files
-                                   [umask, e.g., 600, 644] (default 600)
-      --log-dir-perm octal      Permissions for log directories
-                                   [umask, e.g., 755, 750] (default 750)
-      --idle-max int            Maximum connection idle time allowed [seconds]
-      --time-max int            Maximum connection link time allowed [seconds]
-      --blacklist string        Enable blacklist [filename] (no default)
-      --whitelist string        Enable whitelist [filename] (no default)
-      --version                 Show version information
+--allow-root              Allow running as root (UID 0)
+--ssh-addr strings        SSH listener address
+                            [e.g., :2222, [::1]:8000] (multiple allowed)
+                             (default [:2222])
+--no-banner               Disable SSH connection banner
+--telnet-host string      Default TELNET target [host:port]
+                             (default "127.0.0.1:6180")
+--alt-host string         Alternate TELNET targets [username@host:port]
+                             (multiple allowed)
+--debug                   Debug TELNET negotiation
+--log-dir string          Base directory for logs (default "./log")
+--no-log                  Disable session logging
+--console-log string      Enable console logging [quiet, noquiet]
+                             (no default)
+--compress-algo string    Compression algorithm [gzip, lz4, xz, zstd]
+                             (default "gzip")
+--compress-level string   Compression level for gzip, lz4, and zstd
+                             [fast, normal, high] (default "normal")
+--no-compress             Disable session and console log compression
+--log-perm octal          Permissions for log files
+                             [umask, e.g., 600, 644] (default 600)
+--log-dir-perm octal      Permissions for log directories
+                             [umask, e.g., 755, 750] (default 750)
+--idle-max int            Maximum connection idle time allowed [seconds]
+--time-max int            Maximum connection link time allowed [seconds]
+--blacklist string        Enable blacklist [filename] (no default)
+--whitelist string        Enable whitelist [filename] (no default)
+--version                 Show version information
 ```
 
 ### Port binding
