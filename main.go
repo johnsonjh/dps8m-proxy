@@ -865,9 +865,9 @@ func listConfiguration() {
 		logPath = filepath.Clean(logPath)
 		var quietMode string
 		if strings.ToLower(consoleLog) == "quiet" {
-			quietMode = "\r\n* Console Logging Mode: Quiet"
+			quietMode = "\r\n* Console Logging Mode: quiet"
 		} else {
-			quietMode = "\r\n* Console Logging Mode: Normal (noquiet)"
+			quietMode = "\r\n* Console Logging Mode: noquiet"
 		}
 		fmt.Printf("\r* Console Logging: %s%s\r\n", logPath, quietMode)
 	} else {
@@ -1831,13 +1831,11 @@ func sendBanner(sshConn *ssh.ServerConn, ch ssh.Channel, conn *Connection) {
 		if _, err := fmt.Fprint(ch, "Send Control-] to disconnect.\r\n"); err != nil {
 			log.Printf("Error writing disconnect message to channel: %v", err)
 		}
-	} else {
-		if conn.invalidShare {
-			if _, err := fmt.Fprintf(
-				ch, "The username '%s' was NOT active for session sharing!\r\n",
-				conn.userName); err != nil {
-				log.Printf("Error writing invalid share message to channel: %v", err)
-			}
+	} else if conn.invalidShare {
+		if _, err := fmt.Fprintf(
+			ch, "The username '%s' was NOT active for session sharing!\r\n",
+			conn.userName); err != nil {
+			log.Printf("Error writing invalid share message to channel: %v", err)
 		}
 	}
 
