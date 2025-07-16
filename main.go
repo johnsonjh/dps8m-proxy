@@ -223,55 +223,72 @@ func (op *octalPermValue) Set(s string) error {
 
 func init() {
 	flag.Var(&sshAddr,
-		"ssh-addr", "SSH listener address (e.g.: \":2222\", \"[::1]:8000\") [allowed multiple times]")
+		"ssh-addr",
+		"SSH listener address [e.g.: \":2222\", \"[::1]:8000\"] (allowed multiple times)")
 
 	flag.StringVar(&telnetHostPort,
-		"telnet-host", "127.0.0.1:6180", "Default TELNET target (host:port)")
+		"telnet-host", "127.0.0.1:6180",
+		"Default TELNET target [host:port]")
 
 	flag.BoolVar(&debugNegotiation,
-		"debug", false, "Debug TELNET negotiation")
+		"debug", false,
+		"Debug TELNET negotiation")
 
 	flag.StringVar(&logDir,
-		"log-dir", "./log", "Base directory for logs")
+		"log-dir", "./log",
+		"Base directory for logs")
 
 	flag.BoolVar(&noCompress,
-		"no-compress", false, "Disable session and console log compression")
+		"no-compress", false,
+		"Disable session and console log compression")
 
 	flag.BoolVar(&noLog,
-		"no-log", false, "Disable all session logging")
+		"no-log", false,
+		"Disable all session logging")
 
 	flag.IntVar(&idleMax,
-		"idle-max", 0, "Maximum connection idle time in seconds")
+		"idle-max", 0,
+		"Maximum connection idle time allowed [seconds] (no default)")
 
 	flag.IntVar(&timeMax,
-		"time-max", 0, "Maximum connection link time in seconds")
+		"time-max", 0,
+		"Maximum connection link time allowed [seconds] (no default)")
 
 	flag.Var(&altHostFlag{},
-		"alt-host", "Alternate TELNET targets (username@host:port) [allowed multiple times]")
+		"alt-host",
+		"Alternate TELNET targets [username@host:port] (allowed multiple times)")
 
 	flag.BoolVar(&noBanner,
-		"no-banner", false, "Disable SSH connection banner")
+		"no-banner", false,
+		"Disable SSH connection banner")
 
 	flag.StringVar(&blacklistFile,
-		"blacklist", "", "Blacklist file (optional)")
+		"blacklist", "",
+		"Enable blacklist [filename] (no default)")
 
 	flag.StringVar(&whitelistFile,
-		"whitelist", "", "Whitelist file (optional)")
+		"whitelist", "",
+		"Enable whitelist [filename] (no default)")
 
 	flag.BoolVar(&allowRoot,
-		"allow-root", false, "Allow running as root (UID 0) [strongly discouraged!]")
+		"allow-root", false,
+		"Allow running as root/UID 0 (strongly discouraged)")
 
 	flag.BoolVar(&showVersion,
-		"version", false, "Show version information")
+		"version", false,
+		"Show version information")
 
 	flag.StringVar(&consoleLog,
-		"console-log", "", "Enable console logging [requires 'quiet' or 'noquiet' argument]")
+		"console-log", "",
+		"Enable console logging [quiet, noquiet] (no default)")
 
 	flag.StringVar(&compressAlgo,
-		"compress-algo", "gzip", "Compression algorithm [gzip, xz, zstd]")
+		"compress-algo", "gzip",
+		"Compression algorithm [gzip, xz, zstd]")
 
 	flag.Var((*octalPermValue)(&logPerm),
-		"log-perm", "Permissions for log files (umask, e.g., 0600, 0644)")
+		"log-perm",
+		"Permissions for log files [umask, e.g., 0600, 0644]")
 
 	originalLogOutput = log.Writer()
 	logBuffer = &strings.Builder{}
@@ -301,6 +318,14 @@ func shutdownWatchdog() {
 func main() {
 	flag.Parse()
 
+	if consoleLog != "" {
+		cl := strings.ToLower(consoleLog)
+		if cl != "quiet" && cl != "noquiet" {
+			log.Fatalf("ERROR: Invalid -console-log value: %s.  Must be 'quiet' or 'noquiet'",
+				consoleLog)
+		}
+	}
+
 	printVersion()
 
 	if showVersion {
@@ -308,7 +333,7 @@ func main() {
 	}
 
 	if os.Getuid() == 0 && !allowRoot {
-		log.Fatalf("ERROR: Running as root is strongly discouraged!  Use -allow-root to override.")
+		log.Fatalf("ERROR: Running as root/UID 0 is not allowed without the -allow-root flag!")
 	}
 
 	switch compressAlgo {
@@ -383,6 +408,7 @@ func main() {
 	}
 
 	pid := os.Getpid()
+
 	var startMsg string
 	if pid != 0 {
 		startMsg = fmt.Sprintf("Starting proxy [PID %d]", pid)
@@ -1168,13 +1194,8 @@ func parseHostPort(hostPort string) (string, int, error) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func handleSession(
-	conn *Connection,
-	channel ssh.Channel,
-	requests <-chan *ssh.Request,
-	keyLog []string,
-	ctx context.Context,
-) {
+func handleSession(conn *Connection, channel ssh.Channel, requests <-chan *ssh.Request,
+	keyLog []string, ctx context.Context) {
 	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
 
 	remoteHost, _, err := net.SplitHostPort(conn.sshConn.RemoteAddr().String())
@@ -1805,7 +1826,8 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		if conn.emacsKeymapEnabled {
 			keymapStatus = " (Emacs keymap enabled)"
 		}
-		ch.Write([]byte(">> LNK - link time: " + dur.Round(time.Second).String() + keymapStatus + "\r\n"))
+		ch.Write([]byte(">> LNK - link time: " +
+			dur.Round(time.Second).String() + keymapStatus + "\r\n"))
 		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
 	case 'x', 'X':
@@ -1905,7 +1927,7 @@ func newSessionID(connections map[string]*Connection, mutex *sync.Mutex) string 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex) string {
-	const chars = "abcdghkmnprsvwxyzACDFGJKMNPRSTVXY345679" // LOL
+	const chars = "abcdghkmnprsvwxyzACDFGJKMNPRSTVXY345679"
 	for {
 		b := make([]byte, 20)
 		rand.Read(b)
