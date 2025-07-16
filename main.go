@@ -835,7 +835,6 @@ func listConfiguration() {
 	if consoleLog != "" {
 		logPath := getConsoleLogPath(time.Now())
 		logPath = filepath.Clean(logPath)
-		quietMode := ""
 		if strings.ToLower(consoleLog) == "quiet" {
 			quietMode = "\r\n* Console Logging Mode: Quiet"
 		} else {
