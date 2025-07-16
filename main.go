@@ -186,6 +186,8 @@ func (a *altHostFlag) Set(value string) error {
 	return nil
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func (a *altHostFlag) Type() string {
 	return "string"
 }
@@ -193,6 +195,8 @@ func (a *altHostFlag) Type() string {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 type octalPermValue uint
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (op *octalPermValue) String() string {
 	return fmt.Sprintf("%o", *op)
@@ -209,6 +213,8 @@ func (op *octalPermValue) Set(s string) error {
 
 	return nil
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (op *octalPermValue) Type() string {
 	return "octal"
@@ -396,6 +402,7 @@ func main() {
 
 	for _, addr := range sshAddr {
 		go func(addr string) {
+			checkPrivilegedPorts(sshAddr)
 			listener, err := net.Listen("tcp", addr)
 			if err != nil {
 				log.Fatalf("LISTEN %s: %v", addr, err)
@@ -2598,6 +2605,20 @@ func listGoroutines() {
 		}
 
 		fmt.Println()
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func checkPrivilegedPorts(addrs []string) {
+	for _, addr := range addrs {
+		_, portStr, _ := net.SplitHostPort(addr)
+		port, _ := strconv.Atoi(portStr)
+
+		if port > 0 && port < 1024 {
+			checkCapability()
+			return
+		}
 	}
 }
 
