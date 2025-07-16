@@ -778,7 +778,7 @@ func listConfiguration() {
 
 	printVersion()
 	log.SetOutput(originalWriter)
-	fmt.Println("\r\n\rDPS8M PROXY Configuration")
+	fmt.Println("\r\n\rDPS8M Proxy Configuration")
 	fmt.Println("\r=========================")
 
 	if len(sshAddr) == 1 {
@@ -790,7 +790,7 @@ func listConfiguration() {
 		}
 	}
 
-	fmt.Printf("\r* Default Target: %s\r\n", telnetHostPort)
+	fmt.Printf("\r* Default TELNET target: %s\r\n", telnetHostPort)
 
 	if len(altHosts) > 0 {
 		fmt.Println("\r* Alt Targets:")
