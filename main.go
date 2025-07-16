@@ -1057,7 +1057,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	config.AddHostKey(rsaSigner)
 
 	if tcp, ok := rawConn.(*net.TCPConn); ok {
-		tcp.SetNoDelay(true)
+		_ = tcp.SetNoDelay(true)
 	}
 
 	sshConn, chans, reqs, err := ssh.NewServerConn(rawConn, config)
@@ -1392,7 +1392,7 @@ func handleSession(conn *Connection, channel ssh.Channel, requests <-chan *ssh.R
 	telnetConnectionsTotal.Add(1)
 
 	if tcp2, ok := remote.(*net.TCPConn); ok {
-		tcp2.SetNoDelay(true)
+		_ = tcp2.SetNoDelay(true)
 	}
 
 	defer remote.Close()
