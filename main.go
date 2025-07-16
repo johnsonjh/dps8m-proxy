@@ -37,7 +37,6 @@ import (
 
 	"github.com/klauspost/compress/gzip"
 	"github.com/klauspost/compress/zstd"
-	"github.com/pierrec/lz4/v4"
 	"github.com/spf13/pflag"
 	"github.com/ulikunitz/xz"
 	"golang.org/x/crypto/ssh"
@@ -258,11 +257,11 @@ func init() {
 
 	pflag.StringVarP(&compressAlgo,
 		"compress-algo", "C", "gzip",
-		"Compression algorithm [gzip, lz4, xz, zstd]\n  ")
+		"Compression algorithm [gzip, xz, zstd]\n  ")
 
 	pflag.StringVarP(&compressLevel,
 		"compress-level", "s", "normal",
-		"Compression level for gzip, lz4, and zstd\n   [fast, normal, high]")
+		"Compression level for gzip and zstd\n   [fast, normal, high]")
 
 	pflag.BoolVarP(&noCompress,
 		"no-compress", "x", false,
@@ -341,7 +340,7 @@ func main() {
 	}
 
 	switch compressAlgo {
-	case "gzip", "xz", "zstd", "lz4":
+	case "gzip", "xz", "zstd":
 
 	default:
 		log.Fatalf("ERROR: Invalid -compress-algo: %s", compressAlgo)
@@ -2383,18 +2382,6 @@ func compressLogFile(logFilePath string) {
 		zstdLevel = zstd.SpeedBestCompression
 	}
 
-	var lz4Level lz4.CompressionLevel
-	switch compressLevel {
-	case "fast":
-		lz4Level = lz4.Fast
-
-	case "normal":
-		lz4Level = lz4.Level5
-
-	case "high":
-		lz4Level = lz4.Level9
-	}
-
 	switch compressAlgo {
 	case "gzip":
 		compressedFilePath = logFilePath + ".gz"
@@ -2451,24 +2438,6 @@ func compressLogFile(logFilePath string) {
 			return
 		}
 
-	case "lz4":
-		compressedFilePath = logFilePath + ".lz4"
-		compressedFile, err = os.Create(compressedFilePath)
-		if err != nil {
-			log.Printf("Failed to create compressed file %q: %v", compressedFilePath, err)
-
-			return
-		}
-		lz4Writer := lz4.NewWriter(compressedFile)
-		if err := lz4Writer.Apply(lz4.CompressionLevelOption(lz4Level)); err != nil {
-			log.Printf("Error applying lz4 compression level for %q: %v", compressedFilePath, err)
-			if err := compressedFile.Close(); err != nil {
-				log.Printf("Error closing compressed file after lz4 writer error: %v", err)
-			}
-			return
-		}
-		writer = lz4Writer
-
 	default:
 		log.Printf("Unknown compression algorithm: %s", compressAlgo)
 
@@ -2477,12 +2446,17 @@ func compressLogFile(logFilePath string) {
 
 	defer func() {
 		if err := compressedFile.Close(); err != nil {
-			log.Printf("Error closing compressed file: %v", err)
+			if strings.Contains(err.Error(), "writer already closed") {
+				log.Printf("Error closing compressed file: %v", err)
+			}
 		}
 	}()
+
 	defer func() {
 		if err := writer.Close(); err != nil {
-			log.Printf("Error closing writer: %v", err)
+			if strings.Contains(err.Error(), "file already closed") {
+				log.Printf("Error closing writer: %v", err)
+			}
 		}
 	}()
 
