@@ -127,28 +127,12 @@ to anyone who wants to provide modern SSH access to legacy systems.
 ### User interaction
 
 Users connected via SSH can send `^]` (*i.e.* `Control + ]`) during
-a session to access the following menu:
-
-```
-+======= MENU ========+
-|                     |
-|  A - Send AYT       |
-|  B - Send Break     |
-|  K - Toggle Keymap  |
-|  N - Send NOP       |
-|  S - Show Status    |
-|  X - Disconnect     |
-|                     |
-+=====================+
-```
+a session to access the following following features from a menu:
 
 * `A` sends an IAC `AYT` (*Are You There?*) to the remote host
-
 * `B` sends an IAC `BREAK` signal to the remote host
-
 * `K` toggles the transparent key remapping mode, which translates
   modern `xterm`/`VT320` movement key inputs to Emacs sequences:
-
   |             Input | Output        |
   |------------------:|:--------------|
   | `Control + Up`    | `Escape, [`   |
@@ -164,18 +148,14 @@ a session to access the following menu:
   | `Down`            | `Control + N` |
   | `Right`           | `Control + F` |
   | `Left`            | `Control + B` |
-
 * `N` sends an IAC `NOP` (*No Operation*) to the remote host
-
 * `S` displays the status the session and some statistics:
-
   ```
   >> LNK - The username '_gRSyWHxPcMp2MWvtmWWF' can be used to share this session.
   >> SSH - in:   58 B,   out: 4.82 KiB, in rate:   4 B/s, out rate: 381 B/s
   >> NVT - in: 4.82 KiB, out:   57 B,   in rate: 381 B/s, out rate:   4 B/s
   >> LNK - link time: 13s (Emacs keymap enabled)
   ```
-
 * `X` disconnects from the remote host (and ends the SSH session)
 
 ### Connection sharing
@@ -214,17 +194,16 @@ added in future updates:
 
 * The original legacy software had features not yet re-implemented
   like CAPTCHAs, throttling, and flow control support.
-
 * The **TELNET** features currently implemented are minimal—enough
   for supporting **DPS8M**.  Improved protocol support is planned.
 
 ## Compressed logs
 
-By default, all logfiles are compressed automatically when the
-session terminates, and console log files are compressed when the
-log rolls over to a new day.  When reviewing logs, administrators
-often need to grep through all the past data, including the
-compressed files. We recommend using
+By default, all session log files are compressed automatically when
+the session terminates, and console log files are compressed when the
+log rolls over (starting a new day).  When reviewing logs,
+administrators often need to grep through all the past data, including
+the compressed files. We recommend using
 [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the `-z`
 option) for this task.
 
