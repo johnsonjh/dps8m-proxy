@@ -228,6 +228,10 @@ func init() {
 		"ssh-addr", []string{":2222"},
 		"SSH listener address\n  [e.g., :2222, [::1]:8000] (multiple allowed)\n  ")
 
+	pflag.BoolVar(&noBanner,
+		"no-banner", false,
+		"Disable SSH connection banner")
+
 	pflag.StringVar(&telnetHostPort,
 		"telnet-host", "127.0.0.1:6180",
 		"Default TELNET target [host:port]\n  ")
@@ -279,10 +283,6 @@ func init() {
 	pflag.IntVar(&timeMax,
 		"time-max", 0,
 		"Maximum connection link time allowed [seconds]")
-
-	pflag.BoolVar(&noBanner,
-		"no-banner", false,
-		"Disable SSH connection banner")
 
 	pflag.StringVar(&blacklistFile,
 		"blacklist", "",
