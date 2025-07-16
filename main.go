@@ -220,80 +220,80 @@ func (op *octalPermValue) Type() string {
 func init() {
 	pflag.CommandLine.SortFlags = false
 
-	pflag.BoolVar(&allowRoot,
-		"allow-root", false,
+	pflag.BoolVarP(&allowRoot,
+		"allow-root", "0", false,
 		"Allow running as root (UID 0)")
 
-	pflag.StringSliceVar(&sshAddr,
-		"ssh-addr", []string{":2222"},
-		"SSH listener address\n  [e.g., :2222, [::1]:8000] (multiple allowed)\n  ")
+	pflag.StringSliceVarP(&sshAddr,
+		"ssh-addr", "l", []string{":2222"},
+		"SSH listener address\n  [e.g., :2222, [::1]:8000] (multiple allowed)\n ")
 
-	pflag.BoolVar(&noBanner,
-		"no-banner", false,
+	pflag.BoolVarP(&noBanner,
+		"no-banner", "n", false,
 		"Disable SSH connection banner")
 
-	pflag.StringVar(&telnetHostPort,
-		"telnet-host", "127.0.0.1:6180",
+	pflag.StringVarP(&telnetHostPort,
+		"telnet-host", "t", "127.0.0.1:6180",
 		"Default TELNET target [host:port]\n  ")
 
-	pflag.Var(&altHostFlag{},
-		"alt-host",
+	pflag.VarP(&altHostFlag{},
+		"alt-host", "a",
 		"Alternate TELNET targets [username@host:port]\n   (multiple allowed)")
 
-	pflag.BoolVar(&debugNegotiation,
-		"debug", false,
+	pflag.BoolVarP(&debugNegotiation,
+		"debug", "d", false,
 		"Debug TELNET negotiation")
 
-	pflag.StringVar(&logDir,
-		"log-dir", "./log",
+	pflag.StringVarP(&logDir,
+		"log-dir", "L", "./log",
 		"Base directory for logs")
 
-	pflag.BoolVar(&noLog,
-		"no-log", false,
+	pflag.BoolVarP(&noLog,
+		"no-log", "o", false,
 		"Disable session logging")
 
-	pflag.StringVar(&consoleLog,
-		"console-log", "",
+	pflag.StringVarP(&consoleLog,
+		"console-log", "c", "",
 		"Enable console logging [quiet, noquiet]\n   (no default)")
 
-	pflag.StringVar(&compressAlgo,
-		"compress-algo", "gzip",
+	pflag.StringVarP(&compressAlgo,
+		"compress-algo", "C", "gzip",
 		"Compression algorithm [gzip, lz4, xz, zstd]\n  ")
 
-	pflag.StringVar(&compressLevel,
-		"compress-level", "normal",
+	pflag.StringVarP(&compressLevel,
+		"compress-level", "s", "normal",
 		"Compression level for gzip, lz4, and zstd\n   [fast, normal, high]")
 
-	pflag.BoolVar(&noCompress,
-		"no-compress", false,
+	pflag.BoolVarP(&noCompress,
+		"no-compress", "x", false,
 		"Disable session and console log compression")
 
-	pflag.Var((*octalPermValue)(&logPerm),
-		"log-perm",
+	pflag.VarP((*octalPermValue)(&logPerm),
+		"log-perm", "p",
 		"Permissions for log files\n   [umask, e.g., 600, 644]")
 
-	pflag.Var((*octalPermValue)(&logDirPerm),
-		"log-dir-perm",
+	pflag.VarP((*octalPermValue)(&logDirPerm),
+		"log-dir-perm", "P",
 		"Permissions for log directories\n   [umask, e.g., 755, 750]")
 
-	pflag.IntVar(&idleMax,
-		"idle-max", 0,
+	pflag.IntVarP(&idleMax,
+		"idle-max", "i", 0,
 		"Maximum connection idle time allowed [seconds]")
 
-	pflag.IntVar(&timeMax,
-		"time-max", 0,
+	pflag.IntVarP(&timeMax,
+		"time-max", "m", 0,
 		"Maximum connection link time allowed [seconds]")
 
-	pflag.StringVar(&blacklistFile,
-		"blacklist", "",
+	pflag.StringVarP(&blacklistFile,
+		"blacklist", "b", "",
 		"Enable blacklist [filename] (no default)")
 
-	pflag.StringVar(&whitelistFile,
-		"whitelist", "",
+	pflag.StringVarP(&whitelistFile,
+		"whitelist", "w", "",
 		"Enable whitelist [filename] (no default)")
 
-	pflag.BoolVar(&showVersion,
-		"version", false,
+	pflag.BoolVarP(&showVersion,
+		"version", "v", false,
 		"Show version information")
 
 	shutdownSignal = make(chan struct{})
