@@ -44,18 +44,21 @@ import (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 const (
-	NOP  = 241 // No operation
-	AYT  = 246 // Are You There?
-	IAC  = 255 // Interpret As Command
-	DONT = 254
-	DO   = 253
-	WONT = 252
-	WILL = 251
+	// TELNET Commands
+	TelcmdNOP  = 241 // No operation
+	TelcmdAYT  = 246 // Are You There?
+	TelcmdIAC  = 255 // Interpret As Command
+	TelcmdDONT = 254
+	TelcmdDO   = 253
+	TelcmdWONT = 252
+	TelcmdWILL = 251
 
-	OPT_BINARY            = 0
-	OPT_ECHO              = 1
-	OPT_SUPPRESS_GO_AHEAD = 3
+	// TELNET Command Options
+	TeloptBinary          = 0
+	TeloptEcho            = 1
+	TeloptSuppressGoAhead = 3
 
+	// IEC sizes
 	KiB = 1024
 	MiB = 1024 * KiB
 	GiB = 1024 * MiB
@@ -167,14 +170,12 @@ func (s *stringSliceFlag) String() string {
 
 func (s *stringSliceFlag) Set(value string) error {
 	*s = append(*s, value)
-
 	return nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (a *altHostFlag) String() string {
-
 	return ""
 }
 
@@ -1293,12 +1294,10 @@ func handleSession(conn *Connection, channel ssh.Channel, requests <-chan *ssh.R
 			for {
 				_, err := channel.Read(buf)
 				if err != nil {
-
 					return
 				}
 				if buf[0] == 0x1D { // Ctrl-]
 					channel.Close()
-
 					return
 				}
 			}
@@ -1688,23 +1687,23 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 		}
 		i := 0
 		for i < n {
-			if buf[i] == IAC && i+2 < n {
+			if buf[i] == TelcmdIAC && i+2 < n {
 				cmd, opt := buf[i+1], buf[i+2]
 				writeNegotiation(ch, logw,
 					"[RCVD "+cmdName(cmd)+" "+optName(opt)+"]")
 				var reply byte
 				switch cmd {
-				case WILL:
-					reply = DO
+				case TelcmdWILL:
+					reply = TelcmdDO
 
-				case WONT:
-					reply = DONT
+				case TelcmdWONT:
+					reply = TelcmdDONT
 
-				case DO:
-					reply = WILL
+				case TelcmdDO:
+					reply = TelcmdWILL
 
-				case DONT:
-					reply = WONT
+				case TelcmdDONT:
+					reply = TelcmdWONT
 
 				default:
 					i += 3
@@ -1737,23 +1736,23 @@ func writeNegotiation(ch io.Writer, logw io.Writer, line string) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func sendIAC(w io.Writer, cmd, opt byte) {
-	w.Write([]byte{IAC, cmd, opt})
+	w.Write([]byte{TelcmdIAC, cmd, opt})
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func cmdName(b byte) string {
 	switch b {
-	case DO:
+	case TelcmdDO:
 		return "DO"
 
-	case DONT:
+	case TelcmdDONT:
 		return "DONT"
 
-	case WILL:
+	case TelcmdWILL:
 		return "WILL"
 
-	case WONT:
+	case TelcmdWONT:
 		return "WONT"
 	}
 
@@ -1764,13 +1763,13 @@ func cmdName(b byte) string {
 
 func optName(b byte) string {
 	switch b {
-	case OPT_BINARY:
+	case TeloptBinary:
 		return "BINARY"
 
-	case OPT_ECHO:
+	case TeloptEcho:
 		return "ECHO"
 
-	case OPT_SUPPRESS_GO_AHEAD:
+	case TeloptSuppressGoAhead:
 		return "SUPPRESS GO AHEAD"
 	}
 
@@ -1800,14 +1799,14 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 	logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) {
 	switch sel {
 	case 'a', 'A':
-		remote.Write([]byte{IAC, AYT}) // AYT
-		logw.Write([]byte{IAC, AYT})
+		remote.Write([]byte{TelcmdIAC, TelcmdAYT}) // AYT
+		logw.Write([]byte{TelcmdIAC, TelcmdAYT})
 		ch.Write([]byte("\r\n>> Sent AYT\r\n"))
 		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
 	case 'b', 'B':
-		remote.Write([]byte{IAC, 243}) // BREAK
-		logw.Write([]byte{IAC, 243})
+		remote.Write([]byte{TelcmdIAC, 243}) // BREAK
+		logw.Write([]byte{TelcmdIAC, 243})
 		ch.Write([]byte("\r\n>> Sent BREAK\r\n"))
 		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
@@ -1821,8 +1820,8 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
 	case 'n', 'N':
-		remote.Write([]byte{IAC, NOP}) // NOP
-		logw.Write([]byte{IAC, NOP})
+		remote.Write([]byte{TelcmdIAC, TelcmdNOP}) // NOP
+		logw.Write([]byte{TelcmdIAC, TelcmdNOP})
 		ch.Write([]byte("\r\n>> Sent NOP\r\n"))
 		ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 
@@ -2095,14 +2094,12 @@ func rotateConsoleLog() {
 
 func compressLogFile(logFilePath string) {
 	if _, err := os.Stat(logFilePath); os.IsNotExist(err) {
-
 		return
 	}
 
 	data, err := os.ReadFile(logFilePath)
 	if err != nil {
 		log.Printf("Failed to read log %q for compression: %v", logFilePath, err)
-
 		return
 	}
 
