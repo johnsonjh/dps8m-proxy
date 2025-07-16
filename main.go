@@ -22,7 +22,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -901,7 +900,7 @@ func killConnection(id string) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
-	if data, err := ioutil.ReadFile(path); err == nil {
+	if data, err := os.ReadFile(path); err == nil {
 		return ssh.ParsePrivateKey(data)
 	}
 
@@ -918,7 +917,7 @@ func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
 		}
 
 		data := pem.EncodeToMemory(block)
-		if err := ioutil.WriteFile(path, data, 0o600); err != nil {
+		if err := os.WriteFile(path, data, 0o600); err != nil {
 			return nil, err
 		}
 		return ssh.ParsePrivateKey(data)
@@ -936,7 +935,7 @@ func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
 
 		block := &pem.Block{Type: "PRIVATE KEY", Bytes: pkcs8}
 		data := pem.EncodeToMemory(block)
-		if err := ioutil.WriteFile(path, data, 0o600); err != nil {
+		if err := os.WriteFile(path, data, 0o600); err != nil {
 			return nil, err
 		}
 		return ssh.ParsePrivateKey(data)
@@ -1275,7 +1274,7 @@ func handleSession(
 			closeAndCompressLog(logfile, basePath+".log")
 		}()
 	} else {
-		logwriter = ioutil.Discard
+		logwriter = io.Discard
 	}
 
 	go func() {
@@ -1805,7 +1804,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	}
 
 	ts := now.Format("150405")
-	files, _ := ioutil.ReadDir(dir)
+	files, _ := os.ReadDir(dir)
 	maxSeq := 0
 	prefix := ts + "_" + sid + "_"
 
@@ -1991,7 +1990,7 @@ func compressLogFile(logFilePath string) {
 		return
 	}
 
-	data, err := ioutil.ReadFile(logFilePath)
+	data, err := os.ReadFile(logFilePath)
 	if err != nil {
 		log.Printf("Failed to read log %q for compression: %v", logFilePath, err)
 		return
@@ -2151,9 +2150,7 @@ func listGoroutines() {
 
 		fmt.Printf("  * Name/State: %s\n", func(s string) string {
 			s = strings.TrimSpace(strings.ReplaceAll(s, "\t", " "))
-			if strings.HasSuffix(s, ":") {
-				s = s[:len(s)-1]
-			}
+			s = strings.TrimSuffix(s, ":")
 			return s
 		}(header))
 
