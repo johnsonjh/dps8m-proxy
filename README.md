@@ -130,11 +130,12 @@ hopefully, documented here:
   `sshuser@host:port`, where `sshuser` is the SSH username, and the
   `host:port` is the TELNET target.
 
-* All users connecting are shown a banner which includes details such
-  as the date and time of the session, their IP address, and possibly
-  a resolved host name.  This can be disabled with `--no-banner`.
+* All users connecting with SSH are shown a banner which includes
+  details such as the date and time of the session, their IP address,
+  and possibly a resolved host name.  This can be disabled with
+  `--no-banner`.
 
-* The `--no-banner` command disables only those line described above.
+* The `--no-banner` command disables only those lines described above.
   It does *not* disable the file-based banner content.  These are the
   three primary text files which can be displayed to connecting
   SSH users:
@@ -184,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 gf0758c8+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g74d09b2+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
