@@ -232,7 +232,7 @@ func init() {
 
 	pflag.StringSliceVarP(&sshAddr,
 		"ssh-addr", "l", []string{":2222"},
-		"SSH listener address\n   [e.g., \":2222\", \"[::1]:8000\"]\n   (multiple allowed)")
+		"SSH listener address(es)\n   [e.g., \":2222\", \"[::1]:8000\"]\n   (multiple allowed)")
 	pflag.Lookup("ssh-addr").DefValue = "\":2222\""
 
 	pflag.BoolVarP(&noBanner,
@@ -245,11 +245,11 @@ func init() {
 
 	pflag.VarP(&altHostFlag{},
 		"alt-host", "a",
-		"Alternate TELNET targets [sshuser@host:port]\n   (multiple allowed)")
+		"Alternate TELNET target(s) [sshuser@host:port]\n   (multiple allowed)")
 
 	pflag.BoolVarP(&debugNegotiation,
 		"debug", "d", false,
-		"Debug TELNET negotiation")
+		"Debug TELNET option negotiation")
 
 	pflag.StringVarP(&logDir,
 		"log-dir", "L", "./log",
@@ -277,12 +277,12 @@ func init() {
 
 	pflag.VarP((*octalPermValue)(&logPerm),
 		"log-perm", "p",
-		"Permissions for new log files\n   [umask, e.g., \"600\", \"644\"]")
+		"Permissions (octal) for new log files\n   [ e.g., \"600\", \"644\"]")
 	pflag.Lookup("log-perm").DefValue = "\"600\""
 
 	pflag.VarP((*octalPermValue)(&logDirPerm),
 		"log-dir-perm", "P",
-		"Permissions for new log directories\n   [umask, e.g., \"755\", \"750\"]")
+		"Permissions (octal) for new log directories\n   [e.g., \"755\", \"750\"]")
 	pflag.Lookup("log-dir-perm").DefValue = "\"750\""
 
 	pflag.IntVarP(&idleMax,
@@ -333,8 +333,8 @@ func main() {
 
 	if consoleLog != "" {
 		cl := strings.ToLower(consoleLog)
-		if cl != "quiet" && cl != "noquiet" {
-			log.Fatalf("ERROR: Invalid -console-log value: %s.  Must be 'quiet' or 'noquiet'",
+		if cl != "quiet" && cl != "noquiet" { // LINTED: Fatalf
+			log.Fatalf("ERROR: Invalid --console-log value: %s.  Must be 'quiet' or 'noquiet'",
 				consoleLog)
 		}
 	}
@@ -345,7 +345,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	if os.Getuid() == 0 && !allowRoot {
+	if os.Getuid() == 0 && !allowRoot { // LINTED: Fatalf
 		log.Fatalf("ERROR: Running as root/UID 0 is not allowed without the -allow-root flag!")
 	}
 
@@ -353,20 +353,20 @@ func main() {
 	case "gzip", "xz", "zstd":
 
 	default:
-		log.Fatalf("ERROR: Invalid -compress-algo: %s", compressAlgo)
+		log.Fatalf("ERROR: Invalid --compress-algo: %s", compressAlgo) // LINTED: Fatalf
 	}
 
 	switch compressLevel {
 	case "fast", "normal", "high": //nolint:goconst
 
 	default:
-		log.Fatalf("ERROR: Invalid -compress-level: %s", compressLevel)
+		log.Fatalf("ERROR: Invalid --compress-level: %s", compressLevel) // LINTED: Fatalf
 	}
 
 	setupConsoleLogging()
 
 	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
-		log.Fatalf("Failed to create log directory: %v", err)
+		log.Fatalf("Failed to create log directory: %v", err) // LINTED: Fatalf
 	}
 
 	if p, err := filepath.EvalSymlinks(logDir); err == nil {
@@ -382,23 +382,39 @@ func main() {
 	reloadLists()
 
 	if strings.Contains(telnetHostPort, "@") {
-		log.Fatalf("ERROR: -telnet-host cannot contain a username (e.g., 'user@'). Received: %s",
-			telnetHostPort)
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr,
+				"%s ERROR: --telnet-host cannot contain a username (e.g., 'user@'). "+
+					"Received: %s\r\n", nowStamp(), telnetHostPort)
+		}
+		log.Fatalf("ERROR: --telnet-host cannot contain a username (e.g., 'user@'). "+
+			"Received: %s", telnetHostPort) // LINTED: Fatalf
 	}
 
 	if idleMax > 0 && timeMax > 0 && idleMax >= timeMax {
-		log.Fatalf("ERROR: -idle-max (%d) cannot be greater than or equal to -time-max (%d)",
-			idleMax, timeMax)
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr,
+				"%s ERROR: --idle-max (%d) cannot be greater than or equal to --time-max (%d)\r\n",
+				nowStamp(), idleMax, timeMax)
+		}
+		log.Fatalf("ERROR: --idle-max (%d) cannot be greater than or equal to --time-max (%d)",
+			idleMax, timeMax) // LINTED: Fatalf
 	}
 
 	edSigner, err := loadOrCreateHostKey("ssh_host_ed25519_key.pem", "ed25519")
 	if err != nil {
-		log.Fatalf("Ed25519 host key error: %v", err)
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr, "%s Ed25519 host key error: %v\r\n", nowStamp(), err)
+		}
+		log.Fatalf("Ed25519 host key error: %v", err) // LINTED: Fatalf
 	}
 
 	rsaSigner, err := loadOrCreateHostKey("ssh_host_rsa_key.pem", "rsa")
 	if err != nil {
-		log.Fatalf("RSA host key error: %v", err)
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr, "%s RSA host key error: %v\r\n", nowStamp(), err)
+		}
+		log.Fatalf("RSA host key error: %v", err) // LINTED: Fatalf
 	}
 
 	for _, addr := range sshAddr {
@@ -406,7 +422,10 @@ func main() {
 			checkPrivilegedPorts(sshAddr)
 			listener, err := net.Listen("tcp", addr)
 			if err != nil {
-				log.Fatalf("LISTEN %s: %v", addr, err)
+				if strings.ToLower(consoleLog) == "quiet" {
+					fmt.Fprintf(os.Stderr, "%s LISTEN %s: %v\r\n", nowStamp(), addr, err)
+				}
+				log.Fatalf("LISTEN %s: %v", addr, err) // LINTED: Fatalf
 			}
 			defer func() {
 				if err := listener.Close(); err != nil {
@@ -449,7 +468,11 @@ func main() {
 
 	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
 	if err != nil {
-		log.Fatalf("Error parsing default TELNET target: %v", err)
+		if strings.ToLower(consoleLog) == "quiet" {
+			fmt.Fprintf(os.Stderr, "%s Error parsing default TELNET target: %v\r\n",
+				nowStamp(), err)
+		}
+		log.Fatalf("Error parsing default TELNET target: %v", err) // LINTED: Fatalf
 	}
 	log.Printf("Default TELNET target: %s:%d", defaultHost, defaultPort)
 
@@ -2371,7 +2394,7 @@ func rotateConsoleLog() {
 
 	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
 		consoleLogMutex.Unlock()
-		log.Fatalf("Failed to create console log directory: %v", err)
+		log.Fatalf("Failed to create console log directory: %v", err) // LINTED: Fatalf
 	}
 
 	var err error
@@ -2379,13 +2402,13 @@ func rotateConsoleLog() {
 		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
 	if err != nil {
 		consoleLogMutex.Unlock()
-		log.Fatalf("Failed to open console log file: %v", err)
+		log.Fatalf("Failed to open console log file: %v", err) // LINTED: Fatalf
 	}
 
 	fmt.Fprintf(
-		os.Stderr, "%s Console Logging enabled (suppressing console output)\n", nowStamp())
+		os.Stderr, "%s Console logging enabled (suppressing console output)\n", nowStamp())
 
-	if consoleLog == "quiet" {
+	if strings.ToLower(consoleLog) == "quiet" {
 		log.SetOutput(consoleLogFile)
 	} else {
 		log.SetOutput(io.MultiWriter(os.Stdout, consoleLogFile))

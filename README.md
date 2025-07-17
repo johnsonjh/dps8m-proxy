@@ -65,15 +65,15 @@ to anyone who wants to provide SSH access to legacy systems.
 ```
 Usage of ./proxy:
   -0, --allow-root              Allow running as root (UID 0)
-  -l, --ssh-addr strings        SSH listener address
+  -l, --ssh-addr strings        SSH listener address(es)
                                    [e.g., ":2222", "[::1]:8000"]
                                    (multiple allowed) (default ":2222")
   -n, --no-banner               Disable SSH connection banner
   -t, --telnet-host string      Default TELNET target [host:port]
                                    (default "127.0.0.1:6180")
-  -a, --alt-host string         Alternate TELNET targets [sshuser@host:port]
+  -a, --alt-host string         Alternate TELNET target(s) [sshuser@host:port]
                                    (multiple allowed)
-  -d, --debug                   Debug TELNET negotiation
+  -d, --debug                   Debug TELNET option negotiation
   -L, --log-dir string          Base directory for logs (default "./log")
   -o, --no-log                  Disable all session logging
                                    (for console logging, see "--console-log")
@@ -84,10 +84,10 @@ Usage of ./proxy:
                                    ["fast", "normal", "high"]
                                    (default "normal")
   -x, --no-compress             Disable session and console log compression
-  -p, --log-perm octal          Permissions for new log files
-                                   [umask, e.g., "600", "644"] (default "600")
-  -P, --log-dir-perm octal      Permissions for new log directories
-                                   [umask, e.g., "755", "750"] (default "750")
+  -p, --log-perm octal          Permissions (octal) for new log files
+                                   [ e.g., "600", "644"] (default "600")
+  -P, --log-dir-perm octal      Permissions (octal) for new log directories
+                                   [e.g., "755", "750"] (default "750")
   -i, --idle-max int            Maximum connection idle time allowed [seconds]
   -m, --time-max int            Maximum connection link time allowed [seconds]
   -b, --blacklist string        Enable blacklist [filename] (no default)
@@ -103,7 +103,7 @@ including the versions of all embedded dependencies and the version
 of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 ga0c7abf+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g331a5c3+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
