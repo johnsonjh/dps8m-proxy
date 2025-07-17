@@ -185,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 gff257d4+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 ge3e98ba+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -373,16 +373,6 @@ predecessor (code statistics provided by
 		<th>84932</th>
 		<th>1568</th>
 	</tr><tr>
-		<th>License</th>
-		<th>1</th>
-		<th>22</th>
-		<th>4</th>
-		<th>0</th>
-		<th>18</th>
-		<th>0</th>
-		<th>1121</th>
-		<th>19</th>
-	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
 		<th>225</th>
@@ -390,7 +380,7 @@ predecessor (code statistics provided by
 		<th>51</th>
 		<th>129</th>
 		<th>18</th>
-		<th>6855</th>
+		<th>6863</th>
 		<th>152</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -405,14 +395,14 @@ predecessor (code statistics provided by
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
-		<th>10</th>
-		<th>3463</th>
-		<th>612</th>
+		<th>9</th>
+		<th>3441</th>
+		<th>608</th>
 		<th>230</th>
-		<th>2621</th>
+		<th>2603</th>
 		<th>807</th>
-		<th>95584</th>
-		<th>1801</th>
+		<th>94471</th>
+		<th>1783</th>
 	</tr></tfoot></table>
 
 ## Future plans
