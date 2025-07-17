@@ -185,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 ga1f5708+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 gef603c0+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -385,13 +385,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
-		<th>222</th>
+		<th>225</th>
 		<th>45</th>
 		<th>51</th>
-		<th>126</th>
+		<th>129</th>
 		<th>18</th>
-		<th>6630</th>
-		<th>149</th>
+		<th>6855</th>
+		<th>152</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -399,20 +399,20 @@ predecessor (code statistics provided by
 		<th>24</th>
 		<th>27</th>
 		<th>53</th>
-		<th>11</th>
-		<th>2665</th>
+		<th>10</th>
+		<th>2681</th>
 		<th>68</th>
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
 		<th>10</th>
-		<th>3460</th>
+		<th>3463</th>
 		<th>612</th>
 		<th>230</th>
-		<th>2618</th>
-		<th>807</th>
-		<th>95348</th>
-		<th>1798</th>
+		<th>2621</th>
+		<th>806</th>
+		<th>95589</th>
+		<th>1801</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -486,7 +486,7 @@ If you plan to make any changes to the [`Makefile`](Makefile) (or the
 [ShellCheck](https://www.shellcheck.net/), and
 [shfmt](https://github.com/mvdan/sh) installed, and all modifications
 need to be tested against [pdpmake](https://frippery.org/make/)
-(*with `PDPMAKE_POSIXLY_CORRECT` set*) and
+(*with* `PDPMAKE_POSIXLY_CORRECT` *set*) and
 [yash](https://magicant.github.io/yash/) to ensure POSIX conformance.
 
 While not absolutely required, it’s a good idea to have the latest

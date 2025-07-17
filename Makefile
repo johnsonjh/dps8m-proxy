@@ -65,13 +65,14 @@ lint check:
 	$(MAKE) doc
 	@printf '\n%s\n' "🧩 Running 'make clean'..."
 	$(MAKE) clean
-	@printf '\n%s\n' "🧩 Running linters..."
+	@printf '\n%s\n' "⚙️ Running linters..."
 	$(MAKE) revive reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
 		errcheck shellcheck shfmt codespell golangci-lint
 	@printf '\n%s\n' "🧩 Running 'make cross'..."
 	$(MAKE) cross
 	@printf '\n%s\n' "🧩 Running 'make clean'..."
 	$(MAKE) clean
+	@printf '\n%s\n\n' "🥇 Linting complete; carefully review the output."
 
 ##############################################################################
 # Target: reuse
@@ -187,35 +188,37 @@ govet:
 
 .PHONY: doc docs
 README.md doc docs: README.md.tmpl proxy
-	@printf '%s\n' "📚 Building README.md..."
+	@printf '%s\n\n' "📚 Generating README.md..."
 	@$$(command -v perl > /dev/null 2>&1) || \
 		{ printf '%s\n' "⚠️ perl not found!"; exit 1; }
 	@$$(command -v scc > /dev/null 2>&1) || \
 		{ printf '%s\n' "⚠️ scc not found!"; exit 1; }
 	$(CP) README.md.tmpl README.md
-	@printf '%s\n' "🐪 Perl: Inserting version info..."
+	@printf '\n%s\n' "🐪 Perl: Inserting version info..."
 	$(PERL) -i -pe \
 	'BEGIN { ($$v=qx(./proxy -v 2>&1))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===VERSION===!$$v!g' README.md
 	grep -q '===VERSION===' README.md || exit 0
-	@printf '%s\n' "🐪 Perl: Inserting help info..."
+	@printf '\n%s\n' "🐪 Perl: Inserting help info..."
 	$(PERL) -i -pe \
 	'BEGIN { ($$v=qx(./proxy -h 2>&1))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===HELP===!$$v!g' README.md
 	grep -q '===HELP===' README.md || exit 0
-	@printf '%s\n' "🐪 Perl: Inserting scc output..."
+	@printf '\n%s\n' "🐪 Perl: Inserting scc output..."
 	$(PERL) -i -pe \
 	'BEGIN { ($$v=qx(scc --exclude-file REUSE.toml,README.md,renovate.json,.whitesource,.golangci.yml,dependabot.yml,.txt --no-size --no-cocomo -ud -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===SCC===!$$v!g' README.md
 	grep -q '===SCC===' README.md || exit 0
+	@printf '\n%s\n\n' "📗 README.md generation successful."
 
 ##############################################################################
 # Target: cross
 
 .PHONY: cross
 cross: .cross.sh
-	@printf '%s\n' "🚜 Beginning cross-compilation..."
+	@printf '\n%s\n\n' "🛫 Starting cross-compilation (errors are non-fatal!)"
 	@./.cross.sh
+	@printf '\n%s\n\n' "🛬 Back from cross-compilation"
 
 ##############################################################################
 # vim: set ft=make noexpandtab tabstop=4 cc=78 :

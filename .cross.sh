@@ -58,7 +58,7 @@ esac
 if [ "${max:?}" -eq 1 ]; then
   printf '%s\n' "💻 Build parallelism is disabled."
 else
-  printf '%s\n' "💻 Forking up to ${max:?} builds for parallel compilation..."
+  printf '%s\n' "💻 Forking up to ${max:?} simultaneous builds during parallel compilation..."
 fi
 
 ##############################################################################
