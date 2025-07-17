@@ -134,14 +134,14 @@ documented here:
   as the date and time of the session, their IP address, and possibly
   a resolved host name.  This can be disabled with `--no-banner`.
 
-* There are three text files which can be displayed to connecting
-  users.  These are:
+* There are three primary text pfiles which can be displayed to
+  connecting users:
 
-  | File        | Purpose                                                                   |
-  :-------------:---------------------------------------------------------------------------:
-  | `block.txt` | Displayed before disconnecting connections matching the blacklist         |
-  | `deny.txt`  | Displayed when denying target sessions (*e.g.,* during graceful shutdown) |
-  | `issue.txt` | Displayed to users before they the session with the target begins         |
+| File        | Purpose                                                                   |
+:-------------:---------------------------------------------------------------------------:
+| `block.txt` | Displayed before disconnecting connections matching the blacklist         |
+| `deny.txt`  | Displayed when denying target sessions (*e.g.,* during graceful shutdown) |
+| `issue.txt` | Displayed to users before they the session with the target begins         |
 
   * When multiple targets defined using the `--alt-host` functionality,
     the system will display a file that matches `-NAME` before the
@@ -176,7 +176,7 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 gc2401dd+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g5782142+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -368,7 +368,7 @@ It is also considerably simpler, per
 		<th>0</th>
 		<th>278</th>
 		<th>0</th>
-		<th>14126</th>
+		<th>14113</th>
 		<th>0</th>
 	</tr><tr>
 		<th>License</th>
@@ -398,7 +398,7 @@ It is also considerably simpler, per
 		<th>0</th>
 		<th>320</th>
 		<th>0</th>
-		<th>16663</th>
+		<th>16650</th>
 		<th>0</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -429,7 +429,7 @@ It is also considerably simpler, per
 		<th>234</th>
 		<th>3274</th>
 		<th>0</th>
-		<th>128984</th>
+		<th>128958</th>
 		<th>0</th>
 	</tr></tfoot></table>
 

@@ -104,14 +104,14 @@ documented here:
   as the date and time of the session, their IP address, and possibly
   a resolved host name.  This can be disabled with `--no-banner`.
 
-* There are three text files which can be displayed to connecting
-  users.  These are:
+* There are three primary text pfiles which can be displayed to
+  connecting users:
 
-  | File        | Purpose                                                                   |
-  :-------------:---------------------------------------------------------------------------:
-  | `block.txt` | Displayed before disconnecting connections matching the blacklist         |
-  | `deny.txt`  | Displayed when denying target sessions (*e.g.,* during graceful shutdown) |
-  | `issue.txt` | Displayed to users before they the session with the target begins         |
+| File        | Purpose                                                                   |
+:-------------:---------------------------------------------------------------------------:
+| `block.txt` | Displayed before disconnecting connections matching the blacklist         |
+| `deny.txt`  | Displayed when denying target sessions (*e.g.,* during graceful shutdown) |
+| `issue.txt` | Displayed to users before they the session with the target begins         |
 
   * When multiple targets defined using the `--alt-host` functionality,
     the system will display a file that matches `-NAME` before the
