@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 ##############################################################################
 # Copyright (c) 2025 Jeffrey H. Johnson
 # Copyright (c) 2025 The DPS8M Development Team
@@ -37,14 +37,19 @@ _S=$(go tool dist list \
 # Maximum jobs
 
 if command -v nproc > /dev/null 2>&1; then
-  max=$(nproc 2> /dev/null || printf '%s\n' "1")
+  max=$(nproc 2> /dev/null \
+    || getconf NPROCESSORS_ONLN 2> /dev/null \
+    || getconf _NPROCESSORS_ONLN 2> /dev/null \
+    || getconf NPROCESSORS_CONF 2> /dev/null \
+    || getconf _NPROCESSORS_CONF 2> /dev/null \
+    || printf '%s\n' "1")
 else
   max="1"
 fi
 
 # shellcheck disable=SC2249
 case ${max:-} in
-  ''|*[!0-9]*|0) max=1 ;;
+'' | *[!0-9]* | 0) max=1 ;;
 esac
 
 ##############################################################################
@@ -78,12 +83,17 @@ set +e
 ##############################################################################
 # Run script
 
-OLDIFS=${IFS:-}; IFS=';'
+OLDIFS=${IFS:-}
+IFS=';'
 
 for chunk in ${_S}; do
   cmd=$(printf '%s' "${chunk:?}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
   [ -z "${cmd:?}" ] && continue
-  read -r _ <&3; ( sh -c "${cmd:?}"; printf '%s\n' "" >&3) &
+  read -r _ <&3
+  (
+    sh -c "${cmd:?}"
+    printf '%s\n' "" >&3
+  ) &
 done
 
 IFS=${OLDIFS:?}
