@@ -185,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g22c5570+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g2293387+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -470,23 +470,19 @@ that know what you’re doing!
   [scc](https://github.com/boyter/scc),
   [codespell](https://github.com/codespell-project/codespell), and
   [Perl](https://www.perl.org/).
-
 * If you plan to make any changes to the [`Makefile`](Makefile) (or
   the [.cross.sh](.cross.sh) script), you’ll need to have the
   [ShellCheck](https://www.shellcheck.net/) and
   [shfmt](https://github.com/mvdan/sh) linters available.
-
 * Additionally, all modifications to the `Makefile` and `.cross.sh`
   scripts must be tested against [pdpmake](https://frippery.org/make/)
   (with `PDPMAKE_POSIXLY_CORRECT` set) and
   [yash](https://magicant.github.io/yash/) to ensure POSIX conformance.
-
 * While not absolutely required, it’s a good idea to have the latest
   [golangci-lint](https://golangci-lint.run/) installed.  We ship a
   [configuration file](.golangci.yml) file for it, and try to make
   sure that all the tests pass when using the most recently released
   version.
-
 * The `Makefile` provides a `lint` convenience target to help you run
   all this stuff.
 
