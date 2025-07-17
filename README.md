@@ -150,7 +150,7 @@ documented here:
     (if existing).
   * To disable the file-based banner for a specific target, you can
     just create an empty files using the naming scheme describes above.
-    You can also remove all these files if you don't require this
+    You can also remove all these files if you don’t require this
     functionality.
 
 * You need to start the proxy with `--whitelist` and/or `--blacklist`
@@ -176,12 +176,12 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-17 g3f00e48) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 ge8a3f40+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.6  |
 | ulikunitz/xz              | v0.5.12 |
@@ -252,21 +252,23 @@ further clarification:
 
 * The proxy also acts on the following signals:
 
- |    Signal | Action                                                          |
- |----------:|:----------------------------------------------------------------|
- | `SIGINT`  | Enables the **Immediate shutdown** mode                         |
- | `SIGQUIT` | Enables the **Immediate shutdown** mode                         |
- | `SIGUSR1` | Enables the **Graceful shutdown** mode                          |
- | `SIGUSR2` | Enables the **Deny new connections** mode                       |
- | `SIGHUP`  | Reloads *access control lists* (`--whitelist`, `--blacklist`)   |
+  |    Signal | Action                                                          |
+  |----------:|:----------------------------------------------------------------|
+  | `SIGINT`  | Enables the **Immediate shutdown** mode                         |
+  | `SIGQUIT` | Enables the **Immediate shutdown** mode                         |
+  | `SIGUSR1` | Enables the **Graceful shutdown** mode                          |
+  | `SIGUSR2` | Enables the **Deny new connections** mode                       |
+  | `SIGHUP`  | Reloads *access control lists* (`--whitelist`, `--blacklist`)   |
 
 ### User interaction
 
 Users connected via SSH can send `^]` (*i.e.* `Control + ]`) during
-a session to access the following following features from a menu:
+a session to access the following following TELNET control features:
 
 * `A` sends an IAC `AYT` (*Are You There?*) to the remote host
+
 * `B` sends an IAC `BREAK` signal to the remote host
+
 * `K` toggles the transparent key remapping mode, which translates
   modern `xterm`/`VT320` movement key inputs to Emacs sequences:
 
@@ -287,13 +289,16 @@ a session to access the following following features from a menu:
   | `Left`            | `Control + B` |
 
 * `N` sends an IAC `NOP` (*No Operation*) to the remote host
-* `S` displays the status the session and some statistics:
+
+* `S` displays the status the session, sharing information, and some statistics:
+
   ```
   >> LNK - The username '_gRSyWHxPcMp2MWvtmWWF' can be used to share this session.
   >> SSH - in:   58 B,   out: 4.82 KiB, in rate:   4 B/s, out rate: 381 B/s
   >> NVT - in: 4.82 KiB, out:   57 B,   in rate: 381 B/s, out rate:   4 B/s
   >> LNK - link time: 13s (Emacs keymap enabled)
   ```
+
 * `X` disconnects from the remote host (and ends the SSH session)
 
 ### Connection sharing
@@ -314,6 +319,7 @@ a session to access the following following features from a menu:
 
 This is a from-scratch re-implementation (in
 [Go](https://go.dev/)) of an older legacy program of the same name.
+
 The original software used a multi-process architecture and consisted
 of more than **10,000 SLOC** of haphazardly constructed code: ≅9,000
 lines of [C-Kermit](https://www.kermitproject.org/) (*yes, the
@@ -374,13 +380,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>355</th>
-		<th>71</th>
+		<th>364</th>
+		<th>79</th>
 		<th>0</th>
-		<th>284</th>
+		<th>285</th>
 		<th>0</th>
-		<th>14660</th>
-		<th>271</th>
+		<th>14700</th>
+		<th>272</th>
 	</tr><tr>
 		<th>License</th>
 		<th>1</th>
@@ -404,13 +410,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>398</th>
-		<th>72</th>
+		<th>407</th>
+		<th>80</th>
 		<th>0</th>
-		<th>326</th>
+		<th>327</th>
 		<th>0</th>
-		<th>17195</th>
-		<th>311</th>
+		<th>17237</th>
+		<th>312</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -435,13 +441,13 @@ It is also considerably simpler (per
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>4278</th>
-		<th>758</th>
+		<th>4296</th>
+		<th>774</th>
 		<th>234</th>
-		<th>3286</th>
+		<th>3288</th>
 		<th>801</th>
-		<th>130049</th>
-		<th>2152</th>
+		<th>130131</th>
+		<th>2153</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -463,9 +469,10 @@ It is also considerably simpler (per
 
 By default, all session log files are compressed automatically when
 the session terminates, and console log files are compressed when the
-log rolls over (starting a new day).  When reviewing logs,
-administrators often need to grep through all the past data, including
-the compressed files. We recommend using
+log rolls over (starting a new day).
+
+When reviewing logs, administrators often need to grep through all the
+past data, including the compressed files. We recommend using
 [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the `-z`
 option) for this task.
 
@@ -473,9 +480,11 @@ option) for this task.
 
 If you have existing [OpenSSH](https://www.openssh.com/) Ed25519 or
 RSA host keys that you want to use with the proxy, you’ll need to
-convert those keys to standard PEM format. **NB**: These instructions
-*do not* include specific instructions for safe handling of key file
-permissions—we assume you know what you’re doing!
+convert those keys to standard PEM format.
+
+**NB**: These instructions *do not* include any specific details for
+safe handling of key file permissions—we assume you know what you’re
+doing!
 
 1. Make a *copy* the key files you wish to convert.  Be aware that
    these copies will be *overwritten* in the conversion process:
