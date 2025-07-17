@@ -17,14 +17,14 @@ more **TELNET** connections on the back-end.
 Although this project was originally developed to meet the needs of
 the **BAN.AI Public Access Multics** system and the
 [DPS8M Simulator](https://dps8m.gitlab.io) projects, it may be useful
-to anyone who wants to provide modern SSH access to legacy systems.
+to anyone who wants to provide SSH access to legacy systems.
 
 ## Features
 
 * ✅ **SSH**⟷**TELNET** gateway
 * ✅ Full IPv6 support
 * ✅ Access control whitelist/blacklist (by IP address or CIDR block)
-* ✅ Session monitoring and logging (by date/time and host)
+* ✅ Independent console and session logging (by date/time and host)
 * ✅ Automatic logfile compression (gzip, xz, zstandard)
 * ✅ Banners for accepted, denied, and blocked connections (per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
@@ -52,7 +52,7 @@ to anyone who wants to provide modern SSH access to legacy systems.
   [`git` repository](https://gitlab.com/dps8m/proxy.git) and build
   the source code with `make`:
 
-  ```
+  ```sh
   git clone https://gitlab.com/dps8m/proxy.git
   cd proxy
   make
@@ -103,7 +103,7 @@ including the versions of all embedded dependencies and the version
 of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 gb7c0225+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g11f4c14+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -211,18 +211,19 @@ a session to access the following following features from a menu:
 
 ## History
 
-This version of the `proxy` program is a from-scratch
-[Golang](https://go.dev/) re-implementation of an older legacy program
-of the same name, the original being an over-engineered and complex
-multi-process application of more than 10,000 SLOC: ≅8,000 lines of
-[C-Kermit](https://www.kermitproject.org/) (*yes, it’s own
+This is a from-scratch re-implementation using
+[Golang](https://go.dev/) of an older legacy program of the same name.
+The original software used a multi-process architecture and consisted
+of more than 10,000 SLOC of haphazardly constructed code: ≅9,000 lines
+of [C-Kermit](https://www.kermitproject.org/) (*yes, the
 [programming language](https://www.kermitproject.org/ckututor.html)*)
-and ≅2,000 lines of [ksh93](https://github.com/ksh93/ksh) (along
-with a small amount of Perl).
+and [ksh93](https://github.com/ksh93/ksh), with a small amounts of C
+and Perl, which was difficult to maintain, configure, or securely
+install.
 
-The new implementation replaces the original multi-process
-architecture with lightweight *Goroutines*, and achieves improved
-performance with greatly reduced system overhead.
+The new implementation uses lightweight *Goroutines* in place of
+spawning multiple processes, resulting in significantly improved
+performance and reduced system overhead.
 
 ## Future plans
 
@@ -230,9 +231,7 @@ Some features are still missing in this implementation and will be
 added in future updates:
 
 * The original legacy software had features not yet re-implemented
-  like CAPTCHAs, throttling, and flow control support.
-* The **TELNET** features currently implemented are minimal—enough
-  for supporting **DPS8M**.  Improved protocol support is planned.
+  like *CAPTCHA*s, throttling, load-balancing, and flow control.
 
 ## Compressed logs
 
@@ -271,10 +270,12 @@ permissions—we assume you know what you’re doing!
 ## Security
 
 * The canonical home of this software is
-  [**\<https://gitlab.com/dps8m/proxy\>**](https://gitlab.com/dps8m/proxy).
+  \<[**https://gitlab.com/dps8m/proxy**](https://gitlab.com/dps8m/proxy)\>.
 * This software is intended to be **secure**.  If you find any
-  security-related problems, please do not hesitate to open an Issue
-  or send an [e-mail](mailto:trnsz@pobox.com) to the author.
+  security-related problems, please do not hesitate to
+  [open an Issue](https://gitlab.com/dps8m/proxy/-/issues/new)
+  or send an [e-mail](mailto:contact-project+dps8m-proxy-71601954-issue-@incoming.gitlab.com)
+  to the author.
 
 ## License
 

@@ -1,0 +1,30 @@
+# Copyright (c) 2025 Jeffrey H. Johnson
+# Copyright (c) 2025 The DPS8M Development Team
+# SPDX-License-Identifier: MIT-0
+linters:
+  enable-all: true
+  disable:
+    - containedctx
+    - contextcheck
+    - cyclop
+    - depguard
+    - err113
+    - exhaustruct
+    - forbidigo
+    - funlen
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - gocritic # Useful but have gotten some false positives; run manually.
+    - gocyclo
+    - gofumpt # We prefer to run gofumpt manually in lint target.
+    - ireturn
+    - maintidx
+    - mnd
+    - nestif
+    - nlreturn # Usually good but can conflict with gofumpt; run manually.
+    - perfsprint
+    - tenv
+    - varnamelen
+    - wrapcheck
+    - wsl

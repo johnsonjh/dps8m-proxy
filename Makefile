@@ -23,17 +23,19 @@ all: proxy
 
 .PHONY: proxy
 proxy:
+	@printf '%s\n' "🧩 Building proxy..."
 	@env CGO_ENABLED=0 go build -trimpath -v && \
 	test -x proxy 2> /dev/null && { \
 		printf '\n%s\n\n' "✅ Build successful:"; \
-		./proxy --version 2> /dev/null; } || \
-	printf '\n%s\n\n' "💔 Build failed!"
+		./proxy --version 2> /dev/null; exit 0; } || { \
+		printf '\n%s\n\n' "💔 Build failed!"; exit 1; }
 
 ##############################################################################
 # Target: clean
 
 .PHONY: clean
 clean:
+	@printf '%s\n' "🧹 Cleaning..."
 	go clean -v
 	$(RM) -r ./cross.bin/
 
@@ -65,7 +67,7 @@ lint check:
 	$(MAKE) clean
 	@printf '\n%s\n' "🧩 Running linters..."
 	$(MAKE) revive reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
-		errcheck shellcheck
+		errcheck shellcheck golangci-lint
 	@printf '\n%s\n' "🧩 Running 'make cross'..."
 	$(MAKE) cross
 	@printf '\n%s\n' "🧩 Running 'make clean'..."
@@ -100,6 +102,15 @@ goverify: go.mod
 .PHONY: gotidydiff
 gotidydiff: go.mod
 	go mod tidy -diff
+
+##############################################################################
+# Target: golangci-lint
+
+.PHONY: golangci-lint
+golangci-lint:
+	@$$(command -v golangci-lint > /dev/null 2>&1) || \
+		{ printf '%s\n' "⚠️ golangci-lint not found!"; exit 0; } ; \
+		set -x; golangci-lint run
 
 ##############################################################################
 # Target: staticcheck
@@ -158,6 +169,7 @@ govet:
 
 .PHONY: doc
 README.md doc: README.md.tmpl proxy
+	@printf '%s\n' "📚 Building README.md..."
 	@$$(command -v perl > /dev/null 2>&1) || \
 		{ printf '%s\n' "⚠️ perl not found!"; exit 1; }
 	$(CP) README.md.tmpl README.md
@@ -173,7 +185,8 @@ README.md doc: README.md.tmpl proxy
 
 .PHONY: cross
 cross: .cross.sh
-	-@./.cross.sh
+	@printf '%s\n' "🚜 Beginning cross-compilation..."
+	@./.cross.sh
 
 ##############################################################################
 # vim: set ft=make noexpandtab tabstop=4 cc=78 :

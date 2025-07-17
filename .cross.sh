@@ -48,6 +48,15 @@ case ${max:-} in
 esac
 
 ##############################################################################
+# Inform of parallelism
+
+if [ "${max:?}" -eq 1 ]; then
+  printf '%s\n' "💻 Build parallelism is disabled."
+else
+  printf '%s\n' "💻 Starting up to ${max:?} builds in parallel..."
+fi
+
+##############################################################################
 # Create semaphore
 
 fifo="/tmp/${$}.fifo"

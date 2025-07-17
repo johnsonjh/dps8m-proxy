@@ -32,7 +32,6 @@ func resolveExePath() string {
 	var err error
 
 	exe, err = os.Executable()
-
 	if err != nil { // Fallback to /proc
 		if realPath, err2 := os.Readlink("/proc/self/exe"); err2 == nil {
 			exe = realPath

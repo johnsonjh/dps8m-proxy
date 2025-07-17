@@ -45,7 +45,7 @@ import (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 const (
-	// TELNET Commands
+	// TELNET Commands.
 	TelcmdNOP  = 241 // No operation
 	TelcmdAYT  = 246 // Are You There?
 	TelcmdIAC  = 255 // Interpret As Command
@@ -54,12 +54,12 @@ const (
 	TelcmdWONT = 252 // WONT
 	TelcmdWILL = 251 // WILL
 
-	// TELNET Command Options
+	// TELNET Command Options.
 	TeloptBinary          = 0
 	TeloptEcho            = 1
 	TeloptSuppressGoAhead = 3
 
-	// IEC sizes
+	// IEC sizes.
 	KiB = 1024
 	MiB = 1024 * KiB
 	GiB = 1024 * MiB
@@ -318,7 +318,7 @@ func init() {
 func shutdownWatchdog() {
 	<-shutdownSignal
 	loggingWg.Wait()
-	if strings.ToLower(consoleLog) == "quiet" {
+	if strings.ToLower(consoleLog) == "quiet" { //nolint:goconst
 		fmt.Fprintf(os.Stderr, "%s All connections closed. Exiting.\r\n", nowStamp())
 	}
 	log.Println("All connections closed. Exiting.")
@@ -356,7 +356,7 @@ func main() {
 	}
 
 	switch compressLevel {
-	case "fast", "normal", "high":
+	case "fast", "normal", "high": //nolint:goconst
 
 	default:
 		log.Fatalf("ERROR: Invalid -compress-level: %s", compressLevel)
@@ -539,6 +539,7 @@ func printVersion() {
 		if v := getMainModuleVersion(); v != "" {
 			return " " + v
 		}
+
 		return ""
 	}()
 
@@ -1140,6 +1141,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 				log.Print(line)
 			}
 			keyLog = append(keyLog, line)
+
 			return &ssh.Permissions{
 				Extensions: map[string]string{"auth-method": "publickey"},
 			}, fmt.Errorf("next key")
@@ -1228,13 +1230,14 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		} else {
 			connectionsMutex.Unlock()
 		}
+		const unknownHost = "<UNKNOWN>"
 		if !suppressLogs {
 			host, _, err := net.SplitHostPort(conn.hostName)
 			if err != nil {
-				log.Printf("TEARDOWN [%s] %s@<UNKNOWN>",
+				log.Printf("TEARDOWN [%s] %s@"+unknownHost,
 					sid, func() string {
 						if conn.userName == "" {
-							return "<UNKNOWN>"
+							return unknownHost
 						}
 
 						return conn.userName
@@ -1243,7 +1246,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 				log.Printf("TEARDOWN [%s] %s@%s",
 					sid, func() string {
 						if conn.userName == "" {
-							return "<UNKNOWN>"
+							return unknownHost
 						}
 
 						return conn.userName
@@ -1398,6 +1401,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					if err := channel.Close(); err != nil {
 						log.Printf("Error closing channel for %s: %v", conn.ID, err)
 					}
+
 					return
 				}
 			}
@@ -2395,6 +2399,7 @@ func compressLogFile(logFilePath string) {
 	data, err := os.ReadFile(logFilePath)
 	if err != nil {
 		log.Printf("Failed to read log %q for compression: %v", logFilePath, err)
+
 		return
 	}
 
@@ -2645,6 +2650,7 @@ func checkPrivilegedPorts(addrs []string) {
 
 		if port > 0 && port < 1024 {
 			checkCapability()
+
 			return
 		}
 	}
