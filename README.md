@@ -176,7 +176,7 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-17 gc908437) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-17 g3f00e48) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -207,8 +207,9 @@ DPS8M Proxy v0.0.0 (2025-Jul-17 gc908437) [linux/amd64]
 
 * If this is necessary (*i.e.,* a non-root user on Linux is attempting
   to bind an SSH listener to a privileged port and the
-  `CAP_NET_BIND_SERVICE` is not currently effective), the software
-  should provide a warning message with the above instructions.
+  `CAP_NET_BIND_SERVICE` capability is not currently effective), the
+  software should provide a warning message with the above
+  instructions.
 
 ### Admin interaction
 
@@ -226,7 +227,6 @@ DPS8M Proxy v0.0.0 (2025-Jul-17 gc908437) [linux/amd64]
 []()
 
 []()
-
 Most of these admin console commands are straightforward and should
 be self-explanatory, although there are a few options that merit
 further clarification:
@@ -251,11 +251,14 @@ further clarification:
 ### Signals
 
 * The proxy also acts on the following signals:
-  * `SIGINT`, `SIGQUIT` - enables the *Immediate shutdown* mode
-  * `SIGUSR1` - enables the *Graceful shutdown* mode
-  * `SIGUSR2` - enables the *Deny new connections* mode
-  * `SIGHUP` - reloads *access control lists*
-    (`-whitelist`, `-blacklist`)
+
+ |    Signal | Action                                                          |
+ |----------:|:----------------------------------------------------------------|
+ | `SIGINT`  | Enables the **Immediate shutdown** mode                         |
+ | `SIGQUIT` | Enables the **Immediate shutdown** mode                         |
+ | `SIGUSR1` | Enables the **Graceful shutdown** mode                          |
+ | `SIGUSR2` | Enables the **Deny new connections** mode                       |
+ | `SIGHUP`  | Reloads *access control lists* (`--whitelist`, `--blacklist`)   |
 
 ### User interaction
 
@@ -345,7 +348,7 @@ It is also considerably simpler (per
 		<th>537</th>
 		<th>152</th>
 		<th>2421</th>
-		<th>0</th>
+		<th>778</th>
 		<th>84931</th>
 		<th>1568</th>
 	</tr><tr>
@@ -371,13 +374,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>352</th>
+		<th>355</th>
 		<th>71</th>
 		<th>0</th>
-		<th>281</th>
+		<th>284</th>
 		<th>0</th>
-		<th>14309</th>
-		<th>268</th>
+		<th>14660</th>
+		<th>271</th>
 	</tr><tr>
 		<th>License</th>
 		<th>1</th>
@@ -395,19 +398,19 @@ It is also considerably simpler (per
 		<th>41</th>
 		<th>47</th>
 		<th>116</th>
-		<th>0</th>
-		<th>5957</th>
+		<th>16</th>
+		<th>5956</th>
 		<th>137</th>
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>395</th>
+		<th>398</th>
 		<th>72</th>
 		<th>0</th>
-		<th>323</th>
+		<th>326</th>
 		<th>0</th>
-		<th>16844</th>
-		<th>308</th>
+		<th>17195</th>
+		<th>311</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -415,7 +418,7 @@ It is also considerably simpler (per
 		<th>24</th>
 		<th>27</th>
 		<th>43</th>
-		<th>0</th>
+		<th>7</th>
 		<th>2465</th>
 		<th>58</th>
 	</tr><tr>
@@ -432,13 +435,13 @@ It is also considerably simpler (per
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>4272</th>
+		<th>4278</th>
 		<th>758</th>
 		<th>234</th>
-		<th>3280</th>
-		<th>0</th>
-		<th>129348</th>
-		<th>2149</th>
+		<th>3286</th>
+		<th>801</th>
+		<th>130049</th>
+		<th>2152</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -446,15 +449,15 @@ It is also considerably simpler (per
 1. Some features are still missing in this implementation and will be
    added in future updates.  Some of the features of the original
    legacy software that have not yet been re-implemented include
-   *CAPTCHA*s, throttling, load-balancing, flow control, SSH targets,
-   and TELNET listeners.
+   text *CAPTCHA*s, throttling, load-balancing, flow control, SSH
+   targets, and TELNET listeners.
 
 2. When users access an SSH listener, the connecting client may supply
    a password or present public keys for authentication.  These
    authentication attempts are currently recorded, but are not
-   otherwise used by the proxy.  A future update may allow for public
-   keys to be used for pre-authentication or to influence target
-   routing.
+   otherwise used by the proxy.  A future update may allow for SSH
+   passwords and public keys to be used for pre-authentication or to
+   influence target routing.
 
 ## Compressed logs
 
