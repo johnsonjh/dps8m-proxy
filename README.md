@@ -176,12 +176,12 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 ge8a3f40+) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-17 g5839b46) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0* |
+| dps8m/proxy               | v0.0.0  |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.6  |
 | ulikunitz/xz              | v0.5.12 |
@@ -415,7 +415,7 @@ It is also considerably simpler (per
 		<th>0</th>
 		<th>327</th>
 		<th>0</th>
-		<th>17237</th>
+		<th>17235</th>
 		<th>312</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -446,7 +446,7 @@ It is also considerably simpler (per
 		<th>234</th>
 		<th>3288</th>
 		<th>801</th>
-		<th>130131</th>
+		<th>130129</th>
 		<th>2153</th>
 	</tr></tfoot></table>
 
