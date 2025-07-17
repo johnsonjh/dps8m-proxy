@@ -185,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g5cc5f63+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 gff257d4+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -399,8 +399,8 @@ predecessor (code statistics provided by
 		<th>24</th>
 		<th>27</th>
 		<th>53</th>
-		<th>10</th>
-		<th>2681</th>
+		<th>11</th>
+		<th>2676</th>
 		<th>68</th>
 	</tr></tbody>
 	<tfoot><tr>
@@ -410,8 +410,8 @@ predecessor (code statistics provided by
 		<th>612</th>
 		<th>230</th>
 		<th>2621</th>
-		<th>806</th>
-		<th>95589</th>
+		<th>807</th>
+		<th>95584</th>
 		<th>1801</th>
 	</tr></tfoot></table>
 
@@ -469,33 +469,36 @@ that know what you’re doing!
 
 ## Development
 
-For `proxy` development, along with the most recent version of
-[Go](https://go.dev/), you’ll also need a standard POSIX.1 shell
-environment (*at a minimum* `sh`, `make`, `grep`, `awk`, *and* `sed`),
-and [reuse](https://github.com/fsfe/reuse-tool),
-[staticcheck](https://staticcheck.dev/),
-[revive](https://revive.run/),
-[errcheck](https://github.com/kisielk/errcheck),
-[gofumpt](https://github.com/mvdan/gofumpt),
-[scc](https://github.com/boyter/scc),
-[codespell](https://github.com/codespell-project/codespell), and
-[Perl](https://www.perl.org/).
+* For `proxy` development, along with the most recent version of
+  [Go](https://go.dev/), you’ll also need to have a standard POSIX.1
+  shell environment (at a minimum `sh`, `make`, `grep`, `awk`, &
+  `sed`), and [reuse](https://github.com/fsfe/reuse-tool),
+  [staticcheck](https://staticcheck.dev/),
+  [revive](https://revive.run/),
+  [errcheck](https://github.com/kisielk/errcheck),
+  [gofumpt](https://github.com/mvdan/gofumpt),
+  [scc](https://github.com/boyter/scc),
+  [codespell](https://github.com/codespell-project/codespell), and
+  [Perl](https://www.perl.org/).
 
-If you plan to make any changes to the [`Makefile`](Makefile) (or the
-[.cross.sh](.cross.sh) script), you’ll need
-[ShellCheck](https://www.shellcheck.net/), and
-[shfmt](https://github.com/mvdan/sh) installed, and all modifications
-need to be tested against [pdpmake](https://frippery.org/make/)
-(*with* `PDPMAKE_POSIXLY_CORRECT` *set*) and
-[yash](https://magicant.github.io/yash/) to ensure POSIX conformance.
+* If you plan to make any changes to the [`Makefile`](Makefile) (or
+  the [.cross.sh](.cross.sh) script), you’ll need to have the
+  [ShellCheck](https://www.shellcheck.net/) and
+  [shfmt](https://github.com/mvdan/sh) linters available.
 
-While not absolutely required, it’s a good idea to have the latest
-[golangci-lint](https://golangci-lint.run/) installed.  We ship a
-[configuration file](.golangci.yml) file for it, and try to make sure
-that all the tests pass when using the most recently released version.
+* Additionally, all modifications to the `Makefile` and `.cross.sh`
+  scripts must be tested against [pdpmake](https://frippery.org/make/)
+  (with `PDPMAKE_POSIXLY_CORRECT` set) and
+  [yash](https://magicant.github.io/yash/) to ensure POSIX conformance.
 
-The `Makefile` provides a `lint` target to help you run all the
-necessary checks.
+* While not absolutely required, it’s a good idea to have the latest
+  [golangci-lint](https://golangci-lint.run/) installed.  We ship a
+  [configuration file](.golangci.yml) file for it, and try to make
+  sure that all the tests pass when using the most recently released
+  version.
+
+* The `Makefile` provides a `lint` convenience target to help you run
+  all this stuff.
 
 ## Security
 
