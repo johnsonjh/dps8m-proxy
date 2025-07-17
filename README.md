@@ -45,7 +45,6 @@ source code.
 * You can also clone the
   [`git` repository](https://gitlab.com/dps8m/proxy.git) and build
   the source code with `make`:
-
   ```sh
   git clone https://gitlab.com/dps8m/proxy.git
   cd proxy
@@ -53,20 +52,25 @@ source code.
   ```
   * A `cross` target is available via the `Makefile` that attempts to
     build `proxy` binaries for all supported `GOOS` and `GOARCH`
-    combinations.  At the time of writing, **41** binaries are built:
-    aix/ppc64, android/arm64, darwin/amd64, darwin/arm64,
-    dragonfly/amd64, freebsd/386, freebsd/amd64, freebsd/arm,
-    freebsd/arm64, freebsd/riscv64, illumos/amd64, linux/386,
-    linux/amd64, linux/arm, linux/arm64, linux/loong64, linux/mips,
-    linux/mips64, linux/mips64le, linux/mipsle, linux/ppc64,
-    linux/ppc64le, linux/riscv64, linux/s390x, netbsd/386,
-    netbsd/amd64, netbsd/arm, netbsd/arm64, openbsd/386,
-    openbsd/amd64, openbsd/arm, openbsd/arm64, openbsd/ppc64,
-    openbsd/riscv64, plan9/386, plan9/amd64, plan9/arm, solaris/amd64,
-    windows/386, windows/amd64, and windows/arm64.
+    combinations.  At the time of writing, **12** operating systems
+    are supported and **41** binaries are built:
+    * AIX (ppc64)
+    * Android (arm64)
+    * Darwin (amd64, arm64)
+    * Dragonfly (amd64)
+    * FreeBSD (386, amd64, arm, arm64, riscv64)
+    * illumos (amd64)
+    * Linux (386, amd64, arm, arm64, loong64, mips, mips64, mips64le,
+      mipsle, ppc64, ppc64le, riscv64, s390x)
+    * NetBSD (386, amd64, arm, arm64)
+    * OpenBSD (386, amd64, arm, arm64, ppc64, riscv64)
+    * Plan 9 (386, amd64, arm)
+    * Solaris (amd64)
+    * Windows (386, amd64, arm64)
+[]()
 
+[]()
 * You can also install this software using `go install`:
-
   ```sh
   go install gitlab.com/dps8m/proxy@latest
   ```
@@ -176,12 +180,12 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-17 g3bb4f29) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g61655bd+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.6  |
 | ulikunitz/xz              | v0.5.12 |
@@ -192,7 +196,8 @@ DPS8M Proxy v0.0.0 (2025-Jul-17 g3bb4f29) [linux/amd64]
 +===========================+=========+
 ```
 
-If you need to see even more details, use `go version -m proxy`.
+* If you need to see even more details about the `proxy` build, use
+  `go version -m proxy`.
 
 ### Port binding
 
@@ -225,14 +230,14 @@ Most of these admin console commands are straightforward and should
 be self-explanatory, although there are a few options that merit
 further clarification:
 
-* When the *Graceful shutdown* mode is active, any new connections are
+* When the **Graceful shutdown** mode is active, any new connections
   are denied (and are served an appropriate `deny.txt`).  Once all
   clients have disconnected, the proxy software will exit.  Note that
   new *monitoring sessions* can still connect to observe active users,
   as these sessions are automatically closed when their observation
   target disconnects.
 
-* When the *Deny new connections* mode is active, any new connections
+* When the **Deny new connections** mode is active, any new connections
   are denied (and are served an appropriate `deny.txt`).  Also, any
   *logging* of new connections, including denied and rejected
   connections, is suppressed.  This can be useful if the admin console
@@ -301,8 +306,8 @@ a session to access the following following features from a menu:
 
 ## History
 
-This is a from-scratch re-implementation using
-[Golang](https://go.dev/) of an older legacy program of the same name.
+This is a from-scratch re-implementation (in
+[Go](https://go.dev/)) of an older legacy program of the same name.
 The original software used a multi-process architecture and consisted
 of more than **10,000 SLOC** of haphazardly constructed code: ≅9,000
 lines of [C-Kermit](https://www.kermitproject.org/) (*yes, the
@@ -315,8 +320,8 @@ This new implementation many lightweight *Goroutines* instead of
 spawning multiple processes, resulting in significantly improved
 performance and reduced system overhead.
 
-It is also considerably simpler, per
-[`scc`](https://github.com/boyter/scc):
+It is also considerably simpler (per
+[`scc`](https://github.com/boyter/scc)):
 
 <table id="scc-table">
 	<thead><tr>
@@ -339,7 +344,7 @@ It is also considerably simpler, per
 		<th>2421</th>
 		<th>0</th>
 		<th>84931</th>
-		<th>0</th>
+		<th>1568</th>
 	</tr><tr>
 		<th>Plain Text</th>
 		<th>4</th>
@@ -349,7 +354,7 @@ It is also considerably simpler, per
 		<th>36</th>
 		<th>0</th>
 		<th>2296</th>
-		<th>0</th>
+		<th>37</th>
 	</tr><tr>
 		<th>YAML</th>
 		<th>2</th>
@@ -359,17 +364,17 @@ It is also considerably simpler, per
 		<th>33</th>
 		<th>0</th>
 		<th>882</th>
-		<th>0</th>
+		<th>37</th>
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>344</th>
-		<th>66</th>
+		<th>349</th>
+		<th>64</th>
 		<th>0</th>
-		<th>278</th>
+		<th>285</th>
 		<th>0</th>
-		<th>14123</th>
-		<th>0</th>
+		<th>14049</th>
+		<th>270</th>
 	</tr><tr>
 		<th>License</th>
 		<th>1</th>
@@ -379,7 +384,7 @@ It is also considerably simpler, per
 		<th>18</th>
 		<th>0</th>
 		<th>1121</th>
-		<th>0</th>
+		<th>19</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -389,17 +394,17 @@ It is also considerably simpler, per
 		<th>116</th>
 		<th>0</th>
 		<th>5957</th>
-		<th>0</th>
+		<th>137</th>
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>387</th>
-		<th>67</th>
+		<th>392</th>
+		<th>65</th>
 		<th>0</th>
-		<th>320</th>
+		<th>327</th>
 		<th>0</th>
-		<th>16658</th>
-		<th>0</th>
+		<th>16586</th>
+		<th>310</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -409,7 +414,7 @@ It is also considerably simpler, per
 		<th>43</th>
 		<th>0</th>
 		<th>2465</th>
-		<th>0</th>
+		<th>58</th>
 	</tr><tr>
 		<th>TOML</th>
 		<th>1</th>
@@ -419,18 +424,18 @@ It is also considerably simpler, per
 		<th>9</th>
 		<th>0</th>
 		<th>543</th>
-		<th>0</th>
+		<th>13</th>
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>4256</th>
-		<th>748</th>
+		<th>4266</th>
+		<th>744</th>
 		<th>234</th>
-		<th>3274</th>
+		<th>3288</th>
 		<th>0</th>
-		<th>128976</th>
-		<th>0</th>
+		<th>128830</th>
+		<th>2151</th>
 	</tr></tfoot></table>
 
 ## Future plans
