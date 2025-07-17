@@ -52,24 +52,11 @@ source code.
   ```
   * A `cross` target is available via the `Makefile` that attempts to
     build `proxy` binaries for all supported `GOOS` and `GOARCH`
-    combinations.  At the time of writing, **12** operating systems
-    are supported and **41** binaries are built:
-    * AIX (ppc64)
-    * Android (arm64)
-    * Darwin (amd64, arm64)
-    * Dragonfly (amd64)
-    * FreeBSD (386, amd64, arm, arm64, riscv64)
-    * illumos (amd64)
-    * Linux (386, amd64, arm, arm64, loong64, mips, mips64, mips64le,
-      mipsle, ppc64, ppc64le, riscv64, s390x)
-    * NetBSD (386, amd64, arm, arm64)
-    * OpenBSD (386, amd64, arm, arm64, ppc64, riscv64)
-    * Plan 9 (386, amd64, arm)
-    * Solaris (amd64)
-    * Windows (386, amd64, arm64)
-[]()
+    combinations.  At the time of writing, 41 binaries are build, for
+    the 12 operating systems currently supported: AIX, Android, macOS,
+    Dragonfly BSD, FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9,
+    Solaris, and Windows.
 
-[]()
 * You can also install this software using `go install`:
   ```sh
   go install gitlab.com/dps8m/proxy@latest

@@ -52,24 +52,11 @@ source code.
   ```
   * A `cross` target is available via the `Makefile` that attempts to
     build `proxy` binaries for all supported `GOOS` and `GOARCH`
-    combinations.  At the time of writing, **12** operating systems
-    are supported and **41** binaries are built:
-    * AIX (ppc64)
-    * Android (arm64)
-    * Darwin (amd64, arm64)
-    * Dragonfly (amd64)
-    * FreeBSD (386, amd64, arm, arm64, riscv64)
-    * illumos (amd64)
-    * Linux (386, amd64, arm, arm64, loong64, mips, mips64, mips64le,
-      mipsle, ppc64, ppc64le, riscv64, s390x)
-    * NetBSD (386, amd64, arm, arm64)
-    * OpenBSD (386, amd64, arm, arm64, ppc64, riscv64)
-    * Plan 9 (386, amd64, arm)
-    * Solaris (amd64)
-    * Windows (386, amd64, arm64)
-[]()
+    combinations.  At the time of writing, 41 binaries are build, for
+    the 12 operating systems currently supported: AIX, Android, macOS,
+    Dragonfly BSD, FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9,
+    Solaris, and Windows.
 
-[]()
 * You can also install this software using `go install`:
   ```sh
   go install gitlab.com/dps8m/proxy@latest
@@ -180,7 +167,7 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g61655bd+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g52e3319+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -368,13 +355,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>349</th>
+		<th>336</th>
 		<th>64</th>
 		<th>0</th>
-		<th>285</th>
+		<th>272</th>
 		<th>0</th>
-		<th>14049</th>
-		<th>270</th>
+		<th>13700</th>
+		<th>259</th>
 	</tr><tr>
 		<th>License</th>
 		<th>1</th>
@@ -398,13 +385,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>392</th>
+		<th>379</th>
 		<th>65</th>
 		<th>0</th>
-		<th>327</th>
+		<th>314</th>
 		<th>0</th>
-		<th>16586</th>
-		<th>310</th>
+		<th>16237</th>
+		<th>299</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -429,13 +416,13 @@ It is also considerably simpler (per
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>4266</th>
+		<th>4240</th>
 		<th>744</th>
 		<th>234</th>
-		<th>3288</th>
+		<th>3262</th>
 		<th>0</th>
-		<th>128830</th>
-		<th>2151</th>
+		<th>128132</th>
+		<th>2140</th>
 	</tr></tfoot></table>
 
 ## Future plans
