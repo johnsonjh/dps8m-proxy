@@ -166,14 +166,14 @@ func (a *altHostFlag) String() string {
 func (a *altHostFlag) Set(value string) error {
 	parts := strings.SplitN(value, "@", 2)
 	if len(parts) != 2 {
-		return fmt.Errorf("invalid alt-host format: %s, expected username@host:port", value)
+		return fmt.Errorf("invalid alt-host format: %s, expected sshuser@host:port", value)
 	}
 
 	username := parts[0]
 	hostPort := parts[1]
 
 	if _, ok := altHosts[username]; ok {
-		return fmt.Errorf("duplicate alt-host entry for username: %s", username)
+		return fmt.Errorf("duplicate alt-host entry for sshuser: %s", username)
 	}
 
 	_, _, err := net.SplitHostPort(hostPort)
@@ -244,7 +244,7 @@ func init() {
 
 	pflag.VarP(&altHostFlag{},
 		"alt-host", "a",
-		"Alternate TELNET targets [username@host:port]\n   (multiple allowed)")
+		"Alternate TELNET targets [sshuser@host:port]\n   (multiple allowed)")
 
 	pflag.BoolVarP(&debugNegotiation,
 		"debug", "d", false,
