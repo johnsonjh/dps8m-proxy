@@ -176,12 +176,12 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-17 g0123267) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g17d8115+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.6  |
 | ulikunitz/xz              | v0.5.12 |
@@ -204,6 +204,11 @@ DPS8M Proxy v0.0.0 (2025-Jul-17 g0123267) [linux/amd64]
   ```sh
   sudo setcap 'cap_net_bind_service=+ep' "/path/to/proxy"
   ```
+
+* If this is necessary (*i.e.,* a non-root user on Linux is attempting
+  to bind an SSH listener to a privileged port and the
+  `CAP_NET_BIND_SERVICE` is not currently effective), the software
+  should provide a warning message with the above instructions.
 
 ### Admin interaction
 
@@ -364,13 +369,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>345</th>
-		<th>68</th>
+		<th>350</th>
+		<th>69</th>
 		<th>0</th>
-		<th>277</th>
+		<th>281</th>
 		<th>0</th>
-		<th>14049</th>
-		<th>264</th>
+		<th>14307</th>
+		<th>268</th>
 	</tr><tr>
 		<th>License</th>
 		<th>1</th>
@@ -394,13 +399,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>388</th>
-		<th>69</th>
+		<th>393</th>
+		<th>70</th>
 		<th>0</th>
-		<th>319</th>
+		<th>323</th>
 		<th>0</th>
-		<th>16584</th>
-		<th>304</th>
+		<th>16844</th>
+		<th>308</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -425,13 +430,13 @@ It is also considerably simpler (per
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>4258</th>
-		<th>752</th>
+		<th>4268</th>
+		<th>754</th>
 		<th>234</th>
-		<th>3272</th>
+		<th>3280</th>
 		<th>0</th>
-		<th>128828</th>
-		<th>2145</th>
+		<th>129346</th>
+		<th>2149</th>
 	</tr></tfoot></table>
 
 ## Future plans
