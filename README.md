@@ -185,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 ge3e98ba+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g22c5570+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -333,7 +333,7 @@ This is a from-scratch re-implementation (in
 [Go](https://go.dev/)) of an older legacy program of the same name.
 
 The original software used a multi-process architecture and consisted
-of nearly **15,000 SLOC** of haphazardly constructed code: ≅14,000
+of nearly **15,000 lines** of haphazardly constructed code: ≅14,000
 lines of mostly [C-Kermit](https://www.kermitproject.org/) (*yes, the
 [programming language](https://www.kermitproject.org/ckscripts.html)*)
 and [ksh93](https://github.com/ksh93/ksh) (along with some C, Python,
