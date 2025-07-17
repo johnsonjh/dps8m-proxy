@@ -156,7 +156,7 @@ hopefully, documented here:
     of the target-specific text files do not exist, then the standard
     files will be served.
   * To disable the file-based banner for a specific targets only, you
-    can create empty files using the naming scheme describes above.
+    can create empty files using the naming scheme described above.
     You can also remove *all* of these files if you don’t want to
     use this functionality.
 
@@ -185,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g74d09b2+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 gdffd0a0+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
