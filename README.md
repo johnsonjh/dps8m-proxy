@@ -176,12 +176,12 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-17 gb4a2f15) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g0bad134+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.6  |
 | ulikunitz/xz              | v0.5.12 |
@@ -266,6 +266,7 @@ a session to access the following following features from a menu:
 * `B` sends an IAC `BREAK` signal to the remote host
 * `K` toggles the transparent key remapping mode, which translates
   modern `xterm`/`VT320` movement key inputs to Emacs sequences:
+
   |             Input | Output        |
   |------------------:|:--------------|
   | `Control + Up`    | `Escape, [`   |
@@ -281,6 +282,7 @@ a session to access the following following features from a menu:
   | `Down`            | `Control + N` |
   | `Right`           | `Control + F` |
   | `Left`            | `Control + B` |
+
 * `N` sends an IAC `NOP` (*No Operation*) to the remote host
 * `S` displays the status the session and some statistics:
   ```
@@ -369,12 +371,12 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>350</th>
-		<th>69</th>
+		<th>352</th>
+		<th>71</th>
 		<th>0</th>
 		<th>281</th>
 		<th>0</th>
-		<th>14307</th>
+		<th>14309</th>
 		<th>268</th>
 	</tr><tr>
 		<th>License</th>
@@ -399,12 +401,12 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>393</th>
-		<th>70</th>
+		<th>395</th>
+		<th>72</th>
 		<th>0</th>
 		<th>323</th>
 		<th>0</th>
-		<th>16842</th>
+		<th>16846</th>
 		<th>308</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -430,12 +432,12 @@ It is also considerably simpler (per
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>4268</th>
-		<th>754</th>
+		<th>4272</th>
+		<th>758</th>
 		<th>234</th>
 		<th>3280</th>
 		<th>0</th>
-		<th>129344</th>
+		<th>129350</th>
 		<th>2149</th>
 	</tr></tfoot></table>
 
