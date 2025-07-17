@@ -11,13 +11,13 @@
 
 The **`proxy`** (or **`dps8m-proxy`**) program acts as a multi-user
 *terminal server* and proxy, accepting incoming **SSH** connections on
-the front-end and relaying (*or proxying*) these connections to one or
-more **TELNET** connections on the back-end.
+the front-end (*listeners*) and proxying these connections to one or
+more **TELNET** connections on the back-end (*targets*).
 
-Although this project was originally developed to meet the needs of
-the **BAN.AI Public Access Multics** system and the
-[DPS8M Simulator](https://dps8m.gitlab.io) projects, it may be useful
-to anyone who wants to provide SSH access to legacy systems.
+This project was originally developed to meet the needs of the
+**BAN.AI Public Access Multics** system and the
+[DPS8M Simulator](https://dps8m.gitlab.io) project, but may be useful
+to anyone who wants to needs to offer SSH access to legacy systems.
 
 ## Features
 
@@ -26,7 +26,7 @@ to anyone who wants to provide SSH access to legacy systems.
 * ✅ Access control whitelist/blacklist (by IP address or CIDR block)
 * ✅ Independent console and session logging (by date/time and host)
 * ✅ Automatic logfile compression (gzip, xz, zstandard)
-* ✅ Banners for accepted, denied, and blocked connections (per target)
+* ✅ Banners for accepted, denied, and blocked connections (configurable per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
 * ✅ Interactive connection management for administrators
 * ✅ User access to **TELNET** features (*e.g.*, line BREAK, AYT) and statistics
@@ -103,7 +103,7 @@ including the versions of all embedded dependencies and the version
 of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g331a5c3+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g201ee46+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -133,13 +133,13 @@ If you need to see even more details, use `go version -m proxy`.
 
 ### Admin interaction
 
-* The running proxy can be controlled with the following console
+* The running proxy can be controlled with the following admin console
   commands:
   * `?` - Show help text
   * `c` - Show proxy configuration
   * `v` - Show version details
   * `l` - List active connections
-  * `k` - Kill connection
+  * `k` - Kill a connection
   * `d` - Deny new connections
   * `r` - Reload access control lists
   * `q` - Graceful shutdown
@@ -147,10 +147,27 @@ If you need to see even more details, use `go version -m proxy`.
 []()
 
 []()
-* NOTE: When the *Deny new connections* mode is active, any logging
-  of new *denied* connections is suppressed.  This makes the `d` mode
-  very helpful to temporarily enable if you watching the console log
-  files or trying to use the admin console to kill connections.
+
+Most of these admin console commands are straightforward and should
+be self-explanatory, although there are a few options that merit
+further explanatoin:
+
+* When the *Graceful shutdown* mode is active, any new connections are
+  are denied (and are served an appropriate `deny.txt`).  Once all
+  clients have disconnected, the proxy software will exit.  Note that
+  new *monitoring sessions* can still connect to observe active users,
+  as these sessions are automatically closed when their observation
+  target disconnects.
+
+* When the *Deny new connections* mode is active, any new connections
+  are denied (and are served an appropraiote `deny.txt`).  Also, any
+  *logging* of new connections, including denied and rejected
+  connections, is suppressed.  This can be useful if the admin console
+  is overwhelmed with logging activity (such as during bot attacks,
+  busy periods, or when troubleshooting).  Activating this mode can
+  help reduce console noise, making it easier to perform admin actions
+  such as viewing the configuration, or listing and killing active
+  connections.
 
 ### Signals
 
@@ -223,15 +240,136 @@ install.
 
 The new implementation uses lightweight *Goroutines* in place of
 spawning multiple processes, resulting in significantly improved
-performance and reduced system overhead.
+performance and reduced system overhead, and is considerably smaller:
+
+<table id="scc-table">
+	<thead><tr>
+		<th>Language</th>
+		<th>Files</th>
+		<th>Lines</th>
+		<th>Blank</th>
+		<th>Comment</th>
+		<th>Code</th>
+		<th>Complexity</th>
+		<th>Bytes</th>
+	</tr></thead>
+	<tbody><tr>
+		<th>Go</th>
+		<th>7</th>
+		<th>3110</th>
+		<th>537</th>
+		<th>152</th>
+		<th>2421</th>
+		<th>0</th>
+		<th>84931</th>
+	</tr><tr>
+		<th>Plain Text</th>
+		<th>4</th>
+		<th>41</th>
+		<th>5</th>
+		<th>0</th>
+		<th>36</th>
+		<th>0</th>
+		<th>2296</th>
+	</tr><tr>
+		<th>YAML</th>
+		<th>2</th>
+		<th>39</th>
+		<th>1</th>
+		<th>5</th>
+		<th>33</th>
+		<th>0</th>
+		<th>882</th>
+	</tr><tr>
+		<th>Go Template</th>
+		<th>1</th>
+		<th>268</th>
+		<th>55</th>
+		<th>0</th>
+		<th>213</th>
+		<th>0</th>
+		<th>10093</th>
+	</tr><tr>
+		<th>License</th>
+		<th>1</th>
+		<th>22</th>
+		<th>4</th>
+		<th>0</th>
+		<th>18</th>
+		<th>0</th>
+		<th>1121</th>
+	</tr><tr>
+		<th>Makefile</th>
+		<th>1</th>
+		<th>204</th>
+		<th>41</th>
+		<th>47</th>
+		<th>116</th>
+		<th>0</th>
+		<th>5981</th>
+	</tr><tr>
+		<th>Markdown</th>
+		<th>1</th>
+		<th>311</th>
+		<th>56</th>
+		<th>0</th>
+		<th>255</th>
+		<th>0</th>
+		<th>12630</th>
+	</tr><tr>
+		<th>Shell</th>
+		<th>1</th>
+		<th>94</th>
+		<th>24</th>
+		<th>27</th>
+		<th>43</th>
+		<th>0</th>
+		<th>2465</th>
+	</tr><tr>
+		<th>TOML</th>
+		<th>1</th>
+		<th>15</th>
+		<th>3</th>
+		<th>3</th>
+		<th>9</th>
+		<th>0</th>
+		<th>543</th>
+	</tr><tr>
+		<th>gitignore</th>
+		<th>1</th>
+		<th>17</th>
+		<th>0</th>
+		<th>2</th>
+		<th>15</th>
+		<th>0</th>
+		<th>234</th>
+	</tr></tbody>
+	<tfoot><tr>
+		<th>Total</th>
+		<th>20</th>
+		<th>4121</th>
+		<th>726</th>
+		<th>236</th>
+		<th>3159</th>
+		<th>0</th>
+    	<th>121176</th>
+	</tr></tfoot>
+	</table>
 
 ## Future plans
 
-Some features are still missing in this implementation and will be
-added in future updates:
+1. Some features are still missing in this implementation and will be
+   added in future updates.  Some of the features of the original
+   legacy software that have not yet been re-implemented include
+   *CAPTCHA*s, throttling, load-balancing, flow control, SSH targets,
+   and TELNET listeners.
 
-* The original legacy software had features not yet re-implemented
-  like *CAPTCHA*s, throttling, load-balancing, and flow control.
+2. When users access an SSH listener, the connecting client may supply
+   a password or present public keys for authentication.  These
+   authentication attempts are currently recorded, but are not
+   otherwise used by the proxy.  A future update may allow for public
+   keys to be used for pre-authentication or to influence target
+   routing.
 
 ## Compressed logs
 

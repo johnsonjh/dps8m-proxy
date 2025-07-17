@@ -172,13 +172,24 @@ README.md doc: README.md.tmpl proxy
 	@printf '%s\n' "📚 Building README.md..."
 	@$$(command -v perl > /dev/null 2>&1) || \
 		{ printf '%s\n' "⚠️ perl not found!"; exit 1; }
+	@$$(command -v scc > /dev/null 2>&1) || \
+		{ printf '%s\n' "⚠️ scc not found!"; exit 1; }
 	$(CP) README.md.tmpl README.md
+	@printf '%s\n' "🐪 Perl: Inserting version info..."
 	$(PERL) -i -pe \
-		'BEGIN {($$v=qx(./proxy -v 2>&1))=~s/^\s+|\s+$$//g;$$v=~s/\r//g;} \
-		s!===VERSION===!$$v!g' README.md
+	'BEGIN { ($$v=qx(./proxy -v 2>&1))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
+	s!===VERSION===!$$v!g' README.md
+	grep -q '===VERSION===' README.md || exit 0
+	@printf '%s\n' "🐪 Perl: Inserting help info..."
 	$(PERL) -i -pe \
-		'BEGIN {($$v=qx(./proxy -h 2>&1))=~s/^\s+|\s+$$//g;$$v=~s/\r//g;} \
-		s!===HELP===!$$v!g' README.md
+	'BEGIN { ($$v=qx(./proxy -h 2>&1))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
+	s!===HELP===!$$v!g' README.md
+	grep -q '===HELP===' README.md || exit 0
+	@printf '%s\n' "🐪 Perl: Inserting scc output..."
+	$(PERL) -i -pe \
+	'BEGIN { ($$v=qx(scc --no-size --no-cocomo -cd -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
+	s!===SCC===!$$v!g' README.md
+	grep -q '===SCC===' README.md || exit 0
 
 ##############################################################################
 # Target: cross
