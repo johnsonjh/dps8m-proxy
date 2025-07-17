@@ -1145,8 +1145,9 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 	if !suppressLogs {
 		log.Printf("INITIATE [%s] %s", sid, host)
-		sshSessionsTotal.Add(1)
 	}
+
+	sshSessionsTotal.Add(1)
 
 	config := &ssh.ServerConfig{
 		//revive:disable:unused-parameter
@@ -1604,6 +1605,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 		return
 	}
+
 	telnetConnectionsTotal.Add(1)
 
 	if tcp2, ok := remote.(*net.TCPConn); ok {
