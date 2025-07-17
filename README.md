@@ -12,16 +12,16 @@
 The **`proxy`** (or **`dps8m-proxy`**) program acts as a multi-user
 *terminal server* and proxy, accepting incoming **SSH** connections on
 the front-end (*listeners*) and proxying these connections to one or
-more **TELNET** connections on the back-end (*targets*).
+more TELNET connections on the back-end (*targets*).
 
 This project was originally developed to meet the needs of the
-**BAN.AI Public Access Multics** system and the
+*BAN.AI Public Access Multics* system and the
 [DPS8M Simulator](https://dps8m.gitlab.io) project, but may be useful
 to anyone who wants to needs to offer SSH access to legacy systems.
 
 ## Features
 
-* ✅ **SSH**⟷**TELNET** gateway
+* ✅ SSH⟷TELNET gateway
 * ✅ Full IPv6 support
 * ✅ Access control whitelist/blacklist (by IP address or CIDR block)
 * ✅ Independent console and session logging (by date/time and host)
@@ -29,7 +29,7 @@ to anyone who wants to needs to offer SSH access to legacy systems.
 * ✅ Banners for accepted, denied, and blocked connections (configurable per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
 * ✅ Interactive connection management for administrators
-* ✅ User access to **TELNET** features (*e.g.*, line BREAK, AYT) and statistics
+* ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
 * ✅ Link filtering
 * ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
 * ✅ Live streaming connection sharing (read-only)
@@ -39,14 +39,8 @@ to anyone who wants to needs to offer SSH access to legacy systems.
 
 ### Installation
 
-* The software can be installed using `go install`:
-
-  ```sh
-  go install gitlab.com/dps8m/proxy@latest
-  ```
-  * This will download the needed source, compile, and install the
-    binary to `${GOEXE}/bin/proxy` (which will be
-    `${HOME}/go/bin/proxy` for most users).
+A recent version of [Go](https://go.dev/) is required to build from
+source code.
 
 * You can also clone the
   [`git` repository](https://gitlab.com/dps8m/proxy.git) and build
@@ -57,6 +51,29 @@ to anyone who wants to needs to offer SSH access to legacy systems.
   cd proxy
   make
   ```
+  * A `cross` target is available via the `Makefile` that attempts to
+    build `proxy` binaries for all supported `GOOS` and `GOARCH`
+    combinations.  At the time of writing, **41** binaries are built:
+    aix/ppc64, android/arm64, darwin/amd64, darwin/arm64,
+    dragonfly/amd64, freebsd/386, freebsd/amd64, freebsd/arm,
+    freebsd/arm64, freebsd/riscv64, illumos/amd64, linux/386,
+    linux/amd64, linux/arm, linux/arm64, linux/loong64, linux/mips,
+    linux/mips64, linux/mips64le, linux/mipsle, linux/ppc64,
+    linux/ppc64le, linux/riscv64, linux/s390x, netbsd/386,
+    netbsd/amd64, netbsd/arm, netbsd/arm64, openbsd/386,
+    openbsd/amd64, openbsd/arm, openbsd/arm64, openbsd/ppc64,
+    openbsd/riscv64, plan9/386, plan9/amd64, plan9/arm, solaris/amd64,
+    windows/386, windows/amd64, and windows/arm64.
+
+* You can also install this software using `go install`:
+
+  ```sh
+  go install gitlab.com/dps8m/proxy@latest
+  ```
+  * This will download the needed source, compile, and install the
+    binary to `${GOEXE}/bin/proxy` (which will be
+    `${HOME}/go/bin/proxy` for most users).
+
 
 ### Invocation
 
@@ -159,7 +176,7 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 ge3e61bc+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 gc2401dd+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -346,12 +363,12 @@ It is also considerably simpler, per
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>327</th>
-		<th>64</th>
+		<th>344</th>
+		<th>66</th>
 		<th>0</th>
-		<th>263</th>
+		<th>278</th>
 		<th>0</th>
-		<th>13240</th>
+		<th>14126</th>
 		<th>0</th>
 	</tr><tr>
 		<th>License</th>
@@ -376,12 +393,12 @@ It is also considerably simpler, per
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>370</th>
-		<th>65</th>
+		<th>387</th>
+		<th>67</th>
 		<th>0</th>
-		<th>305</th>
+		<th>320</th>
 		<th>0</th>
-		<th>15777</th>
+		<th>16663</th>
 		<th>0</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -407,12 +424,12 @@ It is also considerably simpler, per
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>4222</th>
-		<th>744</th>
+		<th>4256</th>
+		<th>748</th>
 		<th>234</th>
-		<th>3244</th>
+		<th>3274</th>
 		<th>0</th>
-		<th>127212</th>
+		<th>128984</th>
 		<th>0</th>
 	</tr></tfoot></table>
 
