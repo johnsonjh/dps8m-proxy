@@ -9,10 +9,10 @@
 
 ## Overview
 
-The **`proxy`** (or **`dps8m-proxy`**) program acts as a multi-user
-*terminal server* and proxy, accepting incoming **SSH** connections on
-the front-end (*listeners*) and proxying these connections to one or
-more TELNET connections on the back-end (*targets*).
+The **`proxy`** program acts as a multi-user *terminal server* and
+proxy, accepting incoming SSH connections on the front-end
+(*listeners*) and proxying these connections to one or more TELNET
+connections on the back-end (*targets*).
 
 This project was originally developed to meet the needs of the
 *BAN.AI Public Access Multics* system and the
@@ -21,11 +21,11 @@ to anyone who wants to needs to offer SSH access to legacy systems.
 
 ## Features
 
-* ✅ SSH⟷TELNET gateway
+* ✅ SSH ⟷ TELNET gateway
 * ✅ Full IPv6 support
 * ✅ Access control whitelist/blacklist (by IP address or CIDR block)
 * ✅ Independent console and session logging (by date/time and host)
-* ✅ Automatic logfile compression (gzip, xz, zstandard)
+* ✅ Automatic logfile compression (*gzip*, *xz*, *zstandard*)
 * ✅ Banners for accepted, denied, and blocked connections (configurable per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
 * ✅ Interactive connection management for administrators
@@ -42,28 +42,32 @@ to anyone who wants to needs to offer SSH access to legacy systems.
 A recent version of [Go](https://go.dev/) is required to build from
 source code.
 
-* You can also clone the
+* You can clone the
   [`git` repository](https://gitlab.com/dps8m/proxy.git) and build
   the source code with `make`:
+
   ```sh
   git clone https://gitlab.com/dps8m/proxy.git
   cd proxy
   make
   ```
-  * A `cross` target is available via the `Makefile` that attempts to
-    build `proxy` binaries for all supported `GOOS` and `GOARCH`
-    combinations.  At the time of writing, 41 binaries are build, for
-    the 12 operating systems currently supported: AIX, Android, macOS,
-    Dragonfly BSD, FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9,
-    Solaris, and Windows.
+
+* A `cross` target is available via the `Makefile` that attempts to
+  build `proxy` binaries for all supported `GOOS` and `GOARCH`
+  combinations.  At the time of writing, 41 binaries are built for
+  12 operating systems (running on 13 different architectures):
+  IBM AIX, Android, Apple macOS, Dragonfly BSD, FreeBSD, illumos,
+  Linux, NetBSD, OpenBSD, Plan 9, Solaris, and Microsoft Windows.
 
 * You can also install this software using `go install`:
+
   ```sh
   go install gitlab.com/dps8m/proxy@latest
   ```
-  * This will download the needed source, compile, and install the
-    binary to `${GOEXE}/bin/proxy` (which will be
-    `${HOME}/go/bin/proxy` for most users).
+
+* Installations using `go install` download the required sources,
+  compile, and install the binary to `${GOEXE}/bin/proxy` (which will
+  be `${HOME}/go/bin/proxy` for most users).
 
 
 ### Invocation
@@ -167,7 +171,7 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g52e3319+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 gd44ac1f+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -355,12 +359,12 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>336</th>
-		<th>64</th>
+		<th>340</th>
+		<th>68</th>
 		<th>0</th>
 		<th>272</th>
 		<th>0</th>
-		<th>13700</th>
+		<th>13727</th>
 		<th>259</th>
 	</tr><tr>
 		<th>License</th>
@@ -385,12 +389,12 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>379</th>
-		<th>65</th>
+		<th>383</th>
+		<th>69</th>
 		<th>0</th>
 		<th>314</th>
 		<th>0</th>
-		<th>16237</th>
+		<th>16264</th>
 		<th>299</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -416,12 +420,12 @@ It is also considerably simpler (per
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>4240</th>
-		<th>744</th>
+		<th>4248</th>
+		<th>752</th>
 		<th>234</th>
 		<th>3262</th>
 		<th>0</th>
-		<th>128132</th>
+		<th>128186</th>
 		<th>2140</th>
 	</tr></tfoot></table>
 
