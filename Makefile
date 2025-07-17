@@ -67,7 +67,7 @@ lint check:
 	$(MAKE) clean
 	@printf '\n%s\n' "🧩 Running linters..."
 	$(MAKE) revive reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
-		errcheck shellcheck shfmt golangci-lint
+		errcheck shellcheck shfmt codespell golangci-lint
 	@printf '\n%s\n' "🧩 Running 'make cross'..."
 	$(MAKE) cross
 	@printf '\n%s\n' "🧩 Running 'make clean'..."
@@ -164,7 +164,16 @@ shfmt: .cross.sh
 shellcheck: .cross.sh
 	@$$(command -v shellcheck > /dev/null 2>&1) || \
 		{ printf '%s\n' "⚠️ shellcheck not found!"; exit 0; } ; \
-		set -x; shellcheck -o any,all .cross.sh
+		set -x; shellcheck -s sh -o any,all .cross.sh
+
+##############################################################################
+# Target: codespell
+
+.PHONY: codespell
+codespell:
+	@$$(command -v codespell > /dev/null 2>&1) || \
+		{ printf '%s\n' "⚠️ codespell not found!"; exit 0; } ; \
+		set -x; codespell .
 
 ##############################################################################
 # Target: govet
