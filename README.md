@@ -10,9 +10,9 @@
 ## Overview
 
 The **`proxy`** program acts as a multi-user *terminal server* and
-relay, accepting incoming SSH connections on the front-end
+relay, accepting incoming SSH client connections on the front-end
 (*listeners*) and proxying these connections to one or more TELNET
-connections on the back-end (*targets*).
+servers on the back-end (*targets*).
 
 This project was originally developed to meet the needs of the
 *BAN.AI Public Access Multics* system and the
@@ -184,12 +184,12 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-17 gc698dd6) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 gf0758c8+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
