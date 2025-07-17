@@ -7,6 +7,8 @@
 # Configuration
 
 SHELL=/bin/sh
+CP=cp -f
+PERL=perl
 RM=rm -f
 .NOTPARALLEL:
 
@@ -24,7 +26,7 @@ proxy:
 	@env CGO_ENABLED=0 go build -trimpath -v && \
 	test -x proxy 2> /dev/null && \
 		{ \
-			printf '\n%s\n' "Build successful:"; \
+			printf '\n%s\n' "✅ Build successful:"; \
 				go version -m proxy 2> /dev/null | \
 				grep -E "$$(printf '\t')(mod|dep)$$(printf '\t')" \
 					2> /dev/null; \
@@ -56,9 +58,21 @@ distclean: clean
 ##############################################################################
 # Target: lint
 
-.PHONY: lint
-lint: reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
-	revive errcheck shellcheck
+.PHONY: lint check
+lint check:
+	@printf '%s\n' "🧩 Running 'make clean'..."
+	$(MAKE) clean
+	@printf '\n%s\n' "🧩 Running 'make doc'..."
+	$(MAKE) doc
+	@printf '\n%s\n' "🧩 Running 'make clean'..."
+	$(MAKE) clean
+	@printf '\n%s\n' "🧩 Running linters..."
+	$(MAKE) revive reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
+		errcheck shellcheck
+	@printf '\n%s\n' "🧩 Running 'make cross'..."
+	$(MAKE) cross
+	@printf '\n%s\n' "🧩 Running 'make clean'..."
+	$(MAKE) clean
 
 ##############################################################################
 # Target: reuse
@@ -143,12 +157,26 @@ govet:
 	go vet
 
 ##############################################################################
+# Target: README.md
+
+.PHONY: doc
+README.md doc: README.md.tmpl proxy
+	@$$(command -v perl > /dev/null 2>&1) || \
+		{ printf '%s\n' "⚠️ perl not found!"; exit 1; }
+	$(CP) README.md.tmpl README.md
+	$(PERL) -i -pe \
+		'BEGIN {($$v=qx(./proxy -v 2>&1))=~s/^\s+|\s+$$//g;$$v=~s/\r//g;} \
+		s!===VERSION===!$$v!g' README.md
+	$(PERL) -i -pe \
+		'BEGIN {($$v=qx(./proxy -h 2>&1))=~s/^\s+|\s+$$//g;$$v=~s/\r//g;} \
+		s!===HELP===!$$v!g' README.md
+
+##############################################################################
 # Target: cross
 
 .PHONY: cross
 cross: .cross.sh
 	-@./.cross.sh
-
 
 ##############################################################################
 # vim: set ft=make noexpandtab tabstop=4 cc=78 :

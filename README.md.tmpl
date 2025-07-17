@@ -63,37 +63,7 @@ to anyone who wants to provide modern SSH access to legacy systems.
 * The proxy can be invoked with the following command-line arguments:
 
 ```
-Usage of ./proxy:
-  -0, --allow-root              Allow running as root (UID 0)
-  -l, --ssh-addr strings        SSH listener address
-                                   [e.g., ":2222", "[::1]:8000"]
-                                   (multiple allowed) (default ":2222")
-  -n, --no-banner               Disable SSH connection banner
-  -t, --telnet-host string      Default TELNET target [host:port]
-                                   (default "127.0.0.1:6180")
-  -a, --alt-host string         Alternate TELNET targets [sshuser@host:port]
-                                   (multiple allowed)
-  -d, --debug                   Debug TELNET negotiation
-  -L, --log-dir string          Base directory for logs (default "./log")
-  -o, --no-log                  Disable all session logging
-                                   (for console logging, see "--console-log")
-  -c, --console-log string      Enable console logging ["quiet", "noquiet"]
-  -C, --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
-                                   (default "gzip")
-  -s, --compress-level string   Compression level for gzip and zstd algorithms
-                                   ["fast", "normal", "high"]
-                                   (default "normal")
-  -x, --no-compress             Disable session and console log compression
-  -p, --log-perm octal          Permissions for new log files
-                                   [umask, e.g., "600", "644"] (default "600")
-  -P, --log-dir-perm octal      Permissions for new log directories
-                                   [umask, e.g., "755", "750"] (default "750")
-  -i, --idle-max int            Maximum connection idle time allowed [seconds]
-  -m, --time-max int            Maximum connection link time allowed [seconds]
-  -b, --blacklist string        Enable blacklist [filename] (no default)
-  -w, --whitelist string        Enable whitelist [filename] (no default)
-  -v, --version                 Show version information
-pflag: help requested
+===HELP===
 ```
 
 #### Version
@@ -103,20 +73,7 @@ including the versions of all embedded dependencies and the version
 of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 gf72871b+) [linux/amd64]
-
-+===========================+=========+
-| Component                 | Version |
-+===========================+=========+
-| dps8m/proxy               | v0.0.0* |
-| klauspost/compress        | v1.18.0 |
-| spf13/pflag               | v1.0.6  |
-| ulikunitz/xz              | v0.5.12 |
-| golang.org/x/crypto       | v0.40.0 |
-| kernel.org/.../libcap/cap | v1.2.76 |
-| kernel.org/.../libcap/psx | v1.2.76 |
-| Go compiler (gc)          | v1.24.5 |
-+===========================+=========+
+===VERSION===
 ```
 
 If you need to see even more details, use `go version -m proxy`.

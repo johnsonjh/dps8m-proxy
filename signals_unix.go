@@ -25,8 +25,7 @@ func runSignalHandlers() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan,
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT,
-		syscall.SIGHUP, syscall.SIGUSR1,
-		syscall.SIGUSR2)
+		syscall.SIGHUP, syscall.SIGUSR1, syscall.SIGUSR2)
 
 	go func() {
 		for s := range sigChan {
@@ -43,6 +42,7 @@ func runSignalHandlers() {
 					connectionsMutex.Unlock()
 					select {
 					case shutdownSignal <- struct{}{}:
+
 					default:
 					}
 				} else {

@@ -30,7 +30,7 @@ _S=$(go tool dist list \
   | grep -Ev '^js/wasm$|^wasip1/wasm$|^ios/|^android/(386|amd64|arm)$' \
   | awk 'BEGIN { FS="/" } /\// { print "GOOS="$1" GOARCH="$2 }' \
   | xargs -I{} printf '%s\n' '
-        export {} && printf "%s/%s\n" "${GOOS:?}" "${GOARCH:?}" &&
+        export {} && printf "🧩 %s/%s\n" "${GOOS:?}" "${GOARCH:?}" &&
         go build -trimpath -o ./cross.bin/proxy."${GOOS:?}"."${GOARCH:?}";')
 
 ##############################################################################

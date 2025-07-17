@@ -23,8 +23,7 @@ import (
 
 func runSignalHandlers() {
 	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan,
-		syscall.SIGINT, syscall.SIGHUP)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGHUP)
 
 	go func() {
 		for s := range sigChan {

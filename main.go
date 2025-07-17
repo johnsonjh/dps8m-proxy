@@ -535,6 +535,13 @@ func isGitSHA(s string) bool {
 func printVersion() {
 	versionString := "DPS8M Proxy"
 
+	versionString += func() string {
+		if v := getMainModuleVersion(); v != "" {
+			return " " + v
+		}
+		return ""
+	}()
+
 	if info, ok := debug.ReadBuildInfo(); ok {
 		var date, commit string
 		var modified bool
@@ -576,6 +583,9 @@ func printVersion() {
 
 	if showVersion {
 		fmt.Println(versionString)
+		fmt.Printf("\r\n")
+		printVersionTable()
+		fmt.Printf("\r\n")
 	} else {
 		log.Println(versionString)
 	}
@@ -631,6 +641,22 @@ func handleConsoleInput() {
 		case "c", "C":
 			listConfiguration()
 
+		case "v", "V":
+			fmt.Println("")
+			originalWriter := log.Writer()
+
+			if consoleLogFile != nil {
+				log.SetOutput(io.MultiWriter(os.Stdout))
+			} else {
+				log.SetOutput(os.Stdout)
+			}
+
+			printVersion()
+			fmt.Println("")
+			printVersionTable()
+			fmt.Println("")
+			log.SetOutput(originalWriter)
+
 		case "cg", "CG", "cG", "Cg":
 			listGoroutines()
 
@@ -671,6 +697,7 @@ func showHelp() {
 		"\r+========== HELP ===========+\r\n" +
 		"\r|                           |\r\n" +
 		"\r|  c - Show Configuration   |\r\n" +
+		"\r|  v - Show Version Info    |\r\n" +
 		"\r|  l - List Connections     |\r\n" +
 		"\r|  k - Kill Connection      |\r\n" +
 		"\r|  d - Deny Connections     |\r\n" +
@@ -2348,7 +2375,8 @@ func rotateConsoleLog() {
 		log.Fatalf("Failed to open console log file: %v", err)
 	}
 
-	fmt.Fprintf(os.Stderr, "%s Console Logging enabled (suppressing most output)\n", nowStamp())
+	fmt.Fprintf(
+		os.Stderr, "%s Console Logging enabled (suppressing console output)\n", nowStamp())
 
 	if consoleLog == "quiet" {
 		log.SetOutput(consoleLogFile)
