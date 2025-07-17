@@ -26,7 +26,7 @@ to anyone who wants to provide modern SSH access to legacy systems.
 * ✅ Access control whitelist/blacklist (by IP address or CIDR block)
 * ✅ Session monitoring and logging (by date/time and host)
 * ✅ Automatic logfile compression (gzip, xz, zstandard)
-* ✅ Banners for accepted, denied, and blocked connections
+* ✅ Banners for accepted, denied, and blocked connections (per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
 * ✅ Interactive connection management for administrators
 * ✅ User access to **TELNET** features (*e.g.*, line BREAK, AYT) and statistics
@@ -103,7 +103,7 @@ including the versions of all embedded dependencies and the version
 of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 gf72871b+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 gb7c0225+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -271,7 +271,7 @@ permissions—we assume you know what you’re doing!
 ## Security
 
 * The canonical home of this software is
-  [https://gitlab.com/dps8m/proxy](https://gitlab.com/dps8m/proxy).
+  [**\<https://gitlab.com/dps8m/proxy\>**](https://gitlab.com/dps8m/proxy).
 * This software is intended to be **secure**.  If you find any
   security-related problems, please do not hesitate to open an Issue
   or send an [e-mail](mailto:trnsz@pobox.com) to the author.
