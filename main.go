@@ -20,6 +20,7 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -178,7 +179,7 @@ func (a *altHostFlag) Set(value string) error {
 
 	_, _, err := net.SplitHostPort(hostPort)
 	if err != nil {
-		return fmt.Errorf("invalid host:port in alt-host '%s': %v", value, err)
+		return fmt.Errorf("invalid host:port in alt-host '%s': %w", value, err)
 	}
 
 	altHosts[username] = hostPort
@@ -364,7 +365,7 @@ func main() {
 
 	setupConsoleLogging()
 
-	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil {
+	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
 		log.Fatalf("Failed to create log directory: %v", err)
 	}
 
@@ -1650,7 +1651,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				if err != nil {
 					log.Printf("Error writing to remote for %s: %v", conn.ID, err)
 				}
-				atomic.AddUint64(&telnetOut, uint64(m))
+				atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
 				if _, err := logwriter.Write(escSequence); err != nil {
 					log.Printf("Error writing to log for %s: %v", conn.ID, err)
 				}
@@ -1688,7 +1689,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							if err != nil {
 								log.Printf("Error writing to remote for %s: %v", conn.ID, err)
 							}
-							atomic.AddUint64(&telnetOut, uint64(m))
+							atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
 							if _, err := logwriter.Write([]byte(replacement)); err != nil {
 								log.Printf("Error writing to log for %s: %v", conn.ID, err)
 							}
@@ -1702,7 +1703,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							if err != nil {
 								log.Printf("Error writing to remote for %s: %v", conn.ID, err)
 							}
-							atomic.AddUint64(&telnetOut, uint64(m))
+							atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
 							if _, err := logwriter.Write(escSequence); err != nil {
 								log.Printf("Error writing to log for %s: %v", conn.ID, err)
 							}
@@ -1714,7 +1715,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						if err != nil {
 							log.Printf("Error writing to remote for %s: %v", conn.ID, err)
 						}
-						atomic.AddUint64(&telnetOut, uint64(m))
+						atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
 						if _, err := logwriter.Write(escSequence); err != nil {
 							log.Printf("Error writing to log for %s: %v", conn.ID, err)
 						}
@@ -1729,7 +1730,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					if err != nil {
 						log.Printf("Error writing to remote for %s: %v", conn.ID, err)
 					}
-					atomic.AddUint64(&telnetOut, uint64(m))
+					atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
 					if _, err := logwriter.Write([]byte{b}); err != nil {
 						log.Printf("Error writing to log for %s: %v", conn.ID, err)
 					}
@@ -1744,7 +1745,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						log.Printf("Error writing to log for %s: %v", conn.ID, err)
 					}
 				}
-				if err != io.EOF {
+				if !errors.Is(err, io.EOF) {
 					log.Printf("SSH channel read error: %v", err)
 				}
 
@@ -1763,7 +1764,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			}
 			n, err := remote.Read(buf)
 			if err != nil {
-				if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				var netErr net.Error
+				if errors.As(err, &netErr) && netErr.Timeout() {
 					select {
 					case <-ctx.Done():
 						return
@@ -1906,7 +1908,8 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 	for {
 		n, err := remote.Read(buf)
 		if err != nil {
-			if ne, ok := err.(net.Error); ok && ne.Timeout() {
+			var ne net.Error
+			if errors.As(err, &ne) && ne.Timeout() {
 				break
 			}
 
@@ -2189,12 +2192,12 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 		fmt.Sprintf("%02d", now.Month()),
 		fmt.Sprintf("%02d", now.Day()),
 	)
-	if err := os.MkdirAll(dir, os.FileMode(logDirPerm)); err != nil {
+	if err := os.MkdirAll(dir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
 		return nil, "", err
 	}
 
 	dir = filepath.Join(dir, ipDir)
-	if err := os.MkdirAll(dir, os.FileMode(logDirPerm)); err != nil {
+	if err := os.MkdirAll(dir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
 		return nil, "", err
 	}
 
@@ -2218,7 +2221,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	base := fmt.Sprintf("%s_%s_%d", ts, sid, seq)
 	pathBase := filepath.Join(dir, base)
 	f, err := os.OpenFile(pathBase+".log",
-		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm))
+		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
 
 	return f, pathBase, err
 }
@@ -2366,14 +2369,14 @@ func rotateConsoleLog() {
 	logPath := getConsoleLogPath(time.Now())
 	logDir := filepath.Dir(logPath)
 
-	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil {
+	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
 		consoleLogMutex.Unlock()
 		log.Fatalf("Failed to create console log directory: %v", err)
 	}
 
 	var err error
 	consoleLogFile, err = os.OpenFile(logPath,
-		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm))
+		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
 	if err != nil {
 		consoleLogMutex.Unlock()
 		log.Fatalf("Failed to open console log file: %v", err)

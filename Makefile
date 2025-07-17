@@ -110,7 +110,7 @@ gotidydiff: go.mod
 golangci-lint:
 	@$$(command -v golangci-lint > /dev/null 2>&1) || \
 		{ printf '%s\n' "⚠️ golangci-lint not found!"; exit 0; } ; \
-		set -x; golangci-lint run
+		set -x; golangci-lint version && golangci-lint run
 
 ##############################################################################
 # Target: staticcheck

@@ -103,7 +103,7 @@ including the versions of all embedded dependencies and the version
 of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g11f4c14+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 ga0c7abf+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
