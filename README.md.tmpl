@@ -164,8 +164,9 @@ documented here:
 
 * If this is necessary (*i.e.,* a non-root user on Linux is attempting
   to bind an SSH listener to a privileged port and the
-  `CAP_NET_BIND_SERVICE` is not currently effective), the software
-  should provide a warning message with the above instructions.
+  `CAP_NET_BIND_SERVICE` capability is not currently effective), the
+  software should provide a warning message with the above
+  instructions.
 
 ### Admin interaction
 
@@ -183,7 +184,6 @@ documented here:
 []()
 
 []()
-
 Most of these admin console commands are straightforward and should
 be self-explanatory, although there are a few options that merit
 further clarification:
@@ -208,11 +208,14 @@ further clarification:
 ### Signals
 
 * The proxy also acts on the following signals:
-  * `SIGINT`, `SIGQUIT` - enables the *Immediate shutdown* mode
-  * `SIGUSR1` - enables the *Graceful shutdown* mode
-  * `SIGUSR2` - enables the *Deny new connections* mode
-  * `SIGHUP` - reloads *access control lists*
-    (`-whitelist`, `-blacklist`)
+
+ |    Signal | Action                                                          |
+ |----------:|:----------------------------------------------------------------|
+ | `SIGINT`  | Enables the **Immediate shutdown** mode                         |
+ | `SIGQUIT` | Enables the **Immediate shutdown** mode                         |
+ | `SIGUSR1` | Enables the **Graceful shutdown** mode                          |
+ | `SIGUSR2` | Enables the **Deny new connections** mode                       |
+ | `SIGHUP`  | Reloads *access control lists* (`--whitelist`, `--blacklist`)   |
 
 ### User interaction
 
@@ -290,15 +293,15 @@ It is also considerably simpler (per
 1. Some features are still missing in this implementation and will be
    added in future updates.  Some of the features of the original
    legacy software that have not yet been re-implemented include
-   *CAPTCHA*s, throttling, load-balancing, flow control, SSH targets,
-   and TELNET listeners.
+   text *CAPTCHA*s, throttling, load-balancing, flow control, SSH
+   targets, and TELNET listeners.
 
 2. When users access an SSH listener, the connecting client may supply
    a password or present public keys for authentication.  These
    authentication attempts are currently recorded, but are not
-   otherwise used by the proxy.  A future update may allow for public
-   keys to be used for pre-authentication or to influence target
-   routing.
+   otherwise used by the proxy.  A future update may allow for SSH
+   passwords and public keys to be used for pre-authentication or to
+   influence target routing.
 
 ## Compressed logs
 
