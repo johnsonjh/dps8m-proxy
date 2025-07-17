@@ -4,7 +4,7 @@ go 1.24.5
 
 require (
 	github.com/klauspost/compress v1.18.0
-	github.com/spf13/pflag v1.0.6
+	github.com/spf13/pflag v1.0.7
 	github.com/ulikunitz/xz v0.5.12
 	golang.org/x/crypto v0.40.0
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.76
