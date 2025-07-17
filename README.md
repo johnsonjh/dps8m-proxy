@@ -179,7 +179,7 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 gc5fa14a+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g270e978+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -383,13 +383,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>395</th>
-		<th>84</th>
+		<th>397</th>
+		<th>85</th>
 		<th>0</th>
-		<th>311</th>
+		<th>312</th>
 		<th>0</th>
-		<th>16056</th>
-		<th>298</th>
+		<th>16129</th>
+		<th>299</th>
 	</tr><tr>
 		<th>JSON</th>
 		<th>1</th>
@@ -423,13 +423,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>438</th>
-		<th>85</th>
+		<th>440</th>
+		<th>86</th>
 		<th>0</th>
-		<th>353</th>
+		<th>354</th>
 		<th>0</th>
-		<th>18593</th>
-		<th>338</th>
+		<th>18666</th>
+		<th>339</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -454,13 +454,13 @@ It is also considerably simpler (per
 	<tfoot><tr>
 		<th>Total</th>
 		<th>20</th>
-		<th>4393</th>
-		<th>789</th>
+		<th>4397</th>
+		<th>791</th>
 		<th>238</th>
-		<th>3366</th>
+		<th>3368</th>
 		<th>807</th>
-		<th>133773</th>
-		<th>2206</th>
+		<th>133919</th>
+		<th>2207</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -542,6 +542,8 @@ If you plan to make any changes to the [`Makefile`](Makefile) (or the
 need to be tested against [pdpmake](https://frippery.org/make/)
 (*with `PDPMAKE_POSIXLY_CORRECT` set*) and
 [yash](https://magicant.github.io/yash/) to ensure POSIX conformance.
+
+The `Makefile` provides a `lint` target that runs the necessary checks.
 
 ## Security
 
