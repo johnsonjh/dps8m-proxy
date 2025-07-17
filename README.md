@@ -96,14 +96,70 @@ Usage of ./proxy:
 pflag: help requested
 ```
 
-#### Version
+Most of these command-line arguments are straightforward and should 
+be obvious.  Those that require demystification are, hopefully,
+documented here:
 
-The `-v` or `--version` command shows detailed version information,
-including the versions of all embedded dependencies and the version
-of the Go compiler used to build the software:
+* Logging of sessions is *enabled* by default.  Logging of console
+  messages is *disabled* by default.  Console logging, if enabled,
+  supports two modes: `quiet` and `noquiet`.  In `quiet` mode, all
+  non-fatal messages are logged **only** to the log file, where in
+  `noquiet` mode, messages are logged to both the console and the log
+  file.
+
+* All incoming user are connected to the default TELNET target, unless
+  their connection matches an alternate target enabled with the
+  `--alt-host` flag.  The alt-host syntax is `sshuser@host:port`, where
+  `sshuser` is the SSH username, and the `host:port` is the TELNET
+  target.
+
+* All users connecting are shown a banner which includes details such
+  as the date and time of the session, their IP address, and possibly
+  a resolved host name.  This can be disabled with `--no-banner`.
+
+* There are three text files which can be displayed to connecting
+  users.  These are:
+
+  | File        | Purpose                                                                   |
+  :-------------:---------------------------------------------------------------------------:
+  | `block.txt` | Displayed before disconnecting connections matching the blacklist         |
+  | `deny.txt`  | Displayed when denying target sessions (*e.g.,* during graceful shutdown) |
+  | `issue.txt` | Displayed to users before they the session with the target begins         |
+
+  * When multiple targets defined using the `--alt-host` functionality,
+    the system will display a file that matches `-NAME` before the
+    `.txt` extension.  For example, if you have defined a target as 
+    `oldunix@10.0.5.9:3333` the proxy will look for
+    `block-oldunix.txt`, `deny-oldunix.txt`, and `issue-oldunix.txt`
+    files to serve to the connecting users, before beginning their
+    session (via TELNET to `10.0.5.9:3333`).  If a target-specific
+    text files does not exist, then the standard file will be served
+    (if existing).
+
+* You need to start the proxy with `--whitelist` and/or `--blacklist`
+  to enable the access control functionality.  If *only* the whitelist
+  is enabled, **all** connections will be denied by default.  If
+  *only* the whitelist is enabled, it will be impossible to exempt
+  individual IP addresses when an entire range has been blocked, so it
+  is recommended that you use with both lists, or the whitelist-only
+  mode.
+
+  * The format of the whitelist/blacklist is an IPv4 or IPv6 address
+    (*e.g.,* `23.215.0.138`, `2600:1406:bc00:53::b81e:94ce`), or a
+    CIDR block (*e.g.,* `123.45.0.0/17` which covers `123.45.0.0` to
+    `123.45.127.255`, or `2600:1408:ec00:36::/64` covering
+    `2600:1408:ec00:36:0000:0000:0000:0000` to
+    `2600:1408:ec00:36:ffff:ffff:ffff:ffff`).  The whitelist always
+    takes precedence over the blacklist.  If an address is allowed
+    due to a whitelist match which would have otherwise been blocked
+    by the blacklist, it is tagged as `EXEMPTED` in the logs.
+
+* The `-v` or `--version` command shows detailed version information,
+  including the versions of all embedded dependencies and the version
+  of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g29c0fd3+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 ge3e61bc+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -124,7 +180,7 @@ If you need to see even more details, use `go version -m proxy`.
 ### Port binding
 
 * If you want to listen on the regular SSH port of 22 (without
-  running as `root`, which is strongly discouraged) on Linux systems
+  running as `root`, which is strongly discouraged), on Linux systems
   you can use `setcap` to allow the proxy to bind to low ports:
 
   ```sh
@@ -150,7 +206,7 @@ If you need to see even more details, use `go version -m proxy`.
 
 Most of these admin console commands are straightforward and should
 be self-explanatory, although there are a few options that merit
-further explanatoin:
+further clarification:
 
 * When the *Graceful shutdown* mode is active, any new connections are
   are denied (and are served an appropriate `deny.txt`).  Once all
@@ -160,7 +216,7 @@ further explanatoin:
   target disconnects.
 
 * When the *Deny new connections* mode is active, any new connections
-  are denied (and are served an appropraiote `deny.txt`).  Also, any
+  are denied (and are served an appropriate `deny.txt`).  Also, any
   *logging* of new connections, including denied and rejected
   connections, is suppressed.  This can be useful if the admin console
   is overwhelmed with logging activity (such as during bot attacks,
@@ -238,10 +294,12 @@ and [ksh93](https://github.com/ksh93/ksh), with small amounts of C
 and Perl, which was difficult to maintain, configure, and securely
 install.
 
-This new implementation uses lightweight *Goroutines* instead of
+This new implementation many lightweight *Goroutines* instead of
 spawning multiple processes, resulting in significantly improved
-performance and reduced system overhead.  It is also considerably
-simpler:
+performance and reduced system overhead.
+
+It is also considerably simpler, per
+[`scc`](https://github.com/boyter/scc):
 
 <table id="scc-table">
 	<thead><tr>
@@ -288,12 +346,12 @@ simpler:
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>269</th>
-		<th>55</th>
+		<th>327</th>
+		<th>64</th>
 		<th>0</th>
-		<th>214</th>
+		<th>263</th>
 		<th>0</th>
-		<th>10101</th>
+		<th>13240</th>
 		<th>0</th>
 	</tr><tr>
 		<th>License</th>
@@ -313,17 +371,17 @@ simpler:
 		<th>47</th>
 		<th>116</th>
 		<th>0</th>
-		<th>5982</th>
+		<th>5957</th>
 		<th>0</th>
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>312</th>
-		<th>56</th>
+		<th>370</th>
+		<th>65</th>
 		<th>0</th>
-		<th>256</th>
+		<th>305</th>
 		<th>0</th>
-		<th>12638</th>
+		<th>15777</th>
 		<th>0</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -349,12 +407,12 @@ simpler:
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>4106</th>
-		<th>726</th>
+		<th>4222</th>
+		<th>744</th>
 		<th>234</th>
-		<th>3146</th>
+		<th>3244</th>
 		<th>0</th>
-		<th>120959</th>
+		<th>127212</th>
 		<th>0</th>
 	</tr></tfoot></table>
 
