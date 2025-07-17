@@ -52,12 +52,16 @@ source code.
   make
   ```
 
-* A `cross` target is available via the `Makefile` that attempts to
-  build `proxy` binaries for all supported `GOOS` and `GOARCH`
-  combinations.  At the time of writing, 41 binaries are built for
-  12 operating systems (running on 13 different architectures):
-  IBM AIX, Android, Apple macOS, Dragonfly BSD, FreeBSD, illumos,
-  Linux, NetBSD, OpenBSD, Plan 9, Solaris, and Microsoft Windows.
+* If you don’t have a (POSIX/GNU/BSD) `make` available for reason,
+  `go build` is sufficient.
+
+* A [`cross` script](.cross.sh) is available (or just  `make cross`)
+  that attempts to build `proxy` binaries for all supported `GOOS`
+  and `GOARCH` combinations.  At the time of writing, 41 binaries
+  are built for 12 operating systems (IBM AIX, Android, Apple macOS,
+  Dragonfly BSD, FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9,
+  Solaris, and Microsoft Windows) running on 13 different hardware
+  architectures.
 
 * You can also install this software using `go install`:
 
@@ -68,7 +72,6 @@ source code.
 * Installations using `go install` download the required sources,
   compile, and install the binary to `${GOEXE}/bin/proxy` (which will
   be `${HOME}/go/bin/proxy` for most users).
-
 
 ### Invocation
 
@@ -346,6 +349,34 @@ doing!
    mv ssh_host_rsa_key.tmp ssh_host_rsa_key.pem
    mv ssh_host_ed25519_key.tmp ssh_host_ed25519_key.pem 
    ```
+
+## Development
+
+For `proxy` development, besides the most recent version of
+[Go](https://go.dev/), you’ll also need a standard POSIX.1 shell
+environment (*at least* `sh`, `make`, `grep`, `awk`, *and* `sed`),
+[reuse](https://github.com/fsfe/reuse-tool),
+[staticcheck](https://staticcheck.dev/),
+[revive](https://revive.run/),
+[errcheck](https://github.com/kisielk/errcheck),
+[gofumpt](https://github.com/mvdan/gofumpt),
+[scc](https://github.com/boyter/scc),
+[codespell](https://github.com/codespell-project/codespell), and
+[Perl](https://www.perl.org/).
+
+While not absolutely required, it’s a good idea to have the latest
+[golangci-lint](https://golangci-lint.run/) installed.  We ship a
+[configuration file](.golangci.yml) file and try to make sure that
+all the tests pass using the most recently released version.
+
+If you plan to make any changes to the [`Makefile`](Makefile) (or the
+[.cross.sh](.cross.sh) script), you'll need
+[ShellCheck](https://www.shellcheck.net/), and
+[shfmt](https://github.com/mvdan/sh) installed, and all modifications
+need to be tested against [pdpmake](https://frippery.org/make/)
+(*with `PDPMAKE_POSIXLY_CORRECT` set*) and
+[yash](https://magicant.github.io/yash/) to ensure POSIX conformance.
+
 ## Security
 
 * The canonical home of this software is

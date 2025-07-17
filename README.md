@@ -52,12 +52,16 @@ source code.
   make
   ```
 
-* A `cross` target is available via the `Makefile` that attempts to
-  build `proxy` binaries for all supported `GOOS` and `GOARCH`
-  combinations.  At the time of writing, 41 binaries are built for
-  12 operating systems (running on 13 different architectures):
-  IBM AIX, Android, Apple macOS, Dragonfly BSD, FreeBSD, illumos,
-  Linux, NetBSD, OpenBSD, Plan 9, Solaris, and Microsoft Windows.
+* If you don’t have a (POSIX/GNU/BSD) `make` available for reason,
+  `go build` is sufficient.
+
+* A [`cross` script](.cross.sh) is available (or just  `make cross`)
+  that attempts to build `proxy` binaries for all supported `GOOS`
+  and `GOARCH` combinations.  At the time of writing, 41 binaries
+  are built for 12 operating systems (IBM AIX, Android, Apple macOS,
+  Dragonfly BSD, FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9,
+  Solaris, and Microsoft Windows) running on 13 different hardware
+  architectures.
 
 * You can also install this software using `go install`:
 
@@ -68,7 +72,6 @@ source code.
 * Installations using `go install` download the required sources,
   compile, and install the binary to `${GOEXE}/bin/proxy` (which will
   be `${HOME}/go/bin/proxy` for most users).
-
 
 ### Invocation
 
@@ -176,12 +179,12 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-17 ge975942) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 gc5fa14a+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -350,12 +353,12 @@ It is also considerably simpler (per
 	<tbody><tr>
 		<th>Go</th>
 		<th>7</th>
-		<th>3110</th>
-		<th>537</th>
+		<th>3112</th>
+		<th>539</th>
 		<th>152</th>
 		<th>2421</th>
 		<th>778</th>
-		<th>84931</th>
+		<th>84932</th>
 		<th>1568</th>
 	</tr><tr>
 		<th>Plain Text</th>
@@ -380,13 +383,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>364</th>
-		<th>79</th>
+		<th>395</th>
+		<th>84</th>
 		<th>0</th>
-		<th>285</th>
+		<th>311</th>
 		<th>0</th>
-		<th>14701</th>
-		<th>272</th>
+		<th>16056</th>
+		<th>298</th>
 	</tr><tr>
 		<th>JSON</th>
 		<th>1</th>
@@ -410,33 +413,33 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
-		<th>204</th>
-		<th>41</th>
-		<th>47</th>
-		<th>116</th>
-		<th>16</th>
-		<th>5956</th>
-		<th>137</th>
+		<th>222</th>
+		<th>45</th>
+		<th>51</th>
+		<th>126</th>
+		<th>18</th>
+		<th>6523</th>
+		<th>149</th>
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>407</th>
-		<th>80</th>
+		<th>438</th>
+		<th>85</th>
 		<th>0</th>
-		<th>327</th>
+		<th>353</th>
 		<th>0</th>
-		<th>17236</th>
-		<th>312</th>
+		<th>18593</th>
+		<th>338</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
-		<th>94</th>
+		<th>104</th>
 		<th>24</th>
 		<th>27</th>
-		<th>43</th>
-		<th>7</th>
-		<th>2465</th>
-		<th>58</th>
+		<th>53</th>
+		<th>11</th>
+		<th>2665</th>
+		<th>68</th>
 	</tr><tr>
 		<th>TOML</th>
 		<th>1</th>
@@ -445,19 +448,19 @@ It is also considerably simpler (per
 		<th>3</th>
 		<th>9</th>
 		<th>0</th>
-		<th>575</th>
+		<th>591</th>
 		<th>13</th>
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
 		<th>20</th>
-		<th>4301</th>
-		<th>773</th>
-		<th>234</th>
-		<th>3294</th>
-		<th>801</th>
-		<th>130277</th>
-		<th>2158</th>
+		<th>4393</th>
+		<th>789</th>
+		<th>238</th>
+		<th>3366</th>
+		<th>807</th>
+		<th>133773</th>
+		<th>2206</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -512,6 +515,34 @@ doing!
    mv ssh_host_rsa_key.tmp ssh_host_rsa_key.pem
    mv ssh_host_ed25519_key.tmp ssh_host_ed25519_key.pem 
    ```
+
+## Development
+
+For `proxy` development, besides the most recent version of
+[Go](https://go.dev/), you’ll also need a standard POSIX.1 shell
+environment (*at least* `sh`, `make`, `grep`, `awk`, *and* `sed`),
+[reuse](https://github.com/fsfe/reuse-tool),
+[staticcheck](https://staticcheck.dev/),
+[revive](https://revive.run/),
+[errcheck](https://github.com/kisielk/errcheck),
+[gofumpt](https://github.com/mvdan/gofumpt),
+[scc](https://github.com/boyter/scc),
+[codespell](https://github.com/codespell-project/codespell), and
+[Perl](https://www.perl.org/).
+
+While not absolutely required, it’s a good idea to have the latest
+[golangci-lint](https://golangci-lint.run/) installed.  We ship a
+[configuration file](.golangci.yml) file and try to make sure that
+all the tests pass using the most recently released version.
+
+If you plan to make any changes to the [`Makefile`](Makefile) (or the
+[.cross.sh](.cross.sh) script), you'll need
+[ShellCheck](https://www.shellcheck.net/), and
+[shfmt](https://github.com/mvdan/sh) installed, and all modifications
+need to be tested against [pdpmake](https://frippery.org/make/)
+(*with `PDPMAKE_POSIXLY_CORRECT` set*) and
+[yash](https://magicant.github.io/yash/) to ensure POSIX conformance.
+
 ## Security
 
 * The canonical home of this software is
