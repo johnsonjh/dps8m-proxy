@@ -188,16 +188,17 @@ a session to access the following following features from a menu:
 This is a from-scratch re-implementation using
 [Golang](https://go.dev/) of an older legacy program of the same name.
 The original software used a multi-process architecture and consisted
-of more than 10,000 SLOC of haphazardly constructed code: ≅9,000 lines
-of [C-Kermit](https://www.kermitproject.org/) (*yes, the
+of more than **10,000 SLOC** of haphazardly constructed code: ≅9,000
+lines of [C-Kermit](https://www.kermitproject.org/) (*yes, the
 [programming language](https://www.kermitproject.org/ckututor.html)*)
-and [ksh93](https://github.com/ksh93/ksh), with a small amounts of C
-and Perl, which was difficult to maintain, configure, or securely
+and [ksh93](https://github.com/ksh93/ksh), with small amounts of C
+and Perl, which was difficult to maintain, configure, and securely
 install.
 
-The new implementation uses lightweight *Goroutines* in place of
+This new implementation uses lightweight *Goroutines* instead of
 spawning multiple processes, resulting in significantly improved
-performance and reduced system overhead, and is considerably smaller:
+performance and reduced system overhead.  It is also considerably
+simpler:
 
 ===SCC===
 

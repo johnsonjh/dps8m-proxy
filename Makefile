@@ -187,7 +187,7 @@ README.md doc: README.md.tmpl proxy
 	grep -q '===HELP===' README.md || exit 0
 	@printf '%s\n' "🐪 Perl: Inserting scc output..."
 	$(PERL) -i -pe \
-	'BEGIN { ($$v=qx(scc --no-size --no-cocomo -cd -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
+	'BEGIN { ($$v=qx(scc --no-size --no-cocomo -cdp -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===SCC===!$$v!g' README.md
 	grep -q '===SCC===' README.md || exit 0
 

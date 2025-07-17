@@ -103,7 +103,7 @@ including the versions of all embedded dependencies and the version
 of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g201ee46+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g29c0fd3+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -231,16 +231,17 @@ a session to access the following following features from a menu:
 This is a from-scratch re-implementation using
 [Golang](https://go.dev/) of an older legacy program of the same name.
 The original software used a multi-process architecture and consisted
-of more than 10,000 SLOC of haphazardly constructed code: ≅9,000 lines
-of [C-Kermit](https://www.kermitproject.org/) (*yes, the
+of more than **10,000 SLOC** of haphazardly constructed code: ≅9,000
+lines of [C-Kermit](https://www.kermitproject.org/) (*yes, the
 [programming language](https://www.kermitproject.org/ckututor.html)*)
-and [ksh93](https://github.com/ksh93/ksh), with a small amounts of C
-and Perl, which was difficult to maintain, configure, or securely
+and [ksh93](https://github.com/ksh93/ksh), with small amounts of C
+and Perl, which was difficult to maintain, configure, and securely
 install.
 
-The new implementation uses lightweight *Goroutines* in place of
+This new implementation uses lightweight *Goroutines* instead of
 spawning multiple processes, resulting in significantly improved
-performance and reduced system overhead, and is considerably smaller:
+performance and reduced system overhead.  It is also considerably
+simpler:
 
 <table id="scc-table">
 	<thead><tr>
@@ -252,6 +253,7 @@ performance and reduced system overhead, and is considerably smaller:
 		<th>Code</th>
 		<th>Complexity</th>
 		<th>Bytes</th>
+		<th>Uloc</th>
 	</tr></thead>
 	<tbody><tr>
 		<th>Go</th>
@@ -262,6 +264,7 @@ performance and reduced system overhead, and is considerably smaller:
 		<th>2421</th>
 		<th>0</th>
 		<th>84931</th>
+		<th>0</th>
 	</tr><tr>
 		<th>Plain Text</th>
 		<th>4</th>
@@ -271,6 +274,7 @@ performance and reduced system overhead, and is considerably smaller:
 		<th>36</th>
 		<th>0</th>
 		<th>2296</th>
+		<th>0</th>
 	</tr><tr>
 		<th>YAML</th>
 		<th>2</th>
@@ -280,15 +284,17 @@ performance and reduced system overhead, and is considerably smaller:
 		<th>33</th>
 		<th>0</th>
 		<th>882</th>
+		<th>0</th>
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>268</th>
+		<th>269</th>
 		<th>55</th>
 		<th>0</th>
-		<th>213</th>
+		<th>214</th>
 		<th>0</th>
-		<th>10093</th>
+		<th>10101</th>
+		<th>0</th>
 	</tr><tr>
 		<th>License</th>
 		<th>1</th>
@@ -298,6 +304,7 @@ performance and reduced system overhead, and is considerably smaller:
 		<th>18</th>
 		<th>0</th>
 		<th>1121</th>
+		<th>0</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -306,16 +313,18 @@ performance and reduced system overhead, and is considerably smaller:
 		<th>47</th>
 		<th>116</th>
 		<th>0</th>
-		<th>5981</th>
+		<th>5982</th>
+		<th>0</th>
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>311</th>
+		<th>312</th>
 		<th>56</th>
 		<th>0</th>
-		<th>255</th>
+		<th>256</th>
 		<th>0</th>
-		<th>12630</th>
+		<th>12638</th>
+		<th>0</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -325,6 +334,7 @@ performance and reduced system overhead, and is considerably smaller:
 		<th>43</th>
 		<th>0</th>
 		<th>2465</th>
+		<th>0</th>
 	</tr><tr>
 		<th>TOML</th>
 		<th>1</th>
@@ -334,27 +344,19 @@ performance and reduced system overhead, and is considerably smaller:
 		<th>9</th>
 		<th>0</th>
 		<th>543</th>
-	</tr><tr>
-		<th>gitignore</th>
-		<th>1</th>
-		<th>17</th>
 		<th>0</th>
-		<th>2</th>
-		<th>15</th>
-		<th>0</th>
-		<th>234</th>
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
-		<th>20</th>
-		<th>4121</th>
+		<th>19</th>
+		<th>4106</th>
 		<th>726</th>
-		<th>236</th>
-		<th>3159</th>
+		<th>234</th>
+		<th>3146</th>
 		<th>0</th>
-    	<th>121176</th>
-	</tr></tfoot>
-	</table>
+		<th>120959</th>
+		<th>0</th>
+	</tr></tfoot></table>
 
 ## Future plans
 
