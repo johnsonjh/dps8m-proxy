@@ -16,9 +16,14 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+var oneTime sync.Once
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -56,6 +61,15 @@ func resolveExePath() string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+func showCapabilityMessage(exePath string) {
+	oneTime.Do(func() {
+		log.Println("CAP_NET_BIND_SERVICE is required to bind privileged (<1024) ports")
+		log.Printf("Fix: sudo setcap 'cap_net_bind_service+ep' %q\n", exePath)
+	})
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func checkCapability() {
 	hasBindCap := false
 	if cv, err := cap.FromName("cap_net_bind_service"); err == nil {
@@ -64,8 +78,7 @@ func checkCapability() {
 
 	exePath := resolveExePath()
 	if !hasBindCap && os.Getuid() != 0 {
-		log.Println("CAP_NET_BIND_SERVICE is required to bind privileged (<1024) ports")
-		log.Printf("Fix: sudo setcap 'cap_net_bind_service+ep' %q\n", exePath)
+		showCapabilityMessage(exePath)
 	}
 }
 
