@@ -10,7 +10,7 @@
 ## Overview
 
 The **`proxy`** program acts as a multi-user *terminal server* and
-proxy, accepting incoming SSH connections on the front-end
+relay, accepting incoming SSH connections on the front-end
 (*listeners*) and proxying these connections to one or more TELNET
 connections on the back-end (*targets*).
 
@@ -184,12 +184,12 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-17 g9b423f2) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g4c76c73+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
