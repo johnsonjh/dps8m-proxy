@@ -185,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 gef603c0+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g5cc5f63+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -469,7 +469,7 @@ that know what you’re doing!
 
 ## Development
 
-For `proxy` development, besides the most recent version of
+For `proxy` development, along with the most recent version of
 [Go](https://go.dev/), you’ll also need a standard POSIX.1 shell
 environment (*at a minimum* `sh`, `make`, `grep`, `awk`, *and* `sed`),
 and [reuse](https://github.com/fsfe/reuse-tool),
