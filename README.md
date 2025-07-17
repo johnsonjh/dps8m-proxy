@@ -176,14 +176,14 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g499361c+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 gc047e6e+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
 | dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
-| spf13/pflag               | v1.0.6  |
+| spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
 | golang.org/x/crypto       | v0.40.0 |
 | kernel.org/.../libcap/cap | v1.2.76 |
