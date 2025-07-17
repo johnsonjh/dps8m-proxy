@@ -185,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g2293387+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 gc4726a1+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -471,7 +471,7 @@ that know what you’re doing!
   [codespell](https://github.com/codespell-project/codespell), and
   [Perl](https://www.perl.org/).
 * If you plan to make any changes to the [`Makefile`](Makefile) (or
-  the [.cross.sh](.cross.sh) script), you’ll need to have the
+  the [`.cross.sh`](.cross.sh) script), you’ll need to have the
   [ShellCheck](https://www.shellcheck.net/) and
   [shfmt](https://github.com/mvdan/sh) linters available.
 * Additionally, all modifications to the `Makefile` and `.cross.sh`
