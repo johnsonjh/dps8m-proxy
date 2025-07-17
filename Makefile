@@ -67,7 +67,7 @@ lint check:
 	$(MAKE) clean
 	@printf '\n%s\n' "🧩 Running linters..."
 	$(MAKE) revive reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
-		errcheck shellcheck golangci-lint
+		errcheck shellcheck shfmt golangci-lint
 	@printf '\n%s\n' "🧩 Running 'make cross'..."
 	$(MAKE) cross
 	@printf '\n%s\n' "🧩 Running 'make clean'..."
@@ -147,6 +147,15 @@ gofumpt:
 	@$$(command -v gofumpt > /dev/null 2>&1) || \
 		{ printf '%s\n' "⚠️ gofumpt not found!"; exit 0; } ; \
 		set -x; gofumpt -d -e -s .
+
+##############################################################################
+# Target: shfmt
+
+.PHONY: shfmt
+shfmt: .cross.sh
+	@$$(command -v shfmt > /dev/null 2>&1) || \
+		{ printf '%s\n' "⚠️ shfmt not found!"; exit 0; } ; \
+		set -x; shfmt -bn -sr -fn -i 2 -s -d .cross.sh
 
 ##############################################################################
 # Target: shellcheck
