@@ -185,8 +185,8 @@ govet:
 ##############################################################################
 # Target: README.md
 
-.PHONY: doc
-README.md doc: README.md.tmpl proxy
+.PHONY: doc docs
+README.md doc docs: README.md.tmpl proxy
 	@printf '%s\n' "📚 Building README.md..."
 	@$$(command -v perl > /dev/null 2>&1) || \
 		{ printf '%s\n' "⚠️ perl not found!"; exit 1; }

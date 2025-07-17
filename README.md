@@ -185,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g941fd6f+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g2f8d1c1+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -346,7 +346,8 @@ performance and reduced system overhead.
 
 ### Stats
 
-It is also considerably simpler than the legacy version (per
+The new `proxy` program is considerably simpler than its legacy
+predecessor (code statistics provided by
 [`scc`](https://github.com/boyter/scc)):
 
 <table id="scc-table">
@@ -389,7 +390,7 @@ It is also considerably simpler than the legacy version (per
 		<th>51</th>
 		<th>126</th>
 		<th>18</th>
-		<th>6620</th>
+		<th>6630</th>
 		<th>149</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -410,7 +411,7 @@ It is also considerably simpler than the legacy version (per
 		<th>230</th>
 		<th>2618</th>
 		<th>807</th>
-		<th>95338</th>
+		<th>95348</th>
 		<th>1798</th>
 	</tr></tfoot></table>
 
