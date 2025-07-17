@@ -176,12 +176,12 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 gc047e6e+) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-17 ge975942) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0* |
+| dps8m/proxy               | v0.0.0  |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -323,7 +323,7 @@ This is a from-scratch re-implementation (in
 The original software used a multi-process architecture and consisted
 of more than **10,000 SLOC** of haphazardly constructed code: ≅9,000
 lines of [C-Kermit](https://www.kermitproject.org/) (*yes, the
-[programming language](https://www.kermitproject.org/ckututor.html)*)
+[programming language](https://www.kermitproject.org/ckscripts.html)*)
 and [ksh93](https://github.com/ksh93/ksh), with small amounts of C
 and Perl, which was difficult to maintain, configure, and securely
 install.
@@ -385,7 +385,7 @@ It is also considerably simpler (per
 		<th>0</th>
 		<th>285</th>
 		<th>0</th>
-		<th>14700</th>
+		<th>14701</th>
 		<th>272</th>
 	</tr><tr>
 		<th>JSON</th>
@@ -425,7 +425,7 @@ It is also considerably simpler (per
 		<th>0</th>
 		<th>327</th>
 		<th>0</th>
-		<th>17237</th>
+		<th>17236</th>
 		<th>312</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -440,23 +440,23 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>TOML</th>
 		<th>1</th>
-		<th>15</th>
-		<th>3</th>
+		<th>14</th>
+		<th>2</th>
 		<th>3</th>
 		<th>9</th>
 		<th>0</th>
-		<th>543</th>
+		<th>575</th>
 		<th>13</th>
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
 		<th>20</th>
-		<th>4302</th>
-		<th>774</th>
+		<th>4301</th>
+		<th>773</th>
 		<th>234</th>
 		<th>3294</th>
 		<th>801</th>
-		<th>130245</th>
+		<th>130277</th>
 		<th>2158</th>
 	</tr></tfoot></table>
 
