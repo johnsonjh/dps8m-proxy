@@ -185,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 gc4726a1+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-17 g80b6f13+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -336,7 +336,7 @@ The original software used a multi-process architecture and consisted
 of nearly **15,000 lines** of haphazardly constructed code: ≅14,000
 lines of mostly [C-Kermit](https://www.kermitproject.org/) (*yes, the
 [programming language](https://www.kermitproject.org/ckscripts.html)*)
-and [ksh93](https://github.com/ksh93/ksh) (along with some C, Python,
+and [`ksh93`](https://github.com/ksh93/ksh) (along with some C, Python,
 and Perl) which was difficult to maintain, configure, and securely
 install.
 
@@ -462,27 +462,28 @@ that know what you’re doing!
 * For `proxy` development, along with the most recent version of
   [Go](https://go.dev/), you’ll also need to have a standard POSIX.1
   shell environment (at a minimum `sh`, `make`, `grep`, `awk`, &
-  `sed`), and [reuse](https://github.com/fsfe/reuse-tool),
-  [staticcheck](https://staticcheck.dev/),
-  [revive](https://revive.run/),
-  [errcheck](https://github.com/kisielk/errcheck),
-  [gofumpt](https://github.com/mvdan/gofumpt),
-  [scc](https://github.com/boyter/scc),
-  [codespell](https://github.com/codespell-project/codespell), and
+  `sed`), and [`reuse`](https://github.com/fsfe/reuse-tool),
+  [`staticcheck`](https://staticcheck.dev/),
+  [`revive`](https://revive.run/),
+  [`errcheck`](https://github.com/kisielk/errcheck),
+  [`gofumpt`](https://github.com/mvdan/gofumpt),
+  [`scc`](https://github.com/boyter/scc),
+  [`codespell`](https://github.com/codespell-project/codespell), and
   [Perl](https://www.perl.org/).
 * If you plan to make any changes to the [`Makefile`](Makefile) (or
   the [`.cross.sh`](.cross.sh) script), you’ll need to have the
   [ShellCheck](https://www.shellcheck.net/) and
-  [shfmt](https://github.com/mvdan/sh) linters available.
+  [`shfmt`](https://github.com/mvdan/sh) linters available.
 * Additionally, all modifications to the `Makefile` and `.cross.sh`
-  scripts must be tested against [pdpmake](https://frippery.org/make/)
+  scripts must be tested against
+  [`pdpmake`](https://frippery.org/make/)
   (with `PDPMAKE_POSIXLY_CORRECT` set) and
-  [yash](https://magicant.github.io/yash/) to ensure POSIX conformance.
+  [`yash`](https://magicant.github.io/yash/) to ensure POSIX
+  conformance.
 * While not absolutely required, it’s a good idea to have the latest
-  [golangci-lint](https://golangci-lint.run/) installed.  We ship a
-  [configuration file](.golangci.yml) file for it, and try to make
-  sure that all the tests pass when using the most recently released
-  version.
+  [`golangci-lint`](https://golangci-lint.run/) installed.  We ship a
+  [config file](.golangci.yml) file for it, and try to make sure that
+  all the tests pass when using the most recently released version.
 * The `Makefile` provides a `lint` convenience target to help you run
   all this stuff.
 
@@ -494,7 +495,7 @@ that know what you’re doing!
   security-related problems, please don’t hesitate to
   [open a GitLab Issue](https://gitlab.com/dps8m/proxy/-/issues/new)
   (or send an
-  [e-mail](mailto:contact-project+dps8m-proxy-71601954-issue-@incoming.gitlab.com)
+  [email](mailto:contact-project+dps8m-proxy-71601954-issue-@incoming.gitlab.com)
   to the author).
 
 ## License
