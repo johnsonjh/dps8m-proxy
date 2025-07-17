@@ -3,7 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- vim: set ft=markdown expandtab cc=72 : -->
 <!-- NB: Do not modify README.md directly; modify README.md.tmpl -->
-# dps8m-proxy
+# proxy
 
 [![Go Report Card](https://goreportcard.com/badge/gitlab.com/dps8m/proxy)](https://goreportcard.com/report/gitlab.com/dps8m/proxy)
 
@@ -25,7 +25,7 @@ to anyone who wants to needs to offer SSH access to legacy systems.
 * ✅ Full IPv6 support
 * ✅ Access control whitelist/blacklist (by IP address or CIDR block)
 * ✅ Independent console and session logging (by date/time and host)
-* ✅ Automatic logfile compression (*gzip*, *xz*, *zstandard*)
+* ✅ Automatic log-file compression (*gzip*, *xz*, *zstandard*)
 * ✅ Banners for accepted, denied, and blocked connections (configurable per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
 * ✅ Interactive connection management for administrators
@@ -129,8 +129,9 @@ documented here:
   as the date and time of the session, their IP address, and possibly
   a resolved host name.  This can be disabled with `--no-banner`.
 
-* There are three primary text pfiles which can be displayed to
-  connecting users:
+* The `--no-banner` command disables these lines, but does NOT disable
+  the file-based banner content.  There are three primary text files
+  which can be displayed to connecting users:
 
   | File        | Purpose                                                                   |
   |------------:|:--------------------------------------------------------------------------|
@@ -147,6 +148,10 @@ documented here:
     session (via TELNET to `10.0.5.9:3333`).  If a target-specific
     text files does not exist, then the standard file will be served
     (if existing).
+  * To disable the file-based banner for a specific target, you can
+    just create an empty files using the naming scheme describes above.
+    You can also remove all these files if you don't require this
+    functionality.
 
 * You need to start the proxy with `--whitelist` and/or `--blacklist`
   to enable the access control functionality.  If *only* the whitelist
@@ -171,12 +176,12 @@ documented here:
   of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 gd44ac1f+) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-17 g0123267) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0* |
+| dps8m/proxy               | v0.0.0  |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.6  |
 | ulikunitz/xz              | v0.5.12 |
@@ -359,13 +364,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Go Template</th>
 		<th>1</th>
-		<th>340</th>
+		<th>345</th>
 		<th>68</th>
 		<th>0</th>
-		<th>272</th>
+		<th>277</th>
 		<th>0</th>
-		<th>13727</th>
-		<th>259</th>
+		<th>14049</th>
+		<th>264</th>
 	</tr><tr>
 		<th>License</th>
 		<th>1</th>
@@ -389,13 +394,13 @@ It is also considerably simpler (per
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>383</th>
+		<th>388</th>
 		<th>69</th>
 		<th>0</th>
-		<th>314</th>
+		<th>319</th>
 		<th>0</th>
-		<th>16264</th>
-		<th>299</th>
+		<th>16584</th>
+		<th>304</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -420,13 +425,13 @@ It is also considerably simpler (per
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>4248</th>
+		<th>4258</th>
 		<th>752</th>
 		<th>234</th>
-		<th>3262</th>
+		<th>3272</th>
 		<th>0</th>
-		<th>128186</th>
-		<th>2140</th>
+		<th>128828</th>
+		<th>2145</th>
 	</tr></tfoot></table>
 
 ## Future plans
