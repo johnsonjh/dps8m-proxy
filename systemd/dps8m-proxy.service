@@ -1,0 +1,141 @@
+###############################################################################
+# Copyright (c) 2025 Jeffrey H. Johnson
+# Copyright (c) 2025 The DPS8M Development Team
+# SPDX-License-Identifier: MIT-0
+###############################################################################
+
+###############################################################################
+#
+# To manage the proxy with systemd and tmux on Linux systems:
+#
+#  1. Create a "dps8m-proxy" user with home directory for running the
+#     proxy, usually `sudo adduser -m dps8m-proxy` or similar.
+#
+#  2. Install the `proxy` binary to `/usr/local/bin/dps8m-proxy`
+#
+#  3. Grant the CAP_NET_BIND_SERVICE capability to `dps8m-proxy` using
+#     sudo setcap 'cap_net_bind_service+ep' /usr/local/bin/dps8m-proxy
+#
+#  4. If needed, copy any existing PEM keys or banner text files to the
+#     home directory of the dps8m-proxy user; see README.md for details.
+#
+#  5. Optional: Create the `/usr/local/etc/dps8m-proxy.conf` config file
+#     containing the command-line arguments used to start the proxy.
+#
+#  6. Optional: Adjust the timeouts below to suit your installation.
+#
+#  8. Install the `dps8m-proxy.service` file to your systemd system-wide
+#     unit directory, which is usually `/usr/lib/systemd/system`.
+#
+#  8. Reload the systemd configuration with `systemctl daemon-reload`.
+#
+#  9. Run `systemctl start dps8m-proxy` to start the service now.  For
+#     starting automatically at boot, use `systemctl enable dps8m-proxy`.
+#
+###############################################################################
+
+###############################################################################
+#
+#  While the usual systemd practices apply, here are a few helpful tips:
+#
+#  1. If you have a pending "systemctl stop" for the proxy and you don't
+#     wait for the timeout, while the stop is pending you can send run:
+#
+#     systemctl kill -s SIGINT --kill-who=all dps8m-proxy
+#
+#     Be aware that doing this WITHOUT "systemctl stop" already waiting
+#     will just result in the proxy being automatically restarted, which
+#     may not be what you intended.
+#
+#  2. To interact with the admin console of the running proxy server, run:
+#
+#     sudo -s -u dps8m-proxy tmux attach -t dps8m-proxy
+#
+#     NB: If you exit the proxy using the interactive "q" or "Q" commands,
+#     systemd will automaticallt restart the service.  Instead use systemd
+#     commands (e.g., stop, restart) to stop and start the service. It is
+#     safe to use "r" interactively, which has the same effect as the
+#     systemd "reload" command (if you have enabled the --whitelist and/or
+#     --blacklist options).  To detach from the interactive comsole, use
+#     the tmux detach command, which is usually the key sequence
+#     "Control-b" followed by "d".
+#
+###############################################################################
+
+# Unit configuration
+[Unit]
+Description=DPS8M Proxy Service
+Wants=network.target network-online.target
+After=network.target network-online.target time-sync.target
+
+# Service configuration
+[Service]
+Type=simple
+KillMode=control-group
+Environment=TERM=xterm
+Environment=PATH=/sbin:/usr/bin:/sbin:/bin
+StandardOutput=journal
+StandardError=journal
+
+# The non-privileged user that created to run the proxy and its home directory
+# This is the location the proxy will search for its SSH host keys, banner
+# text files, and where the log subdirectory will be created unless overridden
+User=dps8m-proxy
+WorkingDirectory=/home/dps8m-proxy
+Environment=HOME=/home/dps8m-proxy
+
+# /usr/local/etc/dps8m-proxy.conf contains command-line arguments to start the
+# proxy; one argument per line is acceptable, but all on a single line is OK
+EnvironmentFile=-/usr/local/etc/dps8m-proxy.conf
+
+# How long to wait for graceful shutdown before killing the process.  The
+# TimeoutSTopSec should be a few seconds longer than the STOP_TIMEOUT
+# setting in case the proxy takes a second or two to compress logs, etc.
+Environment="STOP_TIMEOUT=120"
+TimeoutStopSec=125s
+
+# Restart on crashes, with rate limits
+Restart=on-failure
+RestartSec=10s
+
+# #############################################################################
+# ###################### No user serviceable parts below ######################
+# #############################################################################
+
+ExecStart=/bin/sh -c '\
+  tmux -2 -u new-session -d -s dps8m-proxy && \
+  tmux send-keys -t dps8m-proxy \
+    "exec /usr/local/bin/dps8m-proxy \
+       $(cat /usr/local/etc/dps8m-proxy.conf 2> /dev/null | xargs || true); \
+     tmux wait-for -S proxy-done" C-m && \
+  tmux wait-for proxy-done'
+
+ExecReload=/bin/sh -c '\
+  pid=$(tmux list-panes -t dps8m-proxy -F "#{pane_pid}" 2> /dev/null | \
+    head -n 1 2> /dev/null ); \
+  kill -HUP ${pid:?}'
+
+ExecStop=/bin/sh -c '\
+  pid=$(tmux list-panes -t dps8m-proxy -F "#{pane_pid}" 2> /dev/null | \
+    head -n 1 2> /dev/null) && \
+  test -z "${pid:-}" || { \
+    kill -USR1 ${pid:?} && i=0; \
+    while [ "$i" -lt "${STOP_TIMEOUT:?}" ]; do \
+      sleep 1; \
+      kill -0 "${pid:?}" 2> /dev/null || break; \
+      i=$((i + 1)); \
+    done; \
+    exit 0; \
+  }; echo "No proxy PID found to stop, exiting with failure."; exit 1'
+ExecStopPost=/bin/sh -c '\
+  tmux has-session -t dps8m-proxy 2> /dev/null && \
+    tmux kill-session -t dps8m-proxy 2> /dev/null || true'
+
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
+
+###############################################################################
+# vim: set ft=systemd expandtab tabstop=2 cc=80 :
+###############################################################################
