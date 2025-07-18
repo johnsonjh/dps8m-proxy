@@ -188,7 +188,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-18 g43e0745) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-18 g75bd5b7) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -279,8 +279,8 @@ If you are running on the proxy on a Linux system, you can use
 `systemd` to manage the service, while still preserving your
 access to the interactive admin console.
 
-* See the [`dps8m-proxy.service`](systemd/dps8m-proxy.service) file
-  for details.
+* See the [`systemd/dps8m-proxy.service`](systemd/dps8m-proxy.service)
+  file for detailed installation instrucitons.
 
 ### User interaction
 
@@ -402,7 +402,7 @@ predecessor (code statistics provided by
 		<th>0</th>
 		<th>339</th>
 		<th>0</th>
-		<th>17565</th>
+		<th>17600</th>
 		<th>324</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -433,7 +433,7 @@ predecessor (code statistics provided by
 		<th>231</th>
 		<th>3087</th>
 		<th>811</th>
-		<th>118432</th>
+		<th>118467</th>
 		<th>2215</th>
 	</tr></tfoot></table>
 
