@@ -72,7 +72,7 @@ var (
 	allowRoot              bool
 	logPerm                uint = 0o600
 	logDirPerm             uint = 0o750
-	sshSessionsTotal       atomic.Uint64
+	sshConnectionsTotal    atomic.Uint64
 	telnetConnectionsTotal atomic.Uint64
 	altHosts               = make(map[string]string)
 	blacklistedNetworks    []*net.IPNet
@@ -1145,7 +1145,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		log.Printf("INITIATE [%s] %s", sid, host)
 	}
 
-	sshSessionsTotal.Add(1)
+	sshConnectionsTotal.Add(1)
 
 	config := &ssh.ServerConfig{
 		//revive:disable:unused-parameter
