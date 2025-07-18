@@ -12,7 +12,8 @@ PERL=perl
 RM=rm -f
 SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
 		 .whitesource,.golangci.yml,dependabot.yml,.txt"            \
-		 --no-size --no-cocomo -ud
+		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown'       \
+		 --include-symlinks
 .NOTPARALLEL:
 
 ##############################################################################
