@@ -186,7 +186,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-18 g392d229+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-18 g1a96902+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -504,6 +504,9 @@ that know what you’re doing!
   [`golangci-lint`](https://golangci-lint.run/) installed.  We ship a
   [config file](.golangci.yml) file for it, and try to make sure that
   all the tests pass when using the most recently released version.
+* It’s also recommended to (manually) use
+  [`hunspell`](https://hunspell.github.io/) for spell
+  checking—`codespell` doesn’t catch everything.
 * The `Makefile` provides a `lint` convenience target to help you run
   all this stuff.
 
