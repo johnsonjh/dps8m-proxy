@@ -186,12 +186,12 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-18 g1a96902+) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-18 g8aef503) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0* |
+| dps8m/proxy               | v0.0.0  |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -410,7 +410,7 @@ predecessor (code statistics provided by
 		<th>0</th>
 		<th>129</th>
 		<th>0</th>
-		<th>5899</th>
+		<th>5907</th>
 		<th>103</th>
 	</tr></tbody>
 	<tfoot><tr>
@@ -421,7 +421,7 @@ predecessor (code statistics provided by
 		<th>231</th>
 		<th>2747</th>
 		<th>811</th>
-		<th>100802</th>
+		<th>100810</th>
 		<th>1891</th>
 	</tr></tfoot></table>
 
