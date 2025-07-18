@@ -227,6 +227,15 @@ further clarification:
   | `SIGUSR2` | Enables the **Deny new connections** mode                       |
   | `SIGHUP`  | Reloads *access control lists* (`--whitelist`, `--blacklist`)   |
 
+### Automation with systemd
+
+If you are running on the proxy on a Linux system, you can use
+`systemd` to manage the service, while still preserving your
+access to the interactive admin console.
+
+* See the [`dps8m-proxy.service`](systemd/dps8m-proxy.service) file
+  for details.
+
 ### User interaction
 
 Users connected via SSH can send `^]` (*i.e.*, `Control + ]`) during

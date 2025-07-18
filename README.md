@@ -185,7 +185,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-17 g80b6f13+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-18 g21c0415+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -269,6 +269,15 @@ further clarification:
   | `SIGUSR1` | Enables the **Graceful shutdown** mode                          |
   | `SIGUSR2` | Enables the **Deny new connections** mode                       |
   | `SIGHUP`  | Reloads *access control lists* (`--whitelist`, `--blacklist`)   |
+
+### Automation with systemd
+
+If you are running on the proxy on a Linux system, you can use
+`systemd` to manage the service, while still preserving your
+access to the interactive admin console.
+
+* See the [`dps8m-proxy.service`](systemd/dps8m-proxy.service) file
+  for details.
 
 ### User interaction
 
@@ -365,23 +374,23 @@ predecessor (code statistics provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>7</th>
-		<th>3112</th>
+		<th>3119</th>
 		<th>539</th>
 		<th>152</th>
-		<th>2421</th>
-		<th>778</th>
-		<th>84932</th>
-		<th>1568</th>
+		<th>2428</th>
+		<th>781</th>
+		<th>85104</th>
+		<th>1570</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
-		<th>225</th>
-		<th>45</th>
-		<th>51</th>
-		<th>129</th>
-		<th>18</th>
-		<th>6863</th>
-		<th>152</th>
+		<th>237</th>
+		<th>47</th>
+		<th>53</th>
+		<th>137</th>
+		<th>19</th>
+		<th>7145</th>
+		<th>160</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -392,17 +401,27 @@ predecessor (code statistics provided by
 		<th>11</th>
 		<th>2676</th>
 		<th>68</th>
+	</tr><tr>
+		<th>Systemd</th>
+		<th>1</th>
+		<th>141</th>
+		<th>15</th>
+		<th>0</th>
+		<th>126</th>
+		<th>0</th>
+		<th>5622</th>
+		<th>100</th>
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
-		<th>9</th>
-		<th>3441</th>
-		<th>608</th>
-		<th>230</th>
-		<th>2603</th>
-		<th>807</th>
-		<th>94471</th>
-		<th>1783</th>
+		<th>10</th>
+		<th>3601</th>
+		<th>625</th>
+		<th>232</th>
+		<th>2744</th>
+		<th>811</th>
+		<th>100547</th>
+		<th>1889</th>
 	</tr></tfoot></table>
 
 ## Future plans
