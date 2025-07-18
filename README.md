@@ -187,7 +187,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-18 gd2abb7a) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-18 gce1a973) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -461,7 +461,7 @@ to convert those keys to standard PEM format.
 safe handling of key file permissions—we assume you are `root` and
 that know what you’re doing!
 
-1. Make a *copy* the key files you wish to convert.  Be aware that
+1. Make a *copy* of the key files you wish to convert.  Be aware that
    these copies will be *overwritten* in the conversion process:
 
    ```sh
