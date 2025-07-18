@@ -11,10 +11,10 @@
 
 ## Overview
 
-The **`proxy`** program acts as a multi-user *terminal server* and
-relay, accepting incoming SSH client connections on the front-end
+The **`proxy`** program acts as a multi‑user *terminal server* and
+relay, accepting incoming SSH client connections on the front‑end
 (*listeners*) and proxying these connections to one or more TELNET
-servers on the back-end (*targets*).
+servers on the back‑end (*targets*).
 
 This project was originally developed to meet the needs of the
 *BAN.AI Public Access Multics* system and the
@@ -27,7 +27,7 @@ to anyone who wants to offer SSH access to legacy systems.
 * ✅ Full IPv6 support
 * ✅ Access control whitelist/blacklist (by IP address or CIDR block)
 * ✅ Independent console and session logging (by date/time and host)
-* ✅ Automatic log-file compression (using gzip, xz, or zstandard)
+* ✅ Automatic log‑file compression (using gzip, xz, or zstandard)
 * ✅ Banners for accepted, denied, and blocked connections (configurable per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
 * ✅ Interactive connection management for administrators
@@ -35,7 +35,7 @@ to anyone who wants to offer SSH access to legacy systems.
 * ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
 * ✅ Link filtering
 * ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
-* ✅ Live streaming connection sharing (read-only)
+* ✅ Live streaming connection sharing (read‑only)
   * 🤝 Allows users to share their session with one or more viewers
 
 ## Usage
@@ -58,7 +58,7 @@ from source code.
   * If you don’t have a (POSIX/GNU/BSD) `make` available for some
     reason, then building with `go build` is sufficient.
 
-  * A [`.cross.sh`](.cross.sh) cross-compilation helper script is
+  * A [`.cross.sh`](.cross.sh) cross‑compilation helper script is
     provided (which can be called with `make cross`) that attempts to
     build `proxy` binaries for *all* supported `GOOS` and `GOARCH`
     combinations.  At the time of writing, 41 binaries are built for
@@ -78,7 +78,7 @@ from source code.
 
 ### Invocation
 
-* The `proxy` command can be invoked with the following command-line
+* The `proxy` command can be invoked with the following command‑line
   arguments:
 
 ```
@@ -115,21 +115,21 @@ Usage of ./proxy:
 pflag: help requested
 ```
 
-Most of these command-line arguments are straightforward and their
-usage should be obvious, and those that require demystification are,
-hopefully, documented here:
+Most of these command‑line arguments are straightforward with
+usage that should be obvious, and those that require demystification
+are, hopefully, documented here:
 
 * Logging of sessions is *enabled* by default.  Logging of console
   messages is *disabled* by default.
 
   * Console logging, if enabled, supports two modes: `quiet` and
-    `noquiet`.  In `quiet` mode, all non-fatal messages are logged
+    `noquiet`.  In `quiet` mode, all non‑fatal messages are logged
     **only** to the log file, where in `noquiet` mode, messages are
     logged to **both** the console and the log file.
 
 * All incoming SSH users are connected to the default TELNET target,
   unless their supplied SSH username matches an alternate target
-  enabled with the `--alt-host` flag.  The alt-host syntax is
+  enabled with the `--alt-host` flag.  The alt‑host syntax is
   `sshuser@host:port`, where `sshuser` is the SSH username, and the
   `host:port` is the TELNET target.
 
@@ -139,7 +139,7 @@ hopefully, documented here:
   `--no-banner`.
 
 * The `--no-banner` command disables only those lines described above.
-  It does *not* disable the file-based banner content.  These are the
+  It does *not* disable the file‑based banner content.  These are the
   three primary text files which can be displayed to connecting
   SSH users:
 
@@ -156,9 +156,9 @@ hopefully, documented here:
     `block-oldunix.txt`, `deny-oldunix.txt`, and `issue-oldunix.txt`
     files to serve to the connected user, before beginning their
     session with the target (via TELNET to `10.0.5.9:3333`).  If any
-    of the target-specific text files do not exist, then the standard
+    of the target‑specific text files do not exist, then the standard
     files will be served.
-  * To disable the file-based banner for specific targets only, you
+  * To disable the file‑based banner for specific targets only, you
     can create empty files using the naming scheme described above.
     You can also remove *all* of these files if you don’t want to
     use this functionality.
@@ -188,7 +188,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-18 ga94541e) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-18 g57668ce) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -217,7 +217,7 @@ DPS8M Proxy v0.0.0 (2025-Jul-18 ga94541e) [linux/amd64]
   sudo setcap 'cap_net_bind_service=+ep' "/path/to/proxy"
   ```
 
-* If this is necessary (*i.e.*, a non-root user on Linux is attempting
+* If this is necessary (*i.e.*, a non‑root user on Linux is attempting
   to bind an SSH listener to a privileged port and the
   `CAP_NET_BIND_SERVICE` capability is not currently effective), the
   software should provide a warning message with the above
@@ -240,7 +240,7 @@ DPS8M Proxy v0.0.0 (2025-Jul-18 ga94541e) [linux/amd64]
 
 []()
 Most of these admin console commands are straightforward and should
-be self-explanatory, although there are a few options that merit
+be self‑explanatory, although there are a few options that merit
 further clarification:
 
 * When the **Graceful shutdown** mode is active, all new connections
@@ -328,7 +328,7 @@ features:
 ### Connection sharing
 
 * The user can share the username presented above with others,
-  allowing the session to be viewed live (read-only) by one or more
+  allowing the session to be viewed live (read‑only) by one or more
   viewers:
 
   ```sh
@@ -341,12 +341,12 @@ features:
 
 ## History
 
-This is a from-scratch re-implementation (in
+This is a from‑scratch re‑implementation (in
 [Go](https://go.dev/)) of an older legacy program of the same name.
 
-The original software used a multi-process architecture and consisted
+The original software used a multi‑process architecture and consisted
 of nearly **15,000 lines** of haphazardly constructed code: ≅14,000
-lines of mostly [C-Kermit](https://www.kermitproject.org/) (*yes, the
+lines of mostly [C‑Kermit](https://www.kermitproject.org/) (*yes, the
 [programming language](https://www.kermitproject.org/ckscripts.html)*)
 and [`ksh93`](https://github.com/ksh93/ksh) (along with some C, Python,
 and Perl) which was difficult to maintain, configure, and securely
@@ -402,7 +402,7 @@ predecessor (code statistics provided by
 		<th>0</th>
 		<th>339</th>
 		<th>0</th>
-		<th>17600</th>
+		<th>17648</th>
 		<th>324</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -433,7 +433,7 @@ predecessor (code statistics provided by
 		<th>231</th>
 		<th>3087</th>
 		<th>811</th>
-		<th>118467</th>
+		<th>118515</th>
 		<th>2215</th>
 	</tr></tfoot></table>
 
@@ -441,14 +441,14 @@ predecessor (code statistics provided by
 
 1. Some features of the legacy software are still missing in this
    implementation and may be added in future updates.  These features
-   include text *CAPTCHA*s, throttling, load-balancing, fail-over,
+   include text *CAPTCHA*s, throttling, load‑balancing, fail‑over,
    flow control, SSH targets, and TELNET listeners.
 
 2. When users access an SSH listener, the connecting client may supply
    a password or present public keys for authentication.  These
    authentication attempts are currently logged, but are not
    otherwise used by the proxy.  A future update may allow for
-   passwords and public keys to be used for pre-authentication or to
+   passwords and public keys to be used for pre‑authentication or to
    influence target routing.
 
 ## Compressed logs
@@ -531,7 +531,7 @@ that know what you’re doing!
   \<[`https://gitlab.com/dps8m/proxy`](https://gitlab.com/dps8m/proxy)\>
 
 * This software is intended to be **secure**.  If you find any
-  security-related problems, please don’t hesitate to
+  security‑related problems, please don’t hesitate to
   [open a GitLab Issue](https://gitlab.com/dps8m/proxy/-/issues/new)
   (or send an
   [email](mailto:contact-project+dps8m-proxy-71601954-issue-@incoming.gitlab.com)
