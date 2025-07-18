@@ -187,7 +187,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-18 g5796531) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-18 g2a0aee2) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -517,7 +517,8 @@ that know what you’re doing!
 ## Security
 
 * The canonical home of this software is
-  \<[`https://gitlab.com/dps8m/proxy`](https://gitlab.com/dps8m/proxy)\>.
+  \<[`https://gitlab.com/dps8m/proxy`](https://gitlab.com/dps8m/proxy)\>
+
 * This software is intended to be **secure**.  If you find any
   security-related problems, please don’t hesitate to
   [open a GitLab Issue](https://gitlab.com/dps8m/proxy/-/issues/new)
