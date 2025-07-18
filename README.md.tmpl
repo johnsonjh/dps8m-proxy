@@ -232,12 +232,21 @@ further clarification:
 
 ### Automation with systemd
 
-If you are running on the proxy on a Linux system, you can use
-`systemd` to manage the service, while still preserving your
-access to the interactive admin console.
+If you’re running the proxy on a Linux system, you can use `systemd`
+to manage the service (while maintaining access to the interactive
+admin console).
 
-* See the [`systemd/dps8m-proxy.service`](systemd/dps8m-proxy.service)
-  file for detailed installation instructions.
+This integration requires:
+
+* **systemd** version **247** or later (released November 2020)
+* A recent version of [`tmux`](https://github.com/tmux/tmux)
+
+> 🔧 With minor changes to the unit file, this setup can also work on
+> `systemd` versions as old as **229** (released February 2016).
+
+* See the detailed instructions in the
+  [`systemd/dps8m-proxy.service`](systemd/dps8m-proxy.service)
+  file for full installation instructions.
 
 ### User interaction
 

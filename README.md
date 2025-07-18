@@ -188,12 +188,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-18 gd79d594) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-18 g1fdfc98+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -275,12 +275,21 @@ further clarification:
 
 ### Automation with systemd
 
-If you are running on the proxy on a Linux system, you can use
-`systemd` to manage the service, while still preserving your
-access to the interactive admin console.
+If you’re running the proxy on a Linux system, you can use `systemd`
+to manage the service (while maintaining access to the interactive
+admin console).
 
-* See the [`systemd/dps8m-proxy.service`](systemd/dps8m-proxy.service)
-  file for detailed installation instructions.
+This integration requires:
+
+* **systemd** version **247** or later (released November 2020)
+* A recent version of [`tmux`](https://github.com/tmux/tmux)
+
+> 🔧 With minor changes to the unit file, this setup can also work on
+> `systemd` versions as old as **229** (released February 2016).
+
+* See the detailed instructions in the
+  [`systemd/dps8m-proxy.service`](systemd/dps8m-proxy.service)
+  file for full installation instructions.
 
 ### User interaction
 
@@ -397,13 +406,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>429</th>
-		<th>90</th>
+		<th>438</th>
+		<th>93</th>
 		<th>0</th>
-		<th>339</th>
+		<th>345</th>
 		<th>0</th>
-		<th>17663</th>
-		<th>324</th>
+		<th>17971</th>
+		<th>330</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -428,13 +437,13 @@ predecessor (code statistics provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>11</th>
-		<th>4108</th>
-		<th>734</th>
+		<th>4117</th>
+		<th>737</th>
 		<th>233</th>
-		<th>3141</th>
+		<th>3147</th>
 		<th>812</th>
-		<th>120701</th>
-		<th>2259</th>
+		<th>121009</th>
+		<th>2265</th>
 	</tr></tfoot></table>
 
 ## Future plans
