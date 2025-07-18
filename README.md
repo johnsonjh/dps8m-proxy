@@ -31,7 +31,7 @@ to anyone who wants to offer SSH access to legacy systems.
 * ✅ Banners for accepted, denied, and blocked connections (configurable per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
 * ✅ Interactive connection management for administrators
-* ✅ Optional support for process management using `systemd` on Linux
+* ✅ Optional support for management using `systemd` on Linux (running in a sandbox)
 * ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
 * ✅ Link filtering
 * ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
@@ -188,12 +188,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-18 g4d352f8) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-18 gcea84a6+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -402,7 +402,7 @@ predecessor (code statistics provided by
 		<th>0</th>
 		<th>339</th>
 		<th>0</th>
-		<th>17648</th>
+		<th>17663</th>
 		<th>324</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -417,24 +417,24 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Systemd</th>
 		<th>1</th>
-		<th>201</th>
-		<th>34</th>
+		<th>207</th>
+		<th>35</th>
 		<th>0</th>
-		<th>167</th>
+		<th>172</th>
 		<th>0</th>
-		<th>7330</th>
-		<th>129</th>
+		<th>7457</th>
+		<th>134</th>
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
 		<th>11</th>
-		<th>4102</th>
-		<th>733</th>
+		<th>4108</th>
+		<th>734</th>
 		<th>233</th>
-		<th>3136</th>
+		<th>3141</th>
 		<th>812</th>
-		<th>120559</th>
-		<th>2254</th>
+		<th>120701</th>
+		<th>2259</th>
 	</tr></tfoot></table>
 
 ## Future plans

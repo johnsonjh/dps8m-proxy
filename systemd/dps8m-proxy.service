@@ -6,11 +6,11 @@
 
 ###############################################################################
 #
-#  This unit file is compatible with systemd version 245 (and
-#  later), but can be adapted for systemd versions as low as 229.
+#  This unit file is compatible with systemd version 247 (2020) but can
+#  be easily adapted to work with systemd versions as low as 229 (2016).
 #
-#  For compatibility with versions lower than 245, search for the sub-
-#  string "Added in version" and remove any offending lines as necessary.
+#  For compatibility with system versions lower than 247, just search
+#  for the sub-string "Added in version" and remove the offending lines.
 #
 ###############################################################################
 
@@ -89,6 +89,7 @@ Environment=TERM=xterm
 Environment=PATH=/sbin:/usr/bin:/sbin:/bin
 StandardOutput=journal
 StandardError=journal
+IgnoreSIGPIPE=no
 
 ###############################################################################
 
@@ -167,12 +168,14 @@ ExecStopPost=/bin/sh -c '\
 NoNewPrivileges=true
 PrivateDevices=true
 ProtectSystem=full
+SystemCallArchitectures=native
 
 # Added in version 231
 MemoryDenyWriteExecute=true
 RestrictRealtime=true
 
 # Added in version 232
+PrivateUsers=self
 ProtectControlGroups=true
 ProtectKernelModules=true
 ProtectKernelTunables=true
@@ -190,6 +193,9 @@ ProtectKernelLogs=true
 
 # Added in version 245
 ProtectClock=true
+
+# Added in version 247
+ProtectProc=invisible
 
 ###############################################################################
 
