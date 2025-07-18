@@ -946,7 +946,7 @@ func listConfiguration() {
 	fmt.Printf("\r* Graceful Shutdown: %t\r\n", gracefulShutdownMode.Load())
 	fmt.Printf("\r* Deny New Connections: %t\r\n", denyNewConnectionsMode.Load())
 
-	if blacklistFile == "" && len(blacklistedNetworks) == 0 {
+	if blacklistFile == "" && len(blacklistedNetworks) == 0 { //nolint:gocritic
 		fmt.Printf("\r* Blacklist: disabled\r\n")
 	} else if whitelistFile != "" && blacklistFile == "" {
 		fmt.Printf("\r* Blacklist: Deny all (due to whitelist only)\r\n")
@@ -1150,13 +1150,13 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	config := &ssh.ServerConfig{
 		//revive:disable:unused-parameter
 		PasswordCallback: func(
-			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) {
+			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) { //nolint:gofumpt
 			return &ssh.Permissions{
 				Extensions: map[string]string{"auth-method": "password"},
 			}, nil
 		},
 		PublicKeyCallback: func(
-			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) {
+			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) { //nolint:gofumpt
 			line := fmt.Sprintf("VALIDATE [%s] %s@%s %q:%s",
 				sid, c.User(), c.RemoteAddr(), pubKey.Type(), ssh.FingerprintSHA256(pubKey),
 			)
@@ -1171,7 +1171,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		},
 		KeyboardInteractiveCallback: func(
 			conn ssh.ConnMetadata,
-			challenge ssh.KeyboardInteractiveChallenge) (*ssh.Permissions, error) {
+			challenge ssh.KeyboardInteractiveChallenge) (*ssh.Permissions, error) { //nolint:gofumpt
 			return &ssh.Permissions{
 				Extensions: map[string]string{"auth-method": "keyboard-interactive"},
 			}, nil
@@ -1331,7 +1331,7 @@ func parseHostPort(hostPort string) (string, int, error) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
-	requests <-chan *ssh.Request, keyLog []string) {
+	requests <-chan *ssh.Request, keyLog []string) { //nolint:gofumpt
 	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
 
 	remoteHost, _, err := net.SplitHostPort(conn.sshConn.RemoteAddr().String())
@@ -1703,10 +1703,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					continue
 				}
 
-				if len(escSequence) > 0 {
+				if len(escSequence) > 0 { //nolint:gocritic
 					escSequence = append(escSequence, b)
 					if conn.emacsKeymapEnabled {
-						if replacement, ok :=
+						if replacement, ok := //nolint:gofumpt,nolintlint
 							emacsKeymap[string(escSequence)]; ok {
 							m, err := remote.Write([]byte(replacement))
 							if err != nil {
@@ -1718,7 +1718,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							}
 							escSequence = nil
 							escTimer = nil
-						} else if _, isPrefix :=
+						} else if _, isPrefix := //nolint:gofumpt,nolintlint
 							emacsKeymapPrefixes[string(escSequence)]; isPrefix {
 							escTimer = time.After(50 * time.Millisecond)
 						} else {
@@ -2062,7 +2062,7 @@ func showMenu(ch ssh.Channel) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.Conn,
-	logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) {
+	logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) { //nolint:gofumpt
 	switch sel {
 	case 'a', 'A':
 		if _, err := remote.Write([]byte{TelcmdIAC, TelcmdAYT}); err != nil {
@@ -2394,7 +2394,8 @@ func rotateConsoleLog() {
 
 	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
 		consoleLogMutex.Unlock()
-		log.Fatalf("Failed to create console log directory: %v", err) // LINTED: Fatalf
+		log.Fatalf( //nolint:gocritic
+			"Failed to create console log directory: %v", err) // LINTED: Fatalf
 	}
 
 	var err error
@@ -2402,7 +2403,8 @@ func rotateConsoleLog() {
 		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
 	if err != nil {
 		consoleLogMutex.Unlock()
-		log.Fatalf("Failed to open console log file: %v", err) // LINTED: Fatalf
+		log.Fatalf(
+			"Failed to open console log file: %v", err) // LINTED: Fatalf
 	}
 
 	if strings.ToLower(consoleLog) == "quiet" {
