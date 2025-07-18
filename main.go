@@ -2407,8 +2407,15 @@ func rotateConsoleLog() {
 		log.Fatalf("Failed to open console log file: %v", err) // LINTED: Fatalf
 	}
 
-	fmt.Fprintf(
-		os.Stderr, "%s Console logging enabled (suppressing console output)\n", nowStamp())
+	if strings.ToLower(consoleLog) == "quiet" {
+		fmt.Fprintf(
+			os.Stderr, "%s Console logging enabled (suppressing console output)\n",
+			nowStamp())
+	} else {
+		fmt.Fprintf(
+			os.Stderr, "%s Console logging enabled (not suppressing console output)\n",
+			nowStamp())
+	}
 
 	if strings.ToLower(consoleLog) == "quiet" {
 		log.SetOutput(consoleLogFile)
