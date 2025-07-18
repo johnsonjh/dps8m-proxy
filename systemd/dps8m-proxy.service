@@ -39,28 +39,28 @@
 #  While the usual systemd practices apply, here are a few helpful tips:
 #
 #  1. If you have a pending "systemctl stop" for the proxy and you can't
-#     wait for the timeout, while the stop is pending you can send run:
+#     wait for the timeout, while the stop is pending you can execute:
 #
 #     systemctl kill -s SIGINT --kill-who=all dps8m-proxy
 #
-#     Be aware that doing this WITHOUT a "systemctl stop" pending and waiting
+#     Be aware that doing this WITHOUT a "systemctl stop" currently pending
 #     will just result in the proxy being automatically restarted, which may
 #     not be what you intended.  This means you should not interrupt the
-#     "systemctl stop" (with ^C or otherwise) to start the "systemctl kill".
+#     "systemctl stop" (with ^C or otherwise) to run the "systemctl kill".
 #     It is, however, safe to suspend the "systemctl stop" (i.e., Control-Z),
 #     perform the "systemctl kill", and resume "systemctl stop" with "fg".
 #
-#  2. To interact with the admin console of the running proxy server, run:
+#  2. To interact with the admin console of the running proxy server, use:
 #
 #     sudo -s -u dps8m-proxy tmux attach -t dps8m-proxy
 #
 #     NB: If you exit the proxy using the interactive "q" or "Q" commands,
-#     systemd will automatically restart the service.  Instead use systemd
-#     commands (e.g., stop, restart) to stop and start the service. It is
+#     systemd will automatically restart the service.  Instead, use systemd
+#     commands (e.g., stop, restart) to stop and start the service.  It is
 #     safe to use "r" interactively, which has the same effect as the
 #     systemd "reload" command (if you have enabled the --whitelist and/or
-#     --blacklist options).  To detach from the interactive console, use
-#     the tmux detach command, which is usually the key sequence
+#     --blacklist options).  To exit out of the interactive console, use
+#     the tmux "detach" command, which is usually bound to the key sequence
 #     "Control-b" followed by "d".
 #
 ###############################################################################
