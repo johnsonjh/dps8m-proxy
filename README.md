@@ -7,6 +7,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/gitlab.com/dps8m/proxy)](https://goreportcard.com/report/gitlab.com/dps8m/proxy)
 [![REUSE status](https://api.reuse.software/badge/gitlab.com/dps8m/proxy)](https://api.reuse.software/info/gitlab.com/dps8m/proxy)
+[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://www.mend.io/renovate/)
 
 ## Overview
 
@@ -187,7 +188,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-18 g2a0aee2) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-18 g61bdd5a) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
