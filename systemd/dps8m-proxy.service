@@ -43,9 +43,12 @@
 #
 #     systemctl kill -s SIGINT --kill-who=all dps8m-proxy
 #
-#     Be aware that doing this WITHOUT "systemctl stop" already waiting
-#     will just result in the proxy being automatically restarted, which
-#     may not be what you intended.
+#     Be aware that doing this WITHOUT a "systemctl stop" pending and waiting
+#     will just result in the proxy being automatically restarted, which may
+#     not be what you intended.  This means you should not interrupt the
+#     "systemctl stop" (with ^C or otherwise) to start the "systemctl kill".
+#     It is, howver, safe to suspend the "systemctl stop" (i.e., Control-Z),
+#     perform the "systemctl kill", and resume "systemctl stop" with "fg".
 #
 #  2. To interact with the admin console of the running proxy server, run:
 #
