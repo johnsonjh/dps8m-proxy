@@ -188,7 +188,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-18 g3988131) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-18 gabee58e) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -417,24 +417,24 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Systemd</th>
 		<th>1</th>
-		<th>144</th>
-		<th>15</th>
+		<th>201</th>
+		<th>34</th>
 		<th>0</th>
+		<th>167</th>
+		<th>0</th>
+		<th>7330</th>
 		<th>129</th>
-		<th>0</th>
-		<th>5863</th>
-		<th>104</th>
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
 		<th>11</th>
-		<th>4032</th>
-		<th>713</th>
+		<th>4089</th>
+		<th>732</th>
 		<th>233</th>
-		<th>3086</th>
+		<th>3124</th>
 		<th>810</th>
-		<th>118662</th>
-		<th>2221</th>
+		<th>120129</th>
+		<th>2246</th>
 	</tr></tfoot></table>
 
 ## Future plans
