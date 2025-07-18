@@ -4,24 +4,24 @@
 # Copyright (c) 2025 The DPS8M Development Team
 # SPDX-License-Identifier: MIT-0
 
-##############################################################################
+###############################################################################
 # Strict
 
 set -e
 
-##############################################################################
+###############################################################################
 # Cleanup
 
 rm -rf ./cross.bin
 mkdir -p ./cross.bin
 
-##############################################################################
+###############################################################################
 # Disable CGO
 
 CGO_ENABLED=0
 export CGO_ENABLED
 
-##############################################################################
+###############################################################################
 # Create script
 # Exclude ios/*, android/{386,amd64,arm}
 
@@ -30,38 +30,35 @@ _S=$(go tool dist list \
   | grep -Ev '^js/wasm$|^wasip1/wasm$|^ios/|^android/(386|amd64|arm)$' \
   | awk 'BEGIN { FS="/" } /\// { print "GOOS="$1" GOARCH="$2 }' \
   | xargs -I{} printf '%s\n' '
-        export {} && printf "🧩 %s/%s\n" "${GOOS:?}" "${GOARCH:?}" &&
-        go build -trimpath -o ./cross.bin/proxy."${GOOS:?}"."${GOARCH:?}";')
+      export {} && printf "🧩 %s/%s\n" "${GOOS:?}" "${GOARCH:?}" &&
+      go build -trimpath -o ./cross.bin/proxy."${GOOS:?}"."${GOARCH:?}";')
 
-##############################################################################
+###############################################################################
 # Maximum jobs
 
-if command -v nproc > /dev/null 2>&1; then
-  max=$(nproc 2> /dev/null \
-    || getconf NPROCESSORS_ONLN 2> /dev/null \
-    || getconf _NPROCESSORS_ONLN 2> /dev/null \
-    || getconf NPROCESSORS_CONF 2> /dev/null \
-    || getconf _NPROCESSORS_CONF 2> /dev/null \
-    || printf '%s\n' "1")
-else
-  max="1"
-fi
+max=$(nproc 2> /dev/null \
+  || getconf NPROCESSORS_ONLN 2> /dev/null \
+  || getconf _NPROCESSORS_ONLN 2> /dev/null \
+  || getconf NPROCESSORS_CONF 2> /dev/null \
+  || getconf _NPROCESSORS_CONF 2> /dev/null \
+  || printf '%s\n' "1")
 
 # shellcheck disable=SC2249
 case ${max:-} in
 '' | *[!0-9]* | 0) max=1 ;;
 esac
 
-##############################################################################
+###############################################################################
 # Inform of parallelism
 
 if [ "${max:?}" -eq 1 ]; then
   printf '%s\n' "💻 Build parallelism is disabled."
 else
-  printf '%s\n' "💻 Forking up to ${max:?} concurrent builds for parallel compilation..."
+  printf '%s\n' \
+    "💻 Forking up to ${max:?} concurrent builds for parallel compilation..."
 fi
 
-##############################################################################
+###############################################################################
 # Create semaphore
 
 fifo="/tmp/${$}.fifo"
@@ -75,12 +72,12 @@ while [ "${i:?}" -lt "${max:?}" ]; do
   i=$((i + 1))
 done
 
-##############################################################################
+###############################################################################
 # Disable strict
 
 set +e
 
-##############################################################################
+###############################################################################
 # Run script
 
 OLDIFS=${IFS:-}
@@ -101,4 +98,6 @@ IFS=${OLDIFS:?}
 wait
 exec 3>&- 3<&-
 
-##############################################################################
+###############################################################################
+# vim: set ft=sh expandtab tabstop=2 cc=80 :
+###############################################################################
