@@ -187,7 +187,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-18 gce1a973) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-18 g5796531) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -501,6 +501,9 @@ that know what you’re doing!
   (with `PDPMAKE_POSIXLY_CORRECT` set) and
   [`yash`](https://magicant.github.io/yash/) to ensure POSIX
   conformance.
+[]()
+
+[]()
 * While not absolutely required, it’s a good idea to have the latest
   [`golangci-lint`](https://golangci-lint.run/) installed.  We ship a
   [config file](.golangci.yml) file for it, and try to make sure that
