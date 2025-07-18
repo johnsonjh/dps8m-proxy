@@ -55,11 +55,11 @@
 #     sudo -s -u dps8m-proxy tmux attach -t dps8m-proxy
 #
 #     NB: If you exit the proxy using the interactive "q" or "Q" commands,
-#     systemd will automaticallt restart the service.  Instead use systemd
+#     systemd will automatically restart the service.  Instead use systemd
 #     commands (e.g., stop, restart) to stop and start the service. It is
 #     safe to use "r" interactively, which has the same effect as the
 #     systemd "reload" command (if you have enabled the --whitelist and/or
-#     --blacklist options).  To detach from the interactive comsole, use
+#     --blacklist options).  To detach from the interactive console, use
 #     the tmux detach command, which is usually the key sequence
 #     "Control-b" followed by "d".
 #
@@ -92,7 +92,7 @@ Environment=HOME=/home/dps8m-proxy
 EnvironmentFile=-/usr/local/etc/dps8m-proxy.conf
 
 # How long to wait for graceful shutdown before killing the process.  The
-# TimeoutSTopSec should be a few seconds longer than the STOP_TIMEOUT
+# TimeoutStopSec should be a few seconds longer than the STOP_TIMEOUT
 # setting in case the proxy takes a second or two to compress logs, etc.
 Environment="STOP_TIMEOUT=120"
 TimeoutStopSec=125s
