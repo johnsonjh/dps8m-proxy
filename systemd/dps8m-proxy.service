@@ -38,7 +38,7 @@
 #
 #  While the usual systemd practices apply, here are a few helpful tips:
 #
-#  1. If you have a pending "systemctl stop" for the proxy and you don't
+#  1. If you have a pending "systemctl stop" for the proxy and you can't
 #     wait for the timeout, while the stop is pending you can send run:
 #
 #     systemctl kill -s SIGINT --kill-who=all dps8m-proxy
