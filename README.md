@@ -30,6 +30,7 @@ to anyone who wants to offer SSH access to legacy systems.
 * ✅ Banners for accepted, denied, and blocked connections (configurable per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
 * ✅ Interactive connection management for administrators
+* ✅ Optional support for process management using `systemd` on Linux
 * ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
 * ✅ Link filtering
 * ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
@@ -186,7 +187,7 @@ hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-18 g8aef503) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-18 gd2abb7a) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
