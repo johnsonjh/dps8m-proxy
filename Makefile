@@ -29,7 +29,7 @@ all: proxy
 .PHONY: proxy
 proxy:
 	@printf '%s\n' "🧩 Building proxy..."
-	@env CGO_ENABLED=0 go build -trimpath -v && \
+	@env GOTOOLCHAIN=auto CGO_ENABLED=0 go build -trimpath -v && \
 	test -x proxy 2> /dev/null && { \
 		printf '\n%s\n\n' "✅ Build successful:"; \
 		./proxy --version 2> /dev/null; exit 0; } || { \
