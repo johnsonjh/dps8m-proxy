@@ -1,7 +1,7 @@
-//go:build !windows && !plan9 && !wasm && !aix
+//go:build aix
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// DPS8M Proxy - signals_unix.go
+// DPS8M Proxy - signals_aix.go
 // Copyright (c) 2025 Jeffrey H. Johnson
 // Copyright (c) 2025 The DPS8M Development Team
 // SPDX-License-Identifier: MIT
@@ -13,10 +13,24 @@ package main
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 import (
+	"log"
 	"os"
 	"os/signal"
+	"runtime"
+	"runtime/debug"
 	"syscall"
 )
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func lowerGOGC() {
+	currentGOGC := debug.SetGCPercent(-1)
+	newGOGC := currentGOGC - 5
+	if newGOGC < 1 {
+		newGOGC = 1
+	}
+	debug.SetGCPercent(newGOGC)
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -24,10 +38,19 @@ func runSignalHandlers() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan,
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT,
-		syscall.SIGHUP, syscall.SIGUSR1, syscall.SIGUSR2)
+		syscall.SIGHUP, syscall.SIGUSR1, syscall.SIGUSR2, syscall.SIGDANGER)
+
 	go func() {
 		for s := range sigChan {
-			handleSignal(s)
+			if s == syscall.SIGDANGER {
+				log.Println(
+					"SIGDANGER received: Requesting garbage collection and freeing memory.")
+				runtime.GC()
+				debug.FreeOSMemory()
+				lowerGOGC()
+			} else {
+				handleSignal(s)
+			}
 		}
 	}()
 }
