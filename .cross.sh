@@ -19,7 +19,8 @@ mkdir -p ./cross.bin
 # Disable CGO
 
 CGO_ENABLED=0
-export CGO_ENABLED
+GOTOOLCHAIN=auto
+export CGO_ENABLED GOTOOLCHAIN
 
 ###############################################################################
 # Create script

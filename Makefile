@@ -41,7 +41,7 @@ proxy:
 .PHONY: clean
 clean:
 	@printf '%s\n' "🧹 Cleaning..."
-	go clean -v
+	env GOTOOLCHAIN=auto go clean -v
 	$(RM) -r ./cross.bin/
 
 ##############################################################################
@@ -49,7 +49,7 @@ clean:
 
 .PHONY: tidy
 tidy: go.mod
-	go mod tidy -v
+	env GOTOOLCHAIN=auto go mod tidy -v
 
 ##############################################################################
 # Target: distclean
@@ -100,14 +100,14 @@ gofmt:
 
 .PHONY: goverify
 goverify: go.mod
-	go mod verify
+	env GOTOOLCHAIN=auto go mod verify
 
 ##############################################################################
 # Target: gotidydiff
 
 .PHONY: gotidydiff
 gotidydiff: go.mod
-	go mod tidy -diff
+	env GOTOOLCHAIN=auto go mod tidy -diff
 
 ##############################################################################
 # Target: golangci-lint
@@ -186,7 +186,7 @@ codespell:
 
 .PHONY: govet
 govet:
-	go vet
+	env GOTOOLCHAIN=auto go vet
 
 ##############################################################################
 # Target: README.md
