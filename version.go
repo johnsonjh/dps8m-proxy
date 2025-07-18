@@ -8,8 +8,6 @@
 // DPS8M Proxy
 package main
 
-// Version reporting
-
 import (
 	"fmt"
 	"runtime"
