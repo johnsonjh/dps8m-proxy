@@ -10,6 +10,9 @@ SHELL=/bin/sh
 CP=cp -f
 PERL=perl
 RM=rm -f
+SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
+		 .whitesource,.golangci.yml,dependabot.yml,.txt"            \
+		 --no-size --no-cocomo -ud
 .NOTPARALLEL:
 
 ##############################################################################
@@ -206,10 +209,19 @@ README.md doc docs: README.md.tmpl proxy
 	grep -q '===HELP===' README.md || exit 0
 	@printf '\n%s\n' "🐪 Perl: Inserting scc output..."
 	$(PERL) -i -pe \
-	'BEGIN { ($$v=qx(scc --exclude-file LICENSE,REUSE.toml,README.md,renovate.json,.whitesource,.golangci.yml,dependabot.yml,.txt --no-size --no-cocomo -ud -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
+	'BEGIN { ($$v=qx(scc $(SCCFLAGS) -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===SCC===!$$v!g' README.md
 	grep -q '===SCC===' README.md || exit 0
 	@printf '\n%s\n\n' "📗 README.md generation successful."
+
+##############################################################################
+# Target: scc
+
+.PHONY: scc
+scc:
+	@$$(command -v scc > /dev/null 2>&1) || \
+		{ printf '%s\n' "⚠️ scc not found!"; exit 1; } ; \
+		set -x; scc $(SCCFLAGS)
 
 ##############################################################################
 # Target: cross
