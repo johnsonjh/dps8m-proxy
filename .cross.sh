@@ -37,20 +37,32 @@ _S=$(go tool dist list \
 ###############################################################################
 # Maximum jobs
 
-max=$(nproc 2> /dev/null \
-  || getconf NPROCESSORS_ONLN 2> /dev/null \
-  || getconf _NPROCESSORS_ONLN 2> /dev/null \
-  || getconf NPROCESSORS_CONF 2> /dev/null \
-  || getconf _NPROCESSORS_CONF 2> /dev/null \
-  || printf '%s\n' "1")
+if [ -n "${MAX_CPU:-}" ]; then
+  max="${MAX_CPU:?}"
+else
+  max=$(nproc 2> /dev/null \
+    || getconf NPROCESSORS_ONLN 2> /dev/null \
+    || getconf _NPROCESSORS_ONLN 2> /dev/null \
+    || getconf NPROCESSORS_CONF 2> /dev/null \
+    || getconf _NPROCESSORS_CONF 2> /dev/null \
+    || printf '%s\n' "1")
+fi
 
 # shellcheck disable=SC2249
 case ${max:-} in
-'' | *[!0-9]* | 0) max=1 ;;
+'' | *[!0-9]* | 0) {
+  printf '%s\n' "❗ Invalid MAX_CPU value detected, using default of 1."
+  max=1
+} ;;
 esac
 
 ###############################################################################
 # Inform of parallelism
+
+test -z "${MAX_CPU:-}" && {
+  printf '%s\n' \
+    "🧠 Set environment variable MAX_CPU to override detected parallelism."
+}
 
 if [ "${max:?}" -eq 1 ]; then
   printf '%s\n' "💻 Build parallelism is disabled."
