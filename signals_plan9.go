@@ -1,7 +1,7 @@
 //go:build plan9
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// DPS8M Proxy - signals_unix.go
+// DPS8M Proxy - signals_plan9.go
 // Copyright (c) 2025 Jeffrey H. Johnson
 // Copyright (c) 2025 The DPS8M Development Team
 // SPDX-License-Identifier: MIT

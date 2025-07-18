@@ -1,7 +1,7 @@
 //go:build wasm || windows
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// DPS8M Proxy - signals_wasm.go
+// DPS8M Proxy - signals_none.go
 // Copyright (c) 2025 Jeffrey H. Johnson
 // Copyright (c) 2025 The DPS8M Development Team
 // SPDX-License-Identifier: MIT
