@@ -25,7 +25,7 @@ import (
 
 func lowerGOGC() {
 	currentGOGC := debug.SetGCPercent(-1)
-	newGOGC := currentGOGC - 5
+	newGOGC := currentGOGC - 1
 	if newGOGC < 1 {
 		newGOGC = 1
 	}
