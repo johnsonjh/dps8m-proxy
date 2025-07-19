@@ -86,7 +86,7 @@ After=network.target network-online.target time-sync.target
 Type=simple
 KillMode=control-group
 Environment=TERM=xterm
-Environment=PATH=/sbin:/usr/bin:/sbin:/bin
+Environment=PATH=/sbin:/bin:/usr/sbin:/usr/bin
 StandardOutput=journal
 StandardError=journal
 IgnoreSIGPIPE=no
