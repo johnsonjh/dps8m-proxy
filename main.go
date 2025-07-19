@@ -2438,6 +2438,7 @@ func showMenu(ch ssh.Channel) {
 		"\r |  N  | Send NOP      | \r\n" +
 		"\r |  S  | Show Status   | \r\n" +
 		"\r |  X  | Disconnect    | \r\n" +
+		"\r |  ]  | Send Ctrl-]   | \r\n" +
 		"\r +=====+===============+ \r\n"
 
 	if _, err := ch.Write([]byte(menu)); err != nil {
@@ -2601,6 +2602,23 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 
 		if err := ch.Close(); err != nil {
 			log.Printf("Error closing channel: %v", err)
+		}
+
+	case ']':
+		if _, err := remote.Write([]byte{0x1d}); err != nil {
+			log.Printf("Error writing Ctrl-] to remote: %v", err)
+		}
+
+		if _, err := logw.Write([]byte{0x1d}); err != nil {
+			log.Printf("Error writing Ctrl-] to log: %v", err)
+		}
+
+		if _, err := ch.Write([]byte("\r\n>> Sent Ctrl-]\r\n")); err != nil {
+			log.Printf("Error writing 'Sent Ctrl-]' message to channel: %v", err)
+		}
+
+		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+			log.Printf("Error writing '[BACK TO HOST]' message to channel: %v", err)
 		}
 
 	default:
