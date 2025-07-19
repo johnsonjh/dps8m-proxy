@@ -332,17 +332,35 @@ predecessor (code statistics provided by
 
 ## Future plans
 
-1. Some features of the legacy software are still missing in this
+1. To make this more useful as a general purpose proxy, we will
+   need to support NAWS (Negotiate About Window Size) on the TELNET
+   side and listen for SSH "window-change" events on the SSH side,
+   translating between the two.
+
+2. Some features of the legacy software are still missing in this
    implementation and may be added in future updates.  These features
    include text *CAPTCHA*s, throttling, load‑balancing, fail‑over,
    flow control, SSH targets, and TELNET listeners.
 
-2. When users access an SSH listener, the connecting client may supply
+3. When users access an SSH listener, the connecting client may supply
    a password or present public keys for authentication.  These
    authentication attempts are currently logged, but are not
    otherwise used by the proxy.  A future update may allow for
    passwords and public keys to be used for pre‑authentication or to
    influence target routing.
+
+While we will improve the TELNET protocol support in the future, there
+are no plans to support the linemode, environment, X11, authentication,
+or encryption features at this time.
+
+If you need them, you should look into
+[C-Kermit](https://kermitproject.org/) or
+[Kermit 95](https://davidrg.github.io/ckwin/).  Directly running
+programs isn’t something on the roadmap yet, but it’s not difficult to
+creatively use `socat` to connect C-Kermit up to the proxy (*i.e.*,
+`socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
+Be aware that doing this in a way that is both *safe* and *secure* for
+public usage difficult and beyond the scope of this documentation.
 
 ## Compressed logs
 

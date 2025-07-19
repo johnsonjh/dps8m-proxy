@@ -188,7 +188,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-19 g98b09be+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-19 ga88801b+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -386,12 +386,12 @@ predecessor (code statistics provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>9</th>
-		<th>3574</th>
-		<th>759</th>
+		<th>3573</th>
+		<th>758</th>
 		<th>178</th>
 		<th>2637</th>
 		<th>786</th>
-		<th>92920</th>
+		<th>92919</th>
 		<th>1707</th>
 	</tr><tr>
 		<th>Makefile</th>
@@ -406,13 +406,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>438</th>
-		<th>92</th>
+		<th>456</th>
+		<th>95</th>
 		<th>0</th>
+		<th>361</th>
+		<th>0</th>
+		<th>18955</th>
 		<th>346</th>
-		<th>0</th>
-		<th>18001</th>
-		<th>331</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -437,28 +437,46 @@ predecessor (code statistics provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>4574</th>
-		<th>958</th>
+		<th>4591</th>
+		<th>960</th>
 		<th>261</th>
-		<th>3355</th>
+		<th>3370</th>
 		<th>817</th>
-		<th>128779</th>
-		<th>2400</th>
+		<th>129732</th>
+		<th>2415</th>
 	</tr></tfoot></table>
 
 ## Future plans
 
-1. Some features of the legacy software are still missing in this
+1. To make this more useful as a general purpose proxy, we will
+   need to support NAWS (Negotiate About Window Size) on the TELNET
+   side and listen for SSH "window-change" events on the SSH side,
+   translating between the two.
+
+2. Some features of the legacy software are still missing in this
    implementation and may be added in future updates.  These features
    include text *CAPTCHA*s, throttling, load‑balancing, fail‑over,
    flow control, SSH targets, and TELNET listeners.
 
-2. When users access an SSH listener, the connecting client may supply
+3. When users access an SSH listener, the connecting client may supply
    a password or present public keys for authentication.  These
    authentication attempts are currently logged, but are not
    otherwise used by the proxy.  A future update may allow for
    passwords and public keys to be used for pre‑authentication or to
    influence target routing.
+
+While we will improve the TELNET protocol support in the future, there
+are no plans to support the linemode, environment, X11, authentication,
+or encryption features at this time.
+
+If you need them, you should look into
+[C-Kermit](https://kermitproject.org/) or
+[Kermit 95](https://davidrg.github.io/ckwin/).  Directly running
+programs isn’t something on the roadmap yet, but it’s not difficult to
+creatively use `socat` to connect C-Kermit up to the proxy (*i.e.*,
+`socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
+Be aware that doing this in a way that is both *safe* and *secure* for
+public usage difficult and beyond the scope of this documentation.
 
 ## Compressed logs
 
