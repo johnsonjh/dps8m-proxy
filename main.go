@@ -349,9 +349,9 @@ func main() {
 
 	if consoleLog != "" {
 		cl := strings.ToLower(consoleLog)
-		if cl != "quiet" && cl != "noquiet" { // LINTED: Fatalf
+		if cl != "quiet" && cl != "noquiet" { //nolint:goconst
 			log.Fatalf("ERROR: Invalid --console-log value: %s.  Must be 'quiet' or 'noquiet'",
-				consoleLog)
+				consoleLog) // LINTED: Fatalf
 		}
 		isConsoleLogQuiet = (cl == "quiet")
 	}
@@ -526,10 +526,12 @@ func main() {
 
 			case <-time.After(checkInterval):
 				connectionsMutex.Lock()
+
 				for id, conn := range connections {
 					if conn.monitoring {
 						continue
 					}
+
 					idleTime := time.Since(conn.lastActivityTime)
 					connUptime := time.Since(conn.startTime)
 
@@ -539,6 +541,7 @@ func main() {
 						log.Printf("IDLEKILL [%s] %s@%s (idle %s, link %s)",
 							id, conn.userName, conn.hostName, idleTime.Round(time.Second),
 							connUptime.Round(time.Second))
+
 						if _, err := conn.channel.Write([]byte(fmt.Sprintf(
 							"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
 							connUptime.Round(time.Second)))); err != nil {
@@ -557,6 +560,7 @@ func main() {
 						connUptime := time.Since(conn.startTime)
 						log.Printf("TIMEKILL [%s] %s@%s (link time %s)",
 							id, conn.userName, conn.hostName, connUptime.Round(time.Second))
+
 						if _, err := conn.channel.Write([]byte(fmt.Sprintf(
 							"\r\n\r\nCONNECTION TIMEOUT (link time %s)\r\n\r\n",
 							connUptime.Round(time.Second)))); err != nil {
@@ -903,6 +907,7 @@ func toggleGracefulShutdown() {
 
 		if len(connections) == 0 {
 			connectionsMutex.Unlock()
+
 			select {
 			case shutdownSignal <- struct{}{}:
 
@@ -1005,15 +1010,12 @@ func immediateShutdown() {
 
 func listConnections() {
 	connectionsMutex.Lock()
+
 	defer connectionsMutex.Unlock()
 
-	fmt.Printf("\r\n")
-	fmt.Printf("\r+====================+\r\n")
-	fmt.Printf("\r| Active Connections |\r\n")
-	fmt.Printf("\r+====================+\r\n\r\n")
-
 	if len(connections) == 0 {
-		fmt.Printf("\r* None!\r\n\r\n")
+		fmt.Printf("\r%s No active connections.\r\n", nowStamp())
+
 		return
 	}
 
@@ -1084,12 +1086,14 @@ func listConnections() {
 
 	fmt.Print(border)
 	fmt.Printf("\r| %-*s | %-*s | %*s | %*s |\r\n",
-		maxID, "Session ID", maxDetails, "Connection Details", maxLink, "Link Time", maxIdle, "Idle Time")
+		maxID, "Session ID", maxDetails, "Connection Details",
+		maxLink, "Link Time", maxIdle, "Idle Time")
 	fmt.Print(border)
 
 	for _, r := range rows {
 		fmt.Printf("\r| %*s | %-*s | %*s | %*s |\r\n",
-			maxID, r.ID, maxDetails, r.Details, maxLink, r.Link, maxIdle, r.Idle)
+			maxID, r.ID, maxDetails, r.Details,
+			maxLink, r.Link, maxIdle, r.Idle)
 	}
 
 	fmt.Print(border)
@@ -1099,186 +1103,135 @@ func listConnections() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func listConfiguration() {
-	fmt.Println("")
-	originalWriter := log.Writer()
+	pid := os.Getpid()
 
-	if consoleLogFile != nil {
-		log.SetOutput(io.MultiWriter(os.Stdout))
-	} else {
-		log.SetOutput(os.Stdout)
-	}
+	var b strings.Builder
+	const textWidth = 52 // ???
 
-	printVersion()
-
-	log.SetOutput(originalWriter)
-	fmt.Printf("\r\n")
-	fmt.Printf("\r+======================================+\r\n")
-	fmt.Printf("\r| DPS8M Proxy Configuration and Status |\r\n")
-	fmt.Printf("\r+======================================+\r\n")
-	fmt.Printf("\r\n")
-
-	fmt.Printf("* Process ID (PID): %d\r\n", os.Getpid())
-
-	if len(sshAddr) == 1 {
-		fmt.Printf("* SSH listener on: %s\r\n", sshAddr[0])
-	} else {
-		fmt.Println("* SSH listeners on:")
-		for _, addr := range sshAddr {
-			fmt.Printf("\r  * %s\r\n", addr)
+	// XXreviveXX:disable:line-length-limit
+	// XXreviveXX:disable:modifies-parameter
+	printRow := func(b *strings.Builder, text string) {
+		b.WriteString("| ")
+		b.WriteString(text)
+		padding := textWidth - len(text)
+		if padding < 0 {
+			padding = 0
 		}
+		b.WriteString(strings.Repeat(" ", padding))
+		b.WriteString(" |\r\n")
 	}
+	// XXreviveXX:enable:modifies-parameter
+	// XXreviveXX:enable:line-length-limit
 
-	fmt.Printf("* Default TELNET target: %s\r\n", telnetHostPort)
+	separator := "+======================================================+\r\n"
 
+	b.WriteString("\r\n")
+	b.WriteString(separator)
+
+	printRow(&b, fmt.Sprintf("DPS8M Proxy Configuration and Status - PID: %-8d", pid))
+	b.WriteString(separator)
+
+	printRow(&b, "SSH listeners on:")
+	for _, addr := range sshAddr {
+		printRow(&b, "* "+addr)
+	}
+	b.WriteString(separator)
+
+	printRow(&b, "Default TELNET target: "+telnetHostPort)
+	printRow(&b, fmt.Sprintf("Debug TELNET Negotiation: %t", debugNegotiation))
 	if len(altHosts) > 0 {
-		fmt.Println("* Alt Targets:")
+		printRow(&b, "Alt Targets:")
 		for user, hostPort := range altHosts {
-			fmt.Printf("\r  * %s [%s]\r\n", hostPort, user)
+			printRow(&b, fmt.Sprintf("* %s [%s]", hostPort, user))
 		}
-	} else {
-		fmt.Println("* Alt Targets: None configured")
 	}
+	b.WriteString(separator)
 
-	fmt.Printf("* Debug TELNET Negotiation: %t\r\n", debugNegotiation)
+	timeMaxStr := "disabled"
+	if timeMax > 0 {
+		timeMaxStr = fmt.Sprintf("%d seconds", timeMax)
+	}
+	printRow(&b, "Time Max: "+timeMaxStr)
 
-	fmt.Printf("* Time Max: %s\r\n", func(t int) string {
-		if t == 0 {
-			return "disabled"
-		}
+	idleMaxStr := "disabled"
+	if idleMax > 0 {
+		idleMaxStr = fmt.Sprintf("%d seconds", idleMax)
+	}
+	printRow(&b, "Idle Max: "+idleMaxStr)
+	b.WriteString(separator)
 
-		return fmt.Sprintf("%d seconds", t)
-	}(timeMax))
-
-	fmt.Printf("* Idle Max: %s\r\n", func(t int) string {
-		if t == 0 {
-			return "disabled"
-		}
-
-		return fmt.Sprintf("%d seconds", t)
-	}(idleMax))
-
-	fmt.Printf("* Log Base Directory: %s\r\n", logDir)
-	fmt.Printf("* No Session Logging: %t\r\n", noLog)
+	printRow(&b, "Log Base Directory: "+logDir)
+	printRow(&b, fmt.Sprintf("No Session Logging: %t", noLog))
 
 	if consoleLog != "" {
-		logPath := getConsoleLogPath(time.Now())
-		logPath = filepath.Clean(logPath)
-
 		var quietMode string
 		if isConsoleLogQuiet {
-			quietMode = "\r\n* Console Logging Mode: quiet"
+			quietMode = "quiet"
 		} else {
-			quietMode = "\r\n* Console Logging Mode: noquiet"
+			quietMode = "noquiet"
 		}
-
-		fmt.Printf("* Console Logging: %s%s\r\n", logPath, quietMode)
+		printRow(&b, "Console Logging: "+quietMode)
 	} else {
-		fmt.Printf("* Console Logging: disabled\r\n")
+		printRow(&b, "Console Logging: disabled")
 	}
 
-	fmt.Printf("* No Log Compression: %t\r\n", noCompress)
-	fmt.Printf("* Compression Algorithm: %s\r\n", compressAlgo)
-	fmt.Printf("* Compression Level: %s\r\n", compressLevel)
-	fmt.Printf("* Log Permissions: Files: %04o, Dirs: %04o\r\n", logPerm, logDirPerm)
+	printRow(&b, fmt.Sprintf("No Log Compression: %t", noCompress))
+	printRow(&b, "Compression Algorithm: "+compressAlgo)
+	printRow(&b, "Compression Level: "+compressLevel)
+	printRow(&b, fmt.Sprintf("Log Permissions: Files: %04o, Dirs: %04o", logPerm, logDirPerm))
+	b.WriteString(separator)
 
-	fmt.Printf("* Graceful Shutdown: %t\r\n", gracefulShutdownMode.Load())
-	fmt.Printf("* Deny New Connections: %t\r\n", denyNewConnectionsMode.Load())
+	printRow(&b, fmt.Sprintf("Graceful Shutdown: %t", gracefulShutdownMode.Load()))
+	printRow(&b, fmt.Sprintf("Deny New Connections: %t", denyNewConnectionsMode.Load()))
+	b.WriteString(separator)
 
 	if blacklistFile == "" && len(blacklistedNetworks) == 0 { //nolint:gocritic
-		fmt.Printf("* Blacklist: disabled\r\n")
+		printRow(&b, "Blacklist: 0 entries active")
 	} else if whitelistFile != "" && blacklistFile == "" {
-		fmt.Printf("* Blacklist: Deny all (due to whitelist only)\r\n")
+		printRow(&b, "Blacklist: Deny all (due to whitelist only)")
 	} else {
-		if len(blacklistedNetworks) == 1 {
-			fmt.Printf("* Blacklist: 1 entry active\r\n")
-		} else {
-			fmt.Printf("* Blacklist: %d entries active\r\n",
-				len(blacklistedNetworks))
-		}
+		printRow(&b, fmt.Sprintf("Blacklist: %d entries active", len(blacklistedNetworks)))
 	}
 
 	if whitelistFile == "" {
-		fmt.Printf("* Whitelist: disabled\r\n")
+		printRow(&b, "Whitelist: 0 entries active")
 	} else {
-		if len(whitelistedNetworks) == 1 {
-			fmt.Printf("* Whitelist: 1 entry active\r\n")
-		} else {
-			fmt.Printf("* Whitelist: %d entries active\r\n",
-				len(whitelistedNetworks))
-		}
+		printRow(&b, fmt.Sprintf("Whitelist: %d entries active", len(whitelistedNetworks)))
 	}
+	b.WriteString(separator)
 
 	uptime := time.Since(startTime)
-	years := int(uptime.Hours() / (24 * 365))
-	days := int(uptime.Hours()/(24)) % 365
-	hours := int(uptime.Hours()) % 24
-	minutes := int(uptime.Minutes()) % 60
-	seconds := int(uptime.Seconds()) % 60
-
-	uptimeString := ""
-	if years > 0 {
-		if years == 1 {
-			uptimeString += fmt.Sprintf("%d year, ", years)
-		} else {
-			uptimeString += fmt.Sprintf("%d years, ", years)
-		}
-	}
-	if days > 0 {
-		if days == 1 {
-			uptimeString += fmt.Sprintf("%d day, ", days)
-		} else {
-			uptimeString += fmt.Sprintf("%d days, ", days)
-		}
-	}
-	uptimeString += fmt.Sprintf("%dh%dm%ds", hours, minutes, seconds)
-
-	fmt.Printf("* Uptime: %s (since %s)\r\n",
-		uptimeString, startTime.Format("2006-Jan-02 15:04:05"))
+	uptimeString := fmt.Sprintf("%dh%dm%ds (since %s)",
+		int(uptime.Hours())%24, int(uptime.Minutes())%60, int(uptime.Seconds())%60,
+		startTime.Format("2006-Jan-02 15:04:24"))
+	printRow(&b, "Uptime: "+uptimeString)
 
 	var m runtime.MemStats
 	debug.FreeOSMemory()
 	runtime.ReadMemStats(&m)
-
 	alloc := float64(m.Alloc)
 	sys := float64(m.Sys)
-
 	var allocStr, sysStr string
-
 	switch {
-	case alloc >= GiB:
-		allocStr = fmt.Sprintf("%.2f GiB", alloc/GiB)
-
 	case alloc >= MiB:
 		allocStr = fmt.Sprintf("%.2f MiB", alloc/MiB)
-
-	case alloc >= KiB:
-		allocStr = fmt.Sprintf("%.2f KiB", alloc/KiB)
-
 	default:
-		allocStr = fmt.Sprintf("%.0f B", alloc)
+		allocStr = fmt.Sprintf("%.2f KiB", alloc/KiB)
 	}
-
 	switch {
-	case sys >= GiB:
-		sysStr = fmt.Sprintf("%.2f GiB", sys/GiB)
-
 	case sys >= MiB:
 		sysStr = fmt.Sprintf("%.2f MiB", sys/MiB)
-
-	case sys >= KiB:
-		sysStr = fmt.Sprintf("%.2f KiB", sys/KiB)
-
 	default:
-		sysStr = fmt.Sprintf("%.0f B", sys)
+		sysStr = fmt.Sprintf("%.2f KiB", sys/KiB)
 	}
-
 	memStatsStr := fmt.Sprintf("%s used (of %s reserved)", allocStr, sysStr)
+	printRow(&b, "Memory: "+memStatsStr)
 
-	fmt.Printf("* Memory: %s\r\n", memStatsStr)
+	printRow(&b, fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)",
+		runtime.NumGoroutine()))
+	b.WriteString(separator)
 
-	fmt.Printf("* Runtime: %d active Goroutines (use 'cg' for details)\r\n",
-		runtime.NumGoroutine())
-
+	fmt.Print(b.String())
 	fmt.Printf("\r\n")
 }
 
@@ -1362,7 +1315,9 @@ func reloadLists() {
 
 func killConnection(id string) {
 	connectionsMutex.Lock()
+
 	conn, ok := connections[id]
+
 	connectionsMutex.Unlock()
 
 	if !ok {
@@ -1543,6 +1498,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	}
 
 	connectionsMutex.Lock()
+
 	found := false
 
 	for _, existingConn := range connections {
@@ -1562,15 +1518,19 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	}
 
 	connections[sid] = conn
+
 	connectionsMutex.Unlock()
 
 	defer func() {
 		conn.cancelFunc()
+
 		connectionsMutex.Lock()
+
 		delete(connections, sid)
 
 		if gracefulShutdownMode.Load() && len(connections) == 0 {
 			connectionsMutex.Unlock()
+
 			select {
 			case shutdownSignal <- struct{}{}:
 
@@ -2532,6 +2492,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 
 		if conn.wasMonitored {
 			connectionsMutex.Lock()
+
 			currentMonitors := 0
 
 			for _, c := range connections {
@@ -2711,7 +2672,9 @@ func newSessionID(connections map[string]*Connection, mutex *sync.Mutex) string 
 		id := hex.EncodeToString(b)
 
 		mutex.Lock()
+
 		_, exists := connections[id]
+
 		mutex.Unlock()
 
 		if !exists {
@@ -2813,6 +2776,7 @@ func rotateConsoleLog() {
 	debug.FreeOSMemory()
 
 	consoleLogMutex.Lock()
+
 	defer consoleLogMutex.Unlock()
 
 	if consoleLogFile != nil {
@@ -3020,6 +2984,7 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
+
 	defer func() {
 		if err := file.Close(); err != nil {
 			log.Printf("Error closing file: %v", err)
@@ -3070,12 +3035,6 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func listGoroutines() {
-	fmt.Printf("\r\n")
-	fmt.Printf("+===================+\r\n")
-	fmt.Printf("| Active Goroutines |\r\n")
-	fmt.Printf("+===================+\r\n\r\n")
-
-	// Use a larger buffer for the stack trace, just in case.
 	buf := make([]byte, 1<<20)
 	stacklen := runtime.Stack(buf, true)
 	stackTrace := string(buf[:stacklen])
@@ -3103,7 +3062,8 @@ func listGoroutines() {
 
 		header := strings.Fields(lines[0])
 		if len(header) < 2 {
-			continue		}
+			continue
+		}
 
 		id := header[1]
 		state := strings.Trim(lines[0][len(header[0])+len(id)+2:], " :")
@@ -3122,8 +3082,7 @@ func listGoroutines() {
 		})
 	}
 
-	if len(goroutines) == 0 {
-		fmt.Printf("* None!\n\n")
+	if len(goroutines) == 0 { // Not possible!
 		return
 	}
 
@@ -3144,6 +3103,7 @@ func listGoroutines() {
 		if len(r.Name) > maxName {
 			maxName = len(r.Name)
 		}
+
 		if len(r.Value) > maxVal {
 			maxVal = len(r.Value)
 		}
@@ -3153,7 +3113,10 @@ func listGoroutines() {
 		"+=%s=+=%s=+\n", strings.Repeat("=", maxName), strings.Repeat("=", maxVal),
 	)
 
+	fmt.Printf("\r\n")
+
 	fmt.Print(border)
+
 	for _, g := range goroutines {
 		fmt.Printf("| %-*s | %-*s |\n", maxName, "Name", maxVal, "Goroutine #"+g.ID)
 		fmt.Printf("| %-*s | %-*s |\n", maxName, "State", maxVal, g.State)
@@ -3161,9 +3124,9 @@ func listGoroutines() {
 		fmt.Printf("| %-*s | %-*s |\n", maxName, "Caller", maxVal, g.Caller)
 		fmt.Print(border)
 	}
-	fmt.Printf("\n")
-}
 
+	fmt.Printf("\r\n")
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
