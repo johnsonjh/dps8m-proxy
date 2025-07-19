@@ -1891,6 +1891,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		}
 	}
 
+	telnetConnectionsTotal.Add(1)
 	remote, err := net.Dial("tcp", fmt.Sprintf("%s:%d", targetHost, targetPort))
 	if err != nil {
 		if _, err := fmt.Fprintf(channel, "%v\r\n\r\n", err); err != nil {
@@ -1904,8 +1905,6 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 		return
 	}
-
-	telnetConnectionsTotal.Add(1)
 
 	if tcp2, ok := remote.(*net.TCPConn); ok {
 		_ = tcp2.SetNoDelay(true)
