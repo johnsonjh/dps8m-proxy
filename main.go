@@ -1005,7 +1005,6 @@ func immediateShutdown() {
 
 func listConnections() {
 	connectionsMutex.Lock()
-
 	defer connectionsMutex.Unlock()
 
 	fmt.Printf("\r\n")
@@ -1015,28 +1014,85 @@ func listConnections() {
 
 	if len(connections) == 0 {
 		fmt.Printf("\r* None!\r\n\r\n")
-
 		return
 	}
 
+	type row struct {
+		ID      string
+		Details string
+		Link    string
+		Idle    string
+	}
+
+	var rows []row
 	for id, conn := range connections {
+		user := conn.sshConn.User()
+		if len(user) > 21 {
+			user = "..." + user[len(user)-18:]
+		}
+
+		var details, idle string
 		if conn.monitoring {
-			fmt.Printf("\r* ID %s: %s@%s -> %s [Link: %s]\r\n",
-				id, conn.sshConn.User(), conn.sshConn.RemoteAddr(), conn.monitoredConnection.ID,
-				time.Since(conn.startTime).Round(time.Second))
+			details = fmt.Sprintf("%s@%s -> %s",
+				user, conn.sshConn.RemoteAddr(), conn.monitoredConnection.ID)
+			idle = "---------"
 		} else {
 			targetInfo := ""
 			if conn.targetHost != "" {
 				targetInfo = fmt.Sprintf(" -> %s:%d", conn.targetHost, conn.targetPort)
 			}
+			details = fmt.Sprintf("%s@%s%s",
+				user, conn.sshConn.RemoteAddr(), targetInfo)
+			idle = time.Since(conn.lastActivityTime).Round(time.Second).String()
+		}
 
-			fmt.Printf("\r* ID %s: %s@%s%s [Link: %s, Idle: %s]\r\n",
-				id, conn.sshConn.User(), conn.sshConn.RemoteAddr(), targetInfo,
-				time.Since(conn.startTime).Round(time.Second),
-				time.Since(conn.lastActivityTime).Round(time.Second))
+		rows = append(rows, row{
+			ID:      id,
+			Details: details,
+			Link:    time.Since(conn.startTime).Round(time.Second).String(),
+			Idle:    idle,
+		})
+	}
+
+	maxID := len("Session ID")
+	maxDetails := len("Connection Details")
+	maxLink := len("Link Time")
+	maxIdle := len("Idle Time")
+
+	for _, r := range rows {
+		if len(r.ID) > maxID {
+			maxID = len(r.ID)
+		}
+		if len(r.Details) > maxDetails {
+			maxDetails = len(r.Details)
+		}
+		if len(r.Link) > maxLink {
+			maxLink = len(r.Link)
+		}
+		if len(r.Idle) > maxIdle {
+			maxIdle = len(r.Idle)
 		}
 	}
 
+	border := fmt.Sprintf(
+		"\r+=%s=+=%s=+=%s=+=%s=+\r\n",
+		strings.Repeat("=", maxID),
+		strings.Repeat("=", maxDetails),
+		strings.Repeat("=", maxLink),
+		strings.Repeat("=", maxIdle),
+	)
+
+	fmt.Print(border)
+	fmt.Printf("\r| %-*s | %-*s | %*s | %*s |\r\n",
+		maxID, "Session ID", maxDetails, "Connection Details", maxLink, "Link Time", maxIdle, "Idle Time")
+	fmt.Print(border)
+
+	for _, r := range rows {
+		fmt.Printf("\r| %*s | %-*s | %*s | %*s |\r\n",
+			maxID, r.ID, maxDetails, r.Details, maxLink, r.Link, maxIdle, r.Idle)
+	}
+
+	fmt.Print(border)
 	fmt.Printf("\r\n")
 }
 
