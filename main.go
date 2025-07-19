@@ -69,6 +69,7 @@ const (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 var (
+	startTime              = time.Now()
 	allowRoot              bool
 	logPerm                uint = 0o600
 	logDirPerm             uint = 0o750
@@ -683,6 +684,14 @@ func handleConsoleInput() {
 		case "cg", "CG", "cG", "Cg":
 			listGoroutines()
 
+		case "gc":
+			if strings.ToLower(consoleLog) == "quiet" {
+				fmt.Printf("%s Collecting garbage and freeing memory.\r\n", nowStamp())
+			}
+			log.Println("Collecting garbage and freeing memory.")
+			runtime.GC()
+			debug.FreeOSMemory()
+
 		case "k", "K":
 			if len(parts) < 2 {
 				fmt.Fprintf(os.Stderr, "%s Error: session ID required for 'k' command.\r\n",
@@ -701,6 +710,18 @@ func handleConsoleInput() {
 				}
 			}
 			reloadLists()
+
+		case "xyzzy":
+			if strings.ToLower(consoleLog) == "quiet" {
+				fmt.Printf("%s Nothing happens.\r\n", nowStamp())
+			}
+			log.Println("Nothing happens.")
+
+		case "XYZZY":
+			if strings.ToLower(consoleLog) == "quiet" {
+				fmt.Printf("%s NOTHING HAPPENS.\r\n", nowStamp())
+			}
+			log.Println("NOTHING HAPPENS.")
 
 		case "":
 
@@ -886,28 +907,33 @@ func listConfiguration() {
 	log.SetOutput(originalWriter)
 	fmt.Println("\r\n\rDPS8M Proxy Configuration")
 	fmt.Println("\r=========================")
+	fmt.Printf("\r\n")
+
+	fmt.Printf("* Process ID (PID): %d\r\n", os.Getpid())
 
 	if len(sshAddr) == 1 {
-		fmt.Printf("\r\n* SSH listener on: %s\r\n", sshAddr[0])
+		fmt.Printf("* SSH listener on: %s\r\n", sshAddr[0])
 	} else {
-		fmt.Println("\r\n* SSH listeners on:")
+		fmt.Println("* SSH listeners on:")
 		for _, addr := range sshAddr {
 			fmt.Printf("\r  * %s\r\n", addr)
 		}
 	}
 
-	fmt.Printf("\r* Default TELNET target: %s\r\n", telnetHostPort)
+	fmt.Printf("* Default TELNET target: %s\r\n", telnetHostPort)
 
 	if len(altHosts) > 0 {
-		fmt.Println("\r* Alt Targets:")
+		fmt.Println("* Alt Targets:")
 		for user, hostPort := range altHosts {
 			fmt.Printf("\r  * %s [%s]\r\n", hostPort, user)
 		}
 	} else {
-		fmt.Println("\r* Alt Targets: None configured")
+		fmt.Println("* Alt Targets: None configured")
 	}
 
-	fmt.Printf("\r* Time Max: %s\r\n", func(t int) string {
+	fmt.Printf("* Debug TELNET Negotiation: %t\r\n", debugNegotiation)
+
+	fmt.Printf("* Time Max: %s\r\n", func(t int) string {
 		if t == 0 {
 			return "disabled"
 		}
@@ -915,7 +941,7 @@ func listConfiguration() {
 		return fmt.Sprintf("%d seconds", t)
 	}(timeMax))
 
-	fmt.Printf("\r* Idle Max: %s\r\n", func(t int) string {
+	fmt.Printf("* Idle Max: %s\r\n", func(t int) string {
 		if t == 0 {
 			return "disabled"
 		}
@@ -923,8 +949,8 @@ func listConfiguration() {
 		return fmt.Sprintf("%d seconds", t)
 	}(idleMax))
 
-	fmt.Printf("\r* Log Base Directory: %s\r\n", logDir)
-	fmt.Printf("\r* No Session Logging: %t\r\n", noLog)
+	fmt.Printf("* Log Base Directory: %s\r\n", logDir)
+	fmt.Printf("* No Session Logging: %t\r\n", noLog)
 	if consoleLog != "" {
 		logPath := getConsoleLogPath(time.Now())
 		logPath = filepath.Clean(logPath)
@@ -934,45 +960,70 @@ func listConfiguration() {
 		} else {
 			quietMode = "\r\n* Console Logging Mode: noquiet"
 		}
-		fmt.Printf("\r* Console Logging: %s%s\r\n", logPath, quietMode)
+		fmt.Printf("* Console Logging: %s%s\r\n", logPath, quietMode)
 	} else {
-		fmt.Printf("\r* Console Logging: disabled\r\n")
+		fmt.Printf("* Console Logging: disabled\r\n")
 	}
-	fmt.Printf("\r* No Log Compression: %t\r\n", noCompress)
-	fmt.Printf("\r* Compression Algorithm: %s\r\n", compressAlgo)
-	fmt.Printf("\r* Compression Level: %s\r\n", compressLevel)
-	fmt.Printf("\r* Log Permissions: Files: %04o, Dirs: %04o\r\n", logPerm, logDirPerm)
+	fmt.Printf("* No Log Compression: %t\r\n", noCompress)
+	fmt.Printf("* Compression Algorithm: %s\r\n", compressAlgo)
+	fmt.Printf("* Compression Level: %s\r\n", compressLevel)
+	fmt.Printf("* Log Permissions: Files: %04o, Dirs: %04o\r\n", logPerm, logDirPerm)
 
-	fmt.Printf("\r* Graceful Shutdown: %t\r\n", gracefulShutdownMode.Load())
-	fmt.Printf("\r* Deny New Connections: %t\r\n", denyNewConnectionsMode.Load())
+	fmt.Printf("* Graceful Shutdown: %t\r\n", gracefulShutdownMode.Load())
+	fmt.Printf("* Deny New Connections: %t\r\n", denyNewConnectionsMode.Load())
 
 	if blacklistFile == "" && len(blacklistedNetworks) == 0 { //nolint:gocritic
-		fmt.Printf("\r* Blacklist: disabled\r\n")
+		fmt.Printf("* Blacklist: disabled\r\n")
 	} else if whitelistFile != "" && blacklistFile == "" {
-		fmt.Printf("\r* Blacklist: Deny all (due to whitelist only)\r\n")
+		fmt.Printf("* Blacklist: Deny all (due to whitelist only)\r\n")
 	} else {
 		if len(blacklistedNetworks) == 1 {
-			fmt.Printf("\r* Blacklist: 1 entry active\r\n")
+			fmt.Printf("* Blacklist: 1 entry active\r\n")
 		} else {
-			fmt.Printf("\r* Blacklist: %d entries active\r\n",
+			fmt.Printf("* Blacklist: %d entries active\r\n",
 				len(blacklistedNetworks))
 		}
 	}
 
 	if whitelistFile == "" {
-		fmt.Printf("\r* Whitelist: disabled\r\n")
+		fmt.Printf("* Whitelist: disabled\r\n")
 	} else {
 		if len(whitelistedNetworks) == 1 {
-			fmt.Printf("\r* Whitelist: 1 entry active\r\n")
+			fmt.Printf("* Whitelist: 1 entry active\r\n")
 		} else {
-			fmt.Printf("\r* Whitelist: %d entries active\r\n",
+			fmt.Printf("* Whitelist: %d entries active\r\n",
 				len(whitelistedNetworks))
 		}
 	}
 
-	fmt.Printf("\r* Debug: %t\r\n", debugNegotiation)
+	uptime := time.Since(startTime)
+	years := int(uptime.Hours() / (24 * 365))
+	days := int(uptime.Hours()/(24)) % 365
+	hours := int(uptime.Hours()) % 24
+	minutes := int(uptime.Minutes()) % 60
+	seconds := int(uptime.Seconds()) % 60
 
-	fmt.Printf("\r* Runtime: %d active Goroutines (use 'cg' for details)\n\r\n",
+	uptimeString := ""
+	if years > 0 {
+		if years == 1 {
+			uptimeString += fmt.Sprintf("%d year, ", years)
+		} else {
+			uptimeString += fmt.Sprintf("%d years, ", years)
+		}
+	}
+	if days > 0 {
+		if days == 1 {
+			uptimeString += fmt.Sprintf("%d day, ", days)
+		} else {
+			uptimeString += fmt.Sprintf("%d days, ", days)
+		}
+	}
+	uptimeString += fmt.Sprintf("%dh%dm%ds", hours, minutes, seconds)
+
+	fmt.Printf("* Uptime: %s (since %s)\r\n",
+		uptimeString, startTime.Format("2006-Jan-02 15:04:05"))
+
+	fmt.Printf("* Runtime: %d active Goroutines (use 'cg' for details)\r\n\r\n",
 		runtime.NumGoroutine())
 }
 
