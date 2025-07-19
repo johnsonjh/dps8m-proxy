@@ -2996,54 +2996,100 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func listGoroutines() {
-	buf := make([]byte, 1<<20)
-	n := runtime.Stack(buf, true)
-	stacks := bytes.Split(buf[:n], []byte("\n\n"))
-
 	fmt.Printf("\r\n")
 	fmt.Printf("+===================+\r\n")
 	fmt.Printf("| Active Goroutines |\r\n")
-	fmt.Printf("+===================+\r\n")
-	fmt.Printf("\r\n")
+	fmt.Printf("+===================+\r\n\r\n")
 
-	for i, stack := range stacks {
-		lines := bytes.Split(stack, []byte("\n"))
+	// Use a larger buffer for the stack trace, just in case.
+	buf := make([]byte, 1<<20)
+	stacklen := runtime.Stack(buf, true)
+	stackTrace := string(buf[:stacklen])
 
+	goroutinesRaw := strings.Split(stackTrace, "\n\n")
+
+	type GoroutineInfo struct {
+		ID         string
+		State      string
+		Entrypoint string
+		Caller     string
+	}
+
+	var goroutines []GoroutineInfo
+
+	for _, g := range goroutinesRaw {
+		if strings.TrimSpace(g) == "" {
+			continue
+		}
+
+		lines := strings.Split(g, "\n")
 		if len(lines) < 2 {
 			continue
 		}
 
-		header := string(lines[0]) // L1: header
-		entry := string(lines[1])  // L2: entry point
-		caller := ""               // L3: caller
+		header := strings.Fields(lines[0])
+		if len(header) < 2 {
+			continue		}
 
+		id := header[1]
+		state := strings.Trim(lines[0][len(header[0])+len(id)+2:], " :")
+
+		entrypoint := lines[1]
+		caller := ""
 		if len(lines) > 2 {
-			caller = string(lines[2])
+			caller = strings.TrimSpace(lines[2])
 		}
 
-		fmt.Printf("* Goroutine #%d:\n", i+1)
-
-		fmt.Printf("  * Name/State: %s\n", func(s string) string {
-			s = strings.TrimSpace(strings.ReplaceAll(s, "\t", " "))
-			s = strings.TrimSuffix(s, ":")
-			s = regexp.MustCompile(`goroutine \d+ `).ReplaceAllString(s, "")
-
-			return s
-		}(header))
-
-		fmt.Printf("  * Entrypoint: %s\n", func(s string) string {
-			return strings.TrimSpace(strings.ReplaceAll(s, "\t", " "))
-		}(entry))
-
-		if caller != "" {
-			fmt.Printf("  * Caller:     %s\n", func(s string) string {
-				return strings.TrimSpace(strings.ReplaceAll(s, "\t", " "))
-			}(caller))
-		}
-
-		fmt.Println()
+		goroutines = append(goroutines, GoroutineInfo{
+			ID:         id,
+			State:      state,
+			Entrypoint: entrypoint,
+			Caller:     caller,
+		})
 	}
+
+	if len(goroutines) == 0 {
+		fmt.Printf("* None!\n\n")
+		return
+	}
+
+	type row struct{ Name, Value string }
+	var allRows []row
+
+	for _, g := range goroutines {
+		allRows = append(allRows, row{"Name", "Goroutine #" + g.ID})
+		allRows = append(allRows, row{"State", g.State})
+		allRows = append(allRows, row{"Entrypoint", g.Entrypoint})
+		allRows = append(allRows, row{"Caller", g.Caller})
+	}
+
+	maxName := 0
+	maxVal := 0
+
+	for _, r := range allRows {
+		if len(r.Name) > maxName {
+			maxName = len(r.Name)
+		}
+		if len(r.Value) > maxVal {
+			maxVal = len(r.Value)
+		}
+	}
+
+	border := fmt.Sprintf(
+		"+=%s=+=%s=+\n", strings.Repeat("=", maxName), strings.Repeat("=", maxVal),
+	)
+
+	fmt.Print(border)
+	for _, g := range goroutines {
+		fmt.Printf("| %-*s | %-*s |\n", maxName, "Name", maxVal, "Goroutine #"+g.ID)
+		fmt.Printf("| %-*s | %-*s |\n", maxName, "State", maxVal, g.State)
+		fmt.Printf("| %-*s | %-*s |\n", maxName, "Entrypoint", maxVal, g.Entrypoint)
+		fmt.Printf("| %-*s | %-*s |\n", maxName, "Caller", maxVal, g.Caller)
+		fmt.Print(border)
+	}
+	fmt.Printf("\n")
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
