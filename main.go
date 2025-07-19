@@ -702,7 +702,7 @@ func handleConsoleInput() {
 		case "Q":
 			immediateShutdown()
 
-		case "l", "L":
+		case "l":
 			listConnections()
 
 		case "s", "S":
@@ -1026,10 +1026,12 @@ func listConnections() {
 		Idle    string
 	}
 
-	var rows []row
+	userTruncat := false
+	rows := make([]row, 0, len(connections))
 	for id, conn := range connections {
 		user := conn.sshConn.User()
 		if len(user) > 21 {
+			userTruncat = true
 			user = "..." + user[len(user)-18:]
 		}
 
@@ -1084,6 +1086,8 @@ func listConnections() {
 		strings.Repeat("=", maxIdle),
 	)
 
+	fmt.Printf("\r\n")
+
 	fmt.Print(border)
 	fmt.Printf("\r| %-*s | %-*s | %*s | %*s |\r\n",
 		maxID, "Session ID", maxDetails, "Connection Details",
@@ -1097,6 +1101,12 @@ func listConnections() {
 	}
 
 	fmt.Print(border)
+
+	if userTruncat {
+		fmt.Printf(
+			"\r\n* Some Connections Details have been truncated, use 'cg' for wider output.\r\n")
+	}
+
 	fmt.Printf("\r\n")
 }
 
@@ -1108,8 +1118,6 @@ func listConfiguration() {
 	var b strings.Builder
 	const textWidth = 52 // ???
 
-	// XXreviveXX:disable:line-length-limit
-	// XXreviveXX:disable:modifies-parameter
 	printRow := func(b *strings.Builder, text string) {
 		b.WriteString("| ")
 		b.WriteString(text)
@@ -1120,8 +1128,6 @@ func listConfiguration() {
 		b.WriteString(strings.Repeat(" ", padding))
 		b.WriteString(" |\r\n")
 	}
-	// XXreviveXX:enable:modifies-parameter
-	// XXreviveXX:enable:line-length-limit
 
 	separator := "+======================================================+\r\n"
 
@@ -3048,7 +3054,7 @@ func listGoroutines() {
 		Caller     string
 	}
 
-	var goroutines []GoroutineInfo
+	goroutines := make([]GoroutineInfo, 0, len(goroutinesRaw))
 
 	for _, g := range goroutinesRaw {
 		if strings.TrimSpace(g) == "" {
@@ -3087,7 +3093,7 @@ func listGoroutines() {
 	}
 
 	type row struct{ Name, Value string }
-	var allRows []row
+	allRows := make([]row, 0, len(goroutines)*4)
 
 	for _, g := range goroutines {
 		allRows = append(allRows, row{"Name", "Goroutine #" + g.ID})
