@@ -684,14 +684,6 @@ func handleConsoleInput() {
 		case "cg", "CG", "cG", "Cg":
 			listGoroutines()
 
-		case "gc":
-			if strings.ToLower(consoleLog) == "quiet" {
-				fmt.Printf("%s Collecting garbage and freeing memory.\r\n", nowStamp())
-			}
-			log.Println("Collecting garbage and freeing memory.")
-			runtime.GC()
-			debug.FreeOSMemory()
-
 		case "k", "K":
 			if len(parts) < 2 {
 				fmt.Fprintf(os.Stderr, "%s Error: session ID required for 'k' command.\r\n",
@@ -711,13 +703,13 @@ func handleConsoleInput() {
 			}
 			reloadLists()
 
-		case "xyzzy":
+		case "xyzzy": // :)
 			if strings.ToLower(consoleLog) == "quiet" {
 				fmt.Printf("%s Nothing happens.\r\n", nowStamp())
 			}
 			log.Println("Nothing happens.")
 
-		case "XYZZY":
+		case "XYZZY": // =)
 			if strings.ToLower(consoleLog) == "quiet" {
 				fmt.Printf("%s NOTHING HAPPENS.\r\n", nowStamp())
 			}
@@ -738,18 +730,18 @@ func handleConsoleInput() {
 
 func showHelp() {
 	fmt.Print("\r\n" +
-		"\r+========== HELP ===========+\r\n" +
-		"\r|                           |\r\n" +
-		"\r|  c - Show Configuration   |\r\n" +
-		"\r|  v - Show Version Info    |\r\n" +
-		"\r|  l - List Connections     |\r\n" +
-		"\r|  k - Kill Connection      |\r\n" +
-		"\r|  d - Deny Connections     |\r\n" +
-		"\r|  r - Reload Access Lists  |\r\n" +
-		"\r|  q - Graceful Shutdown    |\r\n" +
-		"\r|  Q - Immediate Shutdown   |\r\n" +
-		"\r|                           |\r\n" +
-		"\r+===========================+\r\n" +
+		"\r+============= HELP ============+\r\n" +
+		"\r|                               |\r\n" +
+		"\r|  c - Show Config and Status   |\r\n" +
+		"\r|  v - Show Version Information |\r\n" +
+		"\r|  l - List Active Connections  |\r\n" +
+		"\r|  k - Kill Connection          |\r\n" +
+		"\r|  d - Deny New Connections     |\r\n" +
+		"\r|  r - Reload Access Lists      |\r\n" +
+		"\r|  q - Start Graceful Shutdown  |\r\n" +
+		"\r|  Q - Immediate Shutdown       |\r\n" +
+		"\r|                               |\r\n" +
+		"\r+===============================+\r\n" +
 		"\r\n")
 }
 
@@ -904,9 +896,10 @@ func listConfiguration() {
 	}
 
 	printVersion()
+
 	log.SetOutput(originalWriter)
-	fmt.Println("\r\n\rDPS8M Proxy Configuration")
-	fmt.Println("\r=========================")
+	fmt.Println("\r\n\rDPS8M Proxy Configuration and Status")
+	fmt.Println("\r====================================")
 	fmt.Printf("\r\n")
 
 	fmt.Printf("* Process ID (PID): %d\r\n", os.Getpid())
@@ -1023,8 +1016,51 @@ func listConfiguration() {
 	fmt.Printf("* Uptime: %s (since %s)\r\n",
 		uptimeString, startTime.Format("2006-Jan-02 15:04:05"))
 
-	fmt.Printf("* Runtime: %d active Goroutines (use 'cg' for details)\r\n\r\n",
+	var m runtime.MemStats
+	debug.FreeOSMemory()
+	runtime.ReadMemStats(&m)
+
+	alloc := float64(m.Alloc)
+	sys := float64(m.Sys)
+
+	var allocStr, sysStr string
+
+	switch {
+	case alloc >= GiB:
+		allocStr = fmt.Sprintf("%.2f GiB", alloc/GiB)
+
+	case alloc >= MiB:
+		allocStr = fmt.Sprintf("%.2f MiB", alloc/MiB)
+
+	case alloc >= KiB:
+		allocStr = fmt.Sprintf("%.2f KiB", alloc/KiB)
+
+	default:
+		allocStr = fmt.Sprintf("%.0f B", alloc)
+	}
+
+	switch {
+	case sys >= GiB:
+		sysStr = fmt.Sprintf("%.2f GiB", sys/GiB)
+
+	case sys >= MiB:
+		sysStr = fmt.Sprintf("%.2f MiB", sys/MiB)
+
+	case sys >= KiB:
+		sysStr = fmt.Sprintf("%.2f KiB", sys/KiB)
+
+	default:
+		sysStr = fmt.Sprintf("%.0f B", sys)
+	}
+
+	memStatsStr := fmt.Sprintf("%s used (of %s reserved)", allocStr, sysStr)
+
+	fmt.Printf("* Memory: %s\r\n", memStatsStr)
+
+	fmt.Printf("* Runtime: %d active Goroutines (use 'cg' for details)\r\n",
 		runtime.NumGoroutine())
+
+	fmt.Printf("\r\n")
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2427,6 +2463,8 @@ func setupConsoleLogging() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func rotateConsoleLog() {
+	debug.FreeOSMemory()
+
 	consoleLogMutex.Lock()
 	defer consoleLogMutex.Unlock()
 
