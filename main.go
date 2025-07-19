@@ -732,18 +732,18 @@ func handleConsoleInput() {
 
 func showHelp() {
 	fmt.Print("\r\n" +
-		"\r+============= HELP ============+\r\n" +
-		"\r|                               |\r\n" +
-		"\r|  c - Show Config and Status   |\r\n" +
-		"\r|  v - Show Version Information |\r\n" +
-		"\r|  l - List Active Connections  |\r\n" +
-		"\r|  k - Kill Connection          |\r\n" +
-		"\r|  d - Deny New Connections     |\r\n" +
-		"\r|  r - Reload Access Lists      |\r\n" +
-		"\r|  q - Start Graceful Shutdown  |\r\n" +
-		"\r|  Q - Immediate Shutdown       |\r\n" +
-		"\r|                               |\r\n" +
-		"\r+===============================+\r\n" +
+		"\r+============= HELP =============+\r\n" +
+		"\r|                                |\r\n" +
+		"\r|  c - Show Config and Status    |\r\n" +
+		"\r|  v - Show Version Information  |\r\n" +
+		"\r|  l - List Active Connections   |\r\n" +
+		"\r|  k - Kill Connection           |\r\n" +
+		"\r|  d - Deny New Connections      |\r\n" +
+		"\r|  r - Reload Access Lists       |\r\n" +
+		"\r|  q - Start Graceful Shutdown   |\r\n" +
+		"\r|  Q - Immediate Shutdown        |\r\n" +
+		"\r|                                |\r\n" +
+		"\r+================================+\r\n" +
 		"\r\n")
 }
 
