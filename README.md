@@ -188,7 +188,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-18 g475693b) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-19 g513cb8e) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -279,10 +279,10 @@ If you’re running the proxy on a Linux system, you can use `systemd`
 to manage the service (while maintaining access to the interactive
 admin console).
 
-This integration requires:
-
-* **systemd** version **247** or later (released November 2020)
-* A recent version of [`tmux`](https://github.com/tmux/tmux)
+* The `systemd` integration requires:
+  * **`systemd`** version **247** or later (released November 2020),
+    and
+  * a recent version of **[`tmux`](https://github.com/tmux/tmux)**.
 
 > 🔧 With minor changes to the unit file, this setup can also work on
 > `systemd` versions as old as **229** (released February 2016).
@@ -407,12 +407,12 @@ predecessor (code statistics provided by
 		<th>Markdown</th>
 		<th>1</th>
 		<th>438</th>
-		<th>93</th>
+		<th>92</th>
 		<th>0</th>
-		<th>345</th>
+		<th>346</th>
 		<th>0</th>
-		<th>17971</th>
-		<th>330</th>
+		<th>18001</th>
+		<th>331</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -438,12 +438,12 @@ predecessor (code statistics provided by
 		<th>Total</th>
 		<th>13</th>
 		<th>4204</th>
-		<th>753</th>
+		<th>752</th>
 		<th>260</th>
-		<th>3191</th>
+		<th>3192</th>
 		<th>818</th>
-		<th>123601</th>
-		<th>2285</th>
+		<th>123631</th>
+		<th>2286</th>
 	</tr></tfoot></table>
 
 ## Future plans
