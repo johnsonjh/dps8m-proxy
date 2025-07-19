@@ -703,7 +703,10 @@ func handleConsoleInput() {
 			immediateShutdown()
 
 		case "l":
-			listConnections()
+			listConnections(true)
+
+		case "L":
+			listConnections(false)
 
 		case "s", "S":
 			showStats()
@@ -1008,7 +1011,7 @@ func immediateShutdown() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func listConnections() {
+func listConnections(truncate bool) {
 	connectionsMutex.Lock()
 
 	defer connectionsMutex.Unlock()
@@ -1030,7 +1033,7 @@ func listConnections() {
 	rows := make([]row, 0, len(connections))
 	for id, conn := range connections {
 		user := conn.sshConn.User()
-		if len(user) > 21 {
+		if truncate && len(user) > 21 {
 			userTruncat = true
 			user = "..." + user[len(user)-18:]
 		}
