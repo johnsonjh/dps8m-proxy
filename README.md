@@ -30,12 +30,12 @@ to anyone who wants to offer SSH access to legacy systems.
 * ✅ Automatic log‑file compression (using gzip, xz, or zstandard)
 * ✅ Banners for accepted, denied, and blocked connections (configurable per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
+* ✅ Translation of SSH `window-change` events to TELNET NAWS messages
 * ✅ Interactive connection management for administrators
-* ✅ Optional support for management using `systemd` on Linux (running in a sandbox)
-* ✅ User access to TELNET features (*e.g.*, line *BREAK*, *AYT*) and statistics
-* ✅ Link filtering
-* ✅ Translation of SSH `window-change` events to TELNET *NAWS* messages
+* ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
 * ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
+* ✅ Optional support for management using `systemd` on Linux (running in a sandbox)
+* ✅ Link filtering
 * ✅ Live streaming connection sharing (read‑only)
   * 🤝 Allows users to share their session with one or more viewers
 
@@ -43,11 +43,11 @@ to anyone who wants to offer SSH access to legacy systems.
 
 ### Installation
 
-A recent version of [Go](https://go.dev/) is required to build `proxy`
-from source code.
+A recent version of [Go](https://go.dev/) 🐹 is required to build
+`proxy` from source code.
 
 * You can clone the
-  [`git` repository](https://gitlab.com/dps8m/proxy.git) and build
+  [`git` repository](https://gitlab.com/dps8m/proxy.git) 🌱 and build
   the source code using `make`:
 
   ```sh
@@ -67,7 +67,7 @@ from source code.
     FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
     Microsoft Windows) running on 13 different hardware architectures.
 
-* You can also install this software using `go install`:
+* You can also install this software using `go install` 📦:
 
   ```sh
   go install gitlab.com/dps8m/proxy@latest
@@ -189,12 +189,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-20 g186d364) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g39a071d+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -286,12 +286,12 @@ to manage the service (while maintaining access to the interactive
 admin console).
 
 * The `systemd` integration requires:
-  * **`systemd`** version **247** or later (released November 2020),
+  * **`systemd`** version **247** or later (*released November 2020*),
     and
   * a recent version of **[`tmux`](https://github.com/tmux/tmux)**.
 
-> 🔧 With minor changes to the unit file, this setup can also work on
-> `systemd` versions as old as **229** (released February 2016).
+* 🔧 With minor changes to the unit file, this setup can also work on
+ `systemd` versions as old as **229** (*released February 2016*).
 
 * See the detailed instructions in the
   [`systemd/dps8m-proxy.service`](systemd/dps8m-proxy.service)
@@ -345,8 +345,8 @@ features:
 
 ### Connection sharing
 
-* The user can share the username presented above with others,
-  allowing the session to be viewed live (read‑only) by one or more
+* 🤝 The user can share the username presented above with others,
+  allowing the session to be viewed live 👀 (read‑only) by one or more
   viewers:
 
   ```sh
@@ -360,25 +360,26 @@ features:
 ## History
 
 This is a from‑scratch re‑implementation (in
-[Go](https://go.dev/)) of an older legacy program of the same name.
+[Go](https://go.dev/)) 🐹 of an older legacy program of the same name.
 
 The original software used a multi‑process architecture and consisted
 of nearly **15,000 lines** of haphazardly constructed code: ≅14,000
-lines of mostly [C‑Kermit](https://www.kermitproject.org/) (*yes, the
+lines of mostly [C‑Kermit](https://www.kermitproject.org/) 🐸 (*yes,
+the
 [programming language](https://www.kermitproject.org/ckscripts.html)*)
-and [`ksh93`](https://github.com/ksh93/ksh) (along with some C, Python,
-and Perl) which was difficult to maintain, configure, and securely
-install.
+and [`ksh93`](https://github.com/ksh93/ksh) (along with some C 💻,
+Python 🐍, and Perl 🐪) which was difficult to maintain, configure,
+and securely install.
 
-This new implementation uses many lightweight *Goroutines* instead of
-spawning multiple processes, resulting in significantly improved
+This new implementation uses many lightweight *Goroutines* 🚀 instead
+of spawning multiple processes, resulting in significantly improved
 performance and reduced system overhead.
 
 ### Stats
 
 The new `proxy` program is considerably simpler than its legacy
 predecessor (code statistics provided by
-[`scc`](https://github.com/boyter/scc)):
+[`scc`](https://github.com/boyter/scc) 📈):
 
 <table id="scc-table">
 	<thead><tr>
@@ -415,13 +416,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>471</th>
+		<th>472</th>
 		<th>98</th>
 		<th>0</th>
-		<th>373</th>
+		<th>374</th>
 		<th>0</th>
-		<th>19524</th>
-		<th>358</th>
+		<th>19615</th>
+		<th>359</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -446,13 +447,13 @@ predecessor (code statistics provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>5533</th>
+		<th>5534</th>
 		<th>1212</th>
 		<th>269</th>
-		<th>4052</th>
+		<th>4053</th>
 		<th>955</th>
-		<th>153373</th>
-		<th>2927</th>
+		<th>153464</th>
+		<th>2928</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -488,16 +489,16 @@ predecessor (code statistics provided by
     C-Kermit to the proxy (*i.e.*,
     `socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
 
-  * Be aware that doing this *securely*—safe for public usage—is more
-    involved than one might imagine.  *Safely* configuring the proxy
-    for this type of operation is possible, but beyond the scope of
-    this documentation.
+  * ⚠️ Be aware that doing this *securely*—safe for public usage—is
+    more involved than one might imagine.  *Safely* configuring the
+    proxy for this type of operation is possible, but beyond the scope
+    of this documentation.
 
 ## Compressed logs
 
-By default, all session log files are compressed automatically when
-the session terminates, and console log files are compressed when the
-log rolls over (*i.e.*, when starting a new day).
+* 🗜️ By default, all session log files are compressed automatically
+  when the session terminates, and console log files are compressed
+  when the log rolls over (*i.e.*, when starting a new day).
 
 When reviewing logs, administrators often need to search through all
 the past data, including through the compressed files. We recommend
@@ -510,9 +511,9 @@ If you have existing [OpenSSH](https://www.openssh.com/) Ed25519 or
 RSA host keys that you want to use with the proxy, you’ll first need
 to convert those keys to standard PEM format.
 
-**NB**: These instructions *do not* include any specific details for
-safe handling of key file permissions—we assume you are `root` and
-that know what you’re doing!
+**NB**: 🚨 These instructions *do not* include any specific details
+for safe handling of key file permissions—we assume you are `root`
+and that know what you’re doing!
 
 1. Make a *copy* of the key files you wish to convert.  Be aware that
    these copies will be *overwritten* in the conversion process:
@@ -572,7 +573,7 @@ that know what you’re doing!
 * The canonical home of this software is
   \<[`https://gitlab.com/dps8m/proxy`](https://gitlab.com/dps8m/proxy)\>
 
-* This software is intended to be **secure**.  If you find any
+* This software is intended to be **secure** 🛡️.  If you find any
   security‑related problems, please don’t hesitate to
   [open a GitLab Issue](https://gitlab.com/dps8m/proxy/-/issues/new)
   (or send an
