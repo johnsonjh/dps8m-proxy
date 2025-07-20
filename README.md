@@ -32,8 +32,9 @@ to anyone who wants to offer SSH access to legacy systems.
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
 * ✅ Interactive connection management for administrators
 * ✅ Optional support for management using `systemd` on Linux (running in a sandbox)
-* ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
+* ✅ User access to TELNET features (*e.g.*, line *BREAK*, *AYT*) and statistics
 * ✅ Link filtering
+* ✅ Translation of SSH `window-change` events to TELNET *NAWS* messages
 * ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
 * ✅ Live streaming connection sharing (read‑only)
   * 🤝 Allows users to share their session with one or more viewers
@@ -188,12 +189,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-20 g6d9fff8) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 gcca870e+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -394,13 +395,13 @@ predecessor (code statistics provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>9</th>
-		<th>4380</th>
-		<th>980</th>
-		<th>184</th>
-		<th>3216</th>
-		<th>896</th>
-		<th>112571</th>
-		<th>2137</th>
+		<th>4471</th>
+		<th>1000</th>
+		<th>185</th>
+		<th>3286</th>
+		<th>925</th>
+		<th>115010</th>
+		<th>2186</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -414,13 +415,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>474</th>
-		<th>99</th>
+		<th>471</th>
+		<th>98</th>
 		<th>0</th>
-		<th>375</th>
+		<th>373</th>
 		<th>0</th>
-		<th>19595</th>
-		<th>360</th>
+		<th>19524</th>
+		<th>358</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -445,56 +446,52 @@ predecessor (code statistics provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>5416</th>
-		<th>1186</th>
-		<th>267</th>
-		<th>3963</th>
-		<th>927</th>
-		<th>150024</th>
-		<th>2859</th>
+		<th>5504</th>
+		<th>1205</th>
+		<th>268</th>
+		<th>4031</th>
+		<th>956</th>
+		<th>152392</th>
+		<th>2906</th>
 	</tr></tfoot></table>
 
 ## Future plans
 
-1. To make this more useful for general-purpose proxying, we need to
-   support NAWS (Negotiate About Window Size) on the TELNET side and
-   listen for SSH "window-change" events on the SSH side.
+* Some features of the legacy software are still missing in this
+  implementation and may be added in future updates.  These features
+  include text *CAPTCHA*s, throttling, load‑balancing, fail‑over,
+  [flow control](https://www.rfc-editor.org/rfc/rfc1372), SSH
+  targets, and TELNET listeners.
 
-2. Some features of the legacy software are still missing in this
-   implementation and may be added in future updates.  These features
-   include text *CAPTCHA*s, throttling, load‑balancing, fail‑over,
-   [flow control](https://www.rfc-editor.org/rfc/rfc1372), SSH
-   targets, and TELNET listeners.
+* When users access an SSH listener, the connecting client may supply
+  a password or present public keys for authentication.  These
+  authentication attempts are currently logged, but are not
+  otherwise used by the proxy.  A future update may allow for
+  passwords and public keys to be used for pre‑authentication or to
+  influence target routing.
 
-3. When users access an SSH listener, the connecting client may supply
-   a password or present public keys for authentication.  These
-   authentication attempts are currently logged, but are not
-   otherwise used by the proxy.  A future update may allow for
-   passwords and public keys to be used for pre‑authentication or to
-   influence target routing.
+* While TELNET protocol support will improve in the future, there are
+  no plans to support the
+  [linemode](https://www.rfc-editor.org/rfc/rfc1184),
+  [environment](https://www.rfc-editor.org/rfc/rfc1572),
+  [X11](https://www.rfc-editor.org/rfc/rfc1096),
+  [authentication](https://www.rfc-editor.org/rfc/rfc2941),
+  or [encryption](https://www.rfc-editor.org/rfc/rfc2946)
+  features at this time.
 
-While TELNET protocol support will improve in the future, there are
-no plans to support the
-[linemode](https://www.rfc-editor.org/rfc/rfc1184),
-[environment](https://www.rfc-editor.org/rfc/rfc1572),
-[X11](https://www.rfc-editor.org/rfc/rfc1096),
-[authentication](https://www.rfc-editor.org/rfc/rfc2941),
-or [encryption](https://www.rfc-editor.org/rfc/rfc2946)
-features at this time.
+  * If you need these features, you should look into
+    [C-Kermit](https://kermitproject.org/) or
+    [Kermit 95](https://davidrg.github.io/ckwin/).
 
-If you need these features, you should look into
-[C-Kermit](https://kermitproject.org/) or
-[Kermit 95](https://davidrg.github.io/ckwin/).
+  * Although directly executing programs isn’t something on the
+    roadmap, it’s not difficult to use `socat` creatively to connect
+    C-Kermit to the proxy (*i.e.*,
+    `socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
 
-Although directly executing programs isn’t something on the roadmap,
-it’s not difficult to use `socat` creatively to connect C-Kermit to
-the proxy (*i.e.*,
-`socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
-
-Be aware that doing this *securely*—safe for public usage—is is more
-involved than one might think.  *Safely* configuring the proxy for
-this type of operation is possible, but beyond the scope of this
-documentation.
+  * Be aware that doing this *securely*—safe for public usage—is more
+    involved than one might imagine.  *Safely* configuring the proxy
+    for this type of operation is possible, but beyond the scope of
+    this documentation.
 
 ## Compressed logs
 
