@@ -2467,9 +2467,9 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 									writeNegotiation(ch, logw,
 										"[SENT SB "+optName(TeloptTTYPE)+" IS "+conn.termType+" IAC SE]", conn.userName)
 								} else {
-									sendIAC(remote, TelcmdNOP)
-									writeNegotiation(ch, logw,
-										"[SENT NOP (no terminal type available)]", conn.userName)
+																	sendIAC(remote, TelcmdWONT, TeloptTTYPE)
+								writeNegotiation(ch, logw,
+									"[SENT WONT "+optName(TeloptTTYPE)+"]", conn.userName)
 								}
 							}
 
