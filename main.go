@@ -519,6 +519,7 @@ func main() {
 			return
 		}
 		checkInterval := 10 * time.Second
+
 		for {
 			select {
 			case <-shutdownSignal:
@@ -863,12 +864,16 @@ func showStats() {
 	)
 
 	fmt.Print("\r\n")
+
 	fmt.Print(border)
+
 	fmt.Printf("\r| %-*s | %*s |\r\n", maxName, "Statistic", maxVal, "Value")
+
 	fmt.Print(border)
 
 	for i, r := range rows {
 		fmt.Printf("\r| %-*s | %*s |\r\n", maxName, r.Name, maxVal, r.Value)
+
 		switch i {
 		case 2, 9, 12, 14:
 			fmt.Print(border)
@@ -1031,8 +1036,10 @@ func listConnections(truncate bool) {
 
 	userTruncat := false
 	rows := make([]row, 0, len(connections))
+
 	for id, conn := range connections {
 		user := conn.sshConn.User()
+
 		if truncate && len(user) > 21 {
 			userTruncat = true
 			user = "..." + user[len(user)-18:]
@@ -1045,9 +1052,11 @@ func listConnections(truncate bool) {
 			idle = "---------"
 		} else {
 			targetInfo := ""
+
 			if conn.targetHost != "" {
 				targetInfo = fmt.Sprintf(" -> %s:%d", conn.targetHost, conn.targetPort)
 			}
+
 			details = fmt.Sprintf("%s@%s%s",
 				user, conn.sshConn.RemoteAddr(), targetInfo)
 			idle = time.Since(conn.lastActivityTime).Round(time.Second).String()
@@ -1070,12 +1079,15 @@ func listConnections(truncate bool) {
 		if len(r.ID) > maxID {
 			maxID = len(r.ID)
 		}
+
 		if len(r.Details) > maxDetails {
 			maxDetails = len(r.Details)
 		}
+
 		if len(r.Link) > maxLink {
 			maxLink = len(r.Link)
 		}
+
 		if len(r.Idle) > maxIdle {
 			maxIdle = len(r.Idle)
 		}
@@ -1092,9 +1104,11 @@ func listConnections(truncate bool) {
 	fmt.Printf("\r\n")
 
 	fmt.Print(border)
+
 	fmt.Printf("\r| %-*s | %-*s | %*s | %*s |\r\n",
 		maxID, "Session ID", maxDetails, "Connection Details",
 		maxLink, "Link Time", maxIdle, "Idle Time")
+
 	fmt.Print(border)
 
 	for _, r := range rows {
@@ -1141,31 +1155,40 @@ func listConfiguration() {
 	b.WriteString(separator)
 
 	printRow(&b, "SSH listeners on:")
+
 	for _, addr := range sshAddr {
 		printRow(&b, "* "+addr)
 	}
+
 	b.WriteString(separator)
 
 	printRow(&b, "Default TELNET target: "+telnetHostPort)
 	printRow(&b, fmt.Sprintf("Debug TELNET Negotiation: %t", debugNegotiation))
+
 	if len(altHosts) > 0 {
 		printRow(&b, "Alt Targets:")
+
 		for user, hostPort := range altHosts {
 			printRow(&b, fmt.Sprintf("* %s [%s]", hostPort, user))
 		}
 	}
+
 	b.WriteString(separator)
 
 	timeMaxStr := "disabled"
+
 	if timeMax > 0 {
 		timeMaxStr = fmt.Sprintf("%d seconds", timeMax)
 	}
+
 	printRow(&b, "Time Max: "+timeMaxStr)
 
 	idleMaxStr := "disabled"
+
 	if idleMax > 0 {
 		idleMaxStr = fmt.Sprintf("%d seconds", idleMax)
 	}
+
 	printRow(&b, "Idle Max: "+idleMaxStr)
 	b.WriteString(separator)
 
@@ -1207,12 +1230,14 @@ func listConfiguration() {
 	} else {
 		printRow(&b, fmt.Sprintf("Whitelist: %d entries active", len(whitelistedNetworks)))
 	}
+
 	b.WriteString(separator)
 
 	uptime := time.Since(startTime)
 	uptimeString := fmt.Sprintf("%dh%dm%ds (since %s)",
 		int(uptime.Hours())%24, int(uptime.Minutes())%60, int(uptime.Seconds())%60,
 		startTime.Format("2006-Jan-02 15:04:24"))
+
 	printRow(&b, "Uptime: "+uptimeString)
 
 	var m runtime.MemStats
@@ -1221,23 +1246,29 @@ func listConfiguration() {
 	alloc := float64(m.Alloc)
 	sys := float64(m.Sys)
 	var allocStr, sysStr string
+
 	switch {
 	case alloc >= MiB:
 		allocStr = fmt.Sprintf("%.2f MiB", alloc/MiB)
+
 	default:
 		allocStr = fmt.Sprintf("%.2f KiB", alloc/KiB)
 	}
+
 	switch {
 	case sys >= MiB:
 		sysStr = fmt.Sprintf("%.2f MiB", sys/MiB)
+
 	default:
 		sysStr = fmt.Sprintf("%.2f KiB", sys/KiB)
 	}
+
 	memStatsStr := fmt.Sprintf("%s used (of %s reserved)", allocStr, sysStr)
 	printRow(&b, "Memory: "+memStatsStr)
 
 	printRow(&b, fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)",
 		runtime.NumGoroutine()))
+
 	b.WriteString(separator)
 
 	fmt.Print(b.String())
@@ -1479,6 +1510,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	}
 
 	var authMethod string
+
 	switch sshConn.Permissions.Extensions["auth-method"] {
 	case "password":
 		authMethod = "password"
@@ -1729,11 +1761,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 		go func() {
 			buf := make([]byte, 1)
+
 			for {
 				_, err := channel.Read(buf)
 				if err != nil {
 					return
 				}
+
 				if buf[0] == 0x1D { // Ctrl-]
 					if err := channel.Close(); err != nil {
 						log.Printf("Error closing channel for %s: %v", conn.ID, err)
@@ -2122,6 +2156,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	go func() {
 		defer wg.Done()
 		buf := make([]byte, 1024)
+
 		for {
 			if err := remote.SetReadDeadline(
 				time.Now().Add(100 * time.Millisecond)); err != nil {
@@ -2303,6 +2338,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 				writeNegotiation(ch, logw,
 					"[RCVD "+cmdName(cmd)+" "+optName(opt)+"]")
 				var reply byte
+
 				switch cmd {
 				case TelcmdWILL:
 					reply = TelcmdDO
@@ -2321,6 +2357,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 
 					continue
 				}
+
 				sendIAC(remote, reply, opt)
 				writeNegotiation(ch, logw,
 					"[SENT "+cmdName(reply)+" "+optName(opt)+"]")
@@ -2629,6 +2666,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	for _, f := range files {
 		if strings.HasPrefix(f.Name(), prefix) {
 			parts := strings.SplitN(f.Name()[len(prefix):], ".", 2)
+
 			if n, err := strconv.Atoi(parts[0]); err == nil && n > maxSeq {
 				maxSeq = n
 			}
@@ -2712,6 +2750,7 @@ func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex)
 		mutex.Lock()
 
 		found := false
+
 		for _, conn := range connections {
 			if conn.shareableUsername == username {
 				found = true
@@ -3131,6 +3170,7 @@ func listGoroutines() {
 		fmt.Printf("| %-*s | %-*s |\n", maxName, "State", maxVal, g.State)
 		fmt.Printf("| %-*s | %-*s |\n", maxName, "Entrypoint", maxVal, g.Entrypoint)
 		fmt.Printf("| %-*s | %-*s |\n", maxName, "Caller", maxVal, g.Caller)
+
 		fmt.Print(border)
 	}
 
