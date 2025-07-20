@@ -2706,8 +2706,6 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 		TeloptBinary:          true,
 		TeloptEcho:            true,
 		TeloptSuppressGoAhead: true,
-		TeloptNAWS:            true,
-		TeloptNewEnviron:      true,
 		TeloptTTYPE:           true,
 	}
 
