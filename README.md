@@ -189,7 +189,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g1e5da80+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g0ddb033+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -422,7 +422,7 @@ predecessor (code statistics 📈 provided by
 		<th>0</th>
 		<th>378</th>
 		<th>0</th>
-		<th>19941</th>
+		<th>19940</th>
 		<th>361</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -453,7 +453,7 @@ predecessor (code statistics 📈 provided by
 		<th>269</th>
 		<th>4057</th>
 		<th>955</th>
-		<th>153790</th>
+		<th>153789</th>
 		<th>2930</th>
 	</tr></tfoot></table>
 
@@ -494,7 +494,7 @@ predecessor (code statistics 📈 provided by
 
 ## Compressed logs
 
-* 🗜️ By default, all session log files are compressed automatically
+* By default, all session log files are compressed 🗜️ automatically
   when the session terminates, and console log files are compressed
   when the log rolls over (*i.e.*, when starting a new day).
 
