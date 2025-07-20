@@ -189,7 +189,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g0ddb033+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g234aee0+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -304,9 +304,15 @@ Users connected via SSH can send `^]` (*i.e.*, `Control + ]`) during
 their session to access the following following TELNET control
 features:
 
+* `]` — sends a literal `Control‑]` to the target TELNET host
+
+* `0` — sends an literal `NUL` to the target TELNET host
+
 * `A` — sends an IAC `AYT` (*Are You There?*) to the target TELNET host
 
 * `B` — sends an IAC `BREAK` signal to the target TELNET host
+
+* `I` — sends an IAC `INTERRUPT` signal to the target TELNET host
 
 * `K` — toggles the transparent key remapping mode, which translates
   modern `xterm`/`VT320` movement key inputs to Emacs sequences:
@@ -341,8 +347,6 @@ features:
 
 * `X` — disconnects from the target TELNET host (and ends the SSH
   session)
-
-* `]` — sends a literal `Control‑]` to the target TELNET host
 
 ### Connection sharing
 
@@ -417,13 +421,13 @@ predecessor (code statistics 📈 provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>471</th>
-		<th>93</th>
+		<th>475</th>
+		<th>95</th>
 		<th>0</th>
-		<th>378</th>
+		<th>380</th>
 		<th>0</th>
-		<th>19940</th>
-		<th>361</th>
+		<th>20069</th>
+		<th>363</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -448,13 +452,13 @@ predecessor (code statistics 📈 provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>5533</th>
-		<th>1207</th>
+		<th>5537</th>
+		<th>1209</th>
 		<th>269</th>
-		<th>4057</th>
+		<th>4059</th>
 		<th>955</th>
-		<th>153789</th>
-		<th>2930</th>
+		<th>153918</th>
+		<th>2932</th>
 	</tr></tfoot></table>
 
 ## Future plans
