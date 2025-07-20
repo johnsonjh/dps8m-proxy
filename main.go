@@ -2432,8 +2432,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]", conn.userName)
 						}
 
-					case TelcmdSB: // Subnegotiation
-						// Find the end of the subnegotiation
+					case TelcmdSB:
 						seIndex := -1
 						for j := i + 3; j < n-1; j++ {
 							if buf[j] == TelcmdIAC && buf[j+1] == TelcmdSE {
@@ -2450,13 +2449,11 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 								"[RCVD SB "+optName(subOpt)+" ... IAC SE]", conn.userName)
 
 							if !supportedOptions[subOpt] {
-								// If we don't support the option, ignore its subnegotiation
-								i = seIndex + 2 // Move past IAC SE
+								i = seIndex + 2
 								continue
 							}
 
 							if subOpt == TeloptTTYPE && len(subData) > 0 && subData[0] == TelnetSend {
-								// Respond with terminal type if available
 								if conn.termType != "" {
 									data := []byte{TelcmdIAC, TelcmdSB, TeloptTTYPE, TelnetIs}
 									data = append(data, []byte(conn.termType)...)
@@ -2467,9 +2464,9 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 									writeNegotiation(ch, logw,
 										"[SENT SB "+optName(TeloptTTYPE)+" IS "+conn.termType+" IAC SE]", conn.userName)
 								} else {
-																	sendIAC(remote, TelcmdWONT, TeloptTTYPE)
-								writeNegotiation(ch, logw,
-									"[SENT WONT "+optName(TeloptTTYPE)+"]", conn.userName)
+									sendIAC(remote, TelcmdWONT, TeloptTTYPE)
+									writeNegotiation(ch, logw,
+										"[SENT WONT "+optName(TeloptTTYPE)+"]", conn.userName)
 								}
 							}
 
@@ -2481,19 +2478,17 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 									log.Printf("NAWS received: %dx%d", width, height)
 								}
 							}
-							i = seIndex + 2 // Move past IAC SE
+							i = seIndex + 2
 							continue
 						}
 
 					default:
-						// Unknown command, skip
 					}
 					i += 3
-				} else if i+1 < n && buf[i+1] == TelcmdSB { // IAC SB without SE
-					// Incomplete subnegotiation, skip IAC SB
+				} else if i+1 < n && buf[i+1] == TelcmdSB {
 					writeNegotiation(ch, logw, "[RCVD IAC SB (incomplete)]", conn.userName)
 					i += 2
-				} else { // IAC followed by single byte or end of buffer
+				} else {
 					writeNegotiation(ch, logw, "[RCVD IAC (incomplete)]", conn.userName)
 					i += 1
 				}
