@@ -16,7 +16,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"runtime"
 	"runtime/debug"
 	"syscall"
 )
@@ -25,8 +24,8 @@ import (
 
 func lowerGOGC() {
 	currentGOGC := debug.SetGCPercent(-1)
-	newGOGC := currentGOGC - 1
-	if newGOGC < 1 {
+	newGOGC := currentGOGC / 2
+	if newGOGC <= 1 {
 		newGOGC = 1
 	}
 	debug.SetGCPercent(newGOGC)
@@ -45,7 +44,6 @@ func runSignalHandlers() {
 			if s == syscall.SIGDANGER {
 				log.Println(
 					"SIGDANGER received: Requesting garbage collection and freeing memory.")
-				runtime.GC()
 				debug.FreeOSMemory()
 				lowerGOGC()
 			} else {
