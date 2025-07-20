@@ -188,7 +188,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 gde3b911+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g90828a3+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -230,6 +230,7 @@ DPS8M Proxy v0.0.0* (2025-Jul-20 gde3b911+) [linux/amd64]
   * `?` — Show help text
   * `c` — Show proxy configuration
   * `v` — Show version details
+  * `s` — Show connection statistics
   * `l` — List active connections
   * `k` — Kill a connection
   * `d` — Deny new connections
@@ -389,13 +390,13 @@ predecessor (code statistics provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>9</th>
-		<th>3703</th>
-		<th>819</th>
+		<th>3696</th>
+		<th>818</th>
 		<th>178</th>
-		<th>2706</th>
+		<th>2700</th>
 		<th>789</th>
-		<th>94750</th>
-		<th>1746</th>
+		<th>94543</th>
+		<th>1740</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -409,13 +410,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>459</th>
-		<th>96</th>
+		<th>470</th>
+		<th>98</th>
 		<th>0</th>
-		<th>363</th>
+		<th>372</th>
 		<th>0</th>
-		<th>19050</th>
-		<th>348</th>
+		<th>19395</th>
+		<th>357</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -440,26 +441,26 @@ predecessor (code statistics provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>4724</th>
-		<th>1022</th>
+		<th>4728</th>
+		<th>1023</th>
 		<th>261</th>
-		<th>3441</th>
+		<th>3444</th>
 		<th>820</th>
-		<th>131658</th>
-		<th>2456</th>
+		<th>131796</th>
+		<th>2459</th>
 	</tr></tfoot></table>
 
 ## Future plans
 
-1. To make this more useful as a general purpose proxy, we will
-   need to support NAWS (Negotiate About Window Size) on the TELNET
-   side and listen for SSH "window-change" events on the SSH side,
-   translating between the two.
+1. To make this more useful for general-purpose proxying, we need to
+   support NAWS (Negotiate About Window Size) on the TELNET side and
+   listen for SSH "window-change" events on the SSH side.
 
 2. Some features of the legacy software are still missing in this
    implementation and may be added in future updates.  These features
    include text *CAPTCHA*s, throttling, load‑balancing, fail‑over,
-   flow control, SSH targets, and TELNET listeners.
+   [flow control](https://www.rfc-editor.org/rfc/rfc1372), SSH
+   targets, and TELNET listeners.
 
 3. When users access an SSH listener, the connecting client may supply
    a password or present public keys for authentication.  These
@@ -468,18 +469,28 @@ predecessor (code statistics provided by
    passwords and public keys to be used for pre‑authentication or to
    influence target routing.
 
-While we will improve the TELNET protocol support in the future, there
-are no plans to support the linemode, environment, X11, authentication,
-or encryption features at this time.
+While TELNET protocol support will improve in the future, there are
+no plans to support the
+[linemode](https://www.rfc-editor.org/rfc/rfc1184),
+[environment](https://www.rfc-editor.org/rfc/rfc1572),
+[X11](https://www.rfc-editor.org/rfc/rfc1096),
+[authentication](https://www.rfc-editor.org/rfc/rfc2941),
+or [encryption](https://www.rfc-editor.org/rfc/rfc2946)
+features at this time.
 
-If you need them, you should look into
+If you need these features, you should look into
 [C-Kermit](https://kermitproject.org/) or
-[Kermit 95](https://davidrg.github.io/ckwin/).  Directly running
-programs isn’t something on the roadmap yet, but it’s not difficult to
-creatively use `socat` to connect C-Kermit up to the proxy (*i.e.*,
+[Kermit 95](https://davidrg.github.io/ckwin/).
+
+Although directly executing programs isn’t something on the roadmap,
+it’s not difficult to use `socat` creatively to connect C-Kermit to
+the proxy (*i.e.*,
 `socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
-Be aware that doing this in a way that is both *safe* and *secure* for
-public usage difficult and beyond the scope of this documentation.
+
+Be aware that doing this *securely*—safe for public usage—is is more
+involved than one might think.  *Safely* configuring the proxy for
+this type of operation is possible, but beyond the scope of this
+documentation.
 
 ## Compressed logs
 

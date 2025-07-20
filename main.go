@@ -123,19 +123,17 @@ var (
 	emacsKeymapPrefixes     = make(map[string]bool)
 	acceptErrorsTotal       atomic.Uint64
 	adminKillsTotal         atomic.Uint64
+	altHostRoutesTotal      atomic.Uint64
 	exemptedTotal           atomic.Uint64
 	idleKillsTotal          atomic.Uint64
 	monitorSessionsTotal    atomic.Uint64
 	rejectedTotal           atomic.Uint64
 	sshConnectionsTotal     atomic.Uint64
 	sshHandshakeFailedTotal atomic.Uint64
-	sshKeySeenTotal         atomic.Uint64
 	sshSessionsTotal        atomic.Uint64
 	telnetConnectionsTotal  atomic.Uint64
-	telnetSessionsTotal     atomic.Uint64
+	telnetFailuresTotal     atomic.Uint64
 	timeKillsTotal          atomic.Uint64
-	sshAuthSeenTotal        atomic.Uint64
-	altHostRoutesTotal      atomic.Uint64
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -829,21 +827,19 @@ func showStats() {
 	type row struct{ Name, Value string }
 
 	rows := []row{
-		{"TELNET Connections", fmt.Sprintf("%d", telnetConnectionsTotal.Load())},
-		{"TELNET User Sessions", fmt.Sprintf("%d", telnetSessionsTotal.Load())},
-		{"TELNET Alt-Host Routings", fmt.Sprintf("%d", altHostRoutesTotal.Load())},
-		{"SSH Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load())},
-		{"SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load())},
-		{"SSH Monitor Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load())},
-		{"SSH Accept Errors", fmt.Sprintf("%d", acceptErrorsTotal.Load())},
-		{"SSH Handshake Errors", fmt.Sprintf("%d", sshHandshakeFailedTotal.Load())},
-		{"SSH Public Keys Seen", fmt.Sprintf("%d", sshKeySeenTotal.Load())},
-		{"Other SSH Auths", fmt.Sprintf("%d", sshAuthSeenTotal.Load())},
-		{"Admin Killed Connections", fmt.Sprintf("%d", adminKillsTotal.Load())},
-		{"Idle Killed Connections", fmt.Sprintf("%d", idleKillsTotal.Load())},
-		{"Timeout Killed Connections", fmt.Sprintf("%d", timeKillsTotal.Load())},
-		{"Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load())},
-		{"Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load())},
+		{"TELNET Total Connections", fmt.Sprintf("%d", telnetConnectionsTotal.Load())},
+		{"* TELNET Alt-Host Routings", fmt.Sprintf("%d", altHostRoutesTotal.Load())},
+		{"* TELNET Connection Failures", fmt.Sprintf("%d", telnetFailuresTotal.Load())},
+		{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load())},
+		{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load())},
+		{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load())},
+		{"* SSH Accept Errors", fmt.Sprintf("%d", acceptErrorsTotal.Load())},
+		{"* SSH Handshake Errors", fmt.Sprintf("%d", sshHandshakeFailedTotal.Load())},
+		{"Connections Killed by Admin", fmt.Sprintf("%d", adminKillsTotal.Load())},
+		{"Connections Killed for Idle Time", fmt.Sprintf("%d", idleKillsTotal.Load())},
+		{"Connections Killed for Max Time", fmt.Sprintf("%d", timeKillsTotal.Load())},
+		{"ACL Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load())},
+		{"* ACL Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load())},
 	}
 
 	maxName := len("Statistic")
@@ -875,7 +871,7 @@ func showStats() {
 		fmt.Printf("\r| %-*s | %*s |\r\n", maxName, r.Name, maxVal, r.Value)
 
 		switch i {
-		case 2, 9, 12, 14:
+		case 2, 7, 10, 12:
 			fmt.Print(border)
 		}
 	}
@@ -1478,7 +1474,6 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 				log.Print(line)
 			}
 
-			sshKeySeenTotal.Add(1)
 			keyLog = append(keyLog, line)
 
 			return &ssh.Permissions{
@@ -1622,7 +1617,6 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	}
 
 	keyLog = append(keyLog, handshakeLog)
-	sshAuthSeenTotal.Add(1)
 
 	go ssh.DiscardRequests(reqs)
 
@@ -1953,6 +1947,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	telnetConnectionsTotal.Add(1)
 	remote, err := net.Dial("tcp", fmt.Sprintf("%s:%d", targetHost, targetPort))
 	if err != nil {
+		telnetFailuresTotal.Add(1)
 		if _, err := fmt.Fprintf(channel, "%v\r\n\r\n", err); err != nil {
 			log.Printf("Error writing to channel for %s: %v", conn.ID, err)
 		}
@@ -1976,8 +1971,6 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}()
 
 	negotiateTelnet(remote, channel, logwriter)
-
-	telnetSessionsTotal.Add(1)
 
 	var wg sync.WaitGroup
 	wg.Add(2)
