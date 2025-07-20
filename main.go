@@ -1231,7 +1231,121 @@ func listConfiguration() {
 	pid := os.Getpid()
 
 	var b strings.Builder
-	const textWidth = 52 // ???
+	// Calculate max length dynamically
+	maxLength := 0
+
+	// Helper to update maxLength
+	updateMaxLength := func(s string) {
+		if len(s) > maxLength {
+			maxLength = len(s)
+		}
+	}
+
+	// Collect all potential strings that will be printed
+	// Initial strings
+	s1 := fmt.Sprintf("DPS8M Proxy Configuration and Status - PID: %-8d", pid)
+	updateMaxLength(s1)
+	updateMaxLength("SSH listeners on:")
+	for _, addr := range sshAddr {
+		updateMaxLength("* " + addr)
+	}
+	updateMaxLength("Default TELNET target: " + telnetHostPort)
+	s2 := fmt.Sprintf("Debug TELNET Negotiation: %t", debugNegotiation)
+	updateMaxLength(s2)
+	if len(altHosts) > 0 {
+		updateMaxLength("Alt Targets:")
+		for user, hostPort := range altHosts {
+			s3 := fmt.Sprintf("* %s [%s]", hostPort, user)
+			updateMaxLength(s3)
+		}
+	}
+	timeMaxStr := "disabled"
+	if timeMax > 0 {
+		timeMaxStr = fmt.Sprintf("%d seconds", timeMax)
+	}
+	updateMaxLength("Time Max: " + timeMaxStr)
+	idleMaxStr := "disabled"
+	if idleMax > 0 {
+		idleMaxStr = fmt.Sprintf("%d seconds", idleMax)
+	}
+	updateMaxLength("Idle Max: " + idleMaxStr)
+	updateMaxLength("Log Base Directory: " + logDir)
+	s4 := fmt.Sprintf("No Session Logging: %t", noLog)
+	updateMaxLength(s4)
+	if consoleLog != "" {
+		var quietMode string
+		if isConsoleLogQuiet {
+			quietMode = "quiet"
+		} else {
+			quietMode = "noquiet"
+		}
+		updateMaxLength("Console Logging: " + quietMode)
+	} else {
+		updateMaxLength("Console Logging: disabled")
+	}
+	s5 := fmt.Sprintf("No Log Compression: %t", noCompress)
+	updateMaxLength(s5)
+	updateMaxLength("Compression Algorithm: " + compressAlgo)
+	updateMaxLength("Compression Level: " + compressLevel)
+	s6 := fmt.Sprintf("Log Permissions: Files: %04o, Dirs: %04o", logPerm, logDirPerm)
+	updateMaxLength(s6)
+	s7 := fmt.Sprintf("Graceful Shutdown: %t", gracefulShutdownMode.Load())
+	updateMaxLength(s7)
+	s8 := fmt.Sprintf("Deny New Connections: %t", denyNewConnectionsMode.Load())
+	updateMaxLength(s8)
+	if blacklistFile == "" && len(blacklistedNetworks) == 0 {
+		updateMaxLength("Blacklist: 0 entries active")
+	} else if whitelistFile != "" && blacklistFile == "" {
+		updateMaxLength("Blacklist: Deny all (due to whitelist only)")
+	} else {
+		s9 := fmt.Sprintf("Blacklist: %d entries active", len(blacklistedNetworks))
+		updateMaxLength(s9)
+	}
+	if whitelistFile == "" {
+		updateMaxLength("Whitelist: 0 entries active")
+	} else {
+		s10 := fmt.Sprintf("Whitelist: %d entries active", len(whitelistedNetworks))
+		updateMaxLength(s10)
+	}
+	uptime := time.Since(startTime)
+	uptimeString := fmt.Sprintf("%dh%dm%ds (since %s)",
+		int(uptime.Hours())%24, int(uptime.Minutes())%60, int(uptime.Seconds())%60,
+		startTime.Format("2006-Jan-02 15:04:24"))
+	updateMaxLength("Uptime: " + uptimeString)
+
+	var m runtime.MemStats
+	debug.FreeOSMemory()
+	runtime.ReadMemStats(&m)
+	alloc := float64(m.Alloc)
+	sys := float64(m.Sys)
+	var allocStr, sysStr string
+
+	switch {
+	case alloc >= MiB:
+		allocStr = fmt.Sprintf("%.2f MiB", alloc/MiB)
+	default:
+		allocStr = fmt.Sprintf("%.2f KiB", alloc/KiB)
+	}
+
+	switch {
+	case sys >= MiB:
+		sysStr = fmt.Sprintf("%.2f MiB", sys/MiB)
+	default:
+		sysStr = fmt.Sprintf("%.2f KiB", sys/KiB)
+	}
+
+	memStatsStr := fmt.Sprintf("%s used (of %s reserved)", allocStr, sysStr)
+	updateMaxLength("Memory: " + memStatsStr)
+
+	s11 := fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)", runtime.NumGoroutine())
+	updateMaxLength(s11)
+
+	// Ensure a minimum width for aesthetic reasons, e.g., 50 characters
+	if maxLength < 50 {
+		maxLength = 50
+	}
+
+	textWidth := maxLength
 
 	printRow := func(b *strings.Builder, text string) {
 		b.WriteString("| ")
@@ -1247,7 +1361,7 @@ func listConfiguration() {
 		b.WriteString(" |\r\n")
 	}
 
-	separator := "+======================================================+\r\n"
+	separator := fmt.Sprintf("+%s+\r\n", strings.Repeat("=", textWidth+2)) // +2 for spaces and pipes
 
 	b.WriteString("\r\n")
 	b.WriteString(separator)
@@ -1276,24 +1390,11 @@ func listConfiguration() {
 
 	b.WriteString(separator)
 
-	timeMaxStr := "disabled"
-
-	if timeMax > 0 {
-		timeMaxStr = fmt.Sprintf("%d seconds", timeMax)
-	}
-
 	printRow(&b, "Time Max: "+timeMaxStr)
-
-	idleMaxStr := "disabled"
-
-	if idleMax > 0 {
-		idleMaxStr = fmt.Sprintf("%d seconds", idleMax)
-	}
-
 	printRow(&b, "Idle Max: "+idleMaxStr)
 	b.WriteString(separator)
 
-	printRow(&b, "Log Base Directory: "+logDir)
+	printRow(&b, "Log Base Directory: " + logDir)
 	printRow(&b, fmt.Sprintf("No Session Logging: %t", noLog))
 
 	if consoleLog != "" {
@@ -1305,14 +1406,14 @@ func listConfiguration() {
 			quietMode = "noquiet"
 		}
 
-		printRow(&b, "Console Logging: "+quietMode)
+		printRow(&b, "Console Logging: " + quietMode)
 	} else {
 		printRow(&b, "Console Logging: disabled")
 	}
 
 	printRow(&b, fmt.Sprintf("No Log Compression: %t", noCompress))
-	printRow(&b, "Compression Algorithm: "+compressAlgo)
-	printRow(&b, "Compression Level: "+compressLevel)
+	printRow(&b, "Compression Algorithm: " + compressAlgo)
+	printRow(&b, "Compression Level: " + compressLevel)
 	printRow(&b, fmt.Sprintf("Log Permissions: Files: %04o, Dirs: %04o", logPerm, logDirPerm))
 	b.WriteString(separator)
 
@@ -1336,47 +1437,16 @@ func listConfiguration() {
 
 	b.WriteString(separator)
 
-	uptime := time.Since(startTime)
-	uptimeString := fmt.Sprintf("%dh%dm%ds (since %s)",
-		int(uptime.Hours())%24, int(uptime.Minutes())%60, int(uptime.Seconds())%60,
-		startTime.Format("2006-Jan-02 15:04:24"))
-
-	printRow(&b, "Uptime: "+uptimeString)
-
-	var m runtime.MemStats
-	debug.FreeOSMemory()
-	runtime.ReadMemStats(&m)
-	alloc := float64(m.Alloc)
-	sys := float64(m.Sys)
-	var allocStr, sysStr string
-
-	switch {
-	case alloc >= MiB:
-		allocStr = fmt.Sprintf("%.2f MiB", alloc/MiB)
-
-	default:
-		allocStr = fmt.Sprintf("%.2f KiB", alloc/KiB)
-	}
-
-	switch {
-	case sys >= MiB:
-		sysStr = fmt.Sprintf("%.2f MiB", sys/MiB)
-
-	default:
-		sysStr = fmt.Sprintf("%.2f KiB", sys/KiB)
-	}
-
-	memStatsStr := fmt.Sprintf("%s used (of %s reserved)", allocStr, sysStr)
-	printRow(&b, "Memory: "+memStatsStr)
-
-	printRow(&b, fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)",
-		runtime.NumGoroutine()))
+	printRow(&b, "Uptime: " + uptimeString)
+	printRow(&b, "Memory: " + memStatsStr)
+	printRow(&b, fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)", runtime.NumGoroutine()))
 
 	b.WriteString(separator)
 
 	fmt.Print(b.String())
 	fmt.Printf("\r\n")
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
