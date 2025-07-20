@@ -189,7 +189,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g190d898+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g628087b+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -288,10 +288,11 @@ admin console).
 * The `systemd` integration requires:
   * `systemd` version **247** or later (*released November 2020*), and
   * a recent version of **[`tmux`](https://github.com/tmux/tmux)**.
+[]()
 
+[]()
 * 🔧 With minor changes to the unit file, this setup can also work
   with `systemd` as old as version **229** (*released February 2016*).
-
 * 🛠️ See the detailed instructions in the
   [`systemd/dps8m-proxy.service`](systemd/dps8m-proxy.service)
   file for full installation instructions.
@@ -359,14 +360,14 @@ features:
 ## History
 
 This is a from‑scratch re‑implementation (in
-[Go](https://go.dev/)) 🐹 of an older legacy program of the same name.
+[Go](https://go.dev/) 🐹) of an older legacy program of the same name.
 
 The original software used a multi‑process architecture and consisted
 of nearly **15,000 lines** of haphazardly constructed code: ≅14,000
 lines of mostly [C‑Kermit](https://www.kermitproject.org/) 🐸 (*yes,
 the
 [programming language](https://www.kermitproject.org/ckscripts.html)*)
-and [`ksh93`](https://github.com/ksh93/ksh) (along with some C 💻,
+and [`ksh93`](https://github.com/ksh93/ksh) 🐚 (along with some C 💻,
 Python 🐍, and Perl 🐪) which was difficult to maintain, configure,
 and securely install.
 
@@ -376,9 +377,9 @@ performance and reduced system overhead.
 
 ### Stats
 
-The new `proxy` program is considerably simpler than its legacy
+* 📈 The new `proxy` program is considerably simpler than its legacy
 predecessor (code statistics provided by
-[`scc`](https://github.com/boyter/scc) 📈):
+[`scc`](https://github.com/boyter/scc)):
 
 <table id="scc-table">
 	<thead><tr>
@@ -415,13 +416,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>471</th>
-		<th>98</th>
+		<th>470</th>
+		<th>92</th>
 		<th>0</th>
-		<th>373</th>
+		<th>378</th>
 		<th>0</th>
-		<th>19617</th>
-		<th>358</th>
+		<th>19707</th>
+		<th>359</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -446,13 +447,13 @@ predecessor (code statistics provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>5533</th>
-		<th>1212</th>
+		<th>5532</th>
+		<th>1206</th>
 		<th>269</th>
-		<th>4052</th>
+		<th>4057</th>
 		<th>955</th>
-		<th>153466</th>
-		<th>2927</th>
+		<th>153556</th>
+		<th>2928</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -462,14 +463,15 @@ predecessor (code statistics provided by
   include text *CAPTCHA*s, throttling, load‑balancing, fail‑over,
   [flow control](https://www.rfc-editor.org/rfc/rfc1372), SSH
   targets, and TELNET listeners.
-
 * When users access an SSH listener, the connecting client may supply
   a password or present public keys for authentication.  These
   authentication attempts are currently logged, but are not
   otherwise used by the proxy.  A future update may allow for
   passwords and public keys to be used for pre‑authentication or to
   influence target routing.
+[]()
 
+[]()
 * While TELNET protocol support will improve in the future, there are
   no plans to support the
   [linemode](https://www.rfc-editor.org/rfc/rfc1184),
@@ -478,16 +480,13 @@ predecessor (code statistics provided by
   [authentication](https://www.rfc-editor.org/rfc/rfc2941),
   or [encryption](https://www.rfc-editor.org/rfc/rfc2946)
   features at this time.
-
   * If you need these features, you should look into
     [C-Kermit](https://kermitproject.org/) or
     [Kermit 95](https://davidrg.github.io/ckwin/).
-
   * Although directly executing programs isn’t something on the
     roadmap, it’s not difficult to use `socat` creatively to connect
     C-Kermit to the proxy (*i.e.*,
     `socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
-
   * ⚠️ Be aware that doing this *securely*—safe for public usage—is
     more involved than one might imagine.  *Safely* configuring the
     proxy for this type of operation is possible, but beyond the scope
@@ -510,7 +509,7 @@ If you have existing [OpenSSH](https://www.openssh.com/) Ed25519 or
 RSA host keys that you want to use with the proxy, you’ll first need
 to convert those keys to standard PEM format.
 
-**NB**: 🚨 These instructions *do not* include any specific details
+🚨 **NB**: These instructions *do not* include any specific details
 for safe handling of key file permissions—we assume you are `root`
 and that know what you’re doing!
 
@@ -570,8 +569,8 @@ and that know what you’re doing!
 ## Security
 
 * The canonical home of this software is
-  \<[`https://gitlab.com/dps8m/proxy`](https://gitlab.com/dps8m/proxy)\>
-
+  [`https://gitlab.com/dps8m/proxy`](https://gitlab.com/dps8m/proxy),
+  with a mirror on [GitHub](https://github.com/johnsonjh/dps8m-proxy/).
 * This software is intended to be **secure** 🛡️.  If you find any
   security‑related problems, please don’t hesitate to
   [open a GitLab Issue](https://gitlab.com/dps8m/proxy/-/issues/new)
