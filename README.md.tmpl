@@ -316,8 +316,8 @@ features:
 
 ## History
 
-🛠️ This is a from‑scratch re‑implementation (in
-[Go](https://go.dev/) 🐹) of an older legacy program of the same name.
+This is a from‑scratch re‑implementation (in [Go](https://go.dev/) 🐹)
+of an older legacy program of the same name.
 
 The original software used a multi‑process architecture and consisted
 of nearly **15,000 lines** of haphazardly constructed code: ≅14,000
@@ -334,7 +334,7 @@ performance and reduced system overhead.
 
 ### Stats
 
-* 📈 The new `proxy` program is considerably simpler than its legacy
+📈 The new `proxy` program is considerably simpler than its legacy
 predecessor (code statistics provided by
 [`scc`](https://github.com/boyter/scc)):
 
@@ -360,7 +360,6 @@ predecessor (code statistics provided by
   no plans to support the
   [linemode](https://www.rfc-editor.org/rfc/rfc1184),
   [environment](https://www.rfc-editor.org/rfc/rfc1572),
-  [X11](https://www.rfc-editor.org/rfc/rfc1096),
   [authentication](https://www.rfc-editor.org/rfc/rfc2941),
   or [encryption](https://www.rfc-editor.org/rfc/rfc2946)
   features at this time.
@@ -370,7 +369,7 @@ predecessor (code statistics provided by
   * Although directly executing programs isn’t something on the
     roadmap, it’s not difficult to use `socat` creatively to connect
     C-Kermit to the proxy (*i.e.*,
-    `socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
+    `socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
   * ⚠️ Be aware that doing this *securely*—safe for public usage—is
     more involved than one might imagine.  *Safely* configuring the
     proxy for this type of operation is possible, but beyond the scope
@@ -382,10 +381,10 @@ predecessor (code statistics provided by
   when the session terminates, and console log files are compressed
   when the log rolls over (*i.e.*, when starting a new day).
 
-When reviewing logs, administrators often need to search through all
-the past data, including through the compressed files. We recommend
-using [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the
-`-z` option) for this task.
+* When reviewing logs, administrators often need to search through all
+  the past data, including through the compressed files. We recommend
+  using [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the
+  `-z` option) for this task.
 
 ## Using OpenSSH host keys
 

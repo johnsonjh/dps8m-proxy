@@ -189,7 +189,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g9ac055a+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g2ba6491+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -359,8 +359,8 @@ features:
 
 ## History
 
-🛠️ This is a from‑scratch re‑implementation (in
-[Go](https://go.dev/) 🐹) of an older legacy program of the same name.
+This is a from‑scratch re‑implementation (in [Go](https://go.dev/) 🐹)
+of an older legacy program of the same name.
 
 The original software used a multi‑process architecture and consisted
 of nearly **15,000 lines** of haphazardly constructed code: ≅14,000
@@ -377,7 +377,7 @@ performance and reduced system overhead.
 
 ### Stats
 
-* 📈 The new `proxy` program is considerably simpler than its legacy
+📈 The new `proxy` program is considerably simpler than its legacy
 predecessor (code statistics provided by
 [`scc`](https://github.com/boyter/scc)):
 
@@ -416,13 +416,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>470</th>
+		<th>469</th>
 		<th>92</th>
 		<th>0</th>
-		<th>378</th>
+		<th>377</th>
 		<th>0</th>
-		<th>19771</th>
-		<th>359</th>
+		<th>19721</th>
+		<th>358</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -447,13 +447,13 @@ predecessor (code statistics provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>5532</th>
+		<th>5531</th>
 		<th>1206</th>
 		<th>269</th>
-		<th>4057</th>
+		<th>4056</th>
 		<th>955</th>
-		<th>153620</th>
-		<th>2928</th>
+		<th>153570</th>
+		<th>2927</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -476,7 +476,6 @@ predecessor (code statistics provided by
   no plans to support the
   [linemode](https://www.rfc-editor.org/rfc/rfc1184),
   [environment](https://www.rfc-editor.org/rfc/rfc1572),
-  [X11](https://www.rfc-editor.org/rfc/rfc1096),
   [authentication](https://www.rfc-editor.org/rfc/rfc2941),
   or [encryption](https://www.rfc-editor.org/rfc/rfc2946)
   features at this time.
@@ -486,7 +485,7 @@ predecessor (code statistics provided by
   * Although directly executing programs isn’t something on the
     roadmap, it’s not difficult to use `socat` creatively to connect
     C-Kermit to the proxy (*i.e.*,
-    `socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
+    `socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
   * ⚠️ Be aware that doing this *securely*—safe for public usage—is
     more involved than one might imagine.  *Safely* configuring the
     proxy for this type of operation is possible, but beyond the scope
@@ -498,10 +497,10 @@ predecessor (code statistics provided by
   when the session terminates, and console log files are compressed
   when the log rolls over (*i.e.*, when starting a new day).
 
-When reviewing logs, administrators often need to search through all
-the past data, including through the compressed files. We recommend
-using [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the
-`-z` option) for this task.
+* When reviewing logs, administrators often need to search through all
+  the past data, including through the compressed files. We recommend
+  using [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the
+  `-z` option) for this task.
 
 ## Using OpenSSH host keys
 
