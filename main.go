@@ -2350,17 +2350,6 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 		TeloptTTYPE:           true,
 	}
 
-	// // Initialize states for all known options to simplify logic
-	// for _, opt := range []byte{
-	// 	TeloptATCP, TeloptAuth, TeloptBinary, TeloptCompPort, TeloptEcho,
-	// 	TeloptEncrypt, TeloptGMCP, TeloptLineMode, TeloptMCCP2, TeloptMCCP3,
-	// 	TeloptMSP, TeloptMSSP, TeloptMXP, TeloptNAWS, TeloptNewEnviron,
-	// 	TeloptOldEnviron, TeloptRM, TeloptSuppressGoAhead, TeloptTS,
-	// 	TeloptXDisplay, TeloptStatus, TeloptTTYPE,
-	// } {
-	// 	telnetStates[opt] = &telnetState{}
-	// }
-
 	if err := remote.SetReadDeadline(time.Now().Add(time.Second / 3)); err != nil {
 		log.Printf("Error setting read deadline: %v", err)
 	}
