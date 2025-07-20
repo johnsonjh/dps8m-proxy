@@ -2819,7 +2819,9 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		}
 
 	case ']':
-		sendIAC(remote, 0x1d) // Ctrl-]
+		if _, err := remote.Write([]byte{0x1d}); err != nil {
+			log.Printf("Error writing Ctrl-] to remote: %v", err)
+		}
 		if _, err := logw.Write([]byte{0x1d}); err != nil {
 			log.Printf("Error writing Ctrl-] to log: %v", err)
 		}
