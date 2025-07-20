@@ -199,6 +199,8 @@ var (
 	telnetConnectionsTotal   atomic.Uint64
 	telnetFailuresTotal      atomic.Uint64
 	timeKillsTotal           atomic.Uint64
+	trafficInTotal           atomic.Uint64
+	trafficOutTotal          atomic.Uint64
 	emacsKeymapPrefixes      = make(map[string]bool)
 	emacsKeymap              = map[string]string{
 		"\x1b[1;5A": "\x1b\x5b", //    Control-Arrow_Up -> Escape, [
@@ -932,6 +934,8 @@ func showStats() {
 		{"* TELNET Alt-Host Routings", fmt.Sprintf("%d", altHostRoutesTotal.Load())},
 		{"* TELNET Connection Failures", fmt.Sprintf("%d", telnetFailuresTotal.Load())},
 		{"Peak Concurrent Connections", fmt.Sprintf("%d", peakUsersTotal.Load())},
+		{"Total Proxy Traffic Inbound", formatBytes(trafficOutTotal.Load())},
+		{"Total Proxy Traffic Outbound", formatBytes(trafficInTotal.Load())},
 		{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load())},
 		{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load())},
 		{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load())},
@@ -976,7 +980,7 @@ func showStats() {
 		fmt.Printf("\r| %-*s | %*s |\r\n", maxName, r.Name, maxVal, r.Value)
 
 		switch i {
-		case 2, 3, 11, 14, 16:
+		case 2, 5, 13, 16, 18:
 			fmt.Print(border)
 		}
 	}
@@ -1354,25 +1358,14 @@ func listConfiguration() {
 	updateMaxLength("Uptime: " + uptimeString)
 
 	var m runtime.MemStats
+
 	debug.FreeOSMemory()
 	runtime.ReadMemStats(&m)
-	alloc := float64(m.Alloc)
-	sys := float64(m.Sys)
+
 	var allocStr, sysStr string
 
-	switch {
-	case alloc >= MiB:
-		allocStr = fmt.Sprintf("%.2f MiB", alloc/MiB)
-	default:
-		allocStr = fmt.Sprintf("%.2f KiB", alloc/KiB)
-	}
-
-	switch {
-	case sys >= MiB:
-		sysStr = fmt.Sprintf("%.2f MiB", sys/MiB)
-	default:
-		sysStr = fmt.Sprintf("%.2f KiB", sys/KiB)
-	}
+	allocStr = formatBytes(m.Alloc)
+	sysStr = formatBytes(m.Sys)
 
 	memStatsStr := fmt.Sprintf("%s used (of %s reserved)", allocStr, sysStr)
 	updateMaxLength("Memory: " + memStatsStr)
@@ -2520,6 +2513,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							}
 
 							atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
+							trafficOutTotal.Add(uint64(m))          //nolint:gosec
 
 							if _, err := logwriter.Write([]byte(replacement)); err != nil {
 								log.Printf("Error writing to log for %s: %v", conn.ID, err)
@@ -2537,6 +2531,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							}
 
 							atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
+							trafficOutTotal.Add(uint64(m))          //nolint:gosec
 
 							if _, err := logwriter.Write(escSequence); err != nil {
 								log.Printf("Error writing to log for %s: %v", conn.ID, err)
@@ -2552,6 +2547,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						}
 
 						atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
+						trafficOutTotal.Add(uint64(m))          //nolint:gosec
 
 						if _, err := logwriter.Write(escSequence); err != nil {
 							log.Printf("Error writing to log for %s: %v", conn.ID, err)
@@ -2570,6 +2566,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					}
 
 					atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
+					trafficOutTotal.Add(uint64(m))          //nolint:gosec
 
 					if _, err := logwriter.Write([]byte{b}); err != nil {
 						log.Printf("Error writing to log for %s: %v", conn.ID, err)
@@ -2605,6 +2602,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				log.Printf("Error setting read deadline for %s: %v", conn.ID, err)
 			}
 			n, err := remote.Read(buf)
+			trafficInTotal.Add(uint64(n)) //nolint:gosec
 			if err != nil {
 				var netErr net.Error
 
@@ -2635,16 +2633,20 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				outRateNVT := uint64(float64(atomic.LoadUint64(&telnetOut)) / dur.Seconds())
 
 				if _, err := channel.Write([]byte(fmt.Sprintf(
-					">> SSH - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-					atomic.LoadUint64(&sshIn), atomic.LoadUint64(&sshOut),
-					inRateSSH, outRateSSH))); err != nil {
+					">> SSH - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
+					formatBytes(atomic.LoadUint64(&sshIn)),
+					formatBytes(atomic.LoadUint64(&sshOut)),
+					formatBytes(inRateSSH),
+					formatBytes(outRateSSH)))); err != nil {
 					log.Printf("Error writing to channel for %s: %v", conn.ID, err)
 				}
 
 				if _, err := channel.Write([]byte(fmt.Sprintf(
-					">> NVT - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-					atomic.LoadUint64(&telnetIn), atomic.LoadUint64(&telnetOut),
-					inRateNVT, outRateNVT))); err != nil {
+					">> NVT - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
+					formatBytes(atomic.LoadUint64(&telnetIn)),
+					formatBytes(atomic.LoadUint64(&telnetOut)),
+					formatBytes(inRateNVT),
+					formatBytes(outRateNVT)))); err != nil {
 					log.Printf("Error writing to channel for %s: %v", conn.ID, err)
 				}
 
@@ -2781,6 +2783,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 
 	for {
 		n, err := remote.Read(buf)
+		trafficInTotal.Add(uint64(n)) //nolint:gosec
 		if err != nil {
 			var ne net.Error
 			if errors.As(err, &ne) && ne.Timeout() {
@@ -3173,6 +3176,30 @@ func optName(b byte) string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+func formatBytes(b uint64) string {
+	const (
+		KiB = 1024       // Kibibytes
+		MiB = 1024 * KiB // Mebibytes
+		GiB = 1024 * MiB // Gibibytes
+	)
+
+	switch {
+	case b >= GiB:
+		return fmt.Sprintf("%.2f GiB", float64(b)/GiB)
+
+	case b >= MiB:
+		return fmt.Sprintf("%.2f MiB", float64(b)/MiB)
+
+	case b >= KiB:
+		return fmt.Sprintf("%.2f KiB", float64(b)/KiB)
+
+	default:
+		return fmt.Sprintf("%d B", b)
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func showMenu(ch ssh.Channel) {
 	menu := "\r                         \r\n" +
 		"\r +=====+=================+ \r\n" +
@@ -3341,14 +3368,16 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		outRateNVT := uint64(float64(atomic.LoadUint64(telnetOut)) / dur.Seconds())
 
 		if _, err := ch.Write([]byte(fmt.Sprintf(
-			">> SSH - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-			inSSH, outSSH, inRateSSH, outRateSSH))); err != nil {
+			">> SSH - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
+			formatBytes(inSSH), formatBytes(outSSH),
+			formatBytes(inRateSSH), formatBytes(outRateSSH)))); err != nil {
 			log.Printf("Error writing SSH statistics to channel: %v", err)
 		}
 
 		if _, err := ch.Write([]byte(fmt.Sprintf(
-			">> NVT - in: %d bytes, out: %d bytes, in-rate: %d B/s, out-rate: %d B/s\r\n",
-			inNVT, outNVT, inRateNVT, outRateNVT))); err != nil {
+			">> NVT - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
+			formatBytes(inNVT), formatBytes(outNVT),
+			formatBytes(inRateNVT), formatBytes(outRateNVT)))); err != nil {
 			log.Printf("Error writing NVT statistics to channel: %v", err)
 		}
 
