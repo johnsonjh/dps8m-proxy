@@ -253,6 +253,7 @@ func (a *altHostFlag) String() string {
 
 func (a *altHostFlag) Set(value string) error {
 	parts := strings.SplitN(value, "@", 2)
+
 	if len(parts) != 2 {
 		return fmt.Errorf("invalid alt-host format: %s, expected sshuser@host:port", value)
 	}
@@ -423,10 +424,12 @@ func main() {
 
 	if consoleLog != "" {
 		cl := strings.ToLower(consoleLog)
+
 		if cl != "quiet" && cl != "noquiet" { //nolint:goconst
 			log.Fatalf("ERROR: Invalid --console-log value: %s.  Must be 'quiet' or 'noquiet'",
 				consoleLog) // LINTED: Fatalf
 		}
+
 		isConsoleLogQuiet = (cl == "quiet")
 	}
 
@@ -550,6 +553,7 @@ func main() {
 	pid := os.Getpid()
 
 	var startMsg string
+
 	if pid != 0 {
 		startMsg = fmt.Sprintf("Starting proxy [PID %d]", pid)
 	} else {
@@ -592,6 +596,7 @@ func main() {
 		if idleMax == 0 {
 			return
 		}
+
 		checkInterval := 10 * time.Second
 
 		for {
@@ -1118,6 +1123,7 @@ func listConnections(truncate bool) {
 		}
 
 		var details, idle string
+
 		if conn.monitoring {
 			details = fmt.Sprintf("%s@%s -> %s",
 				user, conn.sshConn.RemoteAddr(), conn.monitoredConnection.ID)
@@ -1210,10 +1216,13 @@ func listConfiguration() {
 	printRow := func(b *strings.Builder, text string) {
 		b.WriteString("| ")
 		b.WriteString(text)
+
 		padding := textWidth - len(text)
+
 		if padding < 0 {
 			padding = 0
 		}
+
 		b.WriteString(strings.Repeat(" ", padding))
 		b.WriteString(" |\r\n")
 	}
@@ -1269,11 +1278,13 @@ func listConfiguration() {
 
 	if consoleLog != "" {
 		var quietMode string
+
 		if isConsoleLogQuiet {
 			quietMode = "quiet"
 		} else {
 			quietMode = "noquiet"
 		}
+
 		printRow(&b, "Console Logging: "+quietMode)
 	} else {
 		printRow(&b, "Console Logging: disabled")
@@ -1359,7 +1370,6 @@ func reloadLists() {
 
 	if blacklistFile != "" {
 		networks, err := parseIPListFile(blacklistFile)
-
 		if err != nil {
 			reloadErrors = append(
 				reloadErrors, fmt.Sprintf("Blacklist rejected: %v", err))
@@ -1371,7 +1381,6 @@ func reloadLists() {
 
 	if whitelistFile != "" {
 		networks, err := parseIPListFile(whitelistFile)
-
 		if err != nil {
 			reloadErrors = append(
 				reloadErrors, fmt.Sprintf("Whitelist rejected: %v", err))
@@ -1982,6 +1991,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			}
 
 			log.Printf("Error parsing alt-host for user %s: %v", conn.userName, err)
+
 			if err := channel.Close(); err != nil {
 				log.Printf("Error closing channel for %s: %v", conn.ID, err)
 			}
@@ -2824,15 +2834,19 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		if _, err := remote.Write([]byte{0}); err != nil {
 			log.Printf("Error writing NUL to remote: %v", err)
 		}
+
 		if _, err := logw.Write([]byte{0}); err != nil {
 			log.Printf("Error writing NUL to log: %v", err)
 		}
+
 		if _, err := ch.Write([]byte("\r\n>> Sent NUL\r\n")); err != nil {
 			log.Printf("Error writing 'Sent NUL' message to channel: %v", err)
 		}
+
 		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
 			log.Printf("Error writing '[BACK TO HOST]' message to channel: %v", err)
 		}
+
 	case 'a', 'A':
 		sendIAC(remote, TelcmdAYT)
 		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdAYT}); err != nil {
@@ -2866,9 +2880,11 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdIP}); err != nil {
 			log.Printf("Error writing Interrupt to log: %v", err)
 		}
+
 		if _, err := ch.Write([]byte("\r\n>> Sent Interrupt\r\n")); err != nil {
 			log.Printf("Error writing 'Sent Interrupt' message to channel: %v", err)
 		}
+
 		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
 			log.Printf("Error writing '[BACK TO HOST]' message to channel: %v", err)
 		}
@@ -2993,6 +3009,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		if _, err := remote.Write([]byte{0x1d}); err != nil {
 			log.Printf("Error writing Ctrl-] to remote: %v", err)
 		}
+
 		if _, err := logw.Write([]byte{0x1d}); err != nil {
 			log.Printf("Error writing Ctrl-] to log: %v", err)
 		}
@@ -3307,6 +3324,7 @@ func compressLogFile(logFilePath string) {
 		writer, err = gzip.NewWriterLevel(compressedFile, gzipLevel)
 		if err != nil {
 			log.Printf("Error creating gzip writer for %q: %v", compressedFilePath, err)
+
 			if err := compressedFile.Close(); err != nil {
 				log.Printf("Error closing compressed file after gzip writer error: %v", err)
 			}
@@ -3326,6 +3344,7 @@ func compressLogFile(logFilePath string) {
 		writer, err = xz.NewWriter(compressedFile)
 		if err != nil {
 			log.Printf("Error creating xz writer for %q: %v", compressedFilePath, err)
+
 			if err := compressedFile.Close(); err != nil {
 				log.Printf("Error closing compressed file after xz writer error: %v", err)
 			}
@@ -3346,6 +3365,7 @@ func compressLogFile(logFilePath string) {
 			compressedFile, zstd.WithEncoderLevel(zstdLevel))
 		if err != nil {
 			log.Printf("Error creating zstd writer for %q: %v", compressedFilePath, err)
+
 			if err := compressedFile.Close(); err != nil {
 				log.Printf("Error closing compressed file after zstd writer error: %v", err)
 			}
@@ -3495,6 +3515,7 @@ func listGoroutines() {
 
 		entrypoint := lines[1]
 		caller := ""
+
 		if len(lines) > 2 {
 			caller = strings.TrimSpace(lines[2])
 		}
