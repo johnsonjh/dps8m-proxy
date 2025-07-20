@@ -96,7 +96,7 @@ Usage of ./proxy:
   -d, --debug                   Debug TELNET option negotiation
   -L, --log-dir string          Base directory for logs (default "./log")
   -o, --no-log                  Disable all session logging
-                                   (for console logging, see "--console-log")
+                                   (for console logging see "--console-log")
   -c, --console-log string      Enable console logging ["quiet", "noquiet"]
   -C, --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
                                    (default "gzip")
@@ -112,6 +112,8 @@ Usage of ./proxy:
   -m, --time-max int            Maximum connection link time allowed [seconds]
   -b, --blacklist string        Enable blacklist [filename] (no default)
   -w, --whitelist string        Enable whitelist [filename] (no default)
+  -D, --ssh-delay float         Delay for incoming SSH connections
+                                   ["0.0" to "30.0" seconds] (no default)
   -v, --version                 Show version information
 pflag: help requested
 ```
@@ -189,7 +191,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g6cca590+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 gf36a232+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -401,13 +403,13 @@ predecessor (code statistics 📈 provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>9</th>
-		<th>4500</th>
-		<th>1007</th>
+		<th>4586</th>
+		<th>1026</th>
 		<th>186</th>
-		<th>3307</th>
-		<th>924</th>
-		<th>115991</th>
-		<th>2207</th>
+		<th>3374</th>
+		<th>946</th>
+		<th>118330</th>
+		<th>2249</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -426,7 +428,7 @@ predecessor (code statistics 📈 provided by
 		<th>0</th>
 		<th>380</th>
 		<th>0</th>
-		<th>20070</th>
+		<th>20058</th>
 		<th>363</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -452,20 +454,20 @@ predecessor (code statistics 📈 provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>5537</th>
-		<th>1209</th>
+		<th>5623</th>
+		<th>1228</th>
 		<th>269</th>
-		<th>4059</th>
-		<th>955</th>
-		<th>153919</th>
-		<th>2932</th>
+		<th>4126</th>
+		<th>977</th>
+		<th>156246</th>
+		<th>2974</th>
 	</tr></tfoot></table>
 
 ## Future plans
 
 * Some features of the legacy software are still missing in this
   implementation and may be added in future updates.  These features
-  include text *CAPTCHA*s, throttling, load‑balancing, fail‑over,
+  include text *CAPTCHA*s, load‑balancing, fail‑over,
   [flow control](https://www.rfc-editor.org/rfc/rfc1372), SSH
   targets, and TELNET listeners.
 * When users access an SSH listener, the connecting client may supply

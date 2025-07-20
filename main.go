@@ -182,6 +182,7 @@ var (
 	blockFile                = "block.txt"
 	compressAlgo             string
 	compressLevel            string
+	sshDelay                 float64
 	acceptErrorsTotal        atomic.Uint64
 	adminKillsTotal          atomic.Uint64
 	altHostRoutesTotal       atomic.Uint64
@@ -201,6 +202,7 @@ var (
 	timeKillsTotal           atomic.Uint64
 	trafficInTotal           atomic.Uint64
 	trafficOutTotal          atomic.Uint64
+	delayAbandonedTotal      atomic.Uint64
 	emacsKeymapPrefixes      = make(map[string]bool)
 	emacsKeymap              = map[string]string{
 		"\x1b[1;5A": "\x1b\x5b", //    Control-Arrow_Up -> Escape, [
@@ -357,7 +359,7 @@ func init() {
 
 	pflag.BoolVarP(&noLog,
 		"no-log", "o", false,
-		"Disable all session logging\n   (for console logging, see \"--console-log\")")
+		"Disable all session logging\n   (for console logging see \"--console-log\")")
 
 	pflag.StringVarP(&consoleLog,
 		"console-log", "c", "",
@@ -400,6 +402,10 @@ func init() {
 	pflag.StringVarP(&whitelistFile,
 		"whitelist", "w", "",
 		"Enable whitelist [filename] (no default)")
+
+	pflag.Float64VarP(&sshDelay,
+		"ssh-delay", "D", 0,
+		"Delay for incoming SSH connections\n   [\"0.0\" to \"30.0\" seconds] (no default)")
 
 	pflag.BoolVarP(&showVersion,
 		"version", "v", false,
@@ -449,6 +455,14 @@ func main() {
 
 	if showVersion {
 		os.Exit(0)
+	}
+
+	if sshDelay < 0 {
+		log.Fatalf("ERROR: --ssh-delay cannot be negative!") // LINTED: Fatalf
+	}
+
+	if sshDelay > 30 {
+		log.Fatalf("ERROR: --ssh-delay cannot be greater than 30!") // LINTED: Fatalf
 	}
 
 	if os.Getuid() == 0 && !allowRoot { // LINTED: Fatalf
@@ -947,6 +961,7 @@ func showStats() {
 		{"Connections Killed by Admin", fmt.Sprintf("%d", adminKillsTotal.Load())},
 		{"Connections Killed for Idle Time", fmt.Sprintf("%d", idleKillsTotal.Load())},
 		{"Connections Killed for Max Time", fmt.Sprintf("%d", timeKillsTotal.Load())},
+		{"Connections Killed via Delay", fmt.Sprintf("%d", delayAbandonedTotal.Load())},
 		{"Blacklist Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load())},
 		{"Whitelist Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load())},
 	}
@@ -980,7 +995,7 @@ func showStats() {
 		fmt.Printf("\r| %-*s | %*s |\r\n", maxName, r.Name, maxVal, r.Value)
 
 		switch i {
-		case 2, 5, 13, 16, 18:
+		case 2, 5, 13, 17, 19:
 			fmt.Print(border)
 		}
 	}
@@ -1279,7 +1294,7 @@ func listConfiguration() {
 		}
 	}
 
-	timeMaxStr := "disabled"
+	timeMaxStr := "disabled" //nolint:goconst
 
 	if timeMax > 0 {
 		timeMaxStr = fmt.Sprintf("%d seconds", timeMax)
@@ -1404,7 +1419,15 @@ func listConfiguration() {
 
 	b.WriteString(separator)
 
-	printRow(&b, "SSH listeners on:")
+	sshDelayStr := "disabled"
+
+	if sshDelay > 0 {
+		sshDelayStr = fmt.Sprintf("%.1f seconds", sshDelay)
+	}
+
+	printRow(&b, "SSH Connection Delay: "+sshDelayStr)
+
+	printRow(&b, "SSH Listeners:")
 
 	for _, addr := range sshAddr {
 		printRow(&b, "* "+addr)
@@ -1412,7 +1435,7 @@ func listConfiguration() {
 
 	b.WriteString(separator)
 
-	printRow(&b, "Default TELNET target: "+telnetHostPort)
+	printRow(&b, "Default TELNET Target: "+telnetHostPort)
 
 	printRow(&b, fmt.Sprintf("Debug TELNET Negotiation: %t", debugNegotiation))
 
@@ -1871,6 +1894,14 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 		connectionsMutex.Lock()
 
+		if conn.sshConn != nil {
+			if err := conn.sshConn.Close(); err != nil {
+				if !strings.Contains(err.Error(), "use of closed network connection") {
+					log.Printf("Error closing SSH connection for %s: %v", conn.ID, err)
+				}
+			}
+		}
+
 		delete(connections, sid)
 
 		if gracefulShutdownMode.Load() && len(connections) == 0 {
@@ -2200,7 +2231,62 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}
 
 	sendBanner(conn.sshConn, channel, conn)
+
+	if sshDelay > 0 {
+		spinner := []rune{'|', '/', '-', '\\'}
+		spinnerIndex := 0
+		startTime := time.Now()
+
+		for time.Since(startTime).Seconds() < sshDelay {
+			char := string(spinner[spinnerIndex])
+
+			if _, err := channel.Write([]byte(fmt.Sprintf("\r%s", char))); err != nil {
+				if errors.Is(err, io.EOF) {
+					delayAbandonedTotal.Add(1)
+					log.Printf("WAITKILL [%s] %s@%s: %v",
+						conn.ID, conn.userName, conn.hostName, err)
+					if err := conn.sshConn.Close(); err != nil {
+						if !strings.Contains(err.Error(), "use of closed network connection") {
+							log.Printf("Error closing SSH connection for %s: %v",
+								conn.ID, err)
+						}
+					}
+
+					return
+				}
+
+				log.Printf("Error writing delay spinner to channel for %s: %v",
+					conn.ID, err)
+
+				break
+			}
+
+			spinnerIndex = (spinnerIndex + 1) % len(spinner)
+			time.Sleep(100 * time.Millisecond)
+		}
+
+		if _, err := channel.Write([]byte("\r \r")); err != nil {
+			if errors.Is(err, io.EOF) {
+				delayAbandonedTotal.Add(1)
+				log.Printf("WAITKILL [%s] %s@%s: %v",
+					conn.ID, conn.userName, conn.hostName, err)
+				if err := conn.sshConn.Close(); err != nil {
+					if !strings.Contains(err.Error(), "use of closed network connection") {
+						log.Printf("Error closing SSH connection for %s: %v",
+							conn.ID, err)
+					}
+				}
+
+				return
+			}
+
+			log.Printf("Error clearing delay spinner from channel for %s: %v",
+				conn.ID, err)
+		}
+	}
+
 	sshSessionsTotal.Add(1)
+
 	if conn.monitoring {
 		monitorSessionsTotal.Add(1)
 
