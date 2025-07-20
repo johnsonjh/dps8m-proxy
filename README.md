@@ -189,7 +189,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g234aee0+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g70ac885+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -306,7 +306,7 @@ features:
 
 * `]` — sends a literal `Control‑]` to the target TELNET host
 
-* `0` — sends an literal `NUL` to the target TELNET host
+* `0` — sends a literal `NUL` to the target TELNET host
 
 * `A` — sends an IAC `AYT` (*Are You There?*) to the target TELNET host
 
@@ -426,7 +426,7 @@ predecessor (code statistics 📈 provided by
 		<th>0</th>
 		<th>380</th>
 		<th>0</th>
-		<th>20069</th>
+		<th>20068</th>
 		<th>363</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -457,7 +457,7 @@ predecessor (code statistics 📈 provided by
 		<th>269</th>
 		<th>4059</th>
 		<th>955</th>
-		<th>153918</th>
+		<th>153917</th>
 		<th>2932</th>
 	</tr></tfoot></table>
 
