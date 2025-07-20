@@ -2784,17 +2784,20 @@ func optName(b byte) string {
 
 func showMenu(ch ssh.Channel) {
 	menu := "\r                         \r\n" +
-		"\r +=====+===============+ \r\n" +
-		"\r | Key | TELNET Action | \r\n" +
-		"\r +=====+===============+ \r\n" +
-		"\r |  A  | Send AYT      | \r\n" +
-		"\r |  B  | Send Break    | \r\n" +
-		"\r |  K  | Toggle Keymap | \r\n" +
-		"\r |  N  | Send NOP      | \r\n" +
-		"\r |  S  | Show Status   | \r\n" +
-		"\r |  X  | Disconnect    | \r\n" +
-		"\r |  ]  | Send Ctrl-]   | \r\n" +
-		"\r +=====+===============+ \r\n"
+		"\r +=====+=================+ \r\n" +
+		"\r | Key | TELNET Action   | \r\n" +
+		"\r +=====+=================+ \r\n" +
+		"\r |  0  | Send NUL        | \r\n" +
+		"\r |  A  | Send AYT        | \r\n" +
+		"\r |  B  | Send Break      | \r\n" +
+		"\r |  I  | Send Interrupt  | \r\n" +
+		"\r |  N  | Send NOP        | \r\n" +
+		"\r |  ]  | Send Control-]  | \r\n" +
+		"\r +=====+=================+ \r\n" +
+		"\r |  K  | Toggle Keymap   | \r\n" +
+		"\r |  S  | Show Status     | \r\n" +
+		"\r |  X  | Disconnect      | \r\n" +
+		"\r +=====+=================+ \r\n"
 
 	if _, err := ch.Write([]byte(menu)); err != nil {
 		log.Printf("Error writing menu to channel: %v", err)
@@ -2806,6 +2809,19 @@ func showMenu(ch ssh.Channel) {
 func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.Conn,
 	logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) { //nolint:gofumpt
 	switch sel {
+	case '0':
+		if _, err := remote.Write([]byte{0}); err != nil {
+			log.Printf("Error writing NUL to remote: %v", err)
+		}
+		if _, err := logw.Write([]byte{0}); err != nil {
+			log.Printf("Error writing NUL to log: %v", err)
+		}
+		if _, err := ch.Write([]byte("\r\n>> Sent NUL\r\n")); err != nil {
+			log.Printf("Error writing 'Sent NUL' message to channel: %v", err)
+		}
+		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+			log.Printf("Error writing '[BACK TO HOST]' message to channel: %v", err)
+		}
 	case 'a', 'A':
 		sendIAC(remote, TelcmdAYT)
 		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdAYT}); err != nil {
@@ -2830,6 +2846,18 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 			log.Printf("Error writing 'Sent BREAK' message to channel: %v", err)
 		}
 
+		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+			log.Printf("Error writing '[BACK TO HOST]' message to channel: %v", err)
+		}
+
+	case 'i', 'I':
+		sendIAC(remote, TelcmdIP)
+		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdIP}); err != nil {
+			log.Printf("Error writing Interrupt to log: %v", err)
+		}
+		if _, err := ch.Write([]byte("\r\n>> Sent Interrupt\r\n")); err != nil {
+			log.Printf("Error writing 'Sent Interrupt' message to channel: %v", err)
+		}
 		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
 			log.Printf("Error writing '[BACK TO HOST]' message to channel: %v", err)
 		}
@@ -2863,7 +2891,6 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
 			log.Printf("Error writing '[BACK TO HOST]' message to channel: %v", err)
 		}
-
 	case 's', 'S':
 		dur := time.Since(start)
 		if _, err := ch.Write([]byte("\r\n")); err != nil {
