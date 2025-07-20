@@ -115,7 +115,6 @@ Usage of ./proxy:
   -D, --ssh-delay float         Delay for incoming SSH connections
                                    ["0.0" to "30.0" seconds] (no default)
   -v, --version                 Show version information
-pflag: help requested
 ```
 
 Most of these command‑line arguments are straightforward with
@@ -191,12 +190,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-20 g6208e7a) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g79d467c+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -418,7 +417,7 @@ predecessor (code statistics 📈 provided by
 		<th>54</th>
 		<th>138</th>
 		<th>19</th>
-		<th>7349</th>
+		<th>7383</th>
 		<th>162</th>
 	</tr><tr>
 		<th>Markdown</th>
@@ -459,7 +458,7 @@ predecessor (code statistics 📈 provided by
 		<th>269</th>
 		<th>4126</th>
 		<th>977</th>
-		<th>156246</th>
+		<th>156280</th>
 		<th>2974</th>
 	</tr></tfoot></table>
 

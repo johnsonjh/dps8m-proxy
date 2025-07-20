@@ -206,7 +206,7 @@ README.md doc docs: README.md.tmpl proxy
 	grep -q '===VERSION===' README.md || exit 0
 	@printf '\n%s\n' "🐪 Perl: Inserting help info..."
 	$(PERL) -i -pe \
-	'BEGIN { ($$v=qx(./proxy -h 2>&1))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
+	'BEGIN { ($$v=qx(./proxy -h 2>&1 | grep -v "pflag: help requested"))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===HELP===!$$v!g' README.md
 	grep -q '===HELP===' README.md || exit 0
 	@printf '\n%s\n' "🐪 Perl: Inserting scc output..."
