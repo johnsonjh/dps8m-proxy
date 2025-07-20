@@ -45,67 +45,156 @@ import (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Global constants.
 const (
 	// TELNET Commands.
-	TelcmdNOP  = 241 // No operation
-	TelcmdAYT  = 246 // Are You There?
-	TelcmdIAC  = 255 // Interpret As Command
-	TelcmdDONT = 254 // DONT
-	TelcmdDO   = 253 // DO
-	TelcmdWONT = 252 // WONT
-	TelcmdWILL = 251 // WILL
+	TelcmdSE    = 240 // Subnegotiation End
+	TelcmdNOP   = 241 // No operation
+	TelcmdDM    = 242 // Data Mark
+	TelcmdBreak = 243 // Break
+	TelcmdIP    = 244 // Interrupt Process
+	TelcmdAO    = 245 // Abort Output
+	TelcmdAYT   = 246 // Are You There?
+	TelcmdEC    = 247 // Erase Character
+	TelcmdEL    = 248 // Erase Line
+	TelcmdGA    = 249 // Go Ahead
+	TelcmdSB    = 250 // Subnegotiation Begin
+	TelcmdWILL  = 251 // WILL
+	TelcmdWONT  = 252 // WONT
+	TelcmdDO    = 253 // DO
+	TelcmdDONT  = 254 // DONT
+	TelcmdIAC   = 255 // Interpret As Command
 
 	// TELNET Command Options.
-	TeloptBinary          = 0
-	TeloptEcho            = 1
-	TeloptSuppressGoAhead = 3
+	TeloptBinary            = 0   // Binary
+	TeloptEcho              = 1   // Echo
+	TeloptReconnect         = 2   // Reconnection
+	TeloptSuppressGoAhead   = 3   // Suppress Go Ahead
+	TeloptApprox            = 4   // Approx Message Size Negotiation
+	TeloptStatus            = 5   // Status
+	TeloptTimingMark        = 6   // Timing Mark
+	TeloptRemoteControl     = 7   // Remote Controlled Trans and Echo
+	TeloptOutputLineWidth   = 8   // Output Line Width
+	TeloptOutputPageSize    = 9   // Output Page Size
+	TeloptOutputCRD         = 10  // Output Carriage Return Disposition
+	TeloptOutputHTS         = 11  // Output Horizontal Tab Stops
+	TeloptOutputHTD         = 12  // Output Horizontal Tab Disposition
+	TeloptOutputFFD         = 13  // Output Formfeed Disposition
+	TeloptOutputVTS         = 14  // Output Vertical Tabstops
+	TeloptOutputVTD         = 15  // Output Vertical Tab Disposition
+	TeloptOutputLFD         = 16  // Output Linefeed Disposition
+	TeloptExtendedASCII     = 17  // Extended ASCII
+	TeloptLogout            = 18  // Logout
+	TeloptByteMacro         = 19  // Byte Macro
+	TeloptDataEntryTerminal = 20  // Data Entry Terminal
+	TeloptSupdup            = 21  // SUPDUP
+	TeloptSupdupOutput      = 22  // SUPDUP Output
+	TeloptSendLocation      = 23  // Send Location
+	TeloptTTYPE             = 24  // Terminal Type
+	TeloptEOR               = 25  // End of Record
+	TeloptTacacsUserID      = 26  // TACACS User Identification
+	TeloptOutputMarking     = 27  // Output Marking
+	TeloptTermLocationNum   = 28  // Terminal Location Number
+	TeloptTN3270Regime      = 29  // TELNET 3270 Regime
+	TeloptX3PAD             = 30  // X.3 PAD
+	TeloptNAWS              = 31  // Negotiate About Window Size
+	TeloptTS                = 32  // Terminal Speed
+	TeloptRM                = 33  // Remote Flow Control
+	TeloptLineMode          = 34  // Line Mode
+	TeloptXDisplay          = 35  // X Display Location
+	TeloptOldEnviron        = 36  // Old Environment Option
+	TeloptAuth              = 37  // Authentication Option
+	TeloptEncrypt           = 38  // Encryption Option
+	TeloptNewEnviron        = 39  // New Environment Option
+	TeloptTN3270E           = 40  // TN3270E
+	TeloptXAUTH             = 41  // XAUTH
+	TeloptCHARSET           = 42  // CHARSET
+	TeloptRSP               = 43  // Remote Serial Port (RSP)
+	TeloptCompPort          = 44  // COM Port Control
+	TeloptSLE               = 45  // Telnet Suppress Local Echo
+	TeloptStartTLS          = 46  // Start TLS
+	TeloptKermit            = 47  // Kermit
+	TeloptSendURL           = 48  // SEND-URL
+	TeloptForwardX          = 49  // FORWARD_X
+	TeloptMSSP              = 70  // MUD Server Status Protocol
+	TeloptMCCP2             = 86  // MUD Client Compression Protocol 2
+	TeloptMCCP3             = 87  // MUD Client Compression Protocol 3
+	TeloptMSP               = 90  // MUD Sound Protocol
+	TeloptMXP               = 91  // MUD Extension Protocol
+	TeloptPragmaLogon       = 138 // TELOPT PRAGMA LOGON
+	TeloptSspiLogon         = 139 // TELOPT SSPI LOGON
+	TeloptPragmaHeartbeat   = 140 // TELOPT PRAGMA HEARTBEAT
+	TeloptATCP              = 200 // Achaea Telnet Client Protocol
+	TeloptGMCP              = 201 // Generic MUD Client Protocol
+	TeloptEnd               = 255 // End of Option List
+
+	// TELNET subnegotiation commands.
+	TelnetIs    = 0 // IS
+	TelnetSend  = 1 // SEND
+	TelnetReply = 2 // REPLY
+	TelnetName  = 3 // NAME
 
 	// IEC sizes.
-	KiB = 1024
-	MiB = 1024 * KiB
-	GiB = 1024 * MiB
+	KiB = 1024       // Kibibyte
+	MiB = 1024 * KiB // Mebibyte
+	GiB = 1024 * MiB // Gibibyte
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Global variables.
 var (
-	startTime              = time.Now()
-	allowRoot              bool
-	logPerm                uint = 0o600
-	logDirPerm             uint = 0o750
-	altHosts                    = make(map[string]string)
-	blacklistedNetworks    []*net.IPNet
-	blacklistFile          string
-	connections            = make(map[string]*Connection)
-	connectionsMutex       sync.Mutex
-	consoleInputActive     atomic.Bool
-	consoleLogFile         *os.File
-	consoleLogMutex        sync.Mutex
-	consoleLog             string
-	isConsoleLogQuiet      bool
-	debugNegotiation       bool
-	denyNewConnectionsMode atomic.Bool
-	gracefulShutdownMode   atomic.Bool
-	idleMax                int
-	logDir                 string
-	loggingWg              sync.WaitGroup
-	noBanner               bool
-	noCompress             bool
-	noLog                  bool
-	showVersion            bool
-	shutdownOnce           sync.Once
-	shutdownSignal         chan struct{}
-	sshAddr                []string
-	telnetHostPort         string
-	timeMax                int
-	whitelistedNetworks    []*net.IPNet
-	whitelistFile          string
-	issueFile              = "issue.txt"
-	denyFile               = "deny.txt"
-	blockFile              = "block.txt"
-	compressAlgo           string
-	compressLevel          string
-	emacsKeymap            = map[string]string{
+	startTime               = time.Now()
+	allowRoot               bool
+	logPerm                 uint = 0o600
+	logDirPerm              uint = 0o750
+	altHosts                     = make(map[string]string)
+	blacklistedNetworks     []*net.IPNet
+	blacklistFile           string
+	connections             = make(map[string]*Connection)
+	connectionsMutex        sync.Mutex
+	consoleInputActive      atomic.Bool
+	consoleLogFile          *os.File
+	consoleLogMutex         sync.Mutex
+	consoleLog              string
+	isConsoleLogQuiet       bool
+	debugNegotiation        bool
+	denyNewConnectionsMode  atomic.Bool
+	gracefulShutdownMode    atomic.Bool
+	idleMax                 int
+	logDir                  string
+	loggingWg               sync.WaitGroup
+	noBanner                bool
+	noCompress              bool
+	noLog                   bool
+	showVersion             bool
+	shutdownOnce            sync.Once
+	shutdownSignal          chan struct{}
+	sshAddr                 []string
+	telnetHostPort          string
+	timeMax                 int
+	whitelistedNetworks     []*net.IPNet
+	whitelistFile           string
+	issueFile               = "issue.txt"
+	denyFile                = "deny.txt"
+	blockFile               = "block.txt"
+	compressAlgo            string
+	compressLevel           string
+	acceptErrorsTotal       atomic.Uint64
+	adminKillsTotal         atomic.Uint64
+	altHostRoutesTotal      atomic.Uint64
+	exemptedTotal           atomic.Uint64
+	idleKillsTotal          atomic.Uint64
+	monitorSessionsTotal    atomic.Uint64
+	rejectedTotal           atomic.Uint64
+	sshConnectionsTotal     atomic.Uint64
+	sshHandshakeFailedTotal atomic.Uint64
+	sshSessionsTotal        atomic.Uint64
+	telnetConnectionsTotal  atomic.Uint64
+	telnetFailuresTotal     atomic.Uint64
+	timeKillsTotal          atomic.Uint64
+	emacsKeymapPrefixes     = make(map[string]bool)
+	emacsKeymap             = map[string]string{
 		"\x1b[1;5A": "\x1b\x5b", //    Control-Arrow_Up -> Escape, [
 		"\x1b[1;5B": "\x1b\x5d", // Control-Arrrow_Down -> Escape, ]
 		"\x1b[1;5C": "\x1b\x66", // Control-Arrow_Right -> Escape, f
@@ -120,20 +209,6 @@ var (
 		"\x1b[C":    "\x06",     //         Arrow_Right -> Control-F
 		"\x1b[D":    "\x02",     //          Arrow_Left -> Control-B
 	}
-	emacsKeymapPrefixes     = make(map[string]bool)
-	acceptErrorsTotal       atomic.Uint64
-	adminKillsTotal         atomic.Uint64
-	altHostRoutesTotal      atomic.Uint64
-	exemptedTotal           atomic.Uint64
-	idleKillsTotal          atomic.Uint64
-	monitorSessionsTotal    atomic.Uint64
-	rejectedTotal           atomic.Uint64
-	sshConnectionsTotal     atomic.Uint64
-	sshHandshakeFailedTotal atomic.Uint64
-	sshSessionsTotal        atomic.Uint64
-	telnetConnectionsTotal  atomic.Uint64
-	telnetFailuresTotal     atomic.Uint64
-	timeKillsTotal          atomic.Uint64
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,6 +236,7 @@ type Connection struct {
 	userName            string
 	emacsKeymapEnabled  bool
 	wasMonitored        bool
+	termType            string
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,6 +253,7 @@ func (a *altHostFlag) String() string {
 
 func (a *altHostFlag) Set(value string) error {
 	parts := strings.SplitN(value, "@", 2)
+
 	if len(parts) != 2 {
 		return fmt.Errorf("invalid alt-host format: %s, expected sshuser@host:port", value)
 	}
@@ -347,10 +424,12 @@ func main() {
 
 	if consoleLog != "" {
 		cl := strings.ToLower(consoleLog)
+
 		if cl != "quiet" && cl != "noquiet" { //nolint:goconst
 			log.Fatalf("ERROR: Invalid --console-log value: %s.  Must be 'quiet' or 'noquiet'",
 				consoleLog) // LINTED: Fatalf
 		}
+
 		isConsoleLogQuiet = (cl == "quiet")
 	}
 
@@ -474,6 +553,7 @@ func main() {
 	pid := os.Getpid()
 
 	var startMsg string
+
 	if pid != 0 {
 		startMsg = fmt.Sprintf("Starting proxy [PID %d]", pid)
 	} else {
@@ -516,6 +596,7 @@ func main() {
 		if idleMax == 0 {
 			return
 		}
+
 		checkInterval := 10 * time.Second
 
 		for {
@@ -1042,6 +1123,7 @@ func listConnections(truncate bool) {
 		}
 
 		var details, idle string
+
 		if conn.monitoring {
 			details = fmt.Sprintf("%s@%s -> %s",
 				user, conn.sshConn.RemoteAddr(), conn.monitoredConnection.ID)
@@ -1134,10 +1216,13 @@ func listConfiguration() {
 	printRow := func(b *strings.Builder, text string) {
 		b.WriteString("| ")
 		b.WriteString(text)
+
 		padding := textWidth - len(text)
+
 		if padding < 0 {
 			padding = 0
 		}
+
 		b.WriteString(strings.Repeat(" ", padding))
 		b.WriteString(" |\r\n")
 	}
@@ -1193,11 +1278,13 @@ func listConfiguration() {
 
 	if consoleLog != "" {
 		var quietMode string
+
 		if isConsoleLogQuiet {
 			quietMode = "quiet"
 		} else {
 			quietMode = "noquiet"
 		}
+
 		printRow(&b, "Console Logging: "+quietMode)
 	} else {
 		printRow(&b, "Console Logging: disabled")
@@ -1283,7 +1370,6 @@ func reloadLists() {
 
 	if blacklistFile != "" {
 		networks, err := parseIPListFile(blacklistFile)
-
 		if err != nil {
 			reloadErrors = append(
 				reloadErrors, fmt.Sprintf("Blacklist rejected: %v", err))
@@ -1295,7 +1381,6 @@ func reloadLists() {
 
 	if whitelistFile != "" {
 		networks, err := parseIPListFile(whitelistFile)
-
 		if err != nil {
 			reloadErrors = append(
 				reloadErrors, fmt.Sprintf("Whitelist rejected: %v", err))
@@ -1873,6 +1958,9 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		for req := range requests {
 			switch req.Type {
 			case "pty-req":
+				termLen := req.Payload[3]
+				term := string(req.Payload[4 : 4+termLen])
+				conn.termType = term
 				if err := req.Reply(true, nil); err != nil {
 					log.Printf("Error replying to request: %v", err)
 				}
@@ -1903,6 +1991,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			}
 
 			log.Printf("Error parsing alt-host for user %s: %v", conn.userName, err)
+
 			if err := channel.Close(); err != nil {
 				log.Printf("Error closing channel for %s: %v", conn.ID, err)
 			}
@@ -1970,7 +2059,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		}
 	}()
 
-	negotiateTelnet(remote, channel, logwriter)
+	negotiateTelnet(remote, channel, logwriter, conn)
 
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -2300,7 +2389,23 @@ func sendBanner(sshConn *ssh.ServerConn, ch ssh.Channel, conn *Connection) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
+func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Connection) {
+	type telnetState struct {
+		weWill   bool
+		theyWill bool
+		// weDo  bool
+		// theyD bool
+	}
+
+	telnetStates := make(map[byte]*telnetState)
+
+	supportedOptions := map[byte]bool{
+		TeloptBinary:          true,
+		TeloptEcho:            true,
+		TeloptSuppressGoAhead: true,
+		TeloptTTYPE:           true,
+	}
+
 	if err := remote.SetReadDeadline(time.Now().Add(time.Second / 3)); err != nil {
 		log.Printf("Error setting read deadline: %v", err)
 	}
@@ -2326,35 +2431,126 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 
 		i := 0
 		for i < n {
-			if buf[i] == TelcmdIAC && i+2 < n {
-				cmd, opt := buf[i+1], buf[i+2]
-				writeNegotiation(ch, logw,
-					"[RCVD "+cmdName(cmd)+" "+optName(opt)+"]")
-				var reply byte
+			if buf[i] == TelcmdIAC {
+				if i+2 < n { //nolint:gocritic
+					cmd, opt := buf[i+1], buf[i+2]
+					writeNegotiation(ch, logw,
+						"[RCVD "+cmdName(cmd)+" "+optName(opt)+"]", conn.userName)
 
-				switch cmd {
-				case TelcmdWILL:
-					reply = TelcmdDO
+					state, ok := telnetStates[opt]
+					if !ok {
+						state = &telnetState{}
+						telnetStates[opt] = state
+					}
 
-				case TelcmdWONT:
-					reply = TelcmdDONT
+					switch cmd {
+					case TelcmdWILL:
+						if supportedOptions[opt] {
+							if !state.theyWill {
+								state.theyWill = true
+								sendIAC(remote, TelcmdDO, opt)
+								writeNegotiation(ch, logw,
+									"[SENT "+cmdName(TelcmdDO)+" "+optName(opt)+"]",
+									conn.userName)
+							}
+						} else {
+							sendIAC(remote, TelcmdDONT, opt)
+							writeNegotiation(ch, logw,
+								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]",
+								conn.userName)
+						}
 
-				case TelcmdDO:
-					reply = TelcmdWILL
+					case TelcmdWONT:
+						if state.theyWill {
+							state.theyWill = false
+							sendIAC(remote, TelcmdDONT, opt)
+							writeNegotiation(ch, logw,
+								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]",
+								conn.userName)
+						}
 
-				case TelcmdDONT:
-					reply = TelcmdWONT
+					case TelcmdDO:
+						if supportedOptions[opt] {
+							if !state.weWill {
+								state.weWill = true
+								sendIAC(remote, TelcmdWILL, opt)
+								writeNegotiation(ch, logw,
+									"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]",
+									conn.userName)
+							}
+						} else {
+							sendIAC(remote, TelcmdWONT, opt)
+							writeNegotiation(ch, logw,
+								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]",
+								conn.userName)
+						}
 
-				default:
+					case TelcmdDONT:
+						if state.weWill {
+							state.weWill = false
+							sendIAC(remote, TelcmdWONT, opt)
+							writeNegotiation(ch, logw,
+								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]",
+								conn.userName)
+						}
+
+					case TelcmdSB:
+						seIndex := -1
+						for j := i + 3; j < n-1; j++ {
+							if buf[j] == TelcmdIAC && buf[j+1] == TelcmdSE {
+								seIndex = j
+
+								break
+							}
+						}
+
+						if seIndex != -1 {
+							subOpt := buf[i+2]
+							subData := buf[i+3 : seIndex]
+
+							writeNegotiation(ch, logw,
+								"[RCVD SB "+optName(subOpt)+" ... IAC SE]", conn.userName)
+
+							if !supportedOptions[subOpt] {
+								i = seIndex + 2
+
+								continue
+							}
+
+							if subOpt ==
+								TeloptTTYPE && len(subData) > 0 && subData[0] == TelnetSend {
+								if conn.termType != "" {
+									data := []byte{TelcmdIAC, TelcmdSB, TeloptTTYPE, TelnetIs}
+									data = append(data, []byte(conn.termType)...)
+									data = append(data, TelcmdIAC, TelcmdSE)
+									if _, err := remote.Write(data); err != nil {
+										log.Printf("Error writing Telnet TTYPE response: %v", err)
+									}
+									writeNegotiation(ch, logw,
+										"[SENT SB "+optName(TeloptTTYPE)+" IS "+
+											conn.termType+" IAC SE]", conn.userName)
+								} else {
+									sendIAC(remote, TelcmdWONT, TeloptTTYPE)
+									writeNegotiation(ch, logw,
+										"[SENT WONT "+optName(TeloptTTYPE)+"]", conn.userName)
+								}
+							}
+
+							i = seIndex + 2
+
+							continue
+						}
+
+					default:
+					}
 					i += 3
-
-					continue
+				} else if i+1 < n && buf[i+1] == TelcmdSB {
+					writeNegotiation(ch, logw, "[RCVD IAC SB (incomplete)]", conn.userName)
+					i += 2
+				} else {
+					writeNegotiation(ch, logw, "[RCVD IAC (incomplete)]", conn.userName)
+					i++
 				}
-
-				sendIAC(remote, reply, opt)
-				writeNegotiation(ch, logw,
-					"[SENT "+cmdName(reply)+" "+optName(opt)+"]")
-				i += 3
 			} else {
 				_, _ = ch.Write(buf[i : i+1])
 				_, _ = logw.Write(buf[i : i+1])
@@ -2366,8 +2562,13 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func writeNegotiation(ch io.Writer, logw io.Writer, line string) {
-	msg := line + "\r\n"
+func writeNegotiation(ch io.Writer, logw io.Writer, line string, username string) {
+	msg := line
+	if debugNegotiation {
+		msg = fmt.Sprintf("%s %s", username, line)
+	}
+	msg += "\r\n"
+
 	if _, err := logw.Write([]byte(msg)); err != nil {
 		log.Printf("Error writing negotiation message to log: %v", err)
 	}
@@ -2381,8 +2582,10 @@ func writeNegotiation(ch io.Writer, logw io.Writer, line string) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func sendIAC(w io.Writer, cmd, opt byte) {
-	if _, err := w.Write([]byte{TelcmdIAC, cmd, opt}); err != nil {
+func sendIAC(w io.Writer, cmd byte, opts ...byte) {
+	data := []byte{TelcmdIAC, cmd}
+	data = append(data, opts...)
+	if _, err := w.Write(data); err != nil {
 		log.Printf("Error writing Telnet command to writer: %v", err)
 	}
 }
@@ -2411,14 +2614,188 @@ func cmdName(b byte) string {
 
 func optName(b byte) string {
 	switch b {
-	case TeloptBinary:
+	case TeloptBinary: // 0
 		return "BINARY"
 
-	case TeloptEcho:
+	case TeloptEcho: // 1
 		return "ECHO"
 
-	case TeloptSuppressGoAhead:
+	case TeloptReconnect: // 2
+		return "RECONNECTION"
+
+	case TeloptSuppressGoAhead: // 3
 		return "SUPPRESS GO AHEAD"
+
+	case TeloptApprox: // 4
+		return "APPROX MESSAGE SIZE NEGOTIATION"
+
+	case TeloptStatus: // 5
+		return "STATUS"
+
+	case TeloptTimingMark: // 6
+		return "TIMING MARK"
+
+	case TeloptRemoteControl: // 7
+		return "REMOTE CONTROL"
+
+	case TeloptOutputLineWidth: // 8
+		return "OUTPUT LINE WIDTH"
+
+	case TeloptOutputPageSize: // 9
+		return "OUTPUT PAGE SIZE"
+
+	case TeloptOutputCRD: // 10
+		return "OUTPUT CARRIAGE RETURN DISPOSITION"
+
+	case TeloptOutputHTS: // 11
+		return "OUTPUT HORIZONTAL TAB STOPS"
+
+	case TeloptOutputHTD: // 12
+		return "OUTPUT HORIZONTAL TAB DISPOSITION"
+
+	case TeloptOutputFFD: // 13
+		return "OUTPUT FORMFEED DISPOSITION"
+
+	case TeloptOutputVTS: // 14
+		return "OUTPUT VERTICAL TABSTOPS"
+
+	case TeloptOutputVTD: // 15
+		return "OUTPUT VERTICAL TAB DISPOSITION"
+
+	case TeloptOutputLFD: // 16
+		return "OUTPUT LINEFEED DISPOSITION"
+
+	case TeloptExtendedASCII: // 17
+		return "EXTENDED ASCII"
+
+	case TeloptLogout: // 18
+		return "LOGOUT"
+
+	case TeloptByteMacro: // 19
+		return "Byte Macro"
+
+	case TeloptDataEntryTerminal: // 20
+		return "DATA ENTRY TERMINAL"
+
+	case TeloptSupdup: // 21
+		return "SUPDUP"
+
+	case TeloptSupdupOutput: // 22
+		return "SUPDUP OUTPUT"
+
+	case TeloptSendLocation: // 23
+		return "SEND LOCATION"
+
+	case TeloptTTYPE: // 24
+		return "TERMINAL TYPE"
+
+	case TeloptEOR: // 25
+		return "END OF RECORD"
+
+	case TeloptTacacsUserID: // 26
+		return "TACACS USER IDENTIFICATION"
+
+	case TeloptOutputMarking: // 27
+		return "OUTPUT MARKING"
+
+	case TeloptTermLocationNum: // 28
+		return "TERMINAL LOCATION NUMBER"
+
+	case TeloptTN3270Regime: // 29
+		return "TELNET 3270 REGIME"
+
+	case TeloptX3PAD: // 30
+		return "X.3 PAD"
+
+	case TeloptNAWS: // 31
+		return "NEGOTIATE ABOUT WINDOW SIZE"
+
+	case TeloptTS: // 32
+		return "TERMINAL SPEED"
+
+	case TeloptRM: // 33
+		return "REMOTE FLOW CONTROL"
+
+	case TeloptLineMode: // 34
+		return "LINE MODE"
+
+	case TeloptXDisplay: // 35
+		return "X DISPLAY"
+
+	case TeloptOldEnviron: // 36
+		return "OLD ENVIRON"
+
+	case TeloptAuth: // 37
+		return "AUTHENTICATION"
+
+	case TeloptEncrypt: // 38
+		return "ENCRYPTION"
+
+	case TeloptNewEnviron: // 39
+		return "NEW ENVIRON"
+
+	case TeloptTN3270E: // 40
+		return "TN3270E"
+
+	case TeloptXAUTH: // 41
+		return "XAUTH"
+
+	case TeloptCHARSET: // 42
+		return "CHARSET"
+
+	case TeloptRSP: // 43
+		return "REMOTE SERIAL PORT"
+
+	case TeloptCompPort: // 44
+		return "COM PORT CONTROL"
+
+	case TeloptSLE: // 45
+		return "SUPPRESS LOCAL ECHO"
+
+	case TeloptStartTLS: // 46
+		return "START TLS"
+
+	case TeloptKermit: // 47
+		return "KERMIT"
+
+	case TeloptSendURL: // 48
+		return "SEND-URL"
+
+	case TeloptForwardX: // 49
+		return "FORWARD_X"
+
+	case TeloptMSSP: // 70
+		return "MSSP"
+
+	case TeloptMCCP2: // 86
+		return "MCCP2"
+
+	case TeloptMCCP3: // 87
+		return "MCCP3"
+
+	case TeloptMSP: // 90
+		return "MSP"
+
+	case TeloptMXP: // 91
+		return "MXP"
+
+	case TeloptPragmaLogon: // 138
+		return "PRAGMA LOGON"
+
+	case TeloptSspiLogon: // 139
+		return "SSPI LOGON"
+
+	case TeloptPragmaHeartbeat: // 140
+		return "PRAGMA HEARTBEAT"
+
+	case TeloptATCP: // 200
+		return "ATCP"
+
+	case TeloptGMCP: // 201
+		return "GMCP"
+
+	case TeloptEnd: // 255
+		return "END"
 	}
 
 	return fmt.Sprintf("OPT_%d", b)
@@ -2428,17 +2805,20 @@ func optName(b byte) string {
 
 func showMenu(ch ssh.Channel) {
 	menu := "\r                         \r\n" +
-		"\r +=====+===============+ \r\n" +
-		"\r | Key | TELNET Action | \r\n" +
-		"\r +=====+===============+ \r\n" +
-		"\r |  A  | Send AYT      | \r\n" +
-		"\r |  B  | Send Break    | \r\n" +
-		"\r |  K  | Toggle Keymap | \r\n" +
-		"\r |  N  | Send NOP      | \r\n" +
-		"\r |  S  | Show Status   | \r\n" +
-		"\r |  X  | Disconnect    | \r\n" +
-		"\r |  ]  | Send Ctrl-]   | \r\n" +
-		"\r +=====+===============+ \r\n"
+		"\r +=====+=================+ \r\n" +
+		"\r | Key | TELNET Action   | \r\n" +
+		"\r +=====+=================+ \r\n" +
+		"\r |  0  | Send NUL        | \r\n" +
+		"\r |  A  | Send AYT        | \r\n" +
+		"\r |  B  | Send Break      | \r\n" +
+		"\r |  I  | Send Interrupt  | \r\n" +
+		"\r |  N  | Send NOP        | \r\n" +
+		"\r |  ]  | Send Control-]  | \r\n" +
+		"\r +=====+=================+ \r\n" +
+		"\r |  K  | Toggle Keymap   | \r\n" +
+		"\r |  S  | Show Status     | \r\n" +
+		"\r |  X  | Disconnect      | \r\n" +
+		"\r +=====+=================+ \r\n"
 
 	if _, err := ch.Write([]byte(menu)); err != nil {
 		log.Printf("Error writing menu to channel: %v", err)
@@ -2450,11 +2830,25 @@ func showMenu(ch ssh.Channel) {
 func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.Conn,
 	logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) { //nolint:gofumpt
 	switch sel {
-	case 'a', 'A':
-		if _, err := remote.Write([]byte{TelcmdIAC, TelcmdAYT}); err != nil {
-			log.Printf("Error writing AYT to remote: %v", err)
+	case '0':
+		if _, err := remote.Write([]byte{0}); err != nil {
+			log.Printf("Error writing NUL to remote: %v", err)
 		}
 
+		if _, err := logw.Write([]byte{0}); err != nil {
+			log.Printf("Error writing NUL to log: %v", err)
+		}
+
+		if _, err := ch.Write([]byte("\r\n>> Sent NUL\r\n")); err != nil {
+			log.Printf("Error writing 'Sent NUL' message to channel: %v", err)
+		}
+
+		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+			log.Printf("Error writing '[BACK TO HOST]' message to channel: %v", err)
+		}
+
+	case 'a', 'A':
+		sendIAC(remote, TelcmdAYT)
 		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdAYT}); err != nil {
 			log.Printf("Error writing AYT to log: %v", err)
 		}
@@ -2468,16 +2862,27 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		}
 
 	case 'b', 'B':
-		if _, err := remote.Write([]byte{TelcmdIAC, 243}); err != nil {
-			log.Printf("Error writing BREAK to remote: %v", err)
-		}
-
-		if _, err := logw.Write([]byte{TelcmdIAC, 243}); err != nil {
+		sendIAC(remote, TelcmdBreak)
+		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdBreak}); err != nil {
 			log.Printf("Error writing BREAK to log: %v", err)
 		}
 
 		if _, err := ch.Write([]byte("\r\n>> Sent BREAK\r\n")); err != nil {
 			log.Printf("Error writing 'Sent BREAK' message to channel: %v", err)
+		}
+
+		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+			log.Printf("Error writing '[BACK TO HOST]' message to channel: %v", err)
+		}
+
+	case 'i', 'I':
+		sendIAC(remote, TelcmdIP)
+		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdIP}); err != nil {
+			log.Printf("Error writing Interrupt to log: %v", err)
+		}
+
+		if _, err := ch.Write([]byte("\r\n>> Sent Interrupt\r\n")); err != nil {
+			log.Printf("Error writing 'Sent Interrupt' message to channel: %v", err)
 		}
 
 		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
@@ -2501,10 +2906,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		}
 
 	case 'n', 'N':
-		if _, err := remote.Write([]byte{TelcmdIAC, TelcmdNOP}); err != nil {
-			log.Printf("Error writing NOP to remote: %v", err)
-		}
-
+		sendIAC(remote, TelcmdNOP)
 		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdNOP}); err != nil {
 			log.Printf("Error writing NOP to log: %v", err)
 		}
@@ -2516,7 +2918,6 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
 			log.Printf("Error writing '[BACK TO HOST]' message to channel: %v", err)
 		}
-
 	case 's', 'S':
 		dur := time.Since(start)
 		if _, err := ch.Write([]byte("\r\n")); err != nil {
@@ -2923,6 +3324,7 @@ func compressLogFile(logFilePath string) {
 		writer, err = gzip.NewWriterLevel(compressedFile, gzipLevel)
 		if err != nil {
 			log.Printf("Error creating gzip writer for %q: %v", compressedFilePath, err)
+
 			if err := compressedFile.Close(); err != nil {
 				log.Printf("Error closing compressed file after gzip writer error: %v", err)
 			}
@@ -2942,6 +3344,7 @@ func compressLogFile(logFilePath string) {
 		writer, err = xz.NewWriter(compressedFile)
 		if err != nil {
 			log.Printf("Error creating xz writer for %q: %v", compressedFilePath, err)
+
 			if err := compressedFile.Close(); err != nil {
 				log.Printf("Error closing compressed file after xz writer error: %v", err)
 			}
@@ -2962,6 +3365,7 @@ func compressLogFile(logFilePath string) {
 			compressedFile, zstd.WithEncoderLevel(zstdLevel))
 		if err != nil {
 			log.Printf("Error creating zstd writer for %q: %v", compressedFilePath, err)
+
 			if err := compressedFile.Close(); err != nil {
 				log.Printf("Error closing compressed file after zstd writer error: %v", err)
 			}
@@ -3111,6 +3515,7 @@ func listGoroutines() {
 
 		entrypoint := lines[1]
 		caller := ""
+
 		if len(lines) > 2 {
 			caller = strings.TrimSpace(lines[2])
 		}
