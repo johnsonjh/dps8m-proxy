@@ -12,14 +12,14 @@
 ## Overview
 
 The **`proxy`** program acts as a multi‑user *terminal server* and
-relay, accepting incoming SSH client connections on the front‑end
-(*listeners*) and proxying these connections to one or more TELNET
-servers on the back‑end (*targets*).
+relay 📡, accepting incoming **SSH** client connections on the
+front‑end (*listeners* 👂) and proxying these connections to one or
+more **TELNET** servers on the back‑end (*targets* 🎯).
 
-This project was originally developed to meet the needs of the
-*BAN.AI Public Access Multics* system and the
-[DPS8M Simulator](https://dps8m.gitlab.io) project, but may be useful
-to anyone who wants to offer SSH access to legacy systems.
+> This project was originally developed to meet the needs of the
+> *BAN.AI Public Access Multics* system and the
+> [DPS8M Simulator](https://dps8m.gitlab.io) project, but may be
+> useful to anyone who wants to offer SSH access to legacy systems.
 
 ## Features
 
@@ -189,7 +189,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g628087b+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g97cdfa0+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -286,14 +286,14 @@ to manage the service (while maintaining access to the interactive
 admin console).
 
 * The `systemd` integration requires:
-  * `systemd` version **247** or later (*released November 2020*), and
-  * a recent version of **[`tmux`](https://github.com/tmux/tmux)**.
+  * `systemd` version **247** or later (Nov 2020), and
+  * a *recent* version of [`tmux`](https://github.com/tmux/tmux).
 []()
 
 []()
 * 🔧 With minor changes to the unit file, this setup can also work
-  with `systemd` as old as version **229** (*released February 2016*).
-* 🛠️ See the detailed instructions in the
+  with `systemd` as old as version **229** (Feb 2016).
+* See the detailed instructions in the
   [`systemd/dps8m-proxy.service`](systemd/dps8m-proxy.service)
   file for full installation instructions.
 
@@ -359,7 +359,7 @@ features:
 
 ## History
 
-This is a from‑scratch re‑implementation (in
+🛠️ This is a from‑scratch re‑implementation (in
 [Go](https://go.dev/) 🐹) of an older legacy program of the same name.
 
 The original software used a multi‑process architecture and consisted
@@ -421,7 +421,7 @@ predecessor (code statistics provided by
 		<th>0</th>
 		<th>378</th>
 		<th>0</th>
-		<th>19707</th>
+		<th>19704</th>
 		<th>359</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -452,7 +452,7 @@ predecessor (code statistics provided by
 		<th>269</th>
 		<th>4057</th>
 		<th>955</th>
-		<th>153556</th>
+		<th>153553</th>
 		<th>2928</th>
 	</tr></tfoot></table>
 
