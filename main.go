@@ -243,6 +243,10 @@ type Connection struct {
 	emacsKeymapEnabled  bool
 	wasMonitored        bool
 	termType            string
+	nawsActive          bool
+	initialWindowWidth  uint32
+	initialWindowHeight uint32
+	telnetConn          net.Conn
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -802,6 +806,7 @@ func handleConsoleInput() {
 
 		case "v", "V":
 			fmt.Println("")
+
 			originalWriter := log.Writer()
 
 			if consoleLogFile != nil {
@@ -842,18 +847,21 @@ func handleConsoleInput() {
 					log.Printf("Error writing to stdout: %v", err)
 				}
 			}
+
 			reloadLists()
 
 		case "xyzzy": // :)
 			if isConsoleLogQuiet {
 				fmt.Printf("%s Nothing happens.\r\n", nowStamp())
 			}
+
 			log.Println("Nothing happens.")
 
 		case "XYZZY": // =)
 			if isConsoleLogQuiet {
 				fmt.Printf("%s NOTHING HAPPENS.\r\n", nowStamp())
 			}
+
 			log.Println("NOTHING HAPPENS.")
 
 		case "":
@@ -927,7 +935,6 @@ func showStats() {
 		{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load())},
 		{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load())},
 		{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load())},
-		{"* SSH Peak Usage", fmt.Sprintf("%d", peakUsersTotal.Load())},
 		{"* SSH Session Request Timeout", fmt.Sprintf("%d", sshRequestTimeoutTotal.Load())},
 		{"* SSH Illegal Request (SFTP)", fmt.Sprintf("%d", sshIllegalSubsystemTotal.Load())},
 		{"* SSH Illegal Request (SCP/EXEC)", fmt.Sprintf("%d", sshExecRejectedTotal.Load())},
@@ -936,8 +943,8 @@ func showStats() {
 		{"Connections Killed by Admin", fmt.Sprintf("%d", adminKillsTotal.Load())},
 		{"Connections Killed for Idle Time", fmt.Sprintf("%d", idleKillsTotal.Load())},
 		{"Connections Killed for Max Time", fmt.Sprintf("%d", timeKillsTotal.Load())},
-		{"Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load())},
-		{"Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load())},
+		{"Blacklist Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load())},
+		{"Whitelist Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load())},
 	}
 
 	maxName := len("Statistic")
@@ -969,7 +976,7 @@ func showStats() {
 		fmt.Printf("\r| %-*s | %*s |\r\n", maxName, r.Name, maxVal, r.Value)
 
 		switch i {
-		case 2, 3, 12, 15, 17:
+		case 2, 3, 11, 14, 16:
 			fmt.Print(border)
 		}
 	}
@@ -1659,6 +1666,31 @@ func killAllConnections() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+func sendNaws(conn *Connection, width, height uint32) {
+	if width == 0 ||
+		width > 65535 {
+		width = 1
+	}
+
+	if height == 0 ||
+		height > 65535 {
+		height = 1
+	}
+
+	packet := []byte{
+		TelcmdIAC, TelcmdSB, TeloptNAWS,
+		byte(width >> 8), byte(width & 0xFF),
+		byte(height >> 8), byte(height & 0xFF),
+		TelcmdIAC, TelcmdSE,
+	}
+
+	if _, err := conn.telnetConn.Write(packet); err != nil {
+		log.Printf("Error sending NAWS to TELNET target for %s: %v", conn.ID, err)
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
 	if data, err := os.ReadFile(path); err == nil {
 		return ssh.ParsePrivateKey(data)
@@ -1804,6 +1836,15 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		shareableUsername: newShareableUsername(connections, &connectionsMutex),
 	}
 
+	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
+	if err != nil {
+		log.Printf("Error parsing default TELNET target: %v", err)
+
+		return
+	}
+	conn.targetHost = defaultHost
+	conn.targetPort = defaultPort
+
 	connectionsMutex.Lock()
 
 	found := false
@@ -1947,8 +1988,42 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				term := string(req.Payload[4 : 4+termLen])
 				conn.termType = term
 
+				if len(req.Payload) >= int(4+termLen+8) {
+					width := binary.BigEndian.Uint32(req.Payload[4+termLen : 4+termLen+4])
+					height := binary.BigEndian.Uint32(req.Payload[4+termLen+4 : 4+termLen+8])
+
+					conn.initialWindowWidth = width
+					conn.initialWindowHeight = height
+
+					if conn.telnetConn != nil {
+						nawsWill := []byte{TelcmdIAC, TelcmdWILL, TeloptNAWS}
+						if _, err := conn.telnetConn.Write(nawsWill); err != nil {
+							log.Printf("Error sending IAC WILL NAWS to TELNET target for %s: %v",
+								conn.ID, err)
+						}
+					}
+				}
+
 				if err := req.Reply(true, nil); err != nil {
 					log.Printf("Error replying to request: %v", err)
+				}
+
+			case "window-change":
+				if len(req.Payload) == 16 {
+					width := binary.BigEndian.Uint32(req.Payload[:4])
+					height := binary.BigEndian.Uint32(req.Payload[4:8])
+
+					if conn.telnetConn != nil {
+						sendNaws(conn, width, height)
+					}
+
+					if err := req.Reply(true, nil); err != nil {
+						log.Printf("Error replying to window-change request: %v", err)
+					}
+				} else {
+					if err := req.Reply(false, nil); err != nil {
+						log.Printf("Error replying to window-change request (failure): %v", err)
+					}
 				}
 
 			case "shell":
@@ -2332,6 +2407,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		_ = tcp2.SetNoDelay(true)
 	}
 
+	conn.telnetConn = remote
+
 	defer func() {
 		if err := remote.Close(); err != nil {
 			log.Printf("Error closing remote connection for %s: %v", conn.ID, err)
@@ -2339,6 +2416,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}()
 
 	negotiateTelnet(remote, channel, logwriter, conn)
+
+	if conn.nawsActive && conn.initialWindowWidth > 0 && conn.initialWindowHeight > 0 {
+		sendNaws(conn, conn.initialWindowWidth, conn.initialWindowHeight)
+	}
 
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -2681,6 +2762,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 	supportedOptions := map[byte]bool{
 		TeloptBinary:          true,
 		TeloptEcho:            true,
+		TeloptNAWS:            true,
 		TeloptSuppressGoAhead: true,
 		TeloptTTYPE:           true,
 	}
@@ -2749,7 +2831,16 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 						}
 
 					case TelcmdDO:
-						if supportedOptions[opt] {
+						if opt == TeloptNAWS { //nolint:gocritic
+							if !conn.nawsActive {
+								conn.nawsActive = true
+							}
+
+							sendIAC(remote, TelcmdWILL, opt)
+							writeNegotiation(ch, logw,
+								"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]",
+								conn.userName)
+						} else if supportedOptions[opt] {
 							if !state.weWill {
 								state.weWill = true
 								sendIAC(remote, TelcmdWILL, opt)
