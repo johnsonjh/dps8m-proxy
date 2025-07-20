@@ -18,6 +18,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"encoding/binary"
 	"encoding/hex"
 	"encoding/pem"
 	"errors"
@@ -144,57 +145,60 @@ const (
 
 // Global variables.
 var (
-	startTime               = time.Now()
-	allowRoot               bool
-	logPerm                 uint = 0o600
-	logDirPerm              uint = 0o750
-	altHosts                     = make(map[string]string)
-	blacklistedNetworks     []*net.IPNet
-	blacklistFile           string
-	connections             = make(map[string]*Connection)
-	connectionsMutex        sync.Mutex
-	consoleInputActive      atomic.Bool
-	consoleLogFile          *os.File
-	consoleLogMutex         sync.Mutex
-	consoleLog              string
-	isConsoleLogQuiet       bool
-	debugNegotiation        bool
-	denyNewConnectionsMode  atomic.Bool
-	gracefulShutdownMode    atomic.Bool
-	idleMax                 int
-	logDir                  string
-	loggingWg               sync.WaitGroup
-	noBanner                bool
-	noCompress              bool
-	noLog                   bool
-	showVersion             bool
-	shutdownOnce            sync.Once
-	shutdownSignal          chan struct{}
-	sshAddr                 []string
-	telnetHostPort          string
-	timeMax                 int
-	whitelistedNetworks     []*net.IPNet
-	whitelistFile           string
-	issueFile               = "issue.txt"
-	denyFile                = "deny.txt"
-	blockFile               = "block.txt"
-	compressAlgo            string
-	compressLevel           string
-	acceptErrorsTotal       atomic.Uint64
-	adminKillsTotal         atomic.Uint64
-	altHostRoutesTotal      atomic.Uint64
-	exemptedTotal           atomic.Uint64
-	idleKillsTotal          atomic.Uint64
-	monitorSessionsTotal    atomic.Uint64
-	rejectedTotal           atomic.Uint64
-	sshConnectionsTotal     atomic.Uint64
-	sshHandshakeFailedTotal atomic.Uint64
-	sshSessionsTotal        atomic.Uint64
-	telnetConnectionsTotal  atomic.Uint64
-	telnetFailuresTotal     atomic.Uint64
-	timeKillsTotal          atomic.Uint64
-	emacsKeymapPrefixes     = make(map[string]bool)
-	emacsKeymap             = map[string]string{
+	startTime                = time.Now()
+	allowRoot                bool
+	logPerm                  uint = 0o600
+	logDirPerm               uint = 0o750
+	altHosts                      = make(map[string]string)
+	blacklistedNetworks      []*net.IPNet
+	blacklistFile            string
+	connections              = make(map[string]*Connection)
+	connectionsMutex         sync.Mutex
+	consoleInputActive       atomic.Bool
+	consoleLogFile           *os.File
+	consoleLogMutex          sync.Mutex
+	consoleLog               string
+	isConsoleLogQuiet        bool
+	debugNegotiation         bool
+	denyNewConnectionsMode   atomic.Bool
+	gracefulShutdownMode     atomic.Bool
+	idleMax                  int
+	logDir                   string
+	loggingWg                sync.WaitGroup
+	noBanner                 bool
+	noCompress               bool
+	noLog                    bool
+	showVersion              bool
+	shutdownOnce             sync.Once
+	shutdownSignal           chan struct{}
+	sshAddr                  []string
+	telnetHostPort           string
+	timeMax                  int
+	whitelistedNetworks      []*net.IPNet
+	whitelistFile            string
+	issueFile                = "issue.txt"
+	denyFile                 = "deny.txt"
+	blockFile                = "block.txt"
+	compressAlgo             string
+	compressLevel            string
+	acceptErrorsTotal        atomic.Uint64
+	adminKillsTotal          atomic.Uint64
+	altHostRoutesTotal       atomic.Uint64
+	exemptedTotal            atomic.Uint64
+	idleKillsTotal           atomic.Uint64
+	monitorSessionsTotal     atomic.Uint64
+	rejectedTotal            atomic.Uint64
+	sshConnectionsTotal      atomic.Uint64
+	sshHandshakeFailedTotal  atomic.Uint64
+	sshIllegalSubsystemTotal atomic.Uint64
+	sshExecRejectedTotal     atomic.Uint64
+	sshRequestTimeoutTotal   atomic.Uint64
+	sshSessionsTotal         atomic.Uint64
+	telnetConnectionsTotal   atomic.Uint64
+	telnetFailuresTotal      atomic.Uint64
+	timeKillsTotal           atomic.Uint64
+	emacsKeymapPrefixes      = make(map[string]bool)
+	emacsKeymap              = map[string]string{
 		"\x1b[1;5A": "\x1b\x5b", //    Control-Arrow_Up -> Escape, [
 		"\x1b[1;5B": "\x1b\x5d", // Control-Arrrow_Down -> Escape, ]
 		"\x1b[1;5C": "\x1b\x66", // Control-Arrow_Right -> Escape, f
@@ -914,13 +918,16 @@ func showStats() {
 		{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load())},
 		{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load())},
 		{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load())},
+		{"* SSH Session Request Timeout", fmt.Sprintf("%d", sshRequestTimeoutTotal.Load())},
+		{"* SSH Illegal Request (SFTP)", fmt.Sprintf("%d", sshIllegalSubsystemTotal.Load())},
+		{"* SSH Illegal Request (SCP/EXEC)", fmt.Sprintf("%d", sshExecRejectedTotal.Load())},
 		{"* SSH Accept Errors", fmt.Sprintf("%d", acceptErrorsTotal.Load())},
 		{"* SSH Handshake Errors", fmt.Sprintf("%d", sshHandshakeFailedTotal.Load())},
 		{"Connections Killed by Admin", fmt.Sprintf("%d", adminKillsTotal.Load())},
 		{"Connections Killed for Idle Time", fmt.Sprintf("%d", idleKillsTotal.Load())},
 		{"Connections Killed for Max Time", fmt.Sprintf("%d", timeKillsTotal.Load())},
-		{"ACL Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load())},
-		{"* ACL Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load())},
+		{"Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load())},
+		{"Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load())},
 	}
 
 	maxName := len("Statistic")
@@ -952,7 +959,7 @@ func showStats() {
 		fmt.Printf("\r| %-*s | %*s |\r\n", maxName, r.Name, maxVal, r.Value)
 
 		switch i {
-		case 2, 7, 10, 12:
+		case 2, 10, 13, 15:
 			fmt.Print(border)
 		}
 	}
@@ -1748,6 +1755,119 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	requests <-chan *ssh.Request, keyLog []string) { //nolint:gofumpt
 	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
 
+	sessionStarted := make(chan bool, 1)
+	go func() {
+		for req := range requests {
+			switch req.Type {
+			case "pty-req":
+				termLen := req.Payload[3]
+				term := string(req.Payload[4 : 4+termLen])
+				conn.termType = term
+
+				if err := req.Reply(true, nil); err != nil {
+					log.Printf("Error replying to request: %v", err)
+				}
+
+			case "shell":
+				select {
+				case sessionStarted <- true:
+				default:
+				}
+
+				if err := req.Reply(true, nil); err != nil {
+					log.Printf("Error replying to request: %v", err)
+				}
+
+			case "exec":
+				if !suppressLogs {
+					log.Printf("REJECTED [%s] %s (Illegal request: exec)",
+						conn.ID, conn.sshConn.RemoteAddr().String())
+				}
+
+				sshExecRejectedTotal.Add(1)
+
+				if err := req.Reply(false, nil); err != nil {
+					log.Printf("Error replying to request: %v", err)
+				}
+
+				select {
+				case sessionStarted <- false:
+				default:
+				}
+
+				if err := conn.sshConn.Close(); err != nil {
+					log.Printf("Error closing SSH connection for %s: %v",
+						conn.ID, err)
+				}
+
+				return
+
+			case "subsystem":
+				if len(req.Payload) >= 4 {
+					subsystemLen := binary.BigEndian.Uint32(req.Payload[0:4])
+
+					if len(req.Payload) >= 4+int(subsystemLen) {
+						subsystem := string(req.Payload[4 : 4+subsystemLen])
+
+						if subsystem == "sftp" {
+							if !suppressLogs {
+								log.Printf("REJECTED [%s] %s (Illegal request: SFTP)",
+									conn.ID, conn.sshConn.RemoteAddr().String())
+							}
+
+							sshIllegalSubsystemTotal.Add(1)
+							if err := req.Reply(false, nil); err != nil {
+								log.Printf("Error replying to request: %v", err)
+							}
+							select {
+							case sessionStarted <- false:
+
+							default:
+							}
+
+							if err := conn.sshConn.Close(); err != nil {
+								log.Printf("Error closing SSH connection for %s: %v",
+									conn.ID, err)
+							}
+
+							return
+						}
+					}
+				}
+
+				if err := req.Reply(false, nil); err != nil {
+					log.Printf("Error replying to request: %v", err)
+				}
+
+			default:
+				if err := req.Reply(false, nil); err != nil {
+					log.Printf("Error replying to request: %v", err)
+				}
+			}
+		}
+	}()
+
+	select {
+	case proceed := <-sessionStarted:
+		if !proceed {
+			return
+		}
+
+	case <-time.After(2 * time.Second):
+		sshRequestTimeoutTotal.Add(1)
+
+		if !suppressLogs {
+			log.Printf("TEARDOWN [%s] %s (Timeout waiting for session request)",
+				conn.ID, conn.sshConn.RemoteAddr().String())
+		}
+
+		if err := conn.sshConn.Close(); err != nil {
+			log.Printf("Error closing SSH connection for %s: %v", conn.ID, err)
+		}
+
+		return
+	}
+
 	remoteHost, _, err := net.SplitHostPort(conn.sshConn.RemoteAddr().String())
 	if err != nil {
 		remoteHost = conn.sshConn.RemoteAddr().String()
@@ -1953,30 +2073,6 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	} else {
 		logwriter = io.Discard
 	}
-
-	go func() {
-		for req := range requests {
-			switch req.Type {
-			case "pty-req":
-				termLen := req.Payload[3]
-				term := string(req.Payload[4 : 4+termLen])
-				conn.termType = term
-				if err := req.Reply(true, nil); err != nil {
-					log.Printf("Error replying to request: %v", err)
-				}
-
-			case "shell":
-				if err := req.Reply(true, nil); err != nil {
-					log.Printf("Error replying to request: %v", err)
-				}
-
-			default:
-				if err := req.Reply(false, nil); err != nil {
-					log.Printf("Error replying to request: %v", err)
-				}
-			}
-		}
-	}()
 
 	var targetHost string
 	var targetPort int
