@@ -12,9 +12,9 @@
 ## Overview
 
 The **`proxy`** program acts as a multi‑user *terminal server* and
-relay 📡, accepting incoming **SSH** client connections on the
-front‑end (*listeners* 👂) and proxying these connections to one or
-more **TELNET** servers on the back‑end (*targets* 🎯).
+relay 📡, accepting incoming **SSH** client connections on the
+front‑end (*listeners* 👂) and proxying these connections to one or
+more **TELNET** servers on the back‑end (*targets* 🎯).
 
 > This project was originally developed to meet the needs of the
 > *BAN.AI Public Access Multics* system and the
@@ -23,31 +23,31 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 
 ## Features
 
-* ✅ SSH ⟷ TELNET gateway
-* ✅ Full IPv6 support
-* ✅ Access control whitelist/blacklist (by IP address or CIDR block)
-* ✅ Independent console and session logging (by date/time and host)
-* ✅ Automatic log‑file compression (using gzip, xz, or zstandard)
-* ✅ Banners for accepted, denied, and blocked connections (configurable per target)
-* ✅ Session connection monitoring and idle time tracking (with optional timeouts)
-* ✅ Translation of SSH `window-change` events to TELNET NAWS messages
-* ✅ Interactive connection management for administrators
-* ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
-* ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
-* ✅ Optional support for management using `systemd` on Linux (running in a sandbox)
-* ✅ Link filtering
-* ✅ Live streaming connection sharing (read‑only)
-  * 🤝 Allows users to share their session with one or more viewers
+* ✅ SSH ⟷ TELNET gateway
+* ✅ Full IPv6 support
+* ✅ Access control whitelist/blacklist (by IP address or CIDR block)
+* ✅ Independent console and session logging (by date/time and host)
+* ✅ Automatic log‑file compression (using gzip, xz, or zstandard)
+* ✅ Banners for accepted, denied, and blocked connections (configurable per target)
+* ✅ Session connection monitoring and idle time tracking (with optional timeouts)
+* ✅ Translation of SSH `window-change` events to TELNET NAWS messages
+* ✅ Interactive connection management for administrators
+* ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
+* ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
+* ✅ Optional support for management using `systemd` on Linux (running in a sandbox)
+* ✅ Link filtering
+* ✅ Live streaming connection sharing (read‑only)
+  * 🤝 Allows users to share their session with one or more viewers
 
 ## Usage
 
 ### Installation
 
-A recent version of [Go](https://go.dev/) 🐹 is required to build
+A recent version of [Go](https://go.dev/) 🐹 is required to build
 `proxy` from source code.
 
 * You can clone the
-  [`git` repository](https://gitlab.com/dps8m/proxy.git) 🌱 and build
+  [`git` repository](https://gitlab.com/dps8m/proxy.git) 🌱 and build
   the source code using `make`:
 
   ```sh
@@ -63,11 +63,11 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
     provided (which can be called with `make cross`) that attempts to
     build `proxy` binaries for *all* supported `GOOS` and `GOARCH`
     combinations.  At the time of writing, 41 binaries are built for
-    12 operating systems (IBM AIX, Android, Apple macOS, Dragonfly BSD,
+    12 operating systems (IBM AIX, Android, Apple macOS, Dragonfly BSD,
     FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
     Microsoft Windows) running on 13 different hardware architectures.
 
-* You can also install this software using `go install` 📦:
+* You can also install this software using `go install` 📦:
 
   ```sh
   go install gitlab.com/dps8m/proxy@latest
@@ -189,7 +189,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g97cdfa0+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g9ac055a+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -299,7 +299,7 @@ admin console).
 
 ### User interaction
 
-Users connected via SSH can send `^]` (*i.e.*, `Control + ]`) during
+Users connected via SSH can send `^]` (*i.e.*, `Control + ]`) during
 their session to access the following following TELNET control
 features:
 
@@ -312,19 +312,19 @@ features:
 
   |             Input | Output        |
   |------------------:|:--------------|
-  | `Control + Up`    | `Escape, [`   |
-  | `Control + Down`  | `Escape, ]`   |
-  | `Control + Right` | `Escape, f`   |
-  | `Control + Left`  | `Escape, b`   |
-  | `Home`            | `Control + A` |
-  | `Delete`          | `Control + D` |
-  | `End`             | `Control + E` |
-  | `Up`              | `Escape + v`  |
-  | `Down`            | `Control + V` |
-  | `Up`              | `Control + P` |
-  | `Down`            | `Control + N` |
-  | `Right`           | `Control + F` |
-  | `Left`            | `Control + B` |
+  | `Control + Up`    | `Escape, [`   |
+  | `Control + Down`  | `Escape, ]`   |
+  | `Control + Right` | `Escape, f`   |
+  | `Control + Left`  | `Escape, b`   |
+  | `Home`            | `Control + A` |
+  | `Delete`          | `Control + D` |
+  | `End`             | `Control + E` |
+  | `Up`              | `Escape + v`  |
+  | `Down`            | `Control + V` |
+  | `Up`              | `Control + P` |
+  | `Down`            | `Control + N` |
+  | `Right`           | `Control + F` |
+  | `Left`            | `Control + B` |
 
 * `N` — sends an IAC `NOP` (*No Operation*) to the target TELNET host
 
@@ -360,24 +360,24 @@ features:
 ## History
 
 🛠️ This is a from‑scratch re‑implementation (in
-[Go](https://go.dev/) 🐹) of an older legacy program of the same name.
+[Go](https://go.dev/) 🐹) of an older legacy program of the same name.
 
 The original software used a multi‑process architecture and consisted
 of nearly **15,000 lines** of haphazardly constructed code: ≅14,000
-lines of mostly [C‑Kermit](https://www.kermitproject.org/) 🐸 (*yes,
+lines of mostly [C‑Kermit](https://www.kermitproject.org/) 🐸 (*yes,
 the
 [programming language](https://www.kermitproject.org/ckscripts.html)*)
-and [`ksh93`](https://github.com/ksh93/ksh) 🐚 (along with some C 💻,
-Python 🐍, and Perl 🐪) which was difficult to maintain, configure,
+and [`ksh93`](https://github.com/ksh93/ksh) 🐚 (along with some C 💻,
+Python 🐍, and Perl 🐪) which was difficult to maintain, configure,
 and securely install.
 
-This new implementation uses many lightweight *Goroutines* 🚀 instead
+This new implementation uses many lightweight *Goroutines* 🚀 instead
 of spawning multiple processes, resulting in significantly improved
 performance and reduced system overhead.
 
 ### Stats
 
-* 📈 The new `proxy` program is considerably simpler than its legacy
+* 📈 The new `proxy` program is considerably simpler than its legacy
 predecessor (code statistics provided by
 [`scc`](https://github.com/boyter/scc)):
 
@@ -421,7 +421,7 @@ predecessor (code statistics provided by
 		<th>0</th>
 		<th>378</th>
 		<th>0</th>
-		<th>19704</th>
+		<th>19771</th>
 		<th>359</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -452,7 +452,7 @@ predecessor (code statistics provided by
 		<th>269</th>
 		<th>4057</th>
 		<th>955</th>
-		<th>153553</th>
+		<th>153620</th>
 		<th>2928</th>
 	</tr></tfoot></table>
 
@@ -487,14 +487,14 @@ predecessor (code statistics provided by
     roadmap, it’s not difficult to use `socat` creatively to connect
     C-Kermit to the proxy (*i.e.*,
     `socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
-  * ⚠️ Be aware that doing this *securely*—safe for public usage—is
+  * ⚠️ Be aware that doing this *securely*—safe for public usage—is
     more involved than one might imagine.  *Safely* configuring the
     proxy for this type of operation is possible, but beyond the scope
     of this documentation.
 
 ## Compressed logs
 
-* 🗜️ By default, all session log files are compressed automatically
+* 🗜️ By default, all session log files are compressed automatically
   when the session terminates, and console log files are compressed
   when the log rolls over (*i.e.*, when starting a new day).
 
@@ -509,7 +509,7 @@ If you have existing [OpenSSH](https://www.openssh.com/) Ed25519 or
 RSA host keys that you want to use with the proxy, you’ll first need
 to convert those keys to standard PEM format.
 
-🚨 **NB**: These instructions *do not* include any specific details
+🚨 **NB**: These instructions *do not* include any specific details
 for safe handling of key file permissions—we assume you are `root`
 and that know what you’re doing!
 
