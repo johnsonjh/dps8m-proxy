@@ -52,7 +52,12 @@ const (
 	TelcmdNOP   = 241 // No operation
 	TelcmdDM    = 242 // Data Mark
 	TelcmdBreak = 243 // Break
+	TelcmdIP    = 244 // Interrupt Process
+	TelcmdAO    = 245 // Abort Output
 	TelcmdAYT   = 246 // Are You There?
+	TelcmdEC    = 247 // Erase Character
+	TelcmdEL    = 248 // Erase Line
+	TelcmdGA    = 249 // Go Ahead
 	TelcmdSB    = 250 // Subnegotiation Begin
 	TelcmdWILL  = 251 // WILL
 	TelcmdWONT  = 252 // WONT
@@ -124,8 +129,10 @@ const (
 	TeloptEnd               = 255 // End of Option List
 
 	// TELNET subnegotiation commands.
-	TelnetIs   = 0
-	TelnetSend = 1
+	TelnetIs    = 0 // IS
+	TelnetSend  = 1 // SEND
+	TelnetReply = 2 // REPLY
+	TelnetName  = 3 // NAME
 
 	// IEC sizes.
 	KiB = 1024       // Kibibyte
