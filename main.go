@@ -2701,52 +2701,23 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 	}
 
 	telnetStates := make(map[byte]*telnetState)
-	// Options that we do not support and will always reject.
-	var unsupportedOptions = []byte{
-		TeloptATCP,
-		TeloptAuth,
-		TeloptCompPort,
-		TeloptEncrypt,
-		TeloptGMCP,
-		TeloptLineMode,
-		TeloptMCCP2,
-		TeloptMCCP3,
-		TeloptMSP,
-		TeloptMSSP,
-		TeloptMXP,
-		TeloptNewEnviron,
-		TeloptOldEnviron,
-		TeloptRM,
-		TeloptTS,
-		TeloptXDisplay,
-		TeloptStatus,
+
+	supportedOptions := map[byte]bool{
+		TeloptBinary:          true,
+		TeloptEcho:            true,
+		TeloptSuppressGoAhead: true,
+		TeloptNAWS:            true,
+		TeloptNewEnviron:      true,
+		TeloptTTYPE:           true,
 	}
 
-	// Keep track of options we've already rejected to avoid redundant responses.
-	rejectedOptions := make(map[byte]bool)
-
-	// Initialize states for common options
+	// Initialize states for all known options to simplify logic
 	for _, opt := range []byte{
-		TeloptATCP,
-		TeloptAuth,
-		TeloptBinary,
-		TeloptCompPort,
-		TeloptEcho,
-		TeloptEncrypt,
-		TeloptGMCP,
-		TeloptLineMode,
-		TeloptMCCP2,
-		TeloptMCCP3,
-		TeloptMSP,
-		TeloptMSSP,
-		TeloptMXP,
-		TeloptNAWS,
-		TeloptNewEnviron,
-		TeloptOldEnviron,
-		TeloptRM,
-		TeloptSuppressGoAhead,
-		TeloptTS,
-		TeloptXDisplay,
+		TeloptATCP, TeloptAuth, TeloptBinary, TeloptCompPort, TeloptEcho,
+		TeloptEncrypt, TeloptGMCP, TeloptLineMode, TeloptMCCP2, TeloptMCCP3,
+		TeloptMSP, TeloptMSSP, TeloptMXP, TeloptNAWS, TeloptNewEnviron,
+		TeloptOldEnviron, TeloptRM, TeloptSuppressGoAhead, TeloptTS,
+		TeloptXDisplay, TeloptStatus, TeloptTTYPE,
 	} {
 		telnetStates[opt] = &telnetState{}
 	}
@@ -2790,16 +2761,17 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 
 					switch cmd {
 					case TelcmdWILL:
-						if contains(unsupportedOptions, opt) {
+						if supportedOptions[opt] {
+							if !state.theyWill {
+								state.theyWill = true
+								sendIAC(remote, TelcmdDO, opt)
+								writeNegotiation(ch, logw,
+									"[SENT "+cmdName(TelcmdDO)+" "+optName(opt)+"]", conn.userName)
+							}
+						} else {
 							sendIAC(remote, TelcmdDONT, opt)
 							writeNegotiation(ch, logw,
 								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]", conn.userName)
-							rejectedOptions[opt] = true // Still mark as rejected to avoid excessive logging if we re-introduce the check
-						} else if !state.theyWill {
-							state.theyWill = true
-							sendIAC(remote, TelcmdDO, opt)
-							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdDO)+" "+optName(opt)+"]", conn.userName)
 						}
 
 					case TelcmdWONT:
@@ -2811,28 +2783,22 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 						}
 
 					case TelcmdDO:
-						if opt == TeloptTTYPE {
+						if supportedOptions[opt] {
 							if !state.weWill {
 								state.weWill = true
-								sendIAC(remote, TelcmdWILL, TeloptTTYPE)
+								sendIAC(remote, TelcmdWILL, opt)
 								writeNegotiation(ch, logw,
-									"[SENT "+cmdName(TelcmdWILL)+" "+optName(TeloptTTYPE)+"]", conn.userName)
+									"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]", conn.userName)
 							}
-						} else if contains(unsupportedOptions, opt) {
+						} else {
 							sendIAC(remote, TelcmdWONT, opt)
 							writeNegotiation(ch, logw,
 								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]", conn.userName)
-							rejectedOptions[opt] = true // Still mark as rejected
-						} else if !state.theyDo {
-							state.theyDo = true
-							sendIAC(remote, TelcmdWILL, opt)
-							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]", conn.userName)
 						}
 
 					case TelcmdDONT:
-						if state.theyDo {
-							state.theyDo = false
+						if state.weWill {
+							state.weWill = false
 							sendIAC(remote, TelcmdWONT, opt)
 							writeNegotiation(ch, logw,
 								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]", conn.userName)
@@ -2855,6 +2821,12 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 							writeNegotiation(ch, logw,
 								"[RCVD SB "+optName(subOpt)+" ... IAC SE]", conn.userName)
 
+							if !supportedOptions[subOpt] {
+								// If we don't support the option, ignore its subnegotiation
+								i = seIndex + 2 // Move past IAC SE
+								continue
+							}
+
 							if subOpt == TeloptTTYPE && len(subData) > 0 && subData[0] == TelnetSend {
 								// Respond with terminal type if available
 								if conn.termType != "" {
@@ -2871,10 +2843,6 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 									writeNegotiation(ch, logw,
 										"[SENT NOP (no terminal type available)]", conn.userName)
 								}
-							} else if contains(unsupportedOptions, subOpt) {
-								// If we don't support the option, ignore its subnegotiation
-								i = seIndex + 2 // Move past IAC SE
-								continue
 							}
 
 							switch subOpt {
