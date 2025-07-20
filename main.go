@@ -58,10 +58,9 @@ const (
 	TelcmdWILL = 251 // WILL
 
 	// TELNET Command Options.
-	TeloptBinary          = 0
-	TeloptEcho            = 1
-	TeloptSuppressGoAhead = 3
-	TeloptSGA             = 3   // Suppress Go Ahead
+	TeloptBinary          = 0   // Binary
+	TeloptEcho            = 1   // Echo
+	TeloptSuppressGoAhead = 3   // Suppress Go Ahead
 	TeloptStatus          = 5   // Status
 	TeloptTimingMark      = 6   // Timing Mark
 	TeloptNAWS            = 31  // Negotiate About Window Size
@@ -89,364 +88,6 @@ const (
 	// TELNET subnegotiation commands.
 	TelnetIs   = 0
 	TelnetSend = 1
-
-	// TELNET Line Mode subnegotiation commands.
-	TeloptLMODE_MODE        = 1
-	TeloptLMODE_FORWARDMASK = 2
-	TeloptLMODE_SLC         = 3
-	TeloptLMODE_ACK         = 4
-	TeloptLMODE_EOF         = 5
-	TeloptLMODE_SYNCH       = 6
-
-	// TELNET Line Mode options.
-	TeloptSLC_BRK         = 2   // Break
-	TeloptSLC_IP          = 9   // Interrupt Process
-	TeloptSLC_AO          = 10  // Abort Output
-	TeloptSLC_AYT         = 11  // Are You There
-	TeloptSLC_EOR         = 12  // End Of Record
-	TeloptSLC_ABORT       = 13  // Abort
-	TeloptSLC_EOF         = 14  // End Of File
-	TeloptSLC_SUSP        = 15  // Suspend
-	TeloptSLC_EC          = 16  // Erase Character
-	TeloptSLC_EL          = 17  // Erase Line
-	TeloptSLC_ECHO        = 18  // Echo
-	TeloptSLC_REPRINT     = 19  // Reprint
-	TeloptSLC_WERASE      = 20  // Word Erase
-	TeloptSLC_LNEXT       = 21  // Literal Next
-	TeloptSLC_FORW1       = 22  // Forward 1
-	TeloptSLC_FORW2       = 23  // Forward 2
-	TeloptSLC_BM          = 24  // Back Mode
-	TeloptSLC_BEL         = 25  // Bell
-	TeloptSLC_XON         = 26  // XON
-	TeloptSLC_XOFF        = 27  // XOFF
-	TeloptSLC_DO          = 28  // DO
-	TeloptSLC_DONT        = 29  // DONT
-	TeloptSLC_WILL        = 30  // WILL
-	TeloptSLC_WONT        = 31  // WONT
-	TeloptSLC_NULL        = 32  // Null
-	TeloptSLC_LEVEL       = 33  // Level
-	TeloptSLC_CR          = 34  // Carriage Return
-	TeloptSLC_LF          = 35  // Line Feed
-	TeloptSLC_NUL         = 36  // Null (duplicate)
-	TeloptSLC_VT          = 37  // Vertical Tab
-	TeloptSLC_BS          = 38  // Backspace
-	TeloptSLC_ETX         = 39  // End of Text
-	TeloptSLC_EOT         = 40  // End of Transmission
-	TeloptSLC_ENQ         = 41  // Enquiry
-	TeloptSLC_ACK         = 42  // Acknowledge
-	TeloptSLC_NAK         = 43  // Negative Acknowledge
-	TeloptSLC_DLE         = 44  // Data Link Escape
-	TeloptSLC_DC1         = 45  // Device Control 1
-	TeloptSLC_DC2         = 46  // Device Control 2
-	TeloptSLC_DC3         = 47  // Device Control 3
-	TeloptSLC_DC4         = 48  // Device Control 4
-	TeloptSLC_CAN         = 49  // Cancel
-	TeloptSLC_EM          = 50  // End of Medium
-	TeloptSLC_SUB         = 51  // Substitute
-	TeloptSLC_ESC         = 52  // Escape
-	TeloptSLC_FS          = 53  // File Separator
-	TeloptSLC_GS          = 54  // Group Separator
-	TeloptSLC_RS          = 55  // Record Separator
-	TeloptSLC_US          = 56  // Unit Separator
-	TeloptSLC_DEL         = 57  // Delete
-	TeloptSLC_XSTR        = 58  // Extended String
-	TeloptSLC_EXT         = 59  // Extended
-	TeloptSLC_INFO        = 60  // Info
-	TeloptSLC_LNEXT_CHAR  = 61  // Literal Next Character
-	TeloptSLC_FORW1_CHAR  = 62  // Forward 1 Character
-	TeloptSLC_FORW2_CHAR  = 63  // Forward 2 Character
-	TeloptSLC_MCR         = 64  // Multics Carriage Return
-	TeloptSLC_MFF         = 65  // Multics Form Feed
-	TeloptSLC_MVT         = 66  // Multics Vertical Tab
-	TeloptSLC_MBS         = 67  // Multics Backspace
-	TeloptSLC_METX        = 68  // Multics End of Text
-	TeloptSLC_MEOT        = 69  // Multics End of Transmission
-	TeloptSLC_MENQ        = 70  // Multics Enquiry
-	TeloptSLC_MACK        = 71  // Multics Acknowledge
-	TeloptSLC_MNAK        = 72  // Multics Negative Acknowledge
-	TeloptSLC_MDLE        = 73  // Multics Data Link Escape
-	TeloptSLC_MDC1        = 74  // Multics Device Control 1
-	TeloptSLC_MDC2        = 75  // Multics Device Control 2
-	TeloptSLC_MDC3        = 76  // Multics Device Control 3
-	TeloptSLC_MDC4        = 77  // Multics Device Control 4
-	TeloptSLC_MCAN        = 78  // Multics Cancel
-	TeloptSLC_MEM         = 79  // Multics End of Medium
-	TeloptSLC_MSUB        = 80  // Multics Substitute
-	TeloptSLC_MESC        = 81  // Multics Escape
-	TeloptSLC_MFS         = 82  // Multics File Separator
-	TeloptSLC_MGS         = 83  // Multics Group Separator
-	TeloptSLC_MRS         = 84  // Multics Record Separator
-	TeloptSLC_MUS         = 85  // Multics Unit Separator
-	TeloptSLC_MDEL        = 86  // Multics Delete
-	TeloptSLC_MXSTR       = 87  // Multics Extended String
-	TeloptSLC_MEXT        = 88  // Multics Extended
-	TeloptSLC_MINFO       = 89  // Multics Info
-	TeloptSLC_MLNEXT_CHAR = 90  // Multics Literal Next Character
-	TeloptSLC_MFORW1_CHAR = 91  // Multics Forward 1 Character
-	TeloptSLC_MFORW2_CHAR = 92  // Multics Forward 2 Character
-	TeloptSLC_MAX         = 93  // Max
-	TeloptSLC_DEFAULT     = 3   // Default
-	TeloptSLC_VALUE       = 2   // Value
-	TeloptSLC_CANTCHANGE  = 1   // Can't Change
-	TeloptSLC_NOSUPPORT   = 0   // No Support
-	TeloptSLC_ACK_VAL     = 0   // Acknowledge Value
-	TeloptSLC_NAK_VAL     = 1   // Negative Acknowledge Value
-	TeloptSLC_LEVEL_0     = 0   // Level 0
-	TeloptSLC_LEVEL_1     = 1   // Level 1
-	TeloptSLC_LEVEL_2     = 2   // Level 2
-	TeloptSLC_LEVEL_3     = 3   // Level 3
-	TeloptSLC_LEVEL_4     = 4   // Level 4
-	TeloptSLC_LEVEL_5     = 5   // Level 5
-	TeloptSLC_LEVEL_6     = 6   // Level 6
-	TeloptSLC_LEVEL_7     = 7   // Level 7
-	TeloptSLC_LEVEL_8     = 8   // Level 8
-	TeloptSLC_LEVEL_9     = 9   // Level 9
-	TeloptSLC_LEVEL_10    = 10  // Level 10
-	TeloptSLC_LEVEL_11    = 11  // Level 11
-	TeloptSLC_LEVEL_12    = 12  // Level 12
-	TeloptSLC_LEVEL_13    = 13  // Level 13
-	TeloptSLC_LEVEL_14    = 14  // Level 14
-	TeloptSLC_LEVEL_15    = 15  // Level 15
-	TeloptSLC_LEVEL_16    = 16  // Level 16
-	TeloptSLC_LEVEL_17    = 17  // Level 17
-	TeloptSLC_LEVEL_18    = 18  // Level 18
-	TeloptSLC_LEVEL_19    = 19  // Level 19
-	TeloptSLC_LEVEL_20    = 20  // Level 20
-	TeloptSLC_LEVEL_21    = 21  // Level 21
-	TeloptSLC_LEVEL_22    = 22  // Level 22
-	TeloptSLC_LEVEL_23    = 23  // Level 23
-	TeloptSLC_LEVEL_24    = 24  // Level 24
-	TeloptSLC_LEVEL_25    = 25  // Level 25
-	TeloptSLC_LEVEL_26    = 26  // Level 26
-	TeloptSLC_LEVEL_27    = 27  // Level 27
-	TeloptSLC_LEVEL_28    = 28  // Level 28
-	TeloptSLC_LEVEL_29    = 29  // Level 29
-	TeloptSLC_LEVEL_30    = 30  // Level 30
-	TeloptSLC_LEVEL_31    = 31  // Level 31
-	TeloptSLC_LEVEL_32    = 32  // Level 32
-	TeloptSLC_LEVEL_33    = 33  // Level 33
-	TeloptSLC_LEVEL_34    = 34  // Level 34
-	TeloptSLC_LEVEL_35    = 35  // Level 35
-	TeloptSLC_LEVEL_36    = 36  // Level 36
-	TeloptSLC_LEVEL_37    = 37  // Level 37
-	TeloptSLC_LEVEL_38    = 38  // Level 38
-	TeloptSLC_LEVEL_39    = 39  // Level 39
-	TeloptSLC_LEVEL_40    = 40  // Level 40
-	TeloptSLC_LEVEL_41    = 41  // Level 41
-	TeloptSLC_LEVEL_42    = 42  // Level 42
-	TeloptSLC_LEVEL_43    = 43  // Level 43
-	TeloptSLC_LEVEL_44    = 44  // Level 44
-	TeloptSLC_LEVEL_45    = 45  // Level 45
-	TeloptSLC_LEVEL_46    = 46  // Level 46
-	TeloptSLC_LEVEL_47    = 47  // Level 47
-	TeloptSLC_LEVEL_48    = 48  // Level 48
-	TeloptSLC_LEVEL_49    = 49  // Level 49
-	TeloptSLC_LEVEL_50    = 50  // Level 50
-	TeloptSLC_LEVEL_51    = 51  // Level 51
-	TeloptSLC_LEVEL_52    = 52  // Level 52
-	TeloptSLC_LEVEL_53    = 53  // Level 53
-	TeloptSLC_LEVEL_54    = 54  // Level 54
-	TeloptSLC_LEVEL_55    = 55  // Level 55
-	TeloptSLC_LEVEL_56    = 56  // Level 56
-	TeloptSLC_LEVEL_57    = 57  // Level 57
-	TeloptSLC_LEVEL_58    = 58  // Level 58
-	TeloptSLC_LEVEL_59    = 59  // Level 59
-	TeloptSLC_LEVEL_60    = 60  // Level 60
-	TeloptSLC_LEVEL_61    = 61  // Level 61
-	TeloptSLC_LEVEL_62    = 62  // Level 62
-	TeloptSLC_LEVEL_63    = 63  // Level 63
-	TeloptSLC_LEVEL_64    = 64  // Level 64
-	TeloptSLC_LEVEL_65    = 65  // Level 65
-	TeloptSLC_LEVEL_66    = 66  // Level 66
-	TeloptSLC_LEVEL_67    = 67  // Level 67
-	TeloptSLC_LEVEL_68    = 68  // Level 68
-	TeloptSLC_LEVEL_69    = 69  // Level 69
-	TeloptSLC_LEVEL_70    = 70  // Level 70
-	TeloptSLC_LEVEL_71    = 71  // Level 71
-	TeloptSLC_LEVEL_72    = 72  // Level 72
-	TeloptSLC_LEVEL_73    = 73  // Level 73
-	TeloptSLC_LEVEL_74    = 74  // Level 74
-	TeloptSLC_LEVEL_75    = 75  // Level 75
-	TeloptSLC_LEVEL_76    = 76  // Level 76
-	TeloptSLC_LEVEL_77    = 77  // Level 77
-	TeloptSLC_LEVEL_78    = 78  // Level 78
-	TeloptSLC_LEVEL_79    = 79  // Level 79
-	TeloptSLC_LEVEL_80    = 80  // Level 80
-	TeloptSLC_LEVEL_81    = 81  // Level 81
-	TeloptSLC_LEVEL_82    = 82  // Level 82
-	TeloptSLC_LEVEL_83    = 83  // Level 83
-	TeloptSLC_LEVEL_84    = 84  // Level 84
-	TeloptSLC_LEVEL_85    = 85  // Level 85
-	TeloptSLC_LEVEL_86    = 86  // Level 86
-	TeloptSLC_LEVEL_87    = 87  // Level 87
-	TeloptSLC_LEVEL_88    = 88  // Level 88
-	TeloptSLC_LEVEL_89    = 89  // Level 89
-	TeloptSLC_LEVEL_90    = 90  // Level 90
-	TeloptSLC_LEVEL_91    = 91  // Level 91
-	TeloptSLC_LEVEL_92    = 92  // Level 92
-	TeloptSLC_LEVEL_93    = 93  // Level 93
-	TeloptSLC_LEVEL_94    = 94  // Level 94
-	TeloptSLC_LEVEL_95    = 95  // Level 95
-	TeloptSLC_LEVEL_96    = 96  // Level 96
-	TeloptSLC_LEVEL_97    = 97  // Level 97
-	TeloptSLC_LEVEL_98    = 98  // Level 98
-	TeloptSLC_LEVEL_99    = 99  // Level 99
-	TeloptSLC_LEVEL_100   = 100 // Level 100
-	TeloptSLC_LEVEL_101   = 101 // Level 101
-	TeloptSLC_LEVEL_102   = 102 // Level 102
-	TeloptSLC_LEVEL_103   = 103 // Level 103
-	TeloptSLC_LEVEL_104   = 104 // Level 104
-	TeloptSLC_LEVEL_105   = 105 // Level 105
-	TeloptSLC_LEVEL_106   = 106 // Level 106
-	TeloptSLC_LEVEL_107   = 107 // Level 107
-	TeloptSLC_LEVEL_108   = 108 // Level 108
-	TeloptSLC_LEVEL_109   = 109 // Level 109
-	TeloptSLC_LEVEL_110   = 110 // Level 110
-	TeloptSLC_LEVEL_111   = 111 // Level 111
-	TeloptSLC_LEVEL_112   = 112 // Level 112
-	TeloptSLC_LEVEL_113   = 113 // Level 113
-	TeloptSLC_LEVEL_114   = 114 // Level 114
-	TeloptSLC_LEVEL_115   = 115 // Level 115
-	TeloptSLC_LEVEL_116   = 116 // Level 116
-	TeloptSLC_LEVEL_117   = 117 // Level 117
-	TeloptSLC_LEVEL_118   = 118 // Level 118
-	TeloptSLC_LEVEL_119   = 119 // Level 119
-	TeloptSLC_LEVEL_120   = 120 // Level 120
-	TeloptSLC_LEVEL_121   = 121 // Level 121
-	TeloptSLC_LEVEL_122   = 122 // Level 122
-	TeloptSLC_LEVEL_123   = 123 // Level 123
-	TeloptSLC_LEVEL_124   = 124 // Level 124
-	TeloptSLC_LEVEL_125   = 125 // Level 125
-	TeloptSLC_LEVEL_126   = 126 // Level 126
-	TeloptSLC_LEVEL_127   = 127 // Level 127
-	TeloptSLC_LEVEL_128   = 128 // Level 128
-	TeloptSLC_LEVEL_129   = 129 // Level 129
-	TeloptSLC_LEVEL_130   = 130 // Level 130
-	TeloptSLC_LEVEL_131   = 131 // Level 131
-	TeloptSLC_LEVEL_132   = 132 // Level 132
-	TeloptSLC_LEVEL_133   = 133 // Level 133
-	TeloptSLC_LEVEL_134   = 134 // Level 134
-	TeloptSLC_LEVEL_135   = 135 // Level 135
-	TeloptSLC_LEVEL_136   = 136 // Level 136
-	TeloptSLC_LEVEL_137   = 137 // Level 137
-	TeloptSLC_LEVEL_138   = 138 // Level 138
-	TeloptSLC_LEVEL_139   = 139 // Level 139
-	TeloptSLC_LEVEL_140   = 140 // Level 140
-	TeloptSLC_LEVEL_141   = 141 // Level 141
-	TeloptSLC_LEVEL_142   = 142 // Level 142
-	TeloptSLC_LEVEL_143   = 143 // Level 143
-	TeloptSLC_LEVEL_144   = 144 // Level 144
-	TeloptSLC_LEVEL_145   = 145 // Level 145
-	TeloptSLC_LEVEL_146   = 146 // Level 146
-	TeloptSLC_LEVEL_147   = 147 // Level 147
-	TeloptSLC_LEVEL_148   = 148 // Level 148
-	TeloptSLC_LEVEL_149   = 149 // Level 149
-	TeloptSLC_LEVEL_150   = 150 // Level 150
-	TeloptSLC_LEVEL_151   = 151 // Level 151
-	TeloptSLC_LEVEL_152   = 152 // Level 152
-	TeloptSLC_LEVEL_153   = 153 // Level 153
-	TeloptSLC_LEVEL_154   = 154 // Level 154
-	TeloptSLC_LEVEL_155   = 155 // Level 155
-	TeloptSLC_LEVEL_156   = 156 // Level 156
-	TeloptSLC_LEVEL_157   = 157 // Level 157
-	TeloptSLC_LEVEL_158   = 158 // Level 158
-	TeloptSLC_LEVEL_159   = 159 // Level 159
-	TeloptSLC_LEVEL_160   = 160 // Level 160
-	TeloptSLC_LEVEL_161   = 161 // Level 161
-	TeloptSLC_LEVEL_162   = 162 // Level 162
-	TeloptSLC_LEVEL_163   = 163 // Level 163
-	TeloptSLC_LEVEL_164   = 164 // Level 164
-	TeloptSLC_LEVEL_165   = 165 // Level 165
-	TeloptSLC_LEVEL_166   = 166 // Level 166
-	TeloptSLC_LEVEL_167   = 167 // Level 167
-	TeloptSLC_LEVEL_168   = 168 // Level 168
-	TeloptSLC_LEVEL_169   = 169 // Level 169
-	TeloptSLC_LEVEL_170   = 170 // Level 170
-	TeloptSLC_LEVEL_171   = 171 // Level 171
-	TeloptSLC_LEVEL_172   = 172 // Level 172
-	TeloptSLC_LEVEL_173   = 173 // Level 173
-	TeloptSLC_LEVEL_174   = 174 // Level 174
-	TeloptSLC_LEVEL_175   = 175 // Level 175
-	TeloptSLC_LEVEL_176   = 176 // Level 176
-	TeloptSLC_LEVEL_177   = 177 // Level 177
-	TeloptSLC_LEVEL_178   = 178 // Level 178
-	TeloptSLC_LEVEL_179   = 179 // Level 179
-	TeloptSLC_LEVEL_180   = 180 // Level 180
-	TeloptSLC_LEVEL_181   = 181 // Level 181
-	TeloptSLC_LEVEL_182   = 182 // Level 182
-	TeloptSLC_LEVEL_183   = 183 // Level 183
-	TeloptSLC_LEVEL_184   = 184 // Level 184
-	TeloptSLC_LEVEL_185   = 185 // Level 185
-	TeloptSLC_LEVEL_186   = 186 // Level 186
-	TeloptSLC_LEVEL_187   = 187 // Level 187
-	TeloptSLC_LEVEL_188   = 188 // Level 188
-	TeloptSLC_LEVEL_189   = 189 // Level 189
-	TeloptSLC_LEVEL_190   = 190 // Level 190
-	TeloptSLC_LEVEL_191   = 191 // Level 191
-	TeloptSLC_LEVEL_192   = 192 // Level 192
-	TeloptSLC_LEVEL_193   = 193 // Level 193
-	TeloptSLC_LEVEL_194   = 194 // Level 194
-	TeloptSLC_LEVEL_195   = 195 // Level 195
-	TeloptSLC_LEVEL_196   = 196 // Level 196
-	TeloptSLC_LEVEL_197   = 197 // Level 197
-	TeloptSLC_LEVEL_198   = 198 // Level 198
-	TeloptSLC_LEVEL_199   = 199 // Level 199
-	TeloptSLC_LEVEL_200   = 200 // Level 200
-	TeloptSLC_LEVEL_201   = 201 // Level 201
-	TeloptSLC_LEVEL_202   = 202 // Level 202
-	TeloptSLC_LEVEL_203   = 203 // Level 203
-	TeloptSLC_LEVEL_204   = 204 // Level 204
-	TeloptSLC_LEVEL_205   = 205 // Level 205
-	TeloptSLC_LEVEL_206   = 206 // Level 206
-	TeloptSLC_LEVEL_207   = 207 // Level 207
-	TeloptSLC_LEVEL_208   = 208 // Level 208
-	TeloptSLC_LEVEL_209   = 209 // Level 209
-	TeloptSLC_LEVEL_210   = 210 // Level 210
-	TeloptSLC_LEVEL_211   = 211 // Level 211
-	TeloptSLC_LEVEL_212   = 212 // Level 212
-	TeloptSLC_LEVEL_213   = 213 // Level 213
-	TeloptSLC_LEVEL_214   = 214 // Level 214
-	TeloptSLC_LEVEL_215   = 215 // Level 215
-	TeloptSLC_LEVEL_216   = 216 // Level 216
-	TeloptSLC_LEVEL_217   = 217 // Level 217
-	TeloptSLC_LEVEL_218   = 218 // Level 218
-	TeloptSLC_LEVEL_219   = 219 // Level 219
-	TeloptSLC_LEVEL_220   = 220 // Level 220
-	TeloptSLC_LEVEL_221   = 221 // Level 221
-	TeloptSLC_LEVEL_222   = 222 // Level 222
-	TeloptSLC_LEVEL_223   = 223 // Level 223
-	TeloptSLC_LEVEL_224   = 224 // Level 224
-	TeloptSLC_LEVEL_225   = 225 // Level 225
-	TeloptSLC_LEVEL_226   = 226 // Level 226
-	TeloptSLC_LEVEL_227   = 227 // Level 227
-	TeloptSLC_LEVEL_228   = 228 // Level 228
-	TeloptSLC_LEVEL_229   = 229 // Level 229
-	TeloptSLC_LEVEL_230   = 230 // Level 230
-	TeloptSLC_LEVEL_231   = 231 // Level 231
-	TeloptSLC_LEVEL_232   = 232 // Level 232
-	TeloptSLC_LEVEL_233   = 233 // Level 233
-	TeloptSLC_LEVEL_234   = 234 // Level 234
-	TeloptSLC_LEVEL_235   = 235 // Level 235
-	TeloptSLC_LEVEL_236   = 236 // Level 236
-	TeloptSLC_LEVEL_237   = 237 // Level 237
-	TeloptSLC_LEVEL_238   = 238 // Level 238
-	TeloptSLC_LEVEL_239   = 239 // Level 239
-	TeloptSLC_LEVEL_240   = 240 // Level 240
-	TeloptSLC_LEVEL_241   = 241 // Level 241
-	TeloptSLC_LEVEL_242   = 242 // Level 242
-	TeloptSLC_LEVEL_243   = 243 // Level 243
-	TeloptSLC_LEVEL_244   = 244 // Level 244
-	TeloptSLC_LEVEL_245   = 245 // Level 245
-	TeloptSLC_LEVEL_246   = 246 // Level 246
-	TeloptSLC_LEVEL_247   = 247 // Level 247
-	TeloptSLC_LEVEL_248   = 248 // Level 248
-	TeloptSLC_LEVEL_249   = 249 // Level 249
-	TeloptSLC_LEVEL_250   = 250 // Level 250
-	TeloptSLC_LEVEL_251   = 251 // Level 251
-	TeloptSLC_LEVEL_252   = 252 // Level 252
-	TeloptSLC_LEVEL_253   = 253 // Level 253
-	TeloptSLC_LEVEL_254   = 254 // Level 254
-	TeloptSLC_LEVEL_255   = 255 // Level 255
 
 	// IEC sizes.
 	KiB = 1024
@@ -2709,16 +2350,16 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 		TeloptTTYPE:           true,
 	}
 
-	// Initialize states for all known options to simplify logic
-	for _, opt := range []byte{
-		TeloptATCP, TeloptAuth, TeloptBinary, TeloptCompPort, TeloptEcho,
-		TeloptEncrypt, TeloptGMCP, TeloptLineMode, TeloptMCCP2, TeloptMCCP3,
-		TeloptMSP, TeloptMSSP, TeloptMXP, TeloptNAWS, TeloptNewEnviron,
-		TeloptOldEnviron, TeloptRM, TeloptSuppressGoAhead, TeloptTS,
-		TeloptXDisplay, TeloptStatus, TeloptTTYPE,
-	} {
-		telnetStates[opt] = &telnetState{}
-	}
+	// // Initialize states for all known options to simplify logic
+	// for _, opt := range []byte{
+	// 	TeloptATCP, TeloptAuth, TeloptBinary, TeloptCompPort, TeloptEcho,
+	// 	TeloptEncrypt, TeloptGMCP, TeloptLineMode, TeloptMCCP2, TeloptMCCP3,
+	// 	TeloptMSP, TeloptMSSP, TeloptMXP, TeloptNAWS, TeloptNewEnviron,
+	// 	TeloptOldEnviron, TeloptRM, TeloptSuppressGoAhead, TeloptTS,
+	// 	TeloptXDisplay, TeloptStatus, TeloptTTYPE,
+	// } {
+	// 	telnetStates[opt] = &telnetState{}
+	// }
 
 	if err := remote.SetReadDeadline(time.Now().Add(time.Second / 3)); err != nil {
 		log.Printf("Error setting read deadline: %v", err)
@@ -2879,22 +2520,22 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func writeNegotiation(ch io.Writer, logw io.Writer, line string, username string) {
-		msg := line
-		if debugNegotiation {
-			msg = fmt.Sprintf("%s %s", username, line)
-		}
-		msg += "\r\n"
+	msg := line
+	if debugNegotiation {
+		msg = fmt.Sprintf("%s %s", username, line)
+	}
+	msg += "\r\n"
 
-		if _, err := logw.Write([]byte(msg)); err != nil {
-			log.Printf("Error writing negotiation message to log: %v", err)
-		}
+	if _, err := logw.Write([]byte(msg)); err != nil {
+		log.Printf("Error writing negotiation message to log: %v", err)
+	}
 
-		if debugNegotiation {
-			if _, err := ch.Write([]byte(msg)); err != nil {
-				log.Printf("Error writing negotiation message to channel: %v", err)
-			}
+	if debugNegotiation {
+		if _, err := ch.Write([]byte(msg)); err != nil {
+			log.Printf("Error writing negotiation message to channel: %v", err)
 		}
 	}
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
