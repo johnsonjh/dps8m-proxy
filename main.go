@@ -83,7 +83,7 @@ const (
 	TeloptOutputVTS         = 14  // Output Vertical Tabstops
 	TeloptOutputVTD         = 15  // Output Vertical Tab Disposition
 	TeloptOutputLFD         = 16  // Output Linefeed Disposition
-	TeloptExtendedAscii     = 17  // Extended ASCII
+	TeloptExtendedASCII     = 17  // Extended ASCII
 	TeloptLogout            = 18  // Logout
 	TeloptByteMacro         = 19  // Byte Macro
 	TeloptDataEntryTerminal = 20  // Data Entry Terminal
@@ -2382,9 +2382,9 @@ func sendBanner(sshConn *ssh.ServerConn, ch ssh.Channel, conn *Connection) {
 func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Connection) {
 	type telnetState struct {
 		weWill   bool
-		weDo     bool
 		theyWill bool
-		theyDo   bool
+		// weDo  bool
+		// theyD bool
 	}
 
 	telnetStates := make(map[byte]*telnetState)
@@ -2422,7 +2422,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 		i := 0
 		for i < n {
 			if buf[i] == TelcmdIAC {
-				if i+2 < n {
+				if i+2 < n { //nolint:gocritic
 					cmd, opt := buf[i+1], buf[i+2]
 					writeNegotiation(ch, logw,
 						"[RCVD "+cmdName(cmd)+" "+optName(opt)+"]", conn.userName)
@@ -2440,12 +2440,14 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 								state.theyWill = true
 								sendIAC(remote, TelcmdDO, opt)
 								writeNegotiation(ch, logw,
-									"[SENT "+cmdName(TelcmdDO)+" "+optName(opt)+"]", conn.userName)
+									"[SENT "+cmdName(TelcmdDO)+" "+optName(opt)+"]",
+									conn.userName)
 							}
 						} else {
 							sendIAC(remote, TelcmdDONT, opt)
 							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]", conn.userName)
+								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]",
+								conn.userName)
 						}
 
 					case TelcmdWONT:
@@ -2453,7 +2455,8 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 							state.theyWill = false
 							sendIAC(remote, TelcmdDONT, opt)
 							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]", conn.userName)
+								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]",
+								conn.userName)
 						}
 
 					case TelcmdDO:
@@ -2462,12 +2465,14 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 								state.weWill = true
 								sendIAC(remote, TelcmdWILL, opt)
 								writeNegotiation(ch, logw,
-									"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]", conn.userName)
+									"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]",
+									conn.userName)
 							}
 						} else {
 							sendIAC(remote, TelcmdWONT, opt)
 							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]", conn.userName)
+								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]",
+								conn.userName)
 						}
 
 					case TelcmdDONT:
@@ -2475,7 +2480,8 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 							state.weWill = false
 							sendIAC(remote, TelcmdWONT, opt)
 							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]", conn.userName)
+								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]",
+								conn.userName)
 						}
 
 					case TelcmdSB:
@@ -2483,6 +2489,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 						for j := i + 3; j < n-1; j++ {
 							if buf[j] == TelcmdIAC && buf[j+1] == TelcmdSE {
 								seIndex = j
+
 								break
 							}
 						}
@@ -2496,10 +2503,12 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 
 							if !supportedOptions[subOpt] {
 								i = seIndex + 2
+
 								continue
 							}
 
-							if subOpt == TeloptTTYPE && len(subData) > 0 && subData[0] == TelnetSend {
+							if subOpt ==
+								TeloptTTYPE && len(subData) > 0 && subData[0] == TelnetSend {
 								if conn.termType != "" {
 									data := []byte{TelcmdIAC, TelcmdSB, TeloptTTYPE, TelnetIs}
 									data = append(data, []byte(conn.termType)...)
@@ -2508,7 +2517,8 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 										log.Printf("Error writing Telnet TTYPE response: %v", err)
 									}
 									writeNegotiation(ch, logw,
-										"[SENT SB "+optName(TeloptTTYPE)+" IS "+conn.termType+" IAC SE]", conn.userName)
+										"[SENT SB "+optName(TeloptTTYPE)+" IS "+
+											conn.termType+" IAC SE]", conn.userName)
 								} else {
 									sendIAC(remote, TelcmdWONT, TeloptTTYPE)
 									writeNegotiation(ch, logw,
@@ -2517,6 +2527,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 							}
 
 							i = seIndex + 2
+
 							continue
 						}
 
@@ -2528,7 +2539,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 					i += 2
 				} else {
 					writeNegotiation(ch, logw, "[RCVD IAC (incomplete)]", conn.userName)
-					i += 1
+					i++
 				}
 			} else {
 				_, _ = ch.Write(buf[i : i+1])
@@ -2644,7 +2655,7 @@ func optName(b byte) string {
 	case TeloptOutputLFD: // 16
 		return "OUTPUT LINEFEED DISPOSITION"
 
-	case TeloptExtendedAscii: // 17
+	case TeloptExtendedASCII: // 17
 		return "EXTENDED ASCII"
 
 	case TeloptLogout: // 18
