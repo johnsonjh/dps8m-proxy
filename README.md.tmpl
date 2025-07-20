@@ -254,9 +254,9 @@ Users connected via SSH can send `^]` (*i.e.*, `Control + ]`) during
 their session to access the following following TELNET control
 features:
 
-* `A` — sends an IAC `AYT` (*Are You There?*) to the remote host
+* `A` — sends an IAC `AYT` (*Are You There?*) to the target TELNET host
 
-* `B` — sends an IAC `BREAK` signal to the remote host
+* `B` — sends an IAC `BREAK` signal to the target TELNET host
 
 * `K` — toggles the transparent key remapping mode, which translates
   modern `xterm`/`VT320` movement key inputs to Emacs sequences:
@@ -277,7 +277,7 @@ features:
   | `Right`           | `Control + F` |
   | `Left`            | `Control + B` |
 
-* `N` — sends an IAC `NOP` (*No Operation*) to the remote host
+* `N` — sends an IAC `NOP` (*No Operation*) to the target TELNET host
 
 * `S` — displays the status the session, sharing information, and some
   statistics:
@@ -289,7 +289,10 @@ features:
   >> LNK - link time: 13s (Emacs keymap enabled)
   ```
 
-* `X` — disconnects from the remote host (and ends the SSH session)
+* `X` — disconnects from the target TELNET host (and ends the SSH
+  session)
+
+* `]` — sends a literal `Control-]` to the target TELNET host
 
 ### Connection sharing
 

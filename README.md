@@ -188,7 +188,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-19 g8be8fdd+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 gde3b911+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -297,9 +297,9 @@ Users connected via SSH can send `^]` (*i.e.*, `Control + ]`) during
 their session to access the following following TELNET control
 features:
 
-* `A` — sends an IAC `AYT` (*Are You There?*) to the remote host
+* `A` — sends an IAC `AYT` (*Are You There?*) to the target TELNET host
 
-* `B` — sends an IAC `BREAK` signal to the remote host
+* `B` — sends an IAC `BREAK` signal to the target TELNET host
 
 * `K` — toggles the transparent key remapping mode, which translates
   modern `xterm`/`VT320` movement key inputs to Emacs sequences:
@@ -320,7 +320,7 @@ features:
   | `Right`           | `Control + F` |
   | `Left`            | `Control + B` |
 
-* `N` — sends an IAC `NOP` (*No Operation*) to the remote host
+* `N` — sends an IAC `NOP` (*No Operation*) to the target TELNET host
 
 * `S` — displays the status the session, sharing information, and some
   statistics:
@@ -332,7 +332,10 @@ features:
   >> LNK - link time: 13s (Emacs keymap enabled)
   ```
 
-* `X` — disconnects from the remote host (and ends the SSH session)
+* `X` — disconnects from the target TELNET host (and ends the SSH
+  session)
+
+* `]` — sends a literal `Control-]` to the target TELNET host
 
 ### Connection sharing
 
@@ -386,13 +389,13 @@ predecessor (code statistics provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>9</th>
-		<th>3705</th>
+		<th>3703</th>
 		<th>819</th>
 		<th>178</th>
-		<th>2708</th>
+		<th>2706</th>
 		<th>789</th>
-		<th>94777</th>
-		<th>1747</th>
+		<th>94750</th>
+		<th>1746</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -406,13 +409,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>456</th>
-		<th>95</th>
+		<th>459</th>
+		<th>96</th>
 		<th>0</th>
-		<th>361</th>
+		<th>363</th>
 		<th>0</th>
-		<th>18955</th>
-		<th>346</th>
+		<th>19050</th>
+		<th>348</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -437,13 +440,13 @@ predecessor (code statistics provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>4723</th>
-		<th>1021</th>
+		<th>4724</th>
+		<th>1022</th>
 		<th>261</th>
 		<th>3441</th>
 		<th>820</th>
-		<th>131590</th>
-		<th>2455</th>
+		<th>131658</th>
+		<th>2456</th>
 	</tr></tfoot></table>
 
 ## Future plans
