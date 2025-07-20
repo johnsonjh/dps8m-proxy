@@ -30,7 +30,7 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 * ✅ Automatic log‑file compression (using gzip, xz, or zstandard)
 * ✅ Banners for accepted, denied, and blocked connections (configurable per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
-* ✅ Translation of SSH `window-change` events to TELNET NAWS messages
+* ✅ Translation of SSH `window‑change` events to TELNET NAWS messages
 * ✅ Interactive connection management for administrators
 * ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
 * ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
@@ -100,16 +100,16 @@ are, hopefully, documented here:
 
 * All incoming SSH users are connected to the default TELNET target,
   unless their supplied SSH username matches an alternate target
-  enabled with the `--alt-host` flag.  The alt‑host syntax is
+  enabled with the `‑‑alt‑host` flag.  The alt‑host syntax is
   `sshuser@host:port`, where `sshuser` is the SSH username, and the
   `host:port` is the TELNET target.
 
 * All users connecting with SSH are shown a banner which includes
   details such as the date and time of the session, their IP address,
   and possibly a resolved host name.  This can be disabled with
-  `--no-banner`.
+  `‑‑no‑banner`.
 
-* The `--no-banner` command disables only those lines described above.
+* The `‑‑no‑banner` command disables only those lines described above.
   It does *not* disable the file‑based banner content.  These are the
   three primary text files which can be displayed to connecting
   SSH users:
@@ -120,11 +120,11 @@ are, hopefully, documented here:
   | `deny.txt`  | Displayed when denying target sessions (*e.g.*, during graceful shutdown) |
   | `issue.txt` | Displayed to users before their actual session with the target begins     |
 
-  * When multiple are targets defined using the `--alt-host`
-    functionality, the system will display a file that matches `-NAME`
+  * When multiple are targets defined using the `‑‑alt‑host`
+    functionality, the system will display a file that matches `‑NAME`
     before the `.txt` extension.  For example, if you have defined a
     target as  `oldunix@10.0.5.9:3333` the proxy will look for
-    `block-oldunix.txt`, `deny-oldunix.txt`, and `issue-oldunix.txt`
+    `block‑oldunix.txt`, `deny‑oldunix.txt`, and `issue‑oldunix.txt`
     files to serve to the connected user, before beginning their
     session with the target (via TELNET to `10.0.5.9:3333`).  If any
     of the target‑specific text files do not exist, then the standard
@@ -134,8 +134,8 @@ are, hopefully, documented here:
     You can also remove *all* of these files if you don’t want to
     use this functionality.
 
-* You need to start `proxy` using the `--whitelist` and/or
-  `--blacklist` argument to enable the access control functionality.
+* You need to start `proxy` using the `‑‑whitelist` and/or
+  `‑‑blacklist` argument to enable the access control functionality.
   If *only* the whitelist is enabled, then all connections will be
   denied by default.  Note that if *only* the whitelist is enabled, it
   will be impossible to exempt individual IP addresses within a range
@@ -154,7 +154,7 @@ are, hopefully, documented here:
     have otherwise been blocked by the blacklist, it is tagged as
     `EXEMPTED` in the logs.
 
-* The `-v` or `--version` command shows detailed version information,
+* The `‑v` or `‑‑version` command shows detailed version information,
   including the versions of any embedded dependencies as well as the
   version of the Go compiler used to build the software:
 
@@ -163,7 +163,7 @@ are, hopefully, documented here:
 ```
 
 * If you need to see additional details about the `proxy` binary,
-  you can run `go version -m proxy`.
+  you can run `go version ‑m proxy`.
 
 ### Port binding
 
@@ -228,13 +228,14 @@ further clarification:
 * The proxy also acts on the following signals (on systems where
   signals are supported):
 
-  |    Signal | Action                                                          |
-  |----------:|:----------------------------------------------------------------|
-  | `SIGINT`  | Enables the **Immediate shutdown** mode                         |
-  | `SIGQUIT` | Enables the **Immediate shutdown** mode                         |
-  | `SIGUSR1` | Enables the **Graceful shutdown** mode                          |
-  | `SIGUSR2` | Enables the **Deny new connections** mode                       |
-  | `SIGHUP`  | Reloads *access control lists* (`--whitelist`, `--blacklist`)   |
+  |      Signal | Action                                                        |
+  |------------:|:--------------------------------------------------------------|
+  |    `SIGINT` | Enables the **Immediate shutdown** mode                       |
+  |   `SIGQUIT` | Enables the **Immediate shutdown** mode                       |
+  |   `SIGUSR1` | Enables the **Graceful shutdown** mode                        |
+  |   `SIGUSR2` | Enables the **Deny new connections** mode                     |
+  |    `SIGHUP` | Reloads *access control lists* (`‑‑whitelist`, `‑‑blacklist`) |
+  | `SIGDANGER` | Attempts to immediately free as much memory as possible (AIX) |
 
 ### Automation with systemd
 
@@ -248,10 +249,10 @@ admin console).
 []()
 
 []()
-* 🔧 With minor changes to the unit file, this setup can also work
+* With minor changes 🔧 to the unit file, this setup can also work
   with `systemd` as old as version **229** (Feb 2016).
 * See the detailed instructions in the
-  [`systemd/dps8m-proxy.service`](systemd/dps8m-proxy.service)
+  [`systemd/dps8m‑proxy.service`](systemd/dps8m-proxy.service)
   file for full installation instructions.
 
 ### User interaction
@@ -289,16 +290,16 @@ features:
   statistics:
 
   ```
-  >> LNK - The username '_gRSyWHxPcMp2MWvtmWWF' can be used to share this session.
-  >> SSH - in:   58 B,   out: 4.82 KiB, in rate:   4 B/s, out rate: 381 B/s
-  >> NVT - in: 4.82 KiB, out:   57 B,   in rate: 381 B/s, out rate:   4 B/s
-  >> LNK - link time: 13s (Emacs keymap enabled)
+  >> LNK ‑ The username '_gRSyWHxPcMp2MWvtmWWF' can be used to share this session.
+  >> SSH ‑ in:   58 B,   out: 4.82 KiB, in rate:   4 B/s, out rate: 381 B/s
+  >> NVT ‑ in: 4.82 KiB, out:   57 B,   in rate: 381 B/s, out rate:   4 B/s
+  >> LNK ‑ link time: 13s (Emacs keymap enabled)
   ```
 
 * `X` — disconnects from the target TELNET host (and ends the SSH
   session)
 
-* `]` — sends a literal `Control-]` to the target TELNET host
+* `]` — sends a literal `Control‑]` to the target TELNET host
 
 ### Connection sharing
 
@@ -310,8 +311,8 @@ features:
   $ ssh _gRSyWHxPcMp2MWvtmWWF@proxybox
 
   CONNECTION from remote.com [18.17.16.15] started at 2025/07/15 08:22:55.
-  This is a READ-ONLY shared monitoring session.
-  Send Control-] to disconnect.
+  This is a READ‑ONLY shared monitoring session.
+  Send Control‑] to disconnect.
   ```
 
 ## History
@@ -364,12 +365,12 @@ predecessor (code statistics provided by
   or [encryption](https://www.rfc-editor.org/rfc/rfc2946)
   features at this time.
   * If you need these features, you should look into
-    [C-Kermit](https://kermitproject.org/) or
+    [C‑Kermit](https://kermitproject.org/) or
     [Kermit 95](https://davidrg.github.io/ckwin/).
   * Although directly executing programs isn’t something on the
     roadmap, it’s not difficult to use `socat` creatively to connect
-    C-Kermit to the proxy (*i.e.*,
-    `socat TCP-LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
+    C‑Kermit to the proxy (*i.e.*,
+    `socat TCP‑LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
   * ⚠️ Be aware that doing this *securely*—safe for public usage—is
     more involved than one might imagine.  *Safely* configuring the
     proxy for this type of operation is possible, but beyond the scope
@@ -384,7 +385,7 @@ predecessor (code statistics provided by
 * When reviewing logs, administrators often need to search through all
   the past data, including through the compressed files. We recommend
   using [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the
-  `-z` option) for this task.
+  `‑z` option) for this task.
 
 ## Using OpenSSH host keys
 
@@ -404,7 +405,7 @@ and that know what you’re doing!
    cp /etc/ssh/ssh_host_ed25519_key ssh_host_ed25519_key.tmp
    ```
 
-2. Convert the keys (using `ssh-keygen`) and rename them appropriately:
+2. Convert the keys (using `ssh‑keygen`) and rename them appropriately:
 
    ```sh
    ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
