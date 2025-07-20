@@ -189,7 +189,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g1041a81+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g1e5da80+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -271,14 +271,14 @@ further clarification:
 * The proxy also acts on the following signals (on systems where
   signals are supported):
 
-  |      Signal | Action                                                        |
-  |------------:|:--------------------------------------------------------------|
-  |    `SIGINT` | Enables the **Immediate shutdown** mode                       |
-  |   `SIGQUIT` | Enables the **Immediate shutdown** mode                       |
-  |   `SIGUSR1` | Enables the **Graceful shutdown** mode                        |
-  |   `SIGUSR2` | Enables the **Deny new connections** mode                     |
-  |    `SIGHUP` | Reloads *access control lists* (`‑‑whitelist`, `‑‑blacklist`) |
-  | `SIGDANGER` | Attempts to immediately free as much memory as possible (AIX) |
+  |      Signal | Action                                                             |
+  |------------:|:-------------------------------------------------------------------|
+  |    `SIGINT` | Enables the **Immediate shutdown** mode                            |
+  |   `SIGQUIT` | Enables the **Immediate shutdown** mode                            |
+  |   `SIGUSR1` | Enables the **Graceful shutdown** mode                             |
+  |   `SIGUSR2` | Enables the **Deny new connections** mode                          |
+  |    `SIGHUP` | Reloads *access control lists* (`‑‑whitelist`, `‑‑blacklist`)      |
+  | `SIGDANGER` | Attempts to immediately free as much memory as possible (AIX-only) |
 
 ### Automation with systemd
 
@@ -286,9 +286,9 @@ If you’re running the proxy on a Linux system, you can use `systemd`
 to manage the service (while maintaining access to the interactive
 admin console).
 
-* The `systemd` integration requires:
-  * `systemd` version **247** or later (Nov 2020), and
-  * a *recent* version of [`tmux`](https://github.com/tmux/tmux).
+* The `systemd` integration requires `systemd` version **247** or
+  later (Nov 2020), and a *recent* version of
+  [`tmux`](https://github.com/tmux/tmux).
 []()
 
 []()
@@ -346,7 +346,7 @@ features:
 
 ### Connection sharing
 
-* 🤝 The user can share the username presented above with others,
+* The user can share 🤝 the username presented above with others,
   allowing the session to be viewed live 👀 (read‑only) by one or more
   viewers:
 
@@ -378,8 +378,8 @@ performance and reduced system overhead.
 
 ### Stats
 
-📈 The new `proxy` program is considerably simpler than its legacy
-predecessor (code statistics provided by
+The new `proxy` program is considerably simpler than its legacy
+predecessor (code statistics 📈 provided by
 [`scc`](https://github.com/boyter/scc)):
 
 <table id="scc-table">
@@ -417,13 +417,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>470</th>
-		<th>92</th>
+		<th>471</th>
+		<th>93</th>
 		<th>0</th>
 		<th>378</th>
 		<th>0</th>
-		<th>19888</th>
-		<th>359</th>
+		<th>19941</th>
+		<th>361</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -448,13 +448,13 @@ predecessor (code statistics provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>5532</th>
-		<th>1206</th>
+		<th>5533</th>
+		<th>1207</th>
 		<th>269</th>
 		<th>4057</th>
 		<th>955</th>
-		<th>153737</th>
-		<th>2928</th>
+		<th>153790</th>
+		<th>2930</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -532,6 +532,7 @@ and that know what you’re doing!
 
 ## Development
 
+### Required
 * For `proxy` development, along with the most recent version of
   [Go](https://go.dev/), you’ll also need to have a standard POSIX.1
   shell environment (at a minimum `sh`, `make`, `grep`, `awk`, &
@@ -553,9 +554,9 @@ and that know what you’re doing!
   (with `PDPMAKE_POSIXLY_CORRECT` set) and
   [`yash`](https://magicant.github.io/yash/) to ensure POSIX
   conformance.
-[]()
 
-[]()
+### Recommended
+
 * While not absolutely required, it’s a good idea to have the latest
   [`golangci-lint`](https://golangci-lint.run/) installed.  We ship a
   [config file](.golangci.yml) file for it, and try to make sure that
@@ -571,8 +572,8 @@ and that know what you’re doing!
 * The canonical home of this software is
   [`https://gitlab.com/dps8m/proxy`](https://gitlab.com/dps8m/proxy),
   with a mirror on [GitHub](https://github.com/johnsonjh/dps8m-proxy/).
-* This software is intended to be **secure** 🛡️.  If you find any
-  security‑related problems, please don’t hesitate to
+* This software is intended to be **secure** 🛡️.
+* If you find any security‑related problems, please don’t hesitate to
   [open a GitLab Issue](https://gitlab.com/dps8m/proxy/-/issues/new)
   (or send an
   [email](mailto:contact-project+dps8m-proxy-71601954-issue-@incoming.gitlab.com)
