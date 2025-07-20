@@ -821,12 +821,18 @@ func handleConsoleInput() {
 
 		case "k", "K":
 			if len(parts) < 2 {
-				fmt.Fprintf(os.Stderr, "%s Error: session ID required for 'k' command.\r\n",
+				fmt.Fprintf(
+					os.Stderr, "%s Error: Session ID or '*' required for 'k' command.\r\n",
 					nowStamp())
 
 				continue
 			}
-			killConnection(parts[1])
+
+			if parts[1] == "*" {
+				killAllConnections()
+			} else {
+				killConnection(parts[1])
+			}
 
 		case "r", "R":
 			if blacklistFile == "" || whitelistFile == "" {
@@ -1394,7 +1400,7 @@ func listConfiguration() {
 	printRow(&b, "Idle Max: "+idleMaxStr)
 	b.WriteString(separator)
 
-	printRow(&b, "Log Base Directory: " + logDir)
+	printRow(&b, "Log Base Directory: "+logDir)
 	printRow(&b, fmt.Sprintf("No Session Logging: %t", noLog))
 
 	if consoleLog != "" {
@@ -1406,14 +1412,14 @@ func listConfiguration() {
 			quietMode = "noquiet"
 		}
 
-		printRow(&b, "Console Logging: " + quietMode)
+		printRow(&b, "Console Logging: "+quietMode)
 	} else {
 		printRow(&b, "Console Logging: disabled")
 	}
 
 	printRow(&b, fmt.Sprintf("No Log Compression: %t", noCompress))
-	printRow(&b, "Compression Algorithm: " + compressAlgo)
-	printRow(&b, "Compression Level: " + compressLevel)
+	printRow(&b, "Compression Algorithm: "+compressAlgo)
+	printRow(&b, "Compression Level: "+compressLevel)
 	printRow(&b, fmt.Sprintf("Log Permissions: Files: %04o, Dirs: %04o", logPerm, logDirPerm))
 	b.WriteString(separator)
 
@@ -1437,8 +1443,8 @@ func listConfiguration() {
 
 	b.WriteString(separator)
 
-	printRow(&b, "Uptime: " + uptimeString)
-	printRow(&b, "Memory: " + memStatsStr)
+	printRow(&b, "Uptime: "+uptimeString)
+	printRow(&b, "Memory: "+memStatsStr)
 	printRow(&b, fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)", runtime.NumGoroutine()))
 
 	b.WriteString(separator)
@@ -1446,7 +1452,6 @@ func listConfiguration() {
 	fmt.Print(b.String())
 	fmt.Printf("\r\n")
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1559,6 +1564,62 @@ func killConnection(id string) {
 	if err := conn.sshConn.Close(); err != nil {
 		log.Printf("Error closing SSH connection for %s: %v", conn.ID, err)
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func killAllConnections() {
+	connectionsMutex.Lock()
+	defer connectionsMutex.Unlock()
+
+	if len(connections) == 0 {
+		fmt.Printf("\r%s No active connections to kill.\r\n", nowStamp())
+		return
+	}
+
+	fmt.Printf("\r%s Killing all %d active connections...\r\n", nowStamp(), len(connections))
+
+	idsToKill := make([]string, 0, len(connections))
+
+	for id := range connections {
+		idsToKill = append(idsToKill, id)
+	}
+
+	for _, id := range idsToKill {
+		conn := connections[id]
+
+		if conn == nil {
+			continue
+		}
+
+		if isConsoleLogQuiet {
+			if _, err := fmt.Fprintf(
+				os.Stderr, "%s Killing connection %s...\r\n", nowStamp(), id); err != nil {
+				log.Printf("Error writing to stderr: %v", err)
+			}
+		}
+
+		if conn.channel != nil {
+			if _, err := conn.channel.Write(
+				[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n")); err != nil {
+				log.Printf("Error writing to channel for %s: %v", conn.ID, err)
+			}
+		}
+
+		connUptime := time.Since(conn.startTime)
+		log.Printf("TERMKILL [%s] %s@%s (link time %s)",
+			conn.ID, conn.userName, conn.hostName, connUptime.Round(time.Second))
+
+		adminKillsTotal.Add(1)
+
+		if err := conn.sshConn.Close(); err != nil {
+			log.Printf("Error closing SSH connection for %s: %v", conn.ID, err)
+		}
+
+		delete(connections, id)
+	}
+
+	fmt.Printf("\r%s All active connections killed.\r\n", nowStamp())
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
