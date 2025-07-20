@@ -195,6 +195,7 @@ var (
 	sshExecRejectedTotal     atomic.Uint64
 	sshRequestTimeoutTotal   atomic.Uint64
 	sshSessionsTotal         atomic.Uint64
+	peakUsersTotal           atomic.Uint64
 	telnetConnectionsTotal   atomic.Uint64
 	telnetFailuresTotal      atomic.Uint64
 	timeKillsTotal           atomic.Uint64
@@ -916,9 +917,11 @@ func showStats() {
 		{"TELNET Total Connections", fmt.Sprintf("%d", telnetConnectionsTotal.Load())},
 		{"* TELNET Alt-Host Routings", fmt.Sprintf("%d", altHostRoutesTotal.Load())},
 		{"* TELNET Connection Failures", fmt.Sprintf("%d", telnetFailuresTotal.Load())},
+		{"Peak Concurrent Connections", fmt.Sprintf("%d", peakUsersTotal.Load())},
 		{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load())},
 		{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load())},
 		{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load())},
+		{"* SSH Peak Usage", fmt.Sprintf("%d", peakUsersTotal.Load())},
 		{"* SSH Session Request Timeout", fmt.Sprintf("%d", sshRequestTimeoutTotal.Load())},
 		{"* SSH Illegal Request (SFTP)", fmt.Sprintf("%d", sshIllegalSubsystemTotal.Load())},
 		{"* SSH Illegal Request (SCP/EXEC)", fmt.Sprintf("%d", sshExecRejectedTotal.Load())},
@@ -960,7 +963,7 @@ func showStats() {
 		fmt.Printf("\r| %-*s | %*s |\r\n", maxName, r.Name, maxVal, r.Value)
 
 		switch i {
-		case 2, 10, 13, 15:
+		case 2, 3, 12, 15, 17:
 			fmt.Print(border)
 		}
 	}
@@ -1656,6 +1659,10 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	}
 
 	connections[sid] = conn
+
+	if currentLen := uint64(len(connections)); currentLen > peakUsersTotal.Load() {
+		peakUsersTotal.Store(currentLen)
+	}
 
 	connectionsMutex.Unlock()
 
