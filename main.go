@@ -549,6 +549,7 @@ type Connection struct {
 	userName            string
 	emacsKeymapEnabled  bool
 	wasMonitored        bool
+	termType            string
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2261,6 +2262,9 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		for req := range requests {
 			switch req.Type {
 			case "pty-req":
+				termLen := req.Payload[3]
+				term := string(req.Payload[4 : 4+termLen])
+				conn.termType = term
 				if err := req.Reply(true, nil); err != nil {
 					log.Printf("Error replying to request: %v", err)
 				}
@@ -2358,7 +2362,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		}
 	}()
 
-	negotiateTelnet(remote, channel, logwriter)
+	negotiateTelnet(remote, channel, logwriter, conn)
 
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -2688,7 +2692,7 @@ func sendBanner(sshConn *ssh.ServerConn, ch ssh.Channel, conn *Connection) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
+func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Connection) {
 	type telnetState struct {
 		weWill   bool
 		weDo     bool
@@ -2699,9 +2703,23 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 	telnetStates := make(map[byte]*telnetState)
 	// Options that we do not support and will always reject.
 	var unsupportedOptions = []byte{
-		TeloptTTYPE, TeloptTS, TeloptXDisplay, TeloptNewEnviron, TeloptOldEnviron,
-		TeloptAuth, TeloptEncrypt, TeloptCompPort, TeloptMSSP, TeloptMCCP2,
-		TeloptMCCP3, TeloptMSP, TeloptMXP, TeloptATCP, TeloptGMCP, TeloptLineMode,
+		TeloptATCP,
+		TeloptAuth,
+		TeloptCompPort,
+		TeloptEncrypt,
+		TeloptGMCP,
+		TeloptLineMode,
+		TeloptMCCP2,
+		TeloptMCCP3,
+		TeloptMSP,
+		TeloptMSSP,
+		TeloptMXP,
+		TeloptNewEnviron,
+		TeloptOldEnviron,
+		TeloptRM,
+		TeloptTS,
+		TeloptXDisplay,
+		TeloptStatus,
 	}
 
 	// Keep track of options we've already rejected to avoid redundant responses.
@@ -2709,11 +2727,26 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 
 	// Initialize states for common options
 	for _, opt := range []byte{
-		TeloptBinary, TeloptEcho, TeloptSuppressGoAhead, TeloptNAWS,
-		TeloptTS, TeloptRM, TeloptNewEnviron, TeloptTTYPE, TeloptXDisplay,
-		TeloptOldEnviron, TeloptAuth, TeloptEncrypt, TeloptCompPort,
-		TeloptMSSP, TeloptMCCP2, TeloptMCCP3, TeloptMSP, TeloptMXP,
-		TeloptATCP, TeloptGMCP, TeloptLineMode,
+		TeloptATCP,
+		TeloptAuth,
+		TeloptBinary,
+		TeloptCompPort,
+		TeloptEcho,
+		TeloptEncrypt,
+		TeloptGMCP,
+		TeloptLineMode,
+		TeloptMCCP2,
+		TeloptMCCP3,
+		TeloptMSP,
+		TeloptMSSP,
+		TeloptMXP,
+		TeloptNAWS,
+		TeloptNewEnviron,
+		TeloptOldEnviron,
+		TeloptRM,
+		TeloptSuppressGoAhead,
+		TeloptTS,
+		TeloptXDisplay,
 	} {
 		telnetStates[opt] = &telnetState{}
 	}
@@ -2747,7 +2780,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 				if i+2 < n {
 					cmd, opt := buf[i+1], buf[i+2]
 					writeNegotiation(ch, logw,
-						"[RCVD "+cmdName(cmd)+" "+optName(opt)+"]")
+						"[RCVD "+cmdName(cmd)+" "+optName(opt)+"]", conn.userName)
 
 					state, ok := telnetStates[opt]
 					if !ok {
@@ -2760,13 +2793,13 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 						if contains(unsupportedOptions, opt) {
 							sendIAC(remote, TelcmdDONT, opt)
 							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]")
+								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]", conn.userName)
 							rejectedOptions[opt] = true // Still mark as rejected to avoid excessive logging if we re-introduce the check
 						} else if !state.theyWill {
 							state.theyWill = true
 							sendIAC(remote, TelcmdDO, opt)
 							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdDO)+" "+optName(opt)+"]")
+								"[SENT "+cmdName(TelcmdDO)+" "+optName(opt)+"]", conn.userName)
 						}
 
 					case TelcmdWONT:
@@ -2774,20 +2807,27 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 							state.theyWill = false
 							sendIAC(remote, TelcmdDONT, opt)
 							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]")
+								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]", conn.userName)
 						}
 
 					case TelcmdDO:
-						if contains(unsupportedOptions, opt) {
+						if opt == TeloptTTYPE {
+							if !state.weWill {
+								state.weWill = true
+								sendIAC(remote, TelcmdWILL, TeloptTTYPE)
+								writeNegotiation(ch, logw,
+									"[SENT "+cmdName(TelcmdWILL)+" "+optName(TeloptTTYPE)+"]", conn.userName)
+							}
+						} else if contains(unsupportedOptions, opt) {
 							sendIAC(remote, TelcmdWONT, opt)
 							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]")
+								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]", conn.userName)
 							rejectedOptions[opt] = true // Still mark as rejected
 						} else if !state.theyDo {
 							state.theyDo = true
 							sendIAC(remote, TelcmdWILL, opt)
 							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]")
+								"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]", conn.userName)
 						}
 
 					case TelcmdDONT:
@@ -2795,7 +2835,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 							state.theyDo = false
 							sendIAC(remote, TelcmdWONT, opt)
 							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]")
+								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]", conn.userName)
 						}
 
 					case TelcmdSB: // Subnegotiation
@@ -2813,9 +2853,25 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 							subData := buf[i+3 : seIndex]
 
 							writeNegotiation(ch, logw,
-								"[RCVD SB "+optName(subOpt)+" ... IAC SE]")
+								"[RCVD SB "+optName(subOpt)+" ... IAC SE]", conn.userName)
 
-							if contains(unsupportedOptions, subOpt) {
+							if subOpt == TeloptTTYPE && len(subData) > 0 && subData[0] == TelnetSend {
+								// Respond with terminal type if available
+								if conn.termType != "" {
+									data := []byte{TelcmdIAC, TelcmdSB, TeloptTTYPE, TelnetIs}
+									data = append(data, []byte(conn.termType)...)
+									data = append(data, TelcmdIAC, TelcmdSE)
+									if _, err := remote.Write(data); err != nil {
+										log.Printf("Error writing Telnet TTYPE response: %v", err)
+									}
+									writeNegotiation(ch, logw,
+										"[SENT SB "+optName(TeloptTTYPE)+" IS "+conn.termType+" IAC SE]", conn.userName)
+								} else {
+									sendIAC(remote, TelcmdNOP)
+									writeNegotiation(ch, logw,
+										"[SENT NOP (no terminal type available)]", conn.userName)
+								}
+							} else if contains(unsupportedOptions, subOpt) {
 								// If we don't support the option, ignore its subnegotiation
 								i = seIndex + 2 // Move past IAC SE
 								continue
@@ -2839,10 +2895,10 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 					i += 3
 				} else if i+1 < n && buf[i+1] == TelcmdSB { // IAC SB without SE
 					// Incomplete subnegotiation, skip IAC SB
-					writeNegotiation(ch, logw, "[RCVD IAC SB (incomplete)]")
+					writeNegotiation(ch, logw, "[RCVD IAC SB (incomplete)]", conn.userName)
 					i += 2
 				} else { // IAC followed by single byte or end of buffer
-					writeNegotiation(ch, logw, "[RCVD IAC (incomplete)]")
+					writeNegotiation(ch, logw, "[RCVD IAC (incomplete)]", conn.userName)
 					i += 1
 				}
 			} else {
@@ -2856,18 +2912,23 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func writeNegotiation(ch io.Writer, logw io.Writer, line string) {
-	msg := line + "\r\n"
-	if _, err := logw.Write([]byte(msg)); err != nil {
-		log.Printf("Error writing negotiation message to log: %v", err)
-	}
+func writeNegotiation(ch io.Writer, logw io.Writer, line string, username string) {
+		msg := line
+		if debugNegotiation {
+			msg = fmt.Sprintf("%s %s", username, line)
+		}
+		msg += "\r\n"
 
-	if debugNegotiation {
-		if _, err := ch.Write([]byte(msg)); err != nil {
-			log.Printf("Error writing negotiation message to channel: %v", err)
+		if _, err := logw.Write([]byte(msg)); err != nil {
+			log.Printf("Error writing negotiation message to log: %v", err)
+		}
+
+		if debugNegotiation {
+			if _, err := ch.Write([]byte(msg)); err != nil {
+				log.Printf("Error writing negotiation message to channel: %v", err)
+			}
 		}
 	}
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2911,8 +2972,6 @@ func optName(b byte) string {
 
 	case TeloptSuppressGoAhead:
 		return "SUPPRESS GO AHEAD"
-
-	
 
 	case TeloptStatus:
 		return "STATUS"
