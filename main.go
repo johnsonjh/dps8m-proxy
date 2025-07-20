@@ -1237,27 +1237,29 @@ func listConfiguration() {
 	pid := os.Getpid()
 
 	var b strings.Builder
-	// Calculate max length dynamically
 	maxLength := 0
 
-	// Helper to update maxLength
 	updateMaxLength := func(s string) {
 		if len(s) > maxLength {
 			maxLength = len(s)
 		}
 	}
 
-	// Collect all potential strings that will be printed
-	// Initial strings
 	s1 := fmt.Sprintf("DPS8M Proxy Configuration and Status - PID: %-8d", pid)
+
 	updateMaxLength(s1)
+
 	updateMaxLength("SSH listeners on:")
 	for _, addr := range sshAddr {
 		updateMaxLength("* " + addr)
 	}
+
 	updateMaxLength("Default TELNET target: " + telnetHostPort)
+
 	s2 := fmt.Sprintf("Debug TELNET Negotiation: %t", debugNegotiation)
+
 	updateMaxLength(s2)
+
 	if len(altHosts) > 0 {
 		updateMaxLength("Alt Targets:")
 		for user, hostPort := range altHosts {
@@ -1265,19 +1267,29 @@ func listConfiguration() {
 			updateMaxLength(s3)
 		}
 	}
+
 	timeMaxStr := "disabled"
+
 	if timeMax > 0 {
 		timeMaxStr = fmt.Sprintf("%d seconds", timeMax)
 	}
+
 	updateMaxLength("Time Max: " + timeMaxStr)
+
 	idleMaxStr := "disabled"
+
 	if idleMax > 0 {
 		idleMaxStr = fmt.Sprintf("%d seconds", idleMax)
 	}
+
 	updateMaxLength("Idle Max: " + idleMaxStr)
+
 	updateMaxLength("Log Base Directory: " + logDir)
+
 	s4 := fmt.Sprintf("No Session Logging: %t", noLog)
+
 	updateMaxLength(s4)
+
 	if consoleLog != "" {
 		var quietMode string
 		if isConsoleLogQuiet {
@@ -1289,17 +1301,28 @@ func listConfiguration() {
 	} else {
 		updateMaxLength("Console Logging: disabled")
 	}
+
 	s5 := fmt.Sprintf("No Log Compression: %t", noCompress)
+
 	updateMaxLength(s5)
+
 	updateMaxLength("Compression Algorithm: " + compressAlgo)
+
 	updateMaxLength("Compression Level: " + compressLevel)
+
 	s6 := fmt.Sprintf("Log Permissions: Files: %04o, Dirs: %04o", logPerm, logDirPerm)
+
 	updateMaxLength(s6)
+
 	s7 := fmt.Sprintf("Graceful Shutdown: %t", gracefulShutdownMode.Load())
+
 	updateMaxLength(s7)
+
 	s8 := fmt.Sprintf("Deny New Connections: %t", denyNewConnectionsMode.Load())
+
 	updateMaxLength(s8)
-	if blacklistFile == "" && len(blacklistedNetworks) == 0 {
+
+	if blacklistFile == "" && len(blacklistedNetworks) == 0 { //nolint:gocritic
 		updateMaxLength("Blacklist: 0 entries active")
 	} else if whitelistFile != "" && blacklistFile == "" {
 		updateMaxLength("Blacklist: Deny all (due to whitelist only)")
@@ -1307,16 +1330,20 @@ func listConfiguration() {
 		s9 := fmt.Sprintf("Blacklist: %d entries active", len(blacklistedNetworks))
 		updateMaxLength(s9)
 	}
+
 	if whitelistFile == "" {
 		updateMaxLength("Whitelist: 0 entries active")
 	} else {
 		s10 := fmt.Sprintf("Whitelist: %d entries active", len(whitelistedNetworks))
 		updateMaxLength(s10)
 	}
+
 	uptime := time.Since(startTime)
+
 	uptimeString := fmt.Sprintf("%dh%dm%ds (since %s)",
 		int(uptime.Hours())%24, int(uptime.Minutes())%60, int(uptime.Seconds())%60,
 		startTime.Format("2006-Jan-02 15:04:24"))
+
 	updateMaxLength("Uptime: " + uptimeString)
 
 	var m runtime.MemStats
@@ -1343,10 +1370,10 @@ func listConfiguration() {
 	memStatsStr := fmt.Sprintf("%s used (of %s reserved)", allocStr, sysStr)
 	updateMaxLength("Memory: " + memStatsStr)
 
-	s11 := fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)", runtime.NumGoroutine())
+	s11 := fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)",
+		runtime.NumGoroutine())
 	updateMaxLength(s11)
 
-	// Ensure a minimum width for aesthetic reasons, e.g., 50 characters
 	if maxLength < 50 {
 		maxLength = 50
 	}
@@ -1367,12 +1394,14 @@ func listConfiguration() {
 		b.WriteString(" |\r\n")
 	}
 
-	separator := fmt.Sprintf("+%s+\r\n", strings.Repeat("=", textWidth+2)) // +2 for spaces and pipes
+	separator := fmt.Sprintf("+%s+\r\n", strings.Repeat("=", textWidth+2))
 
 	b.WriteString("\r\n")
+
 	b.WriteString(separator)
 
 	printRow(&b, fmt.Sprintf("DPS8M Proxy Configuration and Status - PID: %-8d", pid))
+
 	b.WriteString(separator)
 
 	printRow(&b, "SSH listeners on:")
@@ -1384,6 +1413,7 @@ func listConfiguration() {
 	b.WriteString(separator)
 
 	printRow(&b, "Default TELNET target: "+telnetHostPort)
+
 	printRow(&b, fmt.Sprintf("Debug TELNET Negotiation: %t", debugNegotiation))
 
 	if len(altHosts) > 0 {
@@ -1398,6 +1428,7 @@ func listConfiguration() {
 
 	printRow(&b, "Time Max: "+timeMaxStr)
 	printRow(&b, "Idle Max: "+idleMaxStr)
+
 	b.WriteString(separator)
 
 	printRow(&b, "Log Base Directory: "+logDir)
@@ -1421,10 +1452,12 @@ func listConfiguration() {
 	printRow(&b, "Compression Algorithm: "+compressAlgo)
 	printRow(&b, "Compression Level: "+compressLevel)
 	printRow(&b, fmt.Sprintf("Log Permissions: Files: %04o, Dirs: %04o", logPerm, logDirPerm))
+
 	b.WriteString(separator)
 
 	printRow(&b, fmt.Sprintf("Graceful Shutdown: %t", gracefulShutdownMode.Load()))
 	printRow(&b, fmt.Sprintf("Deny New Connections: %t", denyNewConnectionsMode.Load()))
+
 	b.WriteString(separator)
 
 	if blacklistFile == "" && len(blacklistedNetworks) == 0 { //nolint:gocritic
@@ -1445,7 +1478,8 @@ func listConfiguration() {
 
 	printRow(&b, "Uptime: "+uptimeString)
 	printRow(&b, "Memory: "+memStatsStr)
-	printRow(&b, fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)", runtime.NumGoroutine()))
+	printRow(&b, fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)",
+		runtime.NumGoroutine()))
 
 	b.WriteString(separator)
 
@@ -1574,6 +1608,7 @@ func killAllConnections() {
 
 	if len(connections) == 0 {
 		fmt.Printf("\r%s No active connections to kill.\r\n", nowStamp())
+
 		return
 	}
 
