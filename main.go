@@ -31,6 +31,7 @@ import (
 	"regexp"
 	"runtime"
 	"runtime/debug"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -1111,6 +1112,15 @@ func listConnections(truncate bool) {
 		return
 	}
 
+	conns := make([]*Connection, 0, len(connections))
+	for _, conn := range connections {
+		conns = append(conns, conn)
+	}
+
+	sort.Slice(conns, func(i, j int) bool {
+		return conns[i].startTime.Before(conns[j].startTime)
+	})
+
 	type row struct {
 		ID      string
 		Details string
@@ -1121,7 +1131,7 @@ func listConnections(truncate bool) {
 	userTruncat := false
 	rows := make([]row, 0, len(connections))
 
-	for id, conn := range connections {
+	for _, conn := range conns {
 		user := conn.sshConn.User()
 
 		if truncate && len(user) > 21 {
@@ -1148,7 +1158,7 @@ func listConnections(truncate bool) {
 		}
 
 		rows = append(rows, row{
-			ID:      id,
+			ID:      conn.ID,
 			Details: details,
 			Link:    time.Since(conn.startTime).Round(time.Second).String(),
 			Idle:    idle,
