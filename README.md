@@ -189,7 +189,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g39a071d+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g190d898+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -286,14 +286,13 @@ to manage the service (while maintaining access to the interactive
 admin console).
 
 * The `systemd` integration requires:
-  * **`systemd`** version **247** or later (*released November 2020*),
-    and
+  * `systemd` version **247** or later (*released November 2020*), and
   * a recent version of **[`tmux`](https://github.com/tmux/tmux)**.
 
-* 🔧 With minor changes to the unit file, this setup can also work on
- `systemd` versions as old as **229** (*released February 2016*).
+* 🔧 With minor changes to the unit file, this setup can also work
+  with `systemd` as old as version **229** (*released February 2016*).
 
-* See the detailed instructions in the
+* 🛠️ See the detailed instructions in the
   [`systemd/dps8m-proxy.service`](systemd/dps8m-proxy.service)
   file for full installation instructions.
 
@@ -416,13 +415,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>472</th>
+		<th>471</th>
 		<th>98</th>
 		<th>0</th>
-		<th>374</th>
+		<th>373</th>
 		<th>0</th>
-		<th>19615</th>
-		<th>359</th>
+		<th>19617</th>
+		<th>358</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -447,13 +446,13 @@ predecessor (code statistics provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>5534</th>
+		<th>5533</th>
 		<th>1212</th>
 		<th>269</th>
-		<th>4053</th>
+		<th>4052</th>
 		<th>955</th>
-		<th>153464</th>
-		<th>2928</th>
+		<th>153466</th>
+		<th>2927</th>
 	</tr></tfoot></table>
 
 ## Future plans
