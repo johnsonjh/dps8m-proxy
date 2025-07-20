@@ -189,7 +189,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g70ac885+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g6cca590+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -278,7 +278,7 @@ further clarification:
   |   `SIGUSR1` | Enables the **Graceful shutdown** mode                             |
   |   `SIGUSR2` | Enables the **Deny new connections** mode                          |
   |    `SIGHUP` | Reloads *access control lists* (`‑‑whitelist`, `‑‑blacklist`)      |
-  | `SIGDANGER` | Attempts to immediately free as much memory as possible (AIX-only) |
+  | `SIGDANGER` | Attempts to immediately free as much memory as possible (AIX‑only) |
 
 ### Automation with systemd
 
@@ -426,7 +426,7 @@ predecessor (code statistics 📈 provided by
 		<th>0</th>
 		<th>380</th>
 		<th>0</th>
-		<th>20068</th>
+		<th>20070</th>
 		<th>363</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -457,7 +457,7 @@ predecessor (code statistics 📈 provided by
 		<th>269</th>
 		<th>4059</th>
 		<th>955</th>
-		<th>153917</th>
+		<th>153919</th>
 		<th>2932</th>
 	</tr></tfoot></table>
 
