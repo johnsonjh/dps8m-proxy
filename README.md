@@ -188,7 +188,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-20 g3813846) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-20 g6d9fff8) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -260,6 +260,10 @@ further clarification:
   Activating this mode can help reduce console noise, making it easier
   to perform admin actions such as viewing the configuration, or
   listing and killing active connections.
+
+* The `k` command, which kills a connection, takes either a
+  *Session ID* as an argument (shown when listing active connections
+  with the `l` command) or `*`, which kills *all* active connections.
 
 ### Signals
 
@@ -410,13 +414,13 @@ predecessor (code statistics provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>470</th>
-		<th>98</th>
+		<th>474</th>
+		<th>99</th>
 		<th>0</th>
-		<th>372</th>
+		<th>375</th>
 		<th>0</th>
-		<th>19395</th>
-		<th>357</th>
+		<th>19595</th>
+		<th>360</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -441,13 +445,13 @@ predecessor (code statistics provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>13</th>
-		<th>5412</th>
-		<th>1185</th>
+		<th>5416</th>
+		<th>1186</th>
 		<th>267</th>
-		<th>3960</th>
+		<th>3963</th>
 		<th>927</th>
-		<th>149824</th>
-		<th>2856</th>
+		<th>150024</th>
+		<th>2859</th>
 	</tr></tfoot></table>
 
 ## Future plans
