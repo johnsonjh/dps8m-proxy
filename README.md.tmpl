@@ -370,7 +370,7 @@ predecessor (code statistics provided by
   * Although directly executing programs isn’t something on the
     roadmap, it’s not difficult to use `socat` creatively to connect
     C‑Kermit to the proxy (*i.e.*,
-    `socat TCP‑LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
+    `socat TCP‑LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
   * ⚠️ Be aware that doing this *securely*—safe for public usage—is
     more involved than one might imagine.  *Safely* configuring the
     proxy for this type of operation is possible, but beyond the scope

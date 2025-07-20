@@ -189,7 +189,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-20 g9d20659+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-20 g1041a81+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -422,7 +422,7 @@ predecessor (code statistics provided by
 		<th>0</th>
 		<th>378</th>
 		<th>0</th>
-		<th>19887</th>
+		<th>19888</th>
 		<th>359</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -453,7 +453,7 @@ predecessor (code statistics provided by
 		<th>269</th>
 		<th>4057</th>
 		<th>955</th>
-		<th>153736</th>
+		<th>153737</th>
 		<th>2928</th>
 	</tr></tfoot></table>
 
@@ -486,7 +486,7 @@ predecessor (code statistics provided by
   * Although directly executing programs isn’t something on the
     roadmap, it’s not difficult to use `socat` creatively to connect
     C‑Kermit to the proxy (*i.e.*,
-    `socat TCP‑LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
+    `socat TCP‑LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
   * ⚠️ Be aware that doing this *securely*—safe for public usage—is
     more involved than one might imagine.  *Safely* configuring the
     proxy for this type of operation is possible, but beyond the scope
