@@ -45,96 +45,149 @@ import (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Global constants.
 const (
 	// TELNET Commands.
-	TelcmdNOP  = 241 // No operation
-	TelcmdAYT  = 246 // Are You There?
-	TelcmdSB   = 250 // Subnegotiation Begin
-	TelcmdSE   = 240 // Subnegotiation End
-	TelcmdIAC  = 255 // Interpret As Command
-	TelcmdDONT = 254 // DONT
-	TelcmdDO   = 253 // DO
-	TelcmdWONT = 252 // WONT
-	TelcmdWILL = 251 // WILL
+	TelcmdSE    = 240 // Subnegotiation End
+	TelcmdNOP   = 241 // No operation
+	TelcmdDM    = 242 // Data Mark
+	TelcmdBreak = 243 // Break
+	TelcmdAYT   = 246 // Are You There?
+	TelcmdSB    = 250 // Subnegotiation Begin
+	TelcmdWILL  = 251 // WILL
+	TelcmdWONT  = 252 // WONT
+	TelcmdDO    = 253 // DO
+	TelcmdDONT  = 254 // DONT
+	TelcmdIAC   = 255 // Interpret As Command
 
 	// TELNET Command Options.
-	TeloptBinary          = 0   // Binary
-	TeloptEcho            = 1   // Echo
-	TeloptSuppressGoAhead = 3   // Suppress Go Ahead
-	TeloptStatus          = 5   // Status
-	TeloptTimingMark      = 6   // Timing Mark
-	TeloptNAWS            = 31  // Negotiate About Window Size
-	TeloptTS              = 32  // Terminal Speed
-	TeloptRM              = 33  // Remote Flow Control
-	TeloptNewEnviron      = 39  // New Environment Option
-	TeloptTTYPE           = 24  // Terminal Type
-	TeloptXDisplay        = 35  // X Display Location
-	TeloptOldEnviron      = 36  // Old Environment Option
-	TeloptAuth            = 37  // Authentication Option
-	TeloptEncrypt         = 38  // Encryption Option
-	TeloptCompPort        = 40  // Com Port Control
-	TeloptMSSP            = 70  // Mud Server Status Protocol
-	TeloptMCCP2           = 86  // Mud Client Compression Protocol 2
-	TeloptMCCP3           = 87  // Mud Client Compression Protocol 3
-	TeloptMSP             = 90  // Mud Sound Protocol
-	TeloptMXP             = 91  // Mud Extension Protocol
-	TeloptATCP            = 200 // Achaea Telnet Client Protocol
-	TeloptGMCP            = 201 // Generic Mud Client Protocol
-	TeloptLineMode        = 34  // Line Mode
-	TeloptLinemode        = 34  // Line Mode (duplicate, common typo)
-	TeloptNewEnvironOpt   = 39  // New Environment Option (duplicate)
-	TeloptEnd             = 255 // End of option list
+	TeloptBinary            = 0   // Binary
+	TeloptEcho              = 1   // Echo
+	TeloptReconnect         = 2   // Reconnection
+	TeloptSuppressGoAhead   = 3   // Suppress Go Ahead
+	TeloptApprox            = 4   // Approx Message Size Negotiation
+	TeloptStatus            = 5   // Status
+	TeloptTimingMark        = 6   // Timing Mark
+	TeloptRemoteControl     = 7   // Remote Controlled Trans and Echo
+	TeloptOutputLineWidth   = 8   // Output Line Width
+	TeloptOutputPageSize    = 9   // Output Page Size
+	TeloptOutputCRD         = 10  // Output Carriage Return Disposition
+	TeloptOutputHTS         = 11  // Output Horizontal Tab Stops
+	TeloptOutputHTD         = 12  // Output Horizontal Tab Disposition
+	TeloptOutputFFD         = 13  // Output Formfeed Disposition
+	TeloptOutputVTS         = 14  // Output Vertical Tabstops
+	TeloptOutputVTD         = 15  // Output Vertical Tab Disposition
+	TeloptOutputLFD         = 16  // Output Linefeed Disposition
+	TeloptExtendedAscii     = 17  // Extended ASCII
+	TeloptLogout            = 18  // Logout
+	TeloptByteMacro         = 19  // Byte Macro
+	TeloptDataEntryTerminal = 20  // Data Entry Terminal
+	TeloptSupdup            = 21  // SUPDUP
+	TeloptSupdupOutput      = 22  // SUPDUP Output
+	TeloptSendLocation      = 23  // Send Location
+	TeloptTTYPE             = 24  // Terminal Type
+	TeloptEOR               = 25  // End of Record
+	TeloptTacacsUserID      = 26  // TACACS User Identification
+	TeloptOutputMarking     = 27  // Output Marking
+	TeloptTermLocationNum   = 28  // Terminal Location Number
+	TeloptTN3270Regime      = 29  // TELNET 3270 Regime
+	TeloptX3PAD             = 30  // X.3 PAD
+	TeloptNAWS              = 31  // Negotiate About Window Size
+	TeloptTS                = 32  // Terminal Speed
+	TeloptRM                = 33  // Remote Flow Control
+	TeloptLineMode          = 34  // Line Mode
+	TeloptXDisplay          = 35  // X Display Location
+	TeloptOldEnviron        = 36  // Old Environment Option
+	TeloptAuth              = 37  // Authentication Option
+	TeloptEncrypt           = 38  // Encryption Option
+	TeloptNewEnviron        = 39  // New Environment Option
+	TeloptTN3270E           = 40  // TN3270E
+	TeloptXAUTH             = 41  // XAUTH
+	TeloptCHARSET           = 42  // CHARSET
+	TeloptRSP               = 43  // Remote Serial Port (RSP)
+	TeloptCompPort          = 44  // COM Port Control
+	TeloptSLE               = 45  // Telnet Suppress Local Echo
+	TeloptStartTLS          = 46  // Start TLS
+	TeloptKermit            = 47  // Kermit
+	TeloptSendURL           = 48  // SEND-URL
+	TeloptForwardX          = 49  // FORWARD_X
+	TeloptMSSP              = 70  // MUD Server Status Protocol
+	TeloptMCCP2             = 86  // MUD Client Compression Protocol 2
+	TeloptMCCP3             = 87  // MUD Client Compression Protocol 3
+	TeloptMSP               = 90  // MUD Sound Protocol
+	TeloptMXP               = 91  // MUD Extension Protocol
+	TeloptPragmaLogon       = 138 // TELOPT PRAGMA LOGON
+	TeloptSspiLogon         = 139 // TELOPT SSPI LOGON
+	TeloptPragmaHeartbeat   = 140 // TELOPT PRAGMA HEARTBEAT
+	TeloptATCP              = 200 // Achaea Telnet Client Protocol
+	TeloptGMCP              = 201 // Generic MUD Client Protocol
+	TeloptEnd               = 255 // End of Option List
 
 	// TELNET subnegotiation commands.
 	TelnetIs   = 0
 	TelnetSend = 1
 
 	// IEC sizes.
-	KiB = 1024
-	MiB = 1024 * KiB
-	GiB = 1024 * MiB
+	KiB = 1024       // Kibibyte
+	MiB = 1024 * KiB // Mebibyte
+	GiB = 1024 * MiB // Gibibyte
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Global variables.
 var (
-	startTime              = time.Now()
-	allowRoot              bool
-	logPerm                uint = 0o600
-	logDirPerm             uint = 0o750
-	altHosts                    = make(map[string]string)
-	blacklistedNetworks    []*net.IPNet
-	blacklistFile          string
-	connections            = make(map[string]*Connection)
-	connectionsMutex       sync.Mutex
-	consoleInputActive     atomic.Bool
-	consoleLogFile         *os.File
-	consoleLogMutex        sync.Mutex
-	consoleLog             string
-	isConsoleLogQuiet      bool
-	debugNegotiation       bool
-	denyNewConnectionsMode atomic.Bool
-	gracefulShutdownMode   atomic.Bool
-	idleMax                int
-	logDir                 string
-	loggingWg              sync.WaitGroup
-	noBanner               bool
-	noCompress             bool
-	noLog                  bool
-	showVersion            bool
-	shutdownOnce           sync.Once
-	shutdownSignal         chan struct{}
-	sshAddr                []string
-	telnetHostPort         string
-	timeMax                int
-	whitelistedNetworks    []*net.IPNet
-	whitelistFile          string
-	issueFile              = "issue.txt"
-	denyFile               = "deny.txt"
-	blockFile              = "block.txt"
-	compressAlgo           string
-	compressLevel          string
-	emacsKeymap            = map[string]string{
+	startTime               = time.Now()
+	allowRoot               bool
+	logPerm                 uint = 0o600
+	logDirPerm              uint = 0o750
+	altHosts                     = make(map[string]string)
+	blacklistedNetworks     []*net.IPNet
+	blacklistFile           string
+	connections             = make(map[string]*Connection)
+	connectionsMutex        sync.Mutex
+	consoleInputActive      atomic.Bool
+	consoleLogFile          *os.File
+	consoleLogMutex         sync.Mutex
+	consoleLog              string
+	isConsoleLogQuiet       bool
+	debugNegotiation        bool
+	denyNewConnectionsMode  atomic.Bool
+	gracefulShutdownMode    atomic.Bool
+	idleMax                 int
+	logDir                  string
+	loggingWg               sync.WaitGroup
+	noBanner                bool
+	noCompress              bool
+	noLog                   bool
+	showVersion             bool
+	shutdownOnce            sync.Once
+	shutdownSignal          chan struct{}
+	sshAddr                 []string
+	telnetHostPort          string
+	timeMax                 int
+	whitelistedNetworks     []*net.IPNet
+	whitelistFile           string
+	issueFile               = "issue.txt"
+	denyFile                = "deny.txt"
+	blockFile               = "block.txt"
+	compressAlgo            string
+	compressLevel           string
+	acceptErrorsTotal       atomic.Uint64
+	adminKillsTotal         atomic.Uint64
+	altHostRoutesTotal      atomic.Uint64
+	exemptedTotal           atomic.Uint64
+	idleKillsTotal          atomic.Uint64
+	monitorSessionsTotal    atomic.Uint64
+	rejectedTotal           atomic.Uint64
+	sshConnectionsTotal     atomic.Uint64
+	sshHandshakeFailedTotal atomic.Uint64
+	sshSessionsTotal        atomic.Uint64
+	telnetConnectionsTotal  atomic.Uint64
+	telnetFailuresTotal     atomic.Uint64
+	timeKillsTotal          atomic.Uint64
+	emacsKeymapPrefixes     = make(map[string]bool)
+	emacsKeymap             = map[string]string{
 		"\x1b[1;5A": "\x1b\x5b", //    Control-Arrow_Up -> Escape, [
 		"\x1b[1;5B": "\x1b\x5d", // Control-Arrrow_Down -> Escape, ]
 		"\x1b[1;5C": "\x1b\x66", // Control-Arrow_Right -> Escape, f
@@ -149,20 +202,6 @@ var (
 		"\x1b[C":    "\x06",     //         Arrow_Right -> Control-F
 		"\x1b[D":    "\x02",     //          Arrow_Left -> Control-B
 	}
-	emacsKeymapPrefixes     = make(map[string]bool)
-	acceptErrorsTotal       atomic.Uint64
-	adminKillsTotal         atomic.Uint64
-	altHostRoutesTotal      atomic.Uint64
-	exemptedTotal           atomic.Uint64
-	idleKillsTotal          atomic.Uint64
-	monitorSessionsTotal    atomic.Uint64
-	rejectedTotal           atomic.Uint64
-	sshConnectionsTotal     atomic.Uint64
-	sshHandshakeFailedTotal atomic.Uint64
-	sshSessionsTotal        atomic.Uint64
-	telnetConnectionsTotal  atomic.Uint64
-	telnetFailuresTotal     atomic.Uint64
-	timeKillsTotal          atomic.Uint64
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2470,14 +2509,6 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 								}
 							}
 
-							switch subOpt {
-							case TeloptNAWS:
-								if len(subData) >= 4 {
-									width := int(subData[0])<<8 | int(subData[1])
-									height := int(subData[2])<<8 | int(subData[3])
-									log.Printf("NAWS received: %dx%d", width, height)
-								}
-							}
 							i = seIndex + 2
 							continue
 						}
@@ -2555,76 +2586,187 @@ func cmdName(b byte) string {
 
 func optName(b byte) string {
 	switch b {
-	case TeloptBinary:
+	case TeloptBinary: // 0
 		return "BINARY"
 
-	case TeloptEcho:
+	case TeloptEcho: // 1
 		return "ECHO"
 
-	case TeloptSuppressGoAhead:
+	case TeloptReconnect: // 2
+		return "RECONNECTION"
+
+	case TeloptSuppressGoAhead: // 3
 		return "SUPPRESS GO AHEAD"
 
-	case TeloptStatus:
+	case TeloptApprox: // 4
+		return "APPROX MESSAGE SIZE NEGOTIATION"
+
+	case TeloptStatus: // 5
 		return "STATUS"
 
-	case TeloptTimingMark:
+	case TeloptTimingMark: // 6
 		return "TIMING MARK"
 
-	case TeloptNAWS:
-		return "NAWS"
+	case TeloptRemoteControl: // 7
+		return "REMOTE CONTROL"
 
-	case TeloptTS:
-		return "TERMINAL SPEED"
+	case TeloptOutputLineWidth: // 8
+		return "OUTPUT LINE WIDTH"
 
-	case TeloptRM:
-		return "REMOTE FLOW CONTROL"
+	case TeloptOutputPageSize: // 9
+		return "OUTPUT PAGE SIZE"
 
-	case TeloptNewEnviron:
-		return "NEW ENVIRON"
+	case TeloptOutputCRD: // 10
+		return "OUTPUT CARRIAGE RETURN DISPOSITION"
 
-	case TeloptTTYPE:
+	case TeloptOutputHTS: // 11
+		return "OUTPUT HORIZONTAL TAB STOPS"
+
+	case TeloptOutputHTD: // 12
+		return "OUTPUT HORIZONTAL TAB DISPOSITION"
+
+	case TeloptOutputFFD: // 13
+		return "OUTPUT FORMFEED DISPOSITION"
+
+	case TeloptOutputVTS: // 14
+		return "OUTPUT VERTICAL TABSTOPS"
+
+	case TeloptOutputVTD: // 15
+		return "OUTPUT VERTICAL TAB DISPOSITION"
+
+	case TeloptOutputLFD: // 16
+		return "OUTPUT LINEFEED DISPOSITION"
+
+	case TeloptExtendedAscii: // 17
+		return "EXTENDED ASCII"
+
+	case TeloptLogout: // 18
+		return "LOGOUT"
+
+	case TeloptByteMacro: // 19
+		return "Byte Macro"
+
+	case TeloptDataEntryTerminal: // 20
+		return "DATA ENTRY TERMINAL"
+
+	case TeloptSupdup: // 21
+		return "SUPDUP"
+
+	case TeloptSupdupOutput: // 22
+		return "SUPDUP OUTPUT"
+
+	case TeloptSendLocation: // 23
+		return "SEND LOCATION"
+
+	case TeloptTTYPE: // 24
 		return "TERMINAL TYPE"
 
-	case TeloptXDisplay:
-		return "X DISPLAY"
+	case TeloptEOR: // 25
+		return "END OF RECORD"
 
-	case TeloptOldEnviron:
-		return "OLD ENVIRON"
+	case TeloptTacacsUserID: // 26
+		return "TACACS USER IDENTIFICATION"
 
-	case TeloptAuth:
-		return "AUTHENTICATION"
+	case TeloptOutputMarking: // 27
+		return "OUTPUT MARKING"
 
-	case TeloptEncrypt:
-		return "ENCRYPT"
+	case TeloptTermLocationNum: // 28
+		return "TERMINAL LOCATION NUMBER"
 
-	case TeloptCompPort:
-		return "COM PORT CONTROL"
+	case TeloptTN3270Regime: // 29
+		return "TELNET 3270 REGIME"
 
-	case TeloptMSSP:
-		return "MSSP"
+	case TeloptX3PAD: // 30
+		return "X.3 PAD"
 
-	case TeloptMCCP2:
-		return "MCCP2"
+	case TeloptNAWS: // 31
+		return "NEGOTIATE ABOUT WINDOW SIZE"
 
-	case TeloptMCCP3:
-		return "MCCP3"
+	case TeloptTS: // 32
+		return "TERMINAL SPEED"
 
-	case TeloptMSP:
-		return "MSP"
+	case TeloptRM: // 33
+		return "REMOTE FLOW CONTROL"
 
-	case TeloptMXP:
-		return "MXP"
-
-	case TeloptATCP:
-		return "ATCP"
-
-	case TeloptGMCP:
-		return "GMCP"
-
-	case TeloptLineMode:
+	case TeloptLineMode: // 34
 		return "LINE MODE"
 
-	case TeloptEnd:
+	case TeloptXDisplay: // 35
+		return "X DISPLAY"
+
+	case TeloptOldEnviron: // 36
+		return "OLD ENVIRON"
+
+	case TeloptAuth: // 37
+		return "AUTHENTICATION"
+
+	case TeloptEncrypt: // 38
+		return "ENCRYPTION"
+
+	case TeloptNewEnviron: // 39
+		return "NEW ENVIRON"
+
+	case TeloptTN3270E: // 40
+		return "TN3270E"
+
+	case TeloptXAUTH: // 41
+		return "XAUTH"
+
+	case TeloptCHARSET: // 42
+		return "CHARSET"
+
+	case TeloptRSP: // 43
+		return "REMOTE SERIAL PORT"
+
+	case TeloptCompPort: // 44
+		return "COM PORT CONTROL"
+
+	case TeloptSLE: // 45
+		return "SUPPRESS LOCAL ECHO"
+
+	case TeloptStartTLS: // 46
+		return "START TLS"
+
+	case TeloptKermit: // 47
+		return "KERMIT"
+
+	case TeloptSendURL: // 48
+		return "SEND-URL"
+
+	case TeloptForwardX: // 49
+		return "FORWARD_X"
+
+	case TeloptMSSP: // 70
+		return "MSSP"
+
+	case TeloptMCCP2: // 86
+		return "MCCP2"
+
+	case TeloptMCCP3: // 87
+		return "MCCP3"
+
+	case TeloptMSP: // 90
+		return "MSP"
+
+	case TeloptMXP: // 91
+		return "MXP"
+
+	case TeloptPragmaLogon: // 138
+		return "PRAGMA LOGON"
+
+	case TeloptSspiLogon: // 139
+		return "SSPI LOGON"
+
+	case TeloptPragmaHeartbeat: // 140
+		return "PRAGMA HEARTBEAT"
+
+	case TeloptATCP: // 200
+		return "ATCP"
+
+	case TeloptGMCP: // 201
+		return "GMCP"
+
+	case TeloptEnd: // 255
 		return "END"
 	}
 
@@ -2672,8 +2814,8 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		}
 
 	case 'b', 'B':
-		sendIAC(remote, 243) // BREAK
-		if _, err := logw.Write([]byte{TelcmdIAC, 243}); err != nil {
+		sendIAC(remote, TelcmdBreak)
+		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdBreak}); err != nil {
 			log.Printf("Error writing BREAK to log: %v", err)
 		}
 
