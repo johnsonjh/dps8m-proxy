@@ -13,12 +13,15 @@ import (
 	"runtime"
 	"runtime/debug"
 	"strings"
+	"unicode/utf8"
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 var nameReplacements = []struct{ old, new string }{
 	{"pub/linux/libs/security", "..."},
+	{"github.com/", ""},
+	{"gitlab.com/", ""},
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,7 +39,7 @@ func printVersionTable() {
 		}
 
 		rows = append(rows, row{
-			Name:    sanitizeName(stripHost(info.Main.Path)),
+			Name:    sanitizeName(info.Main.Path),
 			Version: v,
 		})
 
@@ -49,7 +52,7 @@ func printVersionTable() {
 			}
 
 			rows = append(rows, row{
-				Name:    sanitizeName(stripHost(dep.Path)),
+				Name:    sanitizeName(dep.Path),
 				Version: v,
 			})
 		}
@@ -81,27 +84,52 @@ func printVersionTable() {
 		Version: compVer,
 	})
 
+	var componentName string
+	componentRuneWidthAdj := 0
+
+	if haveUTF8console {
+		componentName = "📦 Component"
+		componentRuneWidthAdj = 1
+	} else {
+		componentName = "Component"
+	}
+
+	componentVersion := "Version"
+
 	maxName, maxVer := 0, 0
 	for _, r := range rows {
-		if len(r.Name) > maxName {
-			maxName = len(r.Name)
-		}
+		nameLen := utf8.RuneCountInString(r.Name)
+		verLen := utf8.RuneCountInString(r.Version)
 
-		if len(r.Version) > maxVer {
-			maxVer = len(r.Version)
+		if nameLen > maxName {
+			maxName = nameLen
+		}
+		if verLen > maxVer {
+			maxVer = verLen
 		}
 	}
 
-	border := fmt.Sprintf(
-		"+=%s=+=%s=+\n", strings.Repeat("=", maxName), strings.Repeat("=", maxVer),
+	if nameLen := utf8.RuneCountInString(componentName); nameLen > maxName {
+		maxName = nameLen
+	}
+	if verLen := utf8.RuneCountInString(componentVersion); verLen > maxVer {
+		maxVer = verLen
+	}
+
+	border := fmt.Sprintf("+=%s=+=%s=+\r\n",
+		strings.Repeat("=", maxName), strings.Repeat("=", maxVer),
 	)
 
 	fmt.Print(border)
-	fmt.Printf("| %-*s | %-*s |\n", maxName, "Component", maxVer, "Version")
+
+	fmt.Printf("| %-*s | %-*s |\r\n",
+		maxName-componentRuneWidthAdj, componentName, maxVer, componentVersion)
+
 	fmt.Print(border)
 
 	for _, r := range rows {
-		fmt.Printf("| %-*s | %-*s |\n", maxName, r.Name, maxVer, r.Version)
+		fmt.Printf("| %-*s | %-*s |\r\n",
+			maxName, r.Name, maxVer, r.Version)
 	}
 
 	fmt.Print(border)
@@ -115,18 +143,6 @@ func sanitizeName(name string) string {
 	}
 
 	return name
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-func stripHost(path string) string {
-	for _, h := range []string{"github.com/", "gitlab.com/"} {
-		if strings.HasPrefix(path, h) {
-			return strings.TrimPrefix(path, h)
-		}
-	}
-
-	return path
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

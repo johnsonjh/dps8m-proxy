@@ -29,7 +29,8 @@ func runSignalHandlers() {
 		for s := range sigChan {
 			switch s {
 			case syscall.SIGHUP:
-				log.Println("SIGHUP received: Reloading whitelist and/or blacklist.")
+				log.Printf("%sSIGHUP received: Reloading whitelist and/or blacklist.\r\n",
+					bellPrefix())
 				reloadLists()
 
 			case syscall.SIGINT:

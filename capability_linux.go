@@ -62,8 +62,10 @@ func resolveExePath() string {
 
 func showCapabilityMessage(exePath string) {
 	oneTime.Do(func() {
-		log.Println("CAP_NET_BIND_SERVICE is required to bind privileged (<1024) ports")
-		log.Printf("Fix: sudo setcap 'cap_net_bind_service+ep' %q\n", exePath)
+		log.Printf("%sCAP_NET_BIND_SERVICE is required to bind privileged (<1024) ports\r\n",
+			warnPrefix())
+		log.Printf("%sFix: sudo setcap 'cap_net_bind_service+ep' %q\r\n",
+			toolPrefix(), exePath)
 	})
 }
 
