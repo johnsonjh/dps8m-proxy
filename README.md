@@ -190,16 +190,18 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-21 g89bc79e) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-21 g3af9bb8+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
 | golang.org/x/crypto       | v0.40.0 |
+| golang.org/x/sys          | v0.34.0 |
+| golang.org/x/term         | v0.33.0 |
 | kernel.org/.../libcap/cap | v1.2.76 |
 | kernel.org/.../libcap/psx | v1.2.76 |
 | Go compiler (gc)          | v1.24.5 |
@@ -266,6 +268,11 @@ further clarification:
 * The `k` command, which kills a connection, takes either a
   *Session ID* as an argument (shown when listing active connections
   with the `l` command) or `*`, which kills *all* active connections.
+
+If it is detected that you have a UTF-8 capable terminal, then some
+console output will be augmented with icons or emoji glyphs (and in
+a future version, UTF-8 box drawing symbols will be used for drawing
+tables).
 
 ### Signals
 
@@ -401,34 +408,34 @@ predecessor (code statistics 📈 provided by
 	</tr></thead>
 	<tbody><tr>
 		<th>Go</th>
-		<th>9</th>
-		<th>4586</th>
-		<th>1026</th>
-		<th>186</th>
-		<th>3374</th>
-		<th>946</th>
-		<th>118330</th>
-		<th>2249</th>
+		<th>11</th>
+		<th>5325</th>
+		<th>1149</th>
+		<th>237</th>
+		<th>3939</th>
+		<th>1012</th>
+		<th>133805</th>
+		<th>2516</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
-		<th>239</th>
-		<th>47</th>
-		<th>54</th>
-		<th>138</th>
-		<th>19</th>
-		<th>7383</th>
-		<th>162</th>
+		<th>269</th>
+		<th>52</th>
+		<th>61</th>
+		<th>156</th>
+		<th>31</th>
+		<th>8426</th>
+		<th>185</th>
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>475</th>
-		<th>95</th>
+		<th>480</th>
+		<th>96</th>
 		<th>0</th>
-		<th>380</th>
+		<th>384</th>
 		<th>0</th>
-		<th>20063</th>
-		<th>363</th>
+		<th>20315</th>
+		<th>367</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -452,14 +459,14 @@ predecessor (code statistics 📈 provided by
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
-		<th>13</th>
-		<th>5623</th>
-		<th>1228</th>
-		<th>374</th>
-		<th>4021</th>
-		<th>977</th>
-		<th>156285</th>
-		<th>2974</th>
+		<th>15</th>
+		<th>6397</th>
+		<th>1357</th>
+		<th>432</th>
+		<th>4608</th>
+		<th>1055</th>
+		<th>173055</th>
+		<th>3268</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -553,8 +560,8 @@ and that know what you’re doing!
   the [`.cross.sh`](.cross.sh) script), you’ll need to have the
   [ShellCheck](https://www.shellcheck.net/) and
   [`shfmt`](https://github.com/mvdan/sh) linters available.
-* Additionally, all modifications to the `Makefile` and `.cross.sh`
-  scripts must be tested against
+* Additionally, all modifications to the [`Makefile`](Makefile) and
+  [`.cross.sh`](.cross.sh) scripts must be tested against
   [`pdpmake`](https://frippery.org/make/)
   (with `PDPMAKE_POSIXLY_CORRECT` set) and
   [`yash`](https://magicant.github.io/yash/) to ensure POSIX
@@ -569,8 +576,8 @@ and that know what you’re doing!
 * It’s also recommended to (manually) use
   [`hunspell`](https://hunspell.github.io/) for spell
   checking—`codespell` doesn’t catch everything.
-* The `Makefile` provides a `lint` convenience target to help you run
-  all this stuff.
+* The [`Makefile`](Makefile) provides a `lint` convenience target to
+  help you run all this stuff.
 
 ## Security
 
