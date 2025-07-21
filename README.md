@@ -56,7 +56,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   make
   ```
 
-  * If you don’t have a (POSIX/GNU/BSD) `make` available for some
+  * If you don’t have a (POSIX) `make` available for some
     reason, then building with `go build` is sufficient.
 
   * A [`.cross.sh`](.cross.sh) cross‑compilation helper script is
@@ -74,7 +74,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   ```
 
   * Installations using `go install` download the required sources,
-    compile, and install the binary to `${GOEXE}/bin/proxy` (which will
+    compile, and install the binary to `${GOEXE}/proxy` (which will
     be `${HOME}/go/bin/proxy` for most users).
 
 ### Invocation
@@ -190,12 +190,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0 (2025-Jul-20 g583df5f) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-21 ga0c513a+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0  |
+| dps8m/proxy               | v0.0.0* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -427,7 +427,7 @@ predecessor (code statistics 📈 provided by
 		<th>0</th>
 		<th>380</th>
 		<th>0</th>
-		<th>20058</th>
+		<th>20046</th>
 		<th>363</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -458,7 +458,7 @@ predecessor (code statistics 📈 provided by
 		<th>374</th>
 		<th>4021</th>
 		<th>977</th>
-		<th>156280</th>
+		<th>156268</th>
 		<th>2974</th>
 	</tr></tfoot></table>
 
