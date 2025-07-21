@@ -36,6 +36,14 @@ proxy:
 		printf '\n%s\n\n' "💔 Build failed!"; exit 1; }
 
 ##############################################################################
+# Target: debug
+
+.PHONY: debug
+debug: tags
+	@printf '%s\n' "🐛 Setting flags for debug build..."
+	@env GOFLAGS="-tags=pprof" $(MAKE) proxy
+
+##############################################################################
 # Target: clean
 
 .PHONY: clean
