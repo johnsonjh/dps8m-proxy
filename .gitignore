@@ -7,6 +7,9 @@ block-*.txt
 cross.bin/
 deny-*.txt
 dps8m-proxy
+GPATH
+GRTAGS
+GTAGS
 issue-*.txt
 *.log
 log
@@ -14,4 +17,5 @@ log
 proxy
 ssh_host_ed25519_key.pem
 ssh_host_rsa_key.pem
+tags
 whitelist.txt

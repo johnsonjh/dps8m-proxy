@@ -21,7 +21,7 @@ SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
 # Target: all
 
 .PHONY: all
-all: proxy
+all: tags proxy
 
 ##############################################################################
 # Target: proxy
@@ -57,6 +57,7 @@ tidy: go.mod
 .PHONY: distclean
 distclean: clean
 	$(RM) ssh_host_ed25519_key.pem ssh_host_rsa_key.pem
+	$(RM) ./tags ./GPATH ./GRTAGS ./GTAGS
 	$(RM) -r ./log/
 
 ##############################################################################
@@ -180,6 +181,21 @@ codespell:
 	@$$(command -v codespell > /dev/null 2>&1) || \
 		{ printf '%s\n' "⚠️ codespell not found!"; exit 0; } ; \
 		set -x; codespell .
+
+##############################################################################
+# Target: tags
+
+# ctags: universal-ctags (https://ctags.io/) has Go support
+# gtags: GNU Global support via https://github.com/juntaki/gogtags
+
+.PHONY: tags ctags gtags GRPATH GRTAGS GTAGS
+tags ctags gtags GRPATH GRTAGS GTAGS:
+	@$$(command -v ctags > /dev/null 2>&1) && \
+		{ printf '%s\n' "🏷️ Building ctags database..."; } ; \
+		ctags -R . > /dev/null 2>&1 || true
+	@$$(command -v gogtags > /dev/null 2>&1) && \
+		{ printf '%s\n' "🏷️ Building gtags database..."; } ; \
+		gogtags > /dev/null 2>&1 || true
 
 ##############################################################################
 # Target: govet
