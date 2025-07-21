@@ -190,12 +190,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-21 gcb5cfde+) [linux/amd64]
+DPS8M Proxy v0.0.0 (2025-Jul-21 g89bc79e) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.0* |
+| dps8m/proxy               | v0.0.0  |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -281,20 +281,20 @@ further clarification:
   |    `SIGHUP` | Reloads *access control lists* (`‑‑whitelist`, `‑‑blacklist`)      |
   | `SIGDANGER` | Attempts to immediately free as much memory as possible (AIX‑only) |
 
-### Automation with systemd
+### Management with systemd
 
 If you’re running the proxy on a Linux system, you can use `systemd`
 to manage the service (while maintaining access to the interactive
 admin console).
 
 * The `systemd` integration requires `systemd` version **247** or
-  later (Nov 2020), and a *recent* version of
+  later (Nov. 2020), and a *recent* version of
   [`tmux`](https://github.com/tmux/tmux).
 []()
 
 []()
 * With minor changes 🔧 to the unit file, this setup can also work
-  with `systemd` as old as version **229** (Feb 2016).
+  with `systemd` as old as version **229** (Feb. 2016).
 * See the detailed instructions in the
   [`systemd/dps8m‑proxy.service`](systemd/dps8m-proxy.service)
   file for full installation instructions.
@@ -427,7 +427,7 @@ predecessor (code statistics 📈 provided by
 		<th>0</th>
 		<th>380</th>
 		<th>0</th>
-		<th>20061</th>
+		<th>20063</th>
 		<th>363</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -458,7 +458,7 @@ predecessor (code statistics 📈 provided by
 		<th>374</th>
 		<th>4021</th>
 		<th>977</th>
-		<th>156283</th>
+		<th>156285</th>
 		<th>2974</th>
 	</tr></tfoot></table>
 
