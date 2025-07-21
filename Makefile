@@ -85,7 +85,7 @@ lint check:
 
 .PHONY: reuse
 reuse:
-	@$$(command -v reuse > /dev/null 2>&1) || \
+	@command -v reuse > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ reuse not found"; exit 0; } ; \
 		set -x; reuse lint -q || reuse lint
 
@@ -115,7 +115,7 @@ gotidydiff: go.mod
 
 .PHONY: golangci-lint
 golangci-lint:
-	@$$(command -v golangci-lint > /dev/null 2>&1) || \
+	@command -v golangci-lint > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ golangci-lint not found!"; exit 0; } ; \
 		set -x; golangci-lint run
 
@@ -124,7 +124,7 @@ golangci-lint:
 
 .PHONY: staticcheck
 staticcheck:
-	@$$(command -v staticcheck > /dev/null 2>&1) || \
+	@command -v staticcheck > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ staticcheck not found!"; exit 0; } ; \
 		set -x; staticcheck .
 
@@ -133,7 +133,7 @@ staticcheck:
 
 .PHONY: revive
 revive:
-	@$$(command -v revive > /dev/null 2>&1) || \
+	@command -v revive > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ revive not found!"; exit 0; } ; \
 		set -x; revive ./...
 
@@ -142,7 +142,7 @@ revive:
 
 .PHONY: errcheck
 errcheck:
-	@$$(command -v errcheck > /dev/null 2>&1) || \
+	@command -v errcheck > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ errcheck not found!"; exit 0; } ; \
 		set -x; errcheck
 
@@ -151,7 +151,7 @@ errcheck:
 
 .PHONY: gofumpt
 gofumpt:
-	@$$(command -v gofumpt > /dev/null 2>&1) || \
+	@command -v gofumpt > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ gofumpt not found!"; exit 0; } ; \
 		set -x; gofumpt -d -e -s .
 
@@ -160,7 +160,7 @@ gofumpt:
 
 .PHONY: shfmt
 shfmt: .cross.sh
-	@$$(command -v shfmt > /dev/null 2>&1) || \
+	@command -v shfmt > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ shfmt not found!"; exit 0; } ; \
 		set -x; shfmt -bn -sr -fn -i 2 -s -d .cross.sh
 
@@ -169,7 +169,7 @@ shfmt: .cross.sh
 
 .PHONY: shellcheck
 shellcheck: .cross.sh
-	@$$(command -v shellcheck > /dev/null 2>&1) || \
+	@command -v shellcheck > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ shellcheck not found!"; exit 0; } ; \
 		set -x; shellcheck -s sh -o any,all .cross.sh
 
@@ -178,24 +178,30 @@ shellcheck: .cross.sh
 
 .PHONY: codespell
 codespell:
-	@$$(command -v codespell > /dev/null 2>&1) || \
+	@command -v codespell > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ codespell not found!"; exit 0; } ; \
 		set -x; codespell .
 
 ##############################################################################
 # Target: tags
 
-# ctags: universal-ctags (https://ctags.io/) has Go support
-# gtags: GNU Global support via https://github.com/juntaki/gogtags
+# gotags https://github.com/jstemmer/gotags
+# ctags: https://ctags.io/
+# gogtags: https://github.com/juntaki/gogtags
 
 .PHONY: tags ctags gtags GRPATH GRTAGS GTAGS
 tags ctags gtags GRPATH GRTAGS GTAGS:
-	@$$(command -v ctags > /dev/null 2>&1) && \
-		{ printf '%s\n' "🏷️ Building ctags database..."; } ; \
-		ctags -R . > /dev/null 2>&1 || true
-	@$$(command -v gogtags > /dev/null 2>&1) && \
-		{ printf '%s\n' "🏷️ Building gtags database..."; } ; \
-		gogtags > /dev/null 2>&1 || true
+	@$(RM) ./tags > /dev/null 2>&1
+	@command -v gotags > /dev/null 2>&1 && \
+		{ printf '%s\n' "🏷️ Building gotags database..."; \
+		  gotags -f tags -R . > /dev/null 2>&1 || true; } || true
+	@test -f ./tags || { \
+		command -v ctags > /dev/null 2>&1 && \
+			{ printf '%s\n' "🏷️ Building ctags database..."; \
+			  ctags -R . > /dev/null 2>&1 || true; } || true; } || true
+	@command -v gogtags > /dev/null 2>&1 && \
+		{ printf '%s\n' "🏷️ Building gogtags database..."; \
+		gogtags > /dev/null 2>&1 || true; } || true
 
 ##############################################################################
 # Target: govet
@@ -210,9 +216,9 @@ govet:
 .PHONY: doc docs
 README.md doc docs: README.md.tmpl proxy
 	@printf '%s\n\n' "📚 Generating README.md..."
-	@$$(command -v perl > /dev/null 2>&1) || \
+	@command -v perl > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ perl not found!"; exit 1; }
-	@$$(command -v scc > /dev/null 2>&1) || \
+	@command -v scc > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ scc not found!"; exit 1; }
 	$(CP) README.md.tmpl README.md
 	@printf '\n%s\n' "🐪 Perl: Inserting version info..."
@@ -237,7 +243,7 @@ README.md doc docs: README.md.tmpl proxy
 
 .PHONY: scc
 scc:
-	@$$(command -v scc > /dev/null 2>&1) || \
+	@command -v scc > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ scc not found!"; exit 1; } ; \
 		set -x; scc $(SCCFLAGS)
 
