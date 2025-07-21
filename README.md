@@ -190,7 +190,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.0* (2025-Jul-21 ga0c513a+) [linux/amd64]
+DPS8M Proxy v0.0.0* (2025-Jul-21 gcb5cfde+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -213,7 +213,7 @@ DPS8M Proxy v0.0.0* (2025-Jul-21 ga0c513a+) [linux/amd64]
 
 * If you want to listen on the regular SSH port of 22 (without
   running as `root`, which is strongly discouraged), on Linux systems
-  you can use `setcap` to allow the proxy to bind to low ports:
+  you can use `setcap` to allow the proxy to bind to privileged ports:
 
   ```sh
   sudo setcap 'cap_net_bind_service=+ep' "/path/to/proxy"
@@ -255,8 +255,8 @@ further clarification:
 
 * When the **Deny new connections** mode is active, all new connections
   are denied (and are served an appropriate `deny.txt` banner).  In
-  addition, any *logging* of new connection attempts, including any
-  denied and/or rejected connections, is suppressed.  This can be
+  addition, any *console logging* of new connection attempts, including
+  any denied and/or rejected connections, is suppressed.  This can be
   useful if the admin console is overwhelmed with logging activity
   (such as during bot attacks, busy periods, or when troubleshooting).
   Activating this mode can help reduce console noise, making it easier
@@ -427,7 +427,7 @@ predecessor (code statistics 📈 provided by
 		<th>0</th>
 		<th>380</th>
 		<th>0</th>
-		<th>20046</th>
+		<th>20061</th>
 		<th>363</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -458,7 +458,7 @@ predecessor (code statistics 📈 provided by
 		<th>374</th>
 		<th>4021</th>
 		<th>977</th>
-		<th>156268</th>
+		<th>156283</th>
 		<th>2974</th>
 	</tr></tfoot></table>
 

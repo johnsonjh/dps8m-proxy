@@ -169,7 +169,7 @@ are, hopefully, documented here:
 
 * If you want to listen on the regular SSH port of 22 (without
   running as `root`, which is strongly discouraged), on Linux systems
-  you can use `setcap` to allow the proxy to bind to low ports:
+  you can use `setcap` to allow the proxy to bind to privileged ports:
 
   ```sh
   sudo setcap 'cap_net_bind_service=+ep' "/path/to/proxy"
@@ -211,8 +211,8 @@ further clarification:
 
 * When the **Deny new connections** mode is active, all new connections
   are denied (and are served an appropriate `deny.txt` banner).  In
-  addition, any *logging* of new connection attempts, including any
-  denied and/or rejected connections, is suppressed.  This can be
+  addition, any *console logging* of new connection attempts, including
+  any denied and/or rejected connections, is suppressed.  This can be
   useful if the admin console is overwhelmed with logging activity
   (such as during bot attacks, busy periods, or when troubleshooting).
   Activating this mode can help reduce console noise, making it easier
