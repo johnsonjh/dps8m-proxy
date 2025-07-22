@@ -9,7 +9,7 @@
 #  This unit file is compatible with systemd version 247 (2020) but can
 #  be easily adapted to work with systemd versions as low as 229 (2016).
 #
-#  For compatibility with system versions lower than 247, just search
+#  For compatibility with systemd versions lower than 247, just search
 #  for the sub-string "Added in version" and remove the offending lines.
 #
 ###############################################################################
