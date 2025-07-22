@@ -21,27 +21,30 @@ SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
 # Target: all
 
 .PHONY: all
-all: tags proxy
+all: proxy
 
 ##############################################################################
 # Target: proxy
 
 .PHONY: proxy
-proxy:
+proxy: tags
 	@printf '%s\n' "🧩 Building proxy..."
 	@env GOTOOLCHAIN=auto CGO_ENABLED=0 go build -trimpath -v && \
 	test -x proxy 2> /dev/null && { \
-		printf '\n%s\n\n' "✅ Build successful:"; \
-		./proxy --version 2> /dev/null; exit 0; } || { \
+		printf '%s\n\n' "✅ Build successful!"; \
+		./proxy --version; exit 0; } || { \
 		printf '\n%s\n\n' "💔 Build failed!"; exit 1; }
 
 ##############################################################################
 # Target: debug
 
 .PHONY: debug
-debug: tags
-	@printf '%s\n' "🐛 Setting flags for debug build..."
-	@env GOFLAGS="-tags=debug" $(MAKE) proxy
+debug:
+	@(case "$${GOFLAGS:-}" in -tags=*) : ;; '') : ;; *) exit 1 ;; esac) || { \
+		printf '%s\n' "🚨 Custom GOFLAGS set; aborting build..."; \
+		exit 1; } || true
+	@printf '%s\n' "🐛 Enabling debug build flags..."
+	@env GOFLAGS="-tags=debug" $(MAKE) all
 
 ##############################################################################
 # Target: clean

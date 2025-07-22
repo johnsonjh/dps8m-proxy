@@ -168,6 +168,7 @@ var (
 	loggingWg                sync.WaitGroup
 	noBanner                 bool
 	noCompress               bool
+	noGops                   bool
 	noLog                    bool
 	showVersion              bool
 	shutdownOnce             sync.Once
@@ -358,6 +359,12 @@ func init() {
 		"debug", "d", false,
 		"Debug TELNET option negotiation")
 
+	if runtime.GOOS != "plan9" && runtime.GOOS != "windows" && runtime.GOOS != "wasip1" {
+		pflag.BoolVarP(&noGops,
+			"no-gops", "G", false,
+			"Disable the \"gops\" diagnostics agent\n   (See https://github.com/google/gops)")
+	}
+
 	pflag.StringVarP(&logDir,
 		"log-dir", "L", "./log",
 		"Base directory for logs")
@@ -425,7 +432,6 @@ func init() {
 	}
 
 	haveUTF8console = haveUTF8support()
-
 	debugInit()
 }
 
@@ -498,6 +504,10 @@ func main() {
 	default:
 		log.Fatalf("%sERROR: Invalid --compress-level: %s",
 			errorPrefix(), compressLevel) // LINTED: Fatalf
+	}
+
+	if !noGops {
+		gopsInit()
 	}
 
 	setupConsoleLogging()

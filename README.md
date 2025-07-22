@@ -62,10 +62,11 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   * A [`.cross.sh`](.cross.sh) cross‑compilation helper script is
     provided (which can be called with `make cross`) that attempts to
     build `proxy` binaries for *all* supported `GOOS` and `GOARCH`
-    combinations.  At the time of writing, 41 binaries are built for
-    12 operating systems (IBM AIX, Android, Apple macOS, Dragonfly BSD,
-    FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
-    Microsoft Windows) running on 13 different hardware architectures.
+    combinations.  At the time of writing, 41 usable binaries are
+    built for 12 operating systems (IBM AIX, Android, Apple macOS,
+    Dragonfly BSD, FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9,
+    Solaris, and Microsoft Windows) running on 13 different hardware
+    architectures.
 
 * You can also install this software using `go install` 📦:
 
@@ -94,6 +95,8 @@ Usage of ./proxy:
   -a, --alt-host string         Alternate TELNET target(s) [sshuser@host:port]
                                    (multiple allowed)
   -d, --debug                   Debug TELNET option negotiation
+  -G, --no-gops                 Disable the "gops" diagnostics agent
+                                   (See https://github.com/google/gops)
   -L, --log-dir string          Base directory for logs (default "./log")
   -o, --no-log                  Disable all session logging
                                    (for console logging see "--console-log")
@@ -190,12 +193,13 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.3 (2025-Jul-22 g1e01ac0) [linux/amd64]
+DPS8M Proxy v0.0.4* (2025-Jul-22 g4dc07fd+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.3  |
+| dps8m/proxy               | v0.0.4* |
+| google/gops               | v0.3.28 |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -408,44 +412,44 @@ predecessor (code statistics 📈 provided by
 	</tr></thead>
 	<tbody><tr>
 		<th>Go</th>
-		<th>12</th>
-		<th>5407</th>
-		<th>1169</th>
-		<th>251</th>
-		<th>3987</th>
-		<th>1021</th>
-		<th>136015</th>
-		<th>2554</th>
+		<th>14</th>
+		<th>5472</th>
+		<th>1182</th>
+		<th>276</th>
+		<th>4014</th>
+		<th>1029</th>
+		<th>138201</th>
+		<th>2571</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
-		<th>269</th>
+		<th>272</th>
 		<th>52</th>
 		<th>61</th>
-		<th>156</th>
-		<th>31</th>
-		<th>8426</th>
-		<th>185</th>
+		<th>159</th>
+		<th>32</th>
+		<th>8561</th>
+		<th>188</th>
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>480</th>
+		<th>481</th>
 		<th>96</th>
 		<th>0</th>
-		<th>384</th>
+		<th>385</th>
 		<th>0</th>
-		<th>20315</th>
-		<th>367</th>
+		<th>20326</th>
+		<th>368</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
-		<th>116</th>
-		<th>25</th>
-		<th>29</th>
-		<th>62</th>
-		<th>12</th>
-		<th>3048</th>
-		<th>78</th>
+		<th>49</th>
+		<th>13</th>
+		<th>22</th>
+		<th>14</th>
+		<th>0</th>
+		<th>1501</th>
+		<th>30</th>
 	</tr><tr>
 		<th>Systemd</th>
 		<th>1</th>
@@ -459,14 +463,14 @@ predecessor (code statistics 📈 provided by
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
-		<th>16</th>
-		<th>6479</th>
-		<th>1377</th>
-		<th>446</th>
-		<th>4656</th>
-		<th>1064</th>
-		<th>175265</th>
-		<th>3306</th>
+		<th>18</th>
+		<th>6481</th>
+		<th>1378</th>
+		<th>464</th>
+		<th>4639</th>
+		<th>1061</th>
+		<th>176050</th>
+		<th>3280</th>
 	</tr></tfoot></table>
 
 ## Future plans
