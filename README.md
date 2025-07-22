@@ -195,12 +195,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.5* (2025-Jul-22 g3daa393+) [linux/amd64]
+DPS8M Proxy v0.0.5 (2025-Jul-22 gf067e49) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.5* |
+| dps8m/proxy               | v0.0.5  |
 | arl/statsviz              | v0.6.0  |
 | google/gops               | v0.3.28 |
 | gorilla/websocket         | v1.5.3  |
