@@ -110,7 +110,7 @@ Usage of ./proxy:
                                    (default "normal")
   -x, --no-compress             Disable session and console log compression
   -p, --log-perm octal          Permissions (octal) for new log files
-                                   [ e.g., "600", "644"] (default "600")
+                                   [e.g., "600", "644"] (default "600")
   -r, --log-dir-perm octal      Permissions (octal) for new log directories
                                    [e.g., "755", "750"] (default "750")
   -i, --idle-max int            Maximum connection idle time allowed [seconds]
@@ -195,12 +195,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.5 (2025-Jul-22 gf067e49) [linux/amd64]
+DPS8M Proxy v0.0.6 (2025-Jul-22 gcc1c510) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.5  |
+| dps8m/proxy               | v0.0.6  |
 | arl/statsviz              | v0.6.0  |
 | google/gops               | v0.3.28 |
 | gorilla/websocket         | v1.5.3  |
@@ -422,7 +422,7 @@ predecessor (code statistics 📈 provided by
 		<th>252</th>
 		<th>4004</th>
 		<th>1024</th>
-		<th>136704</th>
+		<th>136703</th>
 		<th>2570</th>
 	</tr><tr>
 		<th>Makefile</th>
@@ -473,7 +473,7 @@ predecessor (code statistics 📈 provided by
 		<th>438</th>
 		<th>4638</th>
 		<th>1054</th>
-		<th>175577</th>
+		<th>175576</th>
 		<th>3287</th>
 	</tr></tfoot></table>
 
