@@ -349,6 +349,9 @@ func isEmojiRune(r rune) bool {
 	case r >= 0x1FA70 && r <= 0x1FAFF: // Extended pictographs
 		return true
 
+	case r >= 0x1F7E0 && r <= 0x1F7EB: // Geometric Shapes Extended
+		return true
+
 	default:
 		return false
 	}
