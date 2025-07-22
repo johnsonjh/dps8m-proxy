@@ -20,6 +20,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"time"
 
 	"github.com/arl/statsviz"
 )
@@ -57,7 +58,8 @@ func debugInit() {
 	})
 
 	go func() {
-		fmt.Printf("%s %sStarted debug HTTP server [http://host:%d/]\r\n",
+		time.Sleep(10 * time.Millisecond)
+		fmt.Printf("%s %sStarted debug HTTP server [:%d]\r\n",
 			nowStamp(), bugPrefix(), debugPort)
 		log.Print(http.ListenAndServe(fmt.Sprintf(":%d",
 			debugPort),

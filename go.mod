@@ -4,6 +4,7 @@ go 1.24.5
 
 require (
 	github.com/arl/statsviz v0.6.0
+	github.com/google/gops v0.3.28
 	github.com/klauspost/compress v1.18.0
 	github.com/spf13/pflag v1.0.7
 	github.com/ulikunitz/xz v0.5.12
