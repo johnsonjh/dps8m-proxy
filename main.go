@@ -400,7 +400,7 @@ func init() {
 
 	pflag.VarP((*octalPermValue)(&logPerm),
 		"log-perm", "p",
-		"Permissions (octal) for new log files\n   [ e.g., \"600\", \"644\"]")
+		"Permissions (octal) for new log files\n   [e.g., \"600\", \"644\"]")
 	pflag.Lookup("log-perm").DefValue = "\"600\""
 
 	pflag.VarP((*octalPermValue)(&logDirPerm),
