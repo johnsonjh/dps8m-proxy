@@ -28,7 +28,7 @@ export CGO_ENABLED GOTOOLCHAIN
 
 # shellcheck disable=SC2016
 _S=$(go tool dist list \
-  | grep -Ev '^js/wasm$|^wasip1/wasm$|^ios/|^android/(386|amd64|arm)$' \
+  | grep -Ev '^ios/|^android/(386|amd64|arm)$' \
   | awk 'BEGIN { FS="/" } /\// { print "GOOS="$1" GOARCH="$2 }' \
   | xargs -I{} printf '%s\n' '
       export {} && printf "🧩 %s/%s\n" "${GOOS:?}" "${GOARCH:?}" &&
