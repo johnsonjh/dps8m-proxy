@@ -501,20 +501,23 @@ func main() {
 	}
 
 	setupConsoleLogging()
-	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
-		log.Fatalf("%sERROR: Failed to create log directory: %v",
-			errorPrefix(), err) // LINTED: Fatalf
-	}
 
-	if p, err := filepath.EvalSymlinks(logDir); err == nil {
-		logDir = p
-	}
+	if !noLog || consoleLog != "" {
+		if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
+			log.Fatalf("%sERROR: Failed to create log directory: %v",
+				errorPrefix(), err) // LINTED: Fatalf
+		}
 
-	if p, err := filepath.Abs(logDir); err == nil {
-		logDir = p
-	}
+		if p, err := filepath.EvalSymlinks(logDir); err == nil {
+			logDir = p
+		}
 
-	logDir = filepath.Clean(logDir)
+		if p, err := filepath.Abs(logDir); err == nil {
+			logDir = p
+		}
+
+		logDir = filepath.Clean(logDir)
+	}
 
 	reloadLists()
 

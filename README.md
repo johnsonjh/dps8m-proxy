@@ -190,12 +190,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.2* (2025-Jul-21 g2ac02d8+) [linux/amd64]
+DPS8M Proxy v0.0.3* (2025-Jul-22 g819156c+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.2* |
+| dps8m/proxy               | v0.0.3* |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -409,13 +409,13 @@ predecessor (code statistics 📈 provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>12</th>
-		<th>5404</th>
-		<th>1168</th>
+		<th>5407</th>
+		<th>1169</th>
 		<th>251</th>
-		<th>3985</th>
-		<th>1018</th>
-		<th>135967</th>
-		<th>2551</th>
+		<th>3987</th>
+		<th>1021</th>
+		<th>136015</th>
+		<th>2554</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -460,13 +460,13 @@ predecessor (code statistics 📈 provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>16</th>
-		<th>6476</th>
-		<th>1376</th>
+		<th>6479</th>
+		<th>1377</th>
 		<th>446</th>
-		<th>4654</th>
-		<th>1061</th>
-		<th>175217</th>
-		<th>3303</th>
+		<th>4656</th>
+		<th>1064</th>
+		<th>175265</th>
+		<th>3306</th>
 	</tr></tfoot></table>
 
 ## Future plans
