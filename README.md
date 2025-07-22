@@ -193,12 +193,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.4 (2025-Jul-22 g5c43905) [linux/amd64]
+DPS8M Proxy v0.0.5* (2025-Jul-22 g4b77bca+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.4  |
+| dps8m/proxy               | v0.0.5* |
 | google/gops               | v0.3.28 |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
@@ -433,13 +433,13 @@ predecessor (code statistics 📈 provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>481</th>
-		<th>96</th>
+		<th>500</th>
+		<th>99</th>
 		<th>0</th>
-		<th>385</th>
+		<th>401</th>
 		<th>0</th>
-		<th>20326</th>
-		<th>368</th>
+		<th>21733</th>
+		<th>384</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -464,13 +464,13 @@ predecessor (code statistics 📈 provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>18</th>
-		<th>6481</th>
-		<th>1378</th>
+		<th>6500</th>
+		<th>1381</th>
 		<th>464</th>
-		<th>4639</th>
+		<th>4655</th>
 		<th>1061</th>
-		<th>176044</th>
-		<th>3280</th>
+		<th>177451</th>
+		<th>3296</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -595,9 +595,28 @@ and that know what you’re doing!
   [email](mailto:contact-project+dps8m-proxy-71601954-issue-@incoming.gitlab.com)
   to the author).
 
-## License
+## Licenses
 
 * The `proxy` program is made available under the terms of the
-  [MIT License](https://opensource.org/license/mit), with some bundled
-  example and miscellaneous files distributed under the terms of the
+  [MIT License](https://opensource.org/license/mit).
+
+* Some bundled example and miscellaneous files distributed under the
+  terms of the
   [MIT No Attribution License](https://opensource.org/license/mit-0).
+
+* All required, optional, and indirect dependencies are licensed under
+  permissive open-source licenses:
+
+  |                                                                     Dependency | License      |
+  |-------------------------------------------------------------------------------:|:-------------|
+  |                                [arl/statsviz](https://github.com/arl/statsviz) | MIT          |
+  |                                  [google/gops](https://github.com/google/gops) | BSD-3-Clause |
+  |                      [gorilla/websocket](https://github.com/gorilla/websocket) | BSD-2-Clause |
+  |                    [klauspost/compress](https://github.com/klauspost/compress) | BSD-3-Clause |
+  | [libcap/cap](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/cap) | BSD-3-Clause |
+  | [libcap/psx](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/psx) | BSD-3-Clause |
+  |                                  [spf13/pflag](https://github.com/spf13/pflag) | BSD-3-Clause |
+  |                                [ulikunitz/xz](https://github.com/ulikunitz/xz) | BSD-3-Clause |
+  |                                                [x/crypto](golang.org/x/crypto) | BSD-3-Clause |
+  |                                                      [x/sys](golang.org/x/sys) | BSD-3-Clause |
+  |                                                    [x/term](golang.org/x/term) | BSD-3-Clause |
