@@ -94,28 +94,30 @@ Usage of ./proxy:
                                    (default "127.0.0.1:6180")
   -a, --alt-host string         Alternate TELNET target(s) [sshuser@host:port]
                                    (multiple allowed)
-  -d, --debug                   Debug TELNET option negotiation
-  -G, --no-gops                 Disable the "gops" diagnostics agent
+      --debug-telnet            Debug TELNET option negotiation
+      --debug-server string     Enable HTTP debug server listening address
+                                   [e.g., ":6060", "[::1]:6060"]
+  -g, --no-gops                 Disable the "gops" diagnostic agent
                                    (See https://github.com/google/gops)
-  -L, --log-dir string          Base directory for logs (default "./log")
+  -d, --log-dir string          Base directory for logs (default "./log")
   -o, --no-log                  Disable all session logging
                                    (for console logging see "--console-log")
   -c, --console-log string      Enable console logging ["quiet", "noquiet"]
-  -C, --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
+  -s, --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
                                    (default "gzip")
-  -s, --compress-level string   Compression level for gzip and zstd algorithms
+  -z, --compress-level string   Compression level for gzip and zstd algorithms
                                    ["fast", "normal", "high"]
                                    (default "normal")
   -x, --no-compress             Disable session and console log compression
   -p, --log-perm octal          Permissions (octal) for new log files
                                    [ e.g., "600", "644"] (default "600")
-  -P, --log-dir-perm octal      Permissions (octal) for new log directories
+  -r, --log-dir-perm octal      Permissions (octal) for new log directories
                                    [e.g., "755", "750"] (default "750")
   -i, --idle-max int            Maximum connection idle time allowed [seconds]
   -m, --time-max int            Maximum connection link time allowed [seconds]
   -b, --blacklist string        Enable blacklist [filename] (no default)
   -w, --whitelist string        Enable whitelist [filename] (no default)
-  -D, --ssh-delay float         Delay for incoming SSH connections
+  -e, --ssh-delay float         Delay for incoming SSH connections
                                    ["0.0" to "30.0" seconds] (no default)
   -v, --version                 Show version information
 ```
@@ -193,13 +195,15 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.5* (2025-Jul-22 g4b77bca+) [linux/amd64]
+DPS8M Proxy v0.0.5* (2025-Jul-22 g3daa393+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
 | dps8m/proxy               | v0.0.5* |
+| arl/statsviz              | v0.6.0  |
 | google/gops               | v0.3.28 |
+| gorilla/websocket         | v1.5.3  |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
@@ -412,24 +416,24 @@ predecessor (code statistics 📈 provided by
 	</tr></thead>
 	<tbody><tr>
 		<th>Go</th>
-		<th>14</th>
-		<th>5472</th>
-		<th>1182</th>
-		<th>276</th>
-		<th>4014</th>
-		<th>1029</th>
-		<th>138195</th>
-		<th>2571</th>
+		<th>12</th>
+		<th>5429</th>
+		<th>1173</th>
+		<th>252</th>
+		<th>4004</th>
+		<th>1024</th>
+		<th>136704</th>
+		<th>2570</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
-		<th>272</th>
-		<th>52</th>
-		<th>61</th>
-		<th>159</th>
-		<th>32</th>
-		<th>8561</th>
-		<th>188</th>
+		<th>261</th>
+		<th>50</th>
+		<th>59</th>
+		<th>152</th>
+		<th>30</th>
+		<th>8190</th>
+		<th>180</th>
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
@@ -438,7 +442,7 @@ predecessor (code statistics 📈 provided by
 		<th>0</th>
 		<th>401</th>
 		<th>0</th>
-		<th>21733</th>
+		<th>21720</th>
 		<th>384</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -458,19 +462,19 @@ predecessor (code statistics 📈 provided by
 		<th>105</th>
 		<th>67</th>
 		<th>0</th>
-		<th>7461</th>
+		<th>7462</th>
 		<th>134</th>
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
-		<th>18</th>
-		<th>6500</th>
-		<th>1381</th>
-		<th>464</th>
-		<th>4655</th>
-		<th>1061</th>
-		<th>177451</th>
-		<th>3296</th>
+		<th>16</th>
+		<th>6446</th>
+		<th>1370</th>
+		<th>438</th>
+		<th>4638</th>
+		<th>1054</th>
+		<th>175577</th>
+		<th>3287</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -604,8 +608,8 @@ and that know what you’re doing!
   terms of the
   [MIT No Attribution License](https://opensource.org/license/mit-0).
 
-* All required, optional, and indirect dependencies are licensed under
-  permissive open-source licenses:
+* All direct and indirect dependencies are licensed under permissive
+  open-source licenses:
 
   |                                                                     Dependency | License      |
   |-------------------------------------------------------------------------------:|:-------------|

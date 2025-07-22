@@ -22,10 +22,13 @@ import (
 	"encoding/hex"
 	"encoding/pem"
 	"errors"
+	_ "expvar"
 	"fmt"
 	"io"
 	"log"
 	"net"
+	"net/http"
+	_ "net/http/pprof" //nolint:gosec
 	"os"
 	"path/filepath"
 	"regexp"
@@ -38,6 +41,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/arl/statsviz"
 	"github.com/klauspost/compress/gzip"
 	"github.com/klauspost/compress/zstd"
 	"github.com/spf13/pflag"
@@ -161,6 +165,7 @@ var (
 	consoleLog               string
 	isConsoleLogQuiet        bool
 	debugNegotiation         bool
+	debugAddr                string
 	denyNewConnectionsMode   atomic.Bool
 	gracefulShutdownMode     atomic.Bool
 	idleMax                  int
@@ -355,18 +360,22 @@ func init() {
 		"alt-host", "a",
 		"Alternate TELNET target(s) [sshuser@host:port]\n   (multiple allowed)")
 
-	pflag.BoolVarP(&debugNegotiation,
-		"debug", "d", false,
+	pflag.BoolVar(&debugNegotiation,
+		"debug-telnet", false,
 		"Debug TELNET option negotiation")
 
-	if runtime.GOOS != "plan9" && runtime.GOOS != "windows" && runtime.GOOS != "wasip1" {
+	pflag.StringVar(&debugAddr,
+		"debug-server", "",
+		"Enable HTTP debug server listening address\n   [e.g., \":6060\", \"[::1]:6060\"]")
+
+	if gopsEnabled {
 		pflag.BoolVarP(&noGops,
-			"no-gops", "G", false,
-			"Disable the \"gops\" diagnostics agent\n   (See https://github.com/google/gops)")
+			"no-gops", "g", false,
+			"Disable the \"gops\" diagnostic agent\n   (See https://github.com/google/gops)")
 	}
 
 	pflag.StringVarP(&logDir,
-		"log-dir", "L", "./log",
+		"log-dir", "d", "./log",
 		"Base directory for logs")
 
 	pflag.BoolVarP(&noLog,
@@ -378,11 +387,11 @@ func init() {
 		"Enable console logging [\"quiet\", \"noquiet\"]")
 
 	pflag.StringVarP(&compressAlgo,
-		"compress-algo", "C", "gzip",
+		"compress-algo", "s", "gzip",
 		"Compression algorithm [\"gzip\", \"xz\", \"zstd\"]\n  ")
 
 	pflag.StringVarP(&compressLevel,
-		"compress-level", "s", "normal",
+		"compress-level", "z", "normal",
 		"Compression level for gzip and zstd algorithms\n   [\"fast\", \"normal\", \"high\"]\n  ")
 
 	pflag.BoolVarP(&noCompress,
@@ -395,7 +404,7 @@ func init() {
 	pflag.Lookup("log-perm").DefValue = "\"600\""
 
 	pflag.VarP((*octalPermValue)(&logDirPerm),
-		"log-dir-perm", "P",
+		"log-dir-perm", "r",
 		"Permissions (octal) for new log directories\n   [e.g., \"755\", \"750\"]")
 	pflag.Lookup("log-dir-perm").DefValue = "\"750\""
 
@@ -416,7 +425,7 @@ func init() {
 		"Enable whitelist [filename] (no default)")
 
 	pflag.Float64VarP(&sshDelay,
-		"ssh-delay", "D", 0,
+		"ssh-delay", "e", 0,
 		"Delay for incoming SSH connections\n   [\"0.0\" to \"30.0\" seconds] (no default)")
 
 	pflag.BoolVarP(&showVersion,
@@ -432,7 +441,6 @@ func init() {
 	}
 
 	haveUTF8console = haveUTF8support()
-	debugInit()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -508,6 +516,10 @@ func main() {
 
 	if !noGops {
 		gopsInit()
+	}
+
+	if debugAddr != "" {
+		debugInit(debugAddr)
 	}
 
 	setupConsoleLogging()
@@ -744,6 +756,42 @@ func main() {
 	}()
 
 	select {}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func debugInit(addr string) {
+	mux := http.NewServeMux()
+
+	_ = statsviz.Register(mux)
+
+	mux.Handle("/debug/pprof/", http.DefaultServeMux)
+
+	mux.Handle("/debug/vars", http.DefaultServeMux)
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		_, _ = fmt.Fprint(w, `
+        <html>
+        <head><title>DPS8M Proxy Debugging Dashboard</title></head>
+        <body>
+            <h1>Debug Dashboard</h1>
+            <ul>
+                <li><a href="/debug/vars">expvar</a></li>
+                <li><a href="/debug/pprof/">pprof</a></li>
+                <li><a href="/debug/statsviz/">statsviz</a></li>
+            </ul>
+        </body>
+        </html>
+    `)
+	})
+
+	log.Printf("%sStarting debug HTTP server on %s",
+		bugPrefix(), addr)
+	go func() {
+		log.Fatalf("%s%v", // LINTED: Fatalf
+			errorPrefix(), http.ListenAndServe(addr, mux)) //nolint:gosec
+	}()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1453,6 +1501,13 @@ func listConfiguration() {
 
 	updateMaxLength(s8)
 
+	debugHTTPStr := "disabled"
+	if debugAddr != "" {
+		debugHTTPStr = debugAddr
+	}
+
+	updateMaxLength("Debug HTTP Server: " + debugHTTPStr)
+
 	if blacklistFile == "" && len(blacklistedNetworks) == 0 { //nolint:gocritic
 		updateMaxLength("Blacklist: 0 entries active")
 	} else if whitelistFile != "" && blacklistFile == "" {
@@ -1619,6 +1674,12 @@ func listConfiguration() {
 
 	b.WriteString(separator)
 
+	debugHTTP := "disabled"
+	if debugAddr != "" {
+		debugHTTP = debugAddr
+	}
+
+	printRow(&b, "Debug HTTP Server: "+debugHTTP)
 	printRow(&b, "Uptime: "+uptimeString)
 	printRow(&b, "Memory: "+memStatsStr)
 	printRow(&b, fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)",

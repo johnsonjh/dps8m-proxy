@@ -36,17 +36,6 @@ proxy: tags
 		printf '\n%s\n\n' "💔 Build failed!"; exit 1; }
 
 ##############################################################################
-# Target: debug
-
-.PHONY: debug
-debug:
-	@(case "$${GOFLAGS:-}" in -tags=*) : ;; '') : ;; *) exit 1 ;; esac) || { \
-		printf '%s\n' "🚨 Custom GOFLAGS set; aborting build..."; \
-		exit 1; } || true
-	@printf '%s\n' "🐛 Enabling debug build flags..."
-	@env GOFLAGS="-tags=debug" $(MAKE) all
-
-##############################################################################
 # Target: clean
 
 .PHONY: clean
