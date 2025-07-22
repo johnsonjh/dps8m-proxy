@@ -41,7 +41,7 @@ proxy:
 .PHONY: debug
 debug: tags
 	@printf '%s\n' "🐛 Setting flags for debug build..."
-	@env GOFLAGS="-tags=pprof" $(MAKE) proxy
+	@env GOFLAGS="-tags=debug" $(MAKE) proxy
 
 ##############################################################################
 # Target: clean
