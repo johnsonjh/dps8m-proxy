@@ -193,12 +193,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.4* (2025-Jul-22 g4dc07fd+) [linux/amd64]
+DPS8M Proxy v0.0.4 (2025-Jul-22 g5c43905) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.4* |
+| dps8m/proxy               | v0.0.4  |
 | google/gops               | v0.3.28 |
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
@@ -418,7 +418,7 @@ predecessor (code statistics 📈 provided by
 		<th>276</th>
 		<th>4014</th>
 		<th>1029</th>
-		<th>138201</th>
+		<th>138195</th>
 		<th>2571</th>
 	</tr><tr>
 		<th>Makefile</th>
@@ -469,7 +469,7 @@ predecessor (code statistics 📈 provided by
 		<th>464</th>
 		<th>4639</th>
 		<th>1061</th>
-		<th>176050</th>
+		<th>176044</th>
 		<th>3280</th>
 	</tr></tfoot></table>
 
