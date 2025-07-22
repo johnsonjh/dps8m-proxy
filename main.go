@@ -123,10 +123,12 @@ const (
 	TeloptSendURL           = 48  // SEND-URL
 	TeloptForwardX          = 49  // FORWARD_X
 	TeloptMSSP              = 70  // MUD Server Status Protocol
+	TeloptMCCP              = 85  // MUD Client Compression Protocol
 	TeloptMCCP2             = 86  // MUD Client Compression Protocol 2
 	TeloptMCCP3             = 87  // MUD Client Compression Protocol 3
 	TeloptMSP               = 90  // MUD Sound Protocol
 	TeloptMXP               = 91  // MUD Extension Protocol
+	TeloptZMP               = 93  // Zenith MUD Protocol
 	TeloptPragmaLogon       = 138 // TELOPT PRAGMA LOGON
 	TeloptSspiLogon         = 139 // TELOPT SSPI LOGON
 	TeloptPragmaHeartbeat   = 140 // TELOPT PRAGMA HEARTBEAT
@@ -3528,6 +3530,9 @@ func optName(b byte) string {
 	case TeloptMSSP: // 70
 		return "MSSP"
 
+	case TeloptMCCP: // 85
+		return "MCCP"
+
 	case TeloptMCCP2: // 86
 		return "MCCP2"
 
@@ -3539,6 +3544,9 @@ func optName(b byte) string {
 
 	case TeloptMXP: // 91
 		return "MXP"
+
+	case TeloptZMP: // 93
+		return "ZMP"
 
 	case TeloptPragmaLogon: // 138
 		return "PRAGMA LOGON"
