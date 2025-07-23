@@ -1899,8 +1899,8 @@ func sendNaws(conn *Connection, width, height uint32) {
 
 	packet := []byte{
 		TelcmdIAC, TelcmdSB, TeloptNAWS,
-		byte(width >> 8), byte(width & 0xFF),
-		byte(height >> 8), byte(height & 0xFF),
+		byte(width >> 8), byte(width & 0xff),
+		byte(height >> 8), byte(height & 0xff),
 		TelcmdIAC, TelcmdSE,
 	}
 
@@ -1919,7 +1919,8 @@ func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
 
 	switch keyType {
 	case "rsa":
-		rsaKey, err := rsa.GenerateKey(rand.Reader, 2048)
+		const rsaBits = 2048
+		rsaKey, err := rsa.GenerateKey(rand.Reader, rsaBits)
 		if err != nil {
 			return nil, err
 		}
@@ -1929,8 +1930,9 @@ func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
 			Bytes: x509.MarshalPKCS1PrivateKey(rsaKey),
 		}
 
+		const rsaPerm = 0o600
 		data := pem.EncodeToMemory(block)
-		if err := os.WriteFile(path, data, 0o600); err != nil {
+		if err := os.WriteFile(path, data, rsaPerm); err != nil {
 			return nil, err
 		}
 
@@ -1947,9 +1949,10 @@ func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
 			return nil, err
 		}
 
+		const ed25519perm = 0o600
 		block := &pem.Block{Type: "PRIVATE KEY", Bytes: pkcs8}
 		data := pem.EncodeToMemory(block)
-		if err := os.WriteFile(path, data, 0o600); err != nil {
+		if err := os.WriteFile(path, data, ed25519perm); err != nil {
 			return nil, err
 		}
 
@@ -2534,7 +2537,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					return
 				}
 
-				if buf[0] == 0x1D { // Ctrl-]
+				if buf[0] == 0x1d { // Ctrl-]
 					if err := channel.Close(); err != nil {
 						log.Printf("%sError closing channel for %s: %v",
 							warnPrefix(), conn.ID, err)
