@@ -211,7 +211,7 @@ func thumbsUpPrefix() string {
 
 func greenDotPrefix() string {
 	if haveUTF8console {
-		return "🟢 " // Good
+		return "🟢 " // Validate/Initiate/Altroute
 	}
 
 	return ""
@@ -222,16 +222,6 @@ func greenDotPrefix() string {
 func yellowDotPrefix() string {
 	if haveUTF8console {
 		return "🟡 " // Kill/Teardown/Detach
-	}
-
-	return ""
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-func blueDotPrefix() string {
-	if haveUTF8console {
-		return "🔵 " // Validate
 	}
 
 	return ""
@@ -338,7 +328,6 @@ func isEmojiRune(r rune) bool {
 		0x1f6a8, // 🚨
 		0x1f7e1, // 🟡
 		0x1f7e2, // 🟢
-		0x1f7e3, // 🔵
 		0x1f95a, // 🥚
 		0x26a0,  // ⚠️
 		0x274c:  // ❌
