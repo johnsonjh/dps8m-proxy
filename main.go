@@ -384,12 +384,12 @@ func init() {
 		"alt-host", "a",
 		"Alternate TELNET target(s) [sshuser@host:port]\n   (multiple allowed)")
 
-	pflag.BoolVar(&debugNegotiation,
-		"debug-telnet", false,
+	pflag.BoolVarP(&debugNegotiation,
+		"debug-telnet", "k", false,
 		"Debug TELNET option negotiation")
 
-	pflag.StringVar(&debugAddr,
-		"debug-server", "",
+	pflag.StringVarP(&debugAddr,
+		"debug-server", "y", "",
 		"Enable HTTP debug server listening address\n   [e.g., \":6060\", \"[::1]:6060\"]")
 
 	if gopsEnabled {
@@ -433,16 +433,16 @@ func init() {
 	pflag.Lookup("log-dir-perm").DefValue = "\"750\""
 
 	if dbEnabled {
-		pflag.StringVar(&dbPath,
-			"db-file", "",
+		pflag.StringVarP(&dbPath,
+			"db-file", "u", "",
 			"Path to file for persistent statistics storage\n   (no default)")
 
-		pflag.Uint64Var(&dbTime,
-			"db-time", 30,
+		pflag.Uint64VarP(&dbTime,
+			"db-time", "j", 30,
 			"Elapsed seconds between database updates\n   [0 to disable periodic writes]")
 
-		pflag.Var((*octalPermValue)(&dbPerm),
-			"db-perm",
+		pflag.VarP((*octalPermValue)(&dbPerm),
+			"db-perm", "f",
 			"Permissions (octal) for new database files\n   [e.g., \"600\", \"644\"]")
 		pflag.Lookup("log-perm").DefValue = "\"600\""
 	}
@@ -1136,69 +1136,128 @@ func showHelp() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func showStats() {
-	type row struct{ Name, Value, Lifetime string }
-
-	rows := []row{
-		{"TELNET Total Connections", fmt.Sprintf("%d", telnetConnectionsTotal.Load()), fmt.Sprintf("%d", lifetimeTelnetConnectionsTotal.Load()+telnetConnectionsTotal.Load())},           //nolint:lll
-		{"* TELNET Alt-Host Routings", fmt.Sprintf("%d", altHostRoutesTotal.Load()), fmt.Sprintf("%d", lifetimeAltHostRoutesTotal.Load()+altHostRoutesTotal.Load())},                     //nolint:lll
-		{"* TELNET Connection Failures", fmt.Sprintf("%d", telnetFailuresTotal.Load()), fmt.Sprintf("%d", lifetimeTelnetFailuresTotal.Load()+telnetFailuresTotal.Load())},                //nolint:lll
-		{"Peak Concurrent Connections", fmt.Sprintf("%d", peakUsersTotal.Load()), fmt.Sprintf("%d", lifetimePeakUsersTotal.Load())},                                                      //nolint:lll
-		{"Total Proxy Traffic Inbound", formatBytes(trafficOutTotal.Load()), formatBytes(lifetimeTrafficOutTotal.Load() + trafficOutTotal.Load())},                                       //nolint:lll
-		{"Total Proxy Traffic Outbound", formatBytes(trafficInTotal.Load()), formatBytes(lifetimeTrafficInTotal.Load() + trafficInTotal.Load())},                                         //nolint:lll
-		{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load()), fmt.Sprintf("%d", lifetimeSSHconnectionsTotal.Load()+sshConnectionsTotal.Load())},                       //nolint:lll
-		{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load()), fmt.Sprintf("%d", lifetimeSSHsessionsTotal.Load()+sshSessionsTotal.Load())},                                  //nolint:lll
-		{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load()), fmt.Sprintf("%d", lifetimeMonitorSessionsTotal.Load()+monitorSessionsTotal.Load())},                //nolint:lll
-		{"* SSH Session Request Timeout", fmt.Sprintf("%d", sshRequestTimeoutTotal.Load()), fmt.Sprintf("%d", lifetimeSSHrequestTimeoutTotal.Load()+sshRequestTimeoutTotal.Load())},      //nolint:lll
-		{"* SSH Illegal Request (SFTP)", fmt.Sprintf("%d", sshIllegalSubsystemTotal.Load()), fmt.Sprintf("%d", lifetimeSSHillegalSubsystemTotal.Load()+sshIllegalSubsystemTotal.Load())}, //nolint:lll
-		{"* SSH Illegal Request (SCP/EXEC)", fmt.Sprintf("%d", sshExecRejectedTotal.Load()), fmt.Sprintf("%d", lifetimeSSHexecRejectedTotal.Load()+sshExecRejectedTotal.Load())},         //nolint:lll
-		{"* SSH Accept Errors", fmt.Sprintf("%d", acceptErrorsTotal.Load()), fmt.Sprintf("%d", lifetimeAcceptErrorsTotal.Load()+acceptErrorsTotal.Load())},                               //nolint:lll
-		{"* SSH Handshake Errors", fmt.Sprintf("%d", sshHandshakeFailedTotal.Load()), fmt.Sprintf("%d", lifetimeSSHhandshakeFailedTotal.Load()+sshHandshakeFailedTotal.Load())},          //nolint:lll
-		{"Connections Killed by Admin", fmt.Sprintf("%d", adminKillsTotal.Load()), fmt.Sprintf("%d", lifetimeAdminKillsTotal.Load()+adminKillsTotal.Load())},                             //nolint:lll
-		{"Connections Killed for Idle Time", fmt.Sprintf("%d", idleKillsTotal.Load()), fmt.Sprintf("%d", lifetimeIdleKillsTotal.Load()+idleKillsTotal.Load())},                           //nolint:lll
-		{"Connections Killed for Max Time", fmt.Sprintf("%d", timeKillsTotal.Load()), fmt.Sprintf("%d", lifetimeTimeKillsTotal.Load()+timeKillsTotal.Load())},                            //nolint:lll
-		{"Connections Killed via Delay", fmt.Sprintf("%d", delayAbandonedTotal.Load()), fmt.Sprintf("%d", lifetimeDelayAbandonedTotal.Load()+delayAbandonedTotal.Load())},                //nolint:lll
-		{"Blacklist Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load()), fmt.Sprintf("%d", lifetimeRejectedTotal.Load()+rejectedTotal.Load())},                                //nolint:lll
-		{"Whitelist Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load()), fmt.Sprintf("%d", lifetimeExemptedTotal.Load()+exemptedTotal.Load())},                                //nolint:lll
-	}
-
-	maxName := len("Statistic")
-	maxVal := len("Value")
-	maxLifetime := len("Lifetime")
-
-	for _, r := range rows {
-		if len(r.Name) > maxName {
-			maxName = len(r.Name)
+	if dbPath == "" {
+		type row struct{ Name, Value string }
+		rows := []row{
+			{"TELNET Total Connections", fmt.Sprintf("%d", telnetConnectionsTotal.Load())},
+			{"* TELNET Alt-Host Routings", fmt.Sprintf("%d", altHostRoutesTotal.Load())},
+			{"* TELNET Connection Failures", fmt.Sprintf("%d", telnetFailuresTotal.Load())},
+			{"Peak Concurrent Connections", fmt.Sprintf("%d", peakUsersTotal.Load())},
+			{"Total Proxy Traffic Inbound", formatBytes(trafficOutTotal.Load())},
+			{"Total Proxy Traffic Outbound", formatBytes(trafficInTotal.Load())},
+			{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load())},
+			{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load())},
+			{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load())},
+			{"* SSH Session Request Timeout", fmt.Sprintf("%d", sshRequestTimeoutTotal.Load())},
+			{"* SSH Illegal Request (SFTP)", fmt.Sprintf("%d", sshIllegalSubsystemTotal.Load())},
+			{"* SSH Illegal Request (SCP/EXEC)", fmt.Sprintf("%d", sshExecRejectedTotal.Load())},
+			{"* SSH Accept Errors", fmt.Sprintf("%d", acceptErrorsTotal.Load())},
+			{"* SSH Handshake Errors", fmt.Sprintf("%d", sshHandshakeFailedTotal.Load())},
+			{"Connections Killed by Admin", fmt.Sprintf("%d", adminKillsTotal.Load())},
+			{"Connections Killed for Idle Time", fmt.Sprintf("%d", idleKillsTotal.Load())},
+			{"Connections Killed for Max Time", fmt.Sprintf("%d", timeKillsTotal.Load())},
+			{"Connections Killed via Delay", fmt.Sprintf("%d", delayAbandonedTotal.Load())},
+			{"Blacklist Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load())},
+			{"Whitelist Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load())},
 		}
-		if len(r.Value) > maxVal {
-			maxVal = len(r.Value)
+
+		maxName := len("Statistic")
+		maxVal := len("Value")
+
+		for _, r := range rows {
+			if len(r.Name) > maxName {
+				maxName = len(r.Name)
+			}
+
+			if len(r.Value) > maxVal {
+				maxVal = len(r.Value)
+			}
 		}
-		if len(r.Lifetime) > maxLifetime {
-			maxLifetime = len(r.Lifetime)
+
+		border := fmt.Sprintf("\r+=%s=+=%s=+\r\n",
+			strings.Repeat("=", maxName), strings.Repeat("=", maxVal))
+		fmt.Print("\r\n")
+		fmt.Print(border)
+		fmt.Printf("\r| %-*s | %*s |\r\n",
+			maxName, "Statistic", maxVal, "Value")
+		fmt.Print(border)
+
+		for i, r := range rows {
+			fmt.Printf("\r| %-*s | %*s |\r\n",
+				maxName, r.Name, maxVal, r.Value)
+
+			if i == 2 || i == 5 || i == 13 || i == 17 || i == 19 {
+				fmt.Print(border)
+			}
 		}
-	}
 
-	border := fmt.Sprintf("\r+=%s=+=%s=+=%s=+\r\n",
-		strings.Repeat("=", maxName),
-		strings.Repeat("=", maxVal),
-		strings.Repeat("=", maxLifetime))
+		fmt.Print("\r\n")
+	} else {
+		type row struct{ Name, Value, Lifetime string }
+		rows := []row{
+			{"TELNET Total Connections", fmt.Sprintf("%d", telnetConnectionsTotal.Load()), fmt.Sprintf("%d", lifetimeTelnetConnectionsTotal.Load()+telnetConnectionsTotal.Load())},           //nolint:lll
+			{"* TELNET Alt-Host Routings", fmt.Sprintf("%d", altHostRoutesTotal.Load()), fmt.Sprintf("%d", lifetimeAltHostRoutesTotal.Load()+altHostRoutesTotal.Load())},                     //nolint:lll
+			{"* TELNET Connection Failures", fmt.Sprintf("%d", telnetFailuresTotal.Load()), fmt.Sprintf("%d", lifetimeTelnetFailuresTotal.Load()+telnetFailuresTotal.Load())},                //nolint:lll
+			{"Peak Concurrent Connections", fmt.Sprintf("%d", peakUsersTotal.Load()), fmt.Sprintf("%d", lifetimePeakUsersTotal.Load())},                                                      //nolint:lll
+			{"Total Proxy Traffic Inbound", formatBytes(trafficOutTotal.Load()), formatBytes(lifetimeTrafficOutTotal.Load() + trafficOutTotal.Load())},                                       //nolint:lll
+			{"Total Proxy Traffic Outbound", formatBytes(trafficInTotal.Load()), formatBytes(lifetimeTrafficInTotal.Load() + trafficInTotal.Load())},                                         //nolint:lll
+			{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load()), fmt.Sprintf("%d", lifetimeSSHconnectionsTotal.Load()+sshConnectionsTotal.Load())},                       //nolint:lll
+			{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load()), fmt.Sprintf("%d", lifetimeSSHsessionsTotal.Load()+sshSessionsTotal.Load())},                                  //nolint:lll
+			{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load()), fmt.Sprintf("%d", lifetimeMonitorSessionsTotal.Load()+monitorSessionsTotal.Load())},                //nolint:lll
+			{"* SSH Session Request Timeout", fmt.Sprintf("%d", sshRequestTimeoutTotal.Load()), fmt.Sprintf("%d", lifetimeSSHrequestTimeoutTotal.Load()+sshRequestTimeoutTotal.Load())},      //nolint:lll
+			{"* SSH Illegal Request (SFTP)", fmt.Sprintf("%d", sshIllegalSubsystemTotal.Load()), fmt.Sprintf("%d", lifetimeSSHillegalSubsystemTotal.Load()+sshIllegalSubsystemTotal.Load())}, //nolint:lll
+			{"* SSH Illegal Request (SCP/EXEC)", fmt.Sprintf("%d", sshExecRejectedTotal.Load()), fmt.Sprintf("%d", lifetimeSSHexecRejectedTotal.Load()+sshExecRejectedTotal.Load())},         //nolint:lll
+			{"* SSH Accept Errors", fmt.Sprintf("%d", acceptErrorsTotal.Load()), fmt.Sprintf("%d", lifetimeAcceptErrorsTotal.Load()+acceptErrorsTotal.Load())},                               //nolint:lll
+			{"* SSH Handshake Errors", fmt.Sprintf("%d", sshHandshakeFailedTotal.Load()), fmt.Sprintf("%d", lifetimeSSHhandshakeFailedTotal.Load()+sshHandshakeFailedTotal.Load())},          //nolint:lll
+			{"Connections Killed by Admin", fmt.Sprintf("%d", adminKillsTotal.Load()), fmt.Sprintf("%d", lifetimeAdminKillsTotal.Load()+adminKillsTotal.Load())},                             //nolint:lll
+			{"Connections Killed for Idle Time", fmt.Sprintf("%d", idleKillsTotal.Load()), fmt.Sprintf("%d", lifetimeIdleKillsTotal.Load()+idleKillsTotal.Load())},                           //nolint:lll
+			{"Connections Killed for Max Time", fmt.Sprintf("%d", timeKillsTotal.Load()), fmt.Sprintf("%d", lifetimeTimeKillsTotal.Load()+timeKillsTotal.Load())},                            //nolint:lll
+			{"Connections Killed via Delay", fmt.Sprintf("%d", delayAbandonedTotal.Load()), fmt.Sprintf("%d", lifetimeDelayAbandonedTotal.Load()+delayAbandonedTotal.Load())},                //nolint:lll
+			{"Blacklist Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load()), fmt.Sprintf("%d", lifetimeRejectedTotal.Load()+rejectedTotal.Load())},                                //nolint:lll
+			{"Whitelist Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load()), fmt.Sprintf("%d", lifetimeExemptedTotal.Load()+exemptedTotal.Load())},                                //nolint:lll
+		}
 
-	fmt.Print("\r\n")
-	fmt.Print(border)
-	fmt.Printf("\r| %-*s | %*s | %*s |\r\n",
-		maxName, "Statistic",
-		maxVal, "Value",
-		maxLifetime, "Lifetime")
-	fmt.Print(border)
+		maxName := len("Statistic")
+		maxVal := len("Value")
+		maxLifetime := len("Lifetime")
 
-	for i, r := range rows {
+		for _, r := range rows {
+			if len(r.Name) > maxName {
+				maxName = len(r.Name)
+			}
+
+			if len(r.Value) > maxVal {
+				maxVal = len(r.Value)
+			}
+
+			if len(r.Lifetime) > maxLifetime {
+				maxLifetime = len(r.Lifetime)
+			}
+		}
+
+		border := fmt.Sprintf("\r+=%s=+=%s=+=%s=+\r\n",
+			strings.Repeat("=", maxName),
+			strings.Repeat("=", maxVal),
+			strings.Repeat("=", maxLifetime))
+		fmt.Print("\r\n")
+		fmt.Print(border)
 		fmt.Printf("\r| %-*s | %*s | %*s |\r\n",
-			maxName, r.Name, maxVal, r.Value, maxLifetime, r.Lifetime)
-		if i == 2 || i == 5 || i == 13 || i == 17 || i == 19 {
-			fmt.Print(border)
-		}
-	}
+			maxName, "Statistic",
+			maxVal, "Value",
+			maxLifetime, "Lifetime")
+		fmt.Print(border)
 
-	fmt.Print("\r\n")
+		for i, r := range rows {
+			fmt.Printf("\r| %-*s | %*s | %*s |\r\n",
+				maxName, r.Name, maxVal, r.Value, maxLifetime, r.Lifetime)
+
+			if i == 2 || i == 5 || i == 13 || i == 17 || i == 19 {
+				fmt.Print(border)
+			}
+		}
+
+		fmt.Print("\r\n")
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1610,6 +1669,18 @@ func listConfiguration() {
 	updateMaxLength("Proxy Uptime: " + uptimeString)
 
 	var lifetimeString string
+
+	if dbTime > 1 && lifetimeString != "" { //nolint:gocritic
+		updateMaxLength(fmt.Sprintf("Database enabled: %s, %d seconds between writes",
+			dbPath, dbTime))
+	} else if dbTime == 1 && lifetimeString != "" {
+		updateMaxLength(fmt.Sprintf("Database enabled: %s, 1 second between writes",
+			dbPath))
+	} else if dbTime == 0 && lifetimeString != "" {
+		updateMaxLength(fmt.Sprintf("Database enabled: %s, periodic updates disabled",
+			dbPath))
+	}
+
 	if !persistedStartTime.IsZero() {
 		lifetime := time.Since(persistedStartTime)
 		days := int(lifetime.Hours() / 24)
@@ -1620,15 +1691,6 @@ func listConfiguration() {
 			days, hours, minutes, seconds,
 			persistedStartTime.Format("2006-Jan-02 15:04:05"))
 		updateMaxLength("Database age: " + lifetimeString)
-	}
-
-	if dbTime > 1 && lifetimeString != "" { //nolint:gocritic
-		updateMaxLength(fmt.Sprintf("Database updates: %d seconds between writes",
-			dbTime))
-	} else if dbTime == 1 && lifetimeString != "" {
-		updateMaxLength("Database updates: 1 second between writes")
-	} else if dbTime == 0 && lifetimeString != "" {
-		updateMaxLength("Database updates: Periodic updates disabled")
 	}
 
 	var m runtime.MemStats
@@ -1784,17 +1846,19 @@ func listConfiguration() {
 	printRow(&b, "Debug HTTP Server: "+debugHTTP)
 	printRow(&b, "Proxy Uptime: "+uptimeString)
 
-	if lifetimeString != "" {
-		printRow(&b, "Database age: "+lifetimeString)
+	if dbTime > 1 && lifetimeString != "" { //nolint:gocritic
+		printRow(&b, fmt.Sprintf("Database enabled: %s, %d seconds between writes",
+			dbPath, dbTime))
+	} else if dbTime == 1 && lifetimeString != "" {
+		printRow(&b, fmt.Sprintf("Database enabled: %s, 1 second between writes",
+			dbPath))
+	} else if dbTime == 0 && lifetimeString != "" {
+		printRow(&b, fmt.Sprintf("Database enabled: %s, periodic updates disabled",
+			dbPath))
 	}
 
-	if dbTime > 1 && lifetimeString != "" { //nolint:gocritic
-		printRow(&b, fmt.Sprintf("Database updates: %d seconds between writes",
-			dbTime))
-	} else if dbTime == 1 && lifetimeString != "" {
-		printRow(&b, "Database updates: 1 second between writes")
-	} else if dbTime == 0 && lifetimeString != "" {
-		printRow(&b, "Database updates: Periodic updates disabled")
+	if lifetimeString != "" {
+		printRow(&b, "Database age: "+lifetimeString)
 	}
 
 	printRow(&b, "Memory: "+memStatsStr)

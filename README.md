@@ -94,8 +94,8 @@ Usage of ./proxy:
                                    (default "127.0.0.1:6180")
   -a, --alt-host string         Alternate TELNET target(s) [sshuser@host:port]
                                    (multiple allowed)
-      --debug-telnet            Debug TELNET option negotiation
-      --debug-server string     Enable HTTP debug server listening address
+  -k, --debug-telnet            Debug TELNET option negotiation
+  -y, --debug-server string     Enable HTTP debug server listening address
                                    [e.g., ":6060", "[::1]:6060"]
   -g, --no-gops                 Disable the "gops" diagnostic agent
                                    (See https://github.com/google/gops)
@@ -113,11 +113,11 @@ Usage of ./proxy:
                                    [e.g., "600", "644"] (default "600")
   -r, --log-dir-perm octal      Permissions (octal) for new log directories
                                    [e.g., "755", "750"] (default "750")
-      --db-file string          Path to file for persistent statistics storage
+  -u, --db-file string          Path to file for persistent statistics storage
                                    (no default)
-      --db-time uint            Elapsed seconds between database updates
+  -j, --db-time uint            Elapsed seconds between database updates
                                    [0 to disable periodic writes] (default 30)
-      --db-perm octal           Permissions (octal) for new database files
+  -f, --db-perm octal           Permissions (octal) for new database files
                                    [e.g., "600", "644"] (default 600)
   -i, --idle-max int            Maximum connection idle time allowed [seconds]
   -m, --time-max int            Maximum connection link time allowed [seconds]
@@ -201,12 +201,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.7 (2025-Jul-23 g41ba7df) [linux/amd64]
+DPS8M Proxy v0.0.7* (2025-Jul-23 g0f93436+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.7  |
+| dps8m/proxy               | v0.0.7* |
 | arl/statsviz              | v0.6.0  |
 | google/gops               | v0.3.28 |
 | gorilla/websocket         | v1.5.3  |
@@ -424,13 +424,13 @@ predecessor (code statistics 📈 provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>14</th>
-		<th>5846</th>
-		<th>1231</th>
+		<th>5910</th>
+		<th>1240</th>
 		<th>287</th>
-		<th>4328</th>
-		<th>1114</th>
-		<th>153306</th>
-		<th>2802</th>
+		<th>4383</th>
+		<th>1131</th>
+		<th>155908</th>
+		<th>2837</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -475,13 +475,13 @@ predecessor (code statistics 📈 provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>18</th>
-		<th>6864</th>
-		<th>1427</th>
+		<th>6928</th>
+		<th>1436</th>
 		<th>473</th>
-		<th>4964</th>
-		<th>1144</th>
-		<th>192948</th>
-		<th>3521</th>
+		<th>5019</th>
+		<th>1161</th>
+		<th>195550</th>
+		<th>3556</th>
 	</tr></tfoot></table>
 
 ## Future plans
