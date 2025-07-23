@@ -309,6 +309,16 @@ func bugPrefix() string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+func dbPrefix() string {
+	if haveUTF8console {
+		return "🌍 " // Database
+	}
+
+	return ""
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 type emojiStripperWriter struct {
 	w io.Writer
 }
@@ -326,6 +336,7 @@ func (e *emojiStripperWriter) Write(p []byte) (int, error) {
 func isEmojiRune(r rune) bool {
 	switch r {
 	case
+		'🌍',
 		'🐛',
 		'👋',
 		'👍',

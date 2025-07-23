@@ -410,6 +410,12 @@ func init() {
 		"Permissions (octal) for new log directories\n   [e.g., \"755\", \"750\"]")
 	pflag.Lookup("log-dir-perm").DefValue = "\"750\""
 
+	if dbEnabled {
+		pflag.StringVar(&dbPath,
+			"database", "",
+			"Path to file for persistent statistics storage\n   (no default)")
+	}
+
 	pflag.IntVarP(&idleMax,
 		"idle-max", "i", 0,
 		"Maximum connection idle time allowed [seconds]")
@@ -450,6 +456,8 @@ func init() {
 func shutdownWatchdog() {
 	<-shutdownSignal
 	loggingWg.Wait()
+
+	closeDB()
 
 	if isConsoleLogQuiet {
 		fmt.Fprintf(os.Stderr,
@@ -523,6 +531,8 @@ func main() {
 	if debugAddr != "" {
 		debugInit(debugAddr)
 	}
+
+	initDB()
 
 	setupConsoleLogging()
 
@@ -1264,6 +1274,8 @@ func immediateShutdown() {
 
 		loggingWg.Wait()
 
+		closeDB()
+
 		if isConsoleLogQuiet {
 			fmt.Fprintf(os.Stderr,
 				"%s %sExiting.\r\n",
@@ -1532,9 +1544,22 @@ func listConfiguration() {
 
 	uptimeString := fmt.Sprintf("%dh%dm%ds (since %s)",
 		int(uptime.Hours())%24, int(uptime.Minutes())%60, int(uptime.Seconds())%60,
-		startTime.Format("2006-Jan-02 15:04:24"))
+		startTime.Format("2006-Jan-02 15:04:05"))
 
 	updateMaxLength("Uptime: " + uptimeString)
+
+	var lifetimeString string
+	if !persistedStartTime.IsZero() {
+		lifetime := time.Since(persistedStartTime)
+		days := int(lifetime.Hours() / 24)
+		hours := int(lifetime.Hours()) % 24
+		minutes := int(lifetime.Minutes()) % 60
+		seconds := int(lifetime.Seconds()) % 60
+		lifetimeString = fmt.Sprintf("%dd%dh%dm%ds (created %s)",
+			days, hours, minutes, seconds,
+			persistedStartTime.Format("2006-Jan-02 15:04:05"))
+		updateMaxLength("DB Age: " + lifetimeString)
+	}
 
 	var m runtime.MemStats
 
@@ -1610,8 +1635,13 @@ func listConfiguration() {
 
 	if len(altHosts) > 0 {
 		printRow(&b, "Alt Targets:")
-
-		for user, hostPort := range altHosts {
+		users := make([]string, 0, len(altHosts))
+		for user := range altHosts {
+			users = append(users, user)
+		}
+		sort.Strings(users)
+		for _, user := range users {
+			hostPort := altHosts[user]
 			printRow(&b, fmt.Sprintf("* %s [%s]",
 				hostPort, user))
 		}
@@ -1683,6 +1713,9 @@ func listConfiguration() {
 
 	printRow(&b, "Debug HTTP Server: "+debugHTTP)
 	printRow(&b, "Uptime: "+uptimeString)
+	if lifetimeString != "" {
+		printRow(&b, "Lifetime: "+lifetimeString)
+	}
 	printRow(&b, "Memory: "+memStatsStr)
 	printRow(&b, fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)",
 		runtime.NumGoroutine()))

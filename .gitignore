@@ -5,6 +5,7 @@
 blacklist.txt
 block-*.txt
 cross.bin/
+*.db
 deny-*.txt
 dps8m-proxy
 GPATH
