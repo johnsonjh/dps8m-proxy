@@ -1,7 +1,7 @@
 //go:build !plan9 && !windows && !wasip1
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// DPS8M Proxy - gops.go
+// DPS8M Proxy - gops_common.go
 // Copyright (c) 2025 Jeffrey H. Johnson
 // Copyright (c) 2025 The DPS8M Development Team
 // SPDX-License-Identifier: MIT

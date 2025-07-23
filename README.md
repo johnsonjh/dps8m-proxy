@@ -113,8 +113,12 @@ Usage of ./proxy:
                                    [e.g., "600", "644"] (default "600")
   -r, --log-dir-perm octal      Permissions (octal) for new log directories
                                    [e.g., "755", "750"] (default "750")
-      --database string         Path to file for persistent statistics storage
+      --db-file string          Path to file for persistent statistics storage
                                    (no default)
+      --db-time uint            Elapsed seconds between database updates
+                                   [0 to disable periodic writes] (default 30)
+      --db-perm octal           Permissions (octal) for new database files
+                                   [e.g., "600", "644"] (default 600)
   -i, --idle-max int            Maximum connection idle time allowed [seconds]
   -m, --time-max int            Maximum connection link time allowed [seconds]
   -b, --blacklist string        Enable blacklist [filename] (no default)
@@ -197,7 +201,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.7* (2025-Jul-23 g31b0c81+) [linux/amd64]
+DPS8M Proxy v0.0.7* (2025-Jul-23 g1f76086+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -420,13 +424,13 @@ predecessor (code statistics 📈 provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>14</th>
-		<th>5655</th>
-		<th>1212</th>
-		<th>284</th>
-		<th>4159</th>
-		<th>1054</th>
-		<th>142849</th>
-		<th>2676</th>
+		<th>5846</th>
+		<th>1231</th>
+		<th>287</th>
+		<th>4328</th>
+		<th>1114</th>
+		<th>153306</th>
+		<th>2802</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -471,13 +475,13 @@ predecessor (code statistics 📈 provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>18</th>
-		<th>6673</th>
-		<th>1408</th>
-		<th>470</th>
-		<th>4795</th>
-		<th>1084</th>
-		<th>182491</th>
-		<th>3395</th>
+		<th>6864</th>
+		<th>1427</th>
+		<th>473</th>
+		<th>4964</th>
+		<th>1144</th>
+		<th>192948</th>
+		<th>3521</th>
 	</tr></tfoot></table>
 
 ## Future plans
