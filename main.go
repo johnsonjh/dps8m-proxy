@@ -1707,8 +1707,8 @@ func reloadLists() {
 		networks, err := parseIPListFile(blacklistFile)
 		if err != nil {
 			reloadErrors = append(
-				reloadErrors, fmt.Sprintf("%sBlacklist rejected: %v",
-					warnPrefix(), err))
+				reloadErrors, fmt.Sprintf("Blacklist rejected: %v",
+					err))
 		} else {
 			newBlacklistedNetworks = networks
 			blacklistReloaded = true
@@ -1719,8 +1719,8 @@ func reloadLists() {
 		networks, err := parseIPListFile(whitelistFile)
 		if err != nil {
 			reloadErrors = append(
-				reloadErrors, fmt.Sprintf("%sWhitelist rejected: %v",
-					warnPrefix(), err))
+				reloadErrors, fmt.Sprintf("Whitelist rejected: %v",
+					err))
 		} else {
 			newWhitelistedNetworks = networks
 			whitelistReloaded = true
@@ -1729,8 +1729,8 @@ func reloadLists() {
 
 	if len(reloadErrors) > 0 {
 		for _, errMsg := range reloadErrors {
-			log.Printf("%s",
-				errMsg)
+			log.Printf("%s%s",
+				warnPrefix(), errMsg)
 		}
 
 		return
@@ -1994,13 +1994,13 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		},
 		PublicKeyCallback: func(
 			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) { //nolint:gofumpt
-			line := fmt.Sprintf("%sVALIDATE [%s] %s@%s %q:%s",
-				blueDotPrefix(), sid, c.User(), c.RemoteAddr(),
+			line := fmt.Sprintf("VALIDATE [%s] %s@%s %q:%s",
+				sid, c.User(), c.RemoteAddr(),
 				pubKey.Type(), ssh.FingerprintSHA256(pubKey),
 			)
 
 			if !suppressLogs {
-				log.Print(line)
+				log.Printf("%s%s", blueDotPrefix(), line)
 			}
 
 			keyLog = append(keyLog, line)
@@ -2156,8 +2156,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 	addr := sshConn.RemoteAddr().String()
 
-	handshakeLog := fmt.Sprintf("%sVALIDATE [%s] %s@%s \"ssh\":%s",
-		blueDotPrefix(), sid, func() string {
+	handshakeLog := fmt.Sprintf("VALIDATE [%s] %s@%s \"ssh\":%s",
+		sid, func() string {
 			if conn.userName == "" {
 				return "<UNKNOWN>"
 			}
@@ -2166,7 +2166,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		}(), addr, authMethod)
 
 	if !suppressLogs {
-		log.Print(handshakeLog)
+		log.Printf("%s%s", blueDotPrefix(), handshakeLog)
 	}
 
 	keyLog = append(keyLog, handshakeLog)

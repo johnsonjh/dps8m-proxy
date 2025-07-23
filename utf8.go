@@ -324,32 +324,24 @@ func (e *emojiStripperWriter) Write(p []byte) (int, error) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func isEmojiRune(r rune) bool {
-	switch {
-	case r >= 0x1F600 && r <= 0x1F64F: // Emoticons
-		return true
-
-	case r >= 0x1F300 && r <= 0x1F5FF: // Misc symbols
-		return true
-
-	case r >= 0x1F680 && r <= 0x1F6FF: // Transport
-		return true
-
-	case r >= 0x2600 && r <= 0x26FF: // Misc symbols
-		return true
-
-	case r >= 0x2700 && r <= 0x27BF: // Dingbats
-		return true
-
-	case r >= 0xFE00 && r <= 0xFE0F: // Selectors
-		return true
-
-	case r >= 0x1F900 && r <= 0x1F9FF: // Supplemental
-		return true
-
-	case r >= 0x1FA70 && r <= 0x1FAFF: // Extended pictographs
-		return true
-
-	case r >= 0x1F7E0 && r <= 0x1F7EB: // Geometric Shapes Extended
+	switch r {
+	case 0x1f41b, // 🐛
+		0x1f44b, // 👋
+		0x1f44d, // 👍
+		0x1f480, // 💀
+		0x1f49a, // 💚
+		0x1f4a5, // 💥
+		0x1f4e1, // 📡
+		0x1f514, // 🔔
+		0x1f527, // 🔧
+		0x1f534, // 🔴
+		0x1f6a8, // 🚨
+		0x1f7e1, // 🟡
+		0x1f7e2, // 🟢
+		0x1f7e3, // 🔵
+		0x1f95a, // 🥚
+		0x26a0,  // ⚠️
+		0x274c:  // ❌
 		return true
 
 	default:
