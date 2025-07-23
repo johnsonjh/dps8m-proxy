@@ -195,7 +195,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.7* (2025-Jul-22 g1cb5b20+) [linux/amd64]
+DPS8M Proxy v0.0.7* (2025-Jul-23 g8c4c49b+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -265,9 +265,9 @@ further clarification:
 
 * When the **Deny new connections** mode is active, all new connections
   are denied (and are served an appropriate `deny.txt` banner).  In
-  addition, any *console logging* of new connection attempts, including
-  any denied and/or rejected connections, is suppressed.  This can be
-  useful if the admin console is overwhelmed with logging activity
+  addition, *all logging* of new connection attempts, including any
+  denied and/or rejected connections, is suppressed.  This can be
+  useful when the logs or admin console are overwhelmed with activity
   (such as during bot attacks, busy periods, or when troubleshooting).
   Activating this mode can help reduce console noise, making it easier
   to perform admin actions such as viewing the configuration, or
@@ -417,13 +417,13 @@ predecessor (code statistics 📈 provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>12</th>
-		<th>5443</th>
-		<th>1176</th>
+		<th>5436</th>
+		<th>1168</th>
 		<th>252</th>
-		<th>4015</th>
-		<th>1025</th>
-		<th>137069</th>
-		<th>2581</th>
+		<th>4016</th>
+		<th>1016</th>
+		<th>136674</th>
+		<th>2591</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -442,7 +442,7 @@ predecessor (code statistics 📈 provided by
 		<th>0</th>
 		<th>401</th>
 		<th>0</th>
-		<th>21720</th>
+		<th>21715</th>
 		<th>384</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -468,13 +468,13 @@ predecessor (code statistics 📈 provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>16</th>
-		<th>6460</th>
-		<th>1373</th>
+		<th>6453</th>
+		<th>1365</th>
 		<th>438</th>
-		<th>4649</th>
-		<th>1055</th>
-		<th>175942</th>
-		<th>3298</th>
+		<th>4650</th>
+		<th>1046</th>
+		<th>175542</th>
+		<th>3308</th>
 	</tr></tfoot></table>
 
 ## Future plans
