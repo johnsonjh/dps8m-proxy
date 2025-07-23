@@ -2000,7 +2000,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 			)
 
 			if !suppressLogs {
-				log.Printf("%s%s", greenDotPrefix(), line)
+				log.Printf("%s%s", blueDotPrefix(), line)
 			}
 
 			keyLog = append(keyLog, line)
@@ -2166,7 +2166,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		}(), addr, authMethod)
 
 	if !suppressLogs {
-		log.Printf("%s%s", greenDotPrefix(), handshakeLog)
+		log.Printf("%s%s", blueDotPrefix(), handshakeLog)
 	}
 
 	keyLog = append(keyLog, handshakeLog)

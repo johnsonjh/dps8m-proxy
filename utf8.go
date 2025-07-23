@@ -161,7 +161,7 @@ func boomPrefix() string {
 
 func warnPrefix() string {
 	if haveUTF8console {
-		return "⚠️ " // Warning
+		return "🔥 " // Warning
 	}
 
 	return ""
@@ -202,6 +202,16 @@ func toolPrefix() string {
 func thumbsUpPrefix() string {
 	if haveUTF8console {
 		return "👍 " // Deny cancel
+	}
+
+	return ""
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func blueDotPrefix() string {
+	if haveUTF8console {
+		return "🔵 " // Validate
 	}
 
 	return ""
@@ -315,22 +325,24 @@ func (e *emojiStripperWriter) Write(p []byte) (int, error) {
 
 func isEmojiRune(r rune) bool {
 	switch r {
-	case 0x1f41b, // 🐛
-		0x1f44b, // 👋
-		0x1f44d, // 👍
-		0x1f480, // 💀
-		0x1f49a, // 💚
-		0x1f4a5, // 💥
-		0x1f4e1, // 📡
-		0x1f514, // 🔔
-		0x1f527, // 🔧
-		0x1f534, // 🔴
-		0x1f6a8, // 🚨
-		0x1f7e1, // 🟡
-		0x1f7e2, // 🟢
-		0x1f95a, // 🥚
-		0x26a0,  // ⚠️
-		0x274c:  // ❌
+	case
+		'🐛',
+		'👋',
+		'👍',
+		'💀',
+		'💚',
+		'💥',
+		'📡',
+		'🔔',
+		'🔧',
+		'🚨',
+		'🟡',
+		'🟢',
+		'🔴',
+		'🔵',
+		'🥚',
+		'🔥',
+		'❌':
 		return true
 
 	default:
