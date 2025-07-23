@@ -80,7 +80,8 @@ func printVersionTable() {
 	}
 
 	rows = append(rows, row{
-		Name:    fmt.Sprintf("Go compiler (%s)", runtime.Compiler),
+		Name: fmt.Sprintf("Go compiler (%s)",
+			runtime.Compiler),
 		Version: compVer,
 	})
 

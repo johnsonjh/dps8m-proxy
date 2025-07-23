@@ -113,6 +113,12 @@ Usage of ./proxy:
                                    [e.g., "600", "644"] (default "600")
   -r, --log-dir-perm octal      Permissions (octal) for new log directories
                                    [e.g., "755", "750"] (default "750")
+      --db-file string          Path to file for persistent statistics storage
+                                   (no default)
+      --db-time uint            Elapsed seconds between database updates
+                                   [0 to disable periodic writes] (default 30)
+      --db-perm octal           Permissions (octal) for new database files
+                                   [e.g., "600", "644"] (default 600)
   -i, --idle-max int            Maximum connection idle time allowed [seconds]
   -m, --time-max int            Maximum connection link time allowed [seconds]
   -b, --blacklist string        Enable blacklist [filename] (no default)
@@ -195,7 +201,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.7* (2025-Jul-23 g8c4c49b+) [linux/amd64]
+DPS8M Proxy v0.0.7* (2025-Jul-23 g1f76086+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
@@ -207,6 +213,7 @@ DPS8M Proxy v0.0.7* (2025-Jul-23 g8c4c49b+) [linux/amd64]
 | klauspost/compress        | v1.18.0 |
 | spf13/pflag               | v1.0.7  |
 | ulikunitz/xz              | v0.5.12 |
+| go.etcd.io/bbolt          | v1.4.2  |
 | golang.org/x/crypto       | v0.40.0 |
 | golang.org/x/sys          | v0.34.0 |
 | golang.org/x/term         | v0.33.0 |
@@ -416,14 +423,14 @@ predecessor (code statistics 📈 provided by
 	</tr></thead>
 	<tbody><tr>
 		<th>Go</th>
-		<th>12</th>
-		<th>5436</th>
-		<th>1168</th>
-		<th>252</th>
-		<th>4016</th>
-		<th>1016</th>
-		<th>136674</th>
-		<th>2591</th>
+		<th>14</th>
+		<th>5846</th>
+		<th>1231</th>
+		<th>287</th>
+		<th>4328</th>
+		<th>1114</th>
+		<th>153306</th>
+		<th>2802</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -437,13 +444,13 @@ predecessor (code statistics 📈 provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>500</th>
-		<th>99</th>
+		<th>501</th>
+		<th>98</th>
 		<th>0</th>
-		<th>401</th>
+		<th>403</th>
 		<th>0</th>
-		<th>21715</th>
-		<th>384</th>
+		<th>22489</th>
+		<th>386</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -467,14 +474,14 @@ predecessor (code statistics 📈 provided by
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
-		<th>16</th>
-		<th>6453</th>
-		<th>1365</th>
-		<th>438</th>
-		<th>4650</th>
-		<th>1046</th>
-		<th>175542</th>
-		<th>3308</th>
+		<th>18</th>
+		<th>6864</th>
+		<th>1427</th>
+		<th>473</th>
+		<th>4964</th>
+		<th>1144</th>
+		<th>192948</th>
+		<th>3521</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -531,7 +538,7 @@ to convert those keys to standard PEM format.
 
 🚨 **NB**: These instructions *do not* include any specific details
 for safe handling of key file permissions—we assume you are `root`
-and that know what you’re doing!
+and that you know what you’re doing!
 
 1. Make a *copy* of the key files you wish to convert.  Be aware that
    these copies will be *overwritten* in the conversion process:
@@ -603,24 +610,25 @@ and that know what you’re doing!
 
 * The `proxy` program is made available under the terms of the
   [MIT License](https://opensource.org/license/mit).
-
 * Some bundled example and miscellaneous files distributed under the
   terms of the
   [MIT No Attribution License](https://opensource.org/license/mit-0).
-
 * All direct and indirect dependencies are licensed under permissive
   open-source licenses:
 
-  |                                                                     Dependency | License      |
-  |-------------------------------------------------------------------------------:|:-------------|
-  |                                [arl/statsviz](https://github.com/arl/statsviz) | MIT          |
-  |                                  [google/gops](https://github.com/google/gops) | BSD-3-Clause |
-  |                      [gorilla/websocket](https://github.com/gorilla/websocket) | BSD-2-Clause |
-  |                    [klauspost/compress](https://github.com/klauspost/compress) | BSD-3-Clause |
-  | [libcap/cap](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/cap) | BSD-3-Clause |
-  | [libcap/psx](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/psx) | BSD-3-Clause |
-  |                                  [spf13/pflag](https://github.com/spf13/pflag) | BSD-3-Clause |
-  |                                [ulikunitz/xz](https://github.com/ulikunitz/xz) | BSD-3-Clause |
-  |                                                [x/crypto](golang.org/x/crypto) | BSD-3-Clause |
-  |                                                      [x/sys](golang.org/x/sys) | BSD-3-Clause |
-  |                                                    [x/term](golang.org/x/term) | BSD-3-Clause |
+  |                                                                     Dependency | License                                                     |
+  |-------------------------------------------------------------------------------:|:------------------------------------------------------------|
+  |                                [arl/statsviz](https://github.com/arl/statsviz) | [MIT](https://opensource.org/license/mit)                   |
+  |                              [etcd-io/bbolt](https://github.com/etcd-io/bbolt) | [MIT](https://opensource.org/license/mit)                   |
+  |                                  [google/gops](https://github.com/google/gops) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                      [gorilla/websocket](https://github.com/gorilla/websocket) | [BSD-2-Clause](https://opensource.org/license/bsd-2-clause) |
+  |                    [klauspost/compress](https://github.com/klauspost/compress) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  | [libcap/cap](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/cap) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  | [libcap/psx](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/psx) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                  [spf13/pflag](https://github.com/spf13/pflag) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                [ulikunitz/xz](https://github.com/ulikunitz/xz) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                                [x/crypto](golang.org/x/crypto) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                                      [x/sys](golang.org/x/sys) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                                    [x/term](golang.org/x/term) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+
+<!-- EOF -->

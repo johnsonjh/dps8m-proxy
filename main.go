@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net"
 	"net/http"
 	_ "net/http/pprof" //nolint:gosec
@@ -152,68 +153,89 @@ const (
 
 // Global variables.
 var (
-	startTime                = time.Now()
-	allowRoot                bool
-	logPerm                  uint = 0o600
-	logDirPerm               uint = 0o750
-	altHosts                      = make(map[string]string)
-	blacklistedNetworks      []*net.IPNet
-	blacklistFile            string
-	connections              = make(map[string]*Connection)
-	connectionsMutex         sync.Mutex
-	consoleInputActive       atomic.Bool
-	consoleLogFile           *os.File
-	consoleLogMutex          sync.Mutex
-	consoleLog               string
-	isConsoleLogQuiet        bool
-	debugNegotiation         bool
-	debugAddr                string
-	denyNewConnectionsMode   atomic.Bool
-	gracefulShutdownMode     atomic.Bool
-	idleMax                  int
-	logDir                   string
-	loggingWg                sync.WaitGroup
-	noBanner                 bool
-	noCompress               bool
-	noGops                   bool
-	noLog                    bool
-	showVersion              bool
-	shutdownOnce             sync.Once
-	shutdownSignal           chan struct{}
-	sshAddr                  []string
-	telnetHostPort           string
-	timeMax                  int
-	whitelistedNetworks      []*net.IPNet
-	whitelistFile            string
-	issueFile                = "issue.txt"
-	denyFile                 = "deny.txt"
-	blockFile                = "block.txt"
-	compressAlgo             string
-	compressLevel            string
-	sshDelay                 float64
-	acceptErrorsTotal        atomic.Uint64
-	adminKillsTotal          atomic.Uint64
-	altHostRoutesTotal       atomic.Uint64
-	exemptedTotal            atomic.Uint64
-	idleKillsTotal           atomic.Uint64
-	monitorSessionsTotal     atomic.Uint64
-	rejectedTotal            atomic.Uint64
-	sshConnectionsTotal      atomic.Uint64
-	sshHandshakeFailedTotal  atomic.Uint64
-	sshIllegalSubsystemTotal atomic.Uint64
-	sshExecRejectedTotal     atomic.Uint64
-	sshRequestTimeoutTotal   atomic.Uint64
-	sshSessionsTotal         atomic.Uint64
-	peakUsersTotal           atomic.Uint64
-	telnetConnectionsTotal   atomic.Uint64
-	telnetFailuresTotal      atomic.Uint64
-	timeKillsTotal           atomic.Uint64
-	trafficInTotal           atomic.Uint64
-	trafficOutTotal          atomic.Uint64
-	delayAbandonedTotal      atomic.Uint64
-	haveUTF8console          bool
-	emacsKeymapPrefixes      = make(map[string]bool)
-	emacsKeymap              = map[string]string{
+	startTime                        = time.Now()
+	allowRoot                        bool
+	dbPerm                           uint = 0o600
+	logPerm                          uint = 0o600
+	logDirPerm                       uint = 0o750
+	altHosts                              = make(map[string]string)
+	blacklistedNetworks              []*net.IPNet
+	blacklistFile                    string
+	connections                      = make(map[string]*Connection)
+	connectionsMutex                 sync.Mutex
+	consoleInputActive               atomic.Bool
+	consoleLogFile                   *os.File
+	consoleLogMutex                  sync.Mutex
+	consoleLog                       string
+	isConsoleLogQuiet                bool
+	debugNegotiation                 bool
+	debugAddr                        string
+	denyNewConnectionsMode           atomic.Bool
+	gracefulShutdownMode             atomic.Bool
+	idleMax                          int
+	logDir                           string
+	loggingWg                        sync.WaitGroup
+	noBanner                         bool
+	noCompress                       bool
+	noGops                           bool
+	noLog                            bool
+	showVersion                      bool
+	shutdownOnce                     sync.Once
+	shutdownSignal                   chan struct{}
+	sshAddr                          []string
+	telnetHostPort                   string
+	timeMax                          int
+	whitelistedNetworks              []*net.IPNet
+	whitelistFile                    string
+	issueFile                        = "issue.txt"
+	denyFile                         = "deny.txt"
+	blockFile                        = "block.txt"
+	compressAlgo                     string
+	compressLevel                    string
+	sshDelay                         float64
+	acceptErrorsTotal                atomic.Uint64
+	adminKillsTotal                  atomic.Uint64
+	altHostRoutesTotal               atomic.Uint64
+	exemptedTotal                    atomic.Uint64
+	idleKillsTotal                   atomic.Uint64
+	monitorSessionsTotal             atomic.Uint64
+	rejectedTotal                    atomic.Uint64
+	sshConnectionsTotal              atomic.Uint64
+	sshHandshakeFailedTotal          atomic.Uint64
+	sshIllegalSubsystemTotal         atomic.Uint64
+	sshExecRejectedTotal             atomic.Uint64
+	sshRequestTimeoutTotal           atomic.Uint64
+	sshSessionsTotal                 atomic.Uint64
+	peakUsersTotal                   atomic.Uint64
+	telnetConnectionsTotal           atomic.Uint64
+	telnetFailuresTotal              atomic.Uint64
+	timeKillsTotal                   atomic.Uint64
+	trafficInTotal                   atomic.Uint64
+	trafficOutTotal                  atomic.Uint64
+	delayAbandonedTotal              atomic.Uint64
+	lifetimeAcceptErrorsTotal        atomic.Uint64
+	lifetimeAdminKillsTotal          atomic.Uint64
+	lifetimeAltHostRoutesTotal       atomic.Uint64
+	lifetimeExemptedTotal            atomic.Uint64
+	lifetimeIdleKillsTotal           atomic.Uint64
+	lifetimeMonitorSessionsTotal     atomic.Uint64
+	lifetimeRejectedTotal            atomic.Uint64
+	lifetimeSSHconnectionsTotal      atomic.Uint64
+	lifetimeSSHhandshakeFailedTotal  atomic.Uint64
+	lifetimeSSHillegalSubsystemTotal atomic.Uint64
+	lifetimeSSHexecRejectedTotal     atomic.Uint64
+	lifetimeSSHrequestTimeoutTotal   atomic.Uint64
+	lifetimeSSHsessionsTotal         atomic.Uint64
+	lifetimePeakUsersTotal           atomic.Uint64
+	lifetimeTelnetConnectionsTotal   atomic.Uint64
+	lifetimeTelnetFailuresTotal      atomic.Uint64
+	lifetimeTimeKillsTotal           atomic.Uint64
+	lifetimeTrafficInTotal           atomic.Uint64
+	lifetimeTrafficOutTotal          atomic.Uint64
+	lifetimeDelayAbandonedTotal      atomic.Uint64
+	haveUTF8console                  bool
+	emacsKeymapPrefixes              = make(map[string]bool)
+	emacsKeymap                      = map[string]string{
 		"\x1b[1;5A": "\x1b\x5b", //    Control-Arrow_Up -> Escape, [
 		"\x1b[1;5B": "\x1b\x5d", // Control-Arrrow_Down -> Escape, ]
 		"\x1b[1;5C": "\x1b\x66", // Control-Arrow_Right -> Escape, f
@@ -410,6 +432,21 @@ func init() {
 		"Permissions (octal) for new log directories\n   [e.g., \"755\", \"750\"]")
 	pflag.Lookup("log-dir-perm").DefValue = "\"750\""
 
+	if dbEnabled {
+		pflag.StringVar(&dbPath,
+			"db-file", "",
+			"Path to file for persistent statistics storage\n   (no default)")
+
+		pflag.Uint64Var(&dbTime,
+			"db-time", 30,
+			"Elapsed seconds between database updates\n   [0 to disable periodic writes]")
+
+		pflag.Var((*octalPermValue)(&dbPerm),
+			"db-perm",
+			"Permissions (octal) for new database files\n   [e.g., \"600\", \"644\"]")
+		pflag.Lookup("log-perm").DefValue = "\"600\""
+	}
+
 	pflag.IntVarP(&idleMax,
 		"idle-max", "i", 0,
 		"Maximum connection idle time allowed [seconds]")
@@ -450,6 +487,8 @@ func init() {
 func shutdownWatchdog() {
 	<-shutdownSignal
 	loggingWg.Wait()
+
+	closeDB()
 
 	if isConsoleLogQuiet {
 		fmt.Fprintf(os.Stderr,
@@ -522,6 +561,40 @@ func main() {
 
 	if debugAddr != "" {
 		debugInit(debugAddr)
+	}
+
+	initDB()
+
+	if dbEnabled && dbPath != "" && dbTime > 0 {
+		const maxSeconds = uint64(math.MaxInt64 / int64(time.Second))
+
+		if dbTime > maxSeconds {
+			log.Printf("%sIllegal --db-time value: \"%d\" exceeds safe range. using \"30\"",
+				warnPrefix(), dbTime)
+			dbTime = 30
+		}
+
+		go func() {
+			log.Printf("%sStarting database updater with %d second interval.",
+				dbPrefix(), dbTime)
+
+			ticker := time.NewTicker(time.Duration(dbTime) * time.Second) //nolint:gosec
+			defer ticker.Stop()
+
+			for {
+				select {
+				case <-ticker.C:
+					writeCountersToDB()
+
+				case <-shutdownSignal:
+					log.Printf("%sStopping database updater.",
+						dbPrefix())
+					writeCountersToDB()
+
+					return
+				}
+			}
+		}()
 	}
 
 	setupConsoleLogging()
@@ -1063,66 +1136,68 @@ func showHelp() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func showStats() {
-	type row struct{ Name, Value string }
+	type row struct{ Name, Value, Lifetime string }
 
 	rows := []row{
-		{"TELNET Total Connections", fmt.Sprintf("%d", telnetConnectionsTotal.Load())},
-		{"* TELNET Alt-Host Routings", fmt.Sprintf("%d", altHostRoutesTotal.Load())},
-		{"* TELNET Connection Failures", fmt.Sprintf("%d", telnetFailuresTotal.Load())},
-		{"Peak Concurrent Connections", fmt.Sprintf("%d", peakUsersTotal.Load())},
-		{"Total Proxy Traffic Inbound", formatBytes(trafficOutTotal.Load())},
-		{"Total Proxy Traffic Outbound", formatBytes(trafficInTotal.Load())},
-		{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load())},
-		{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load())},
-		{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load())},
-		{"* SSH Session Request Timeout", fmt.Sprintf("%d", sshRequestTimeoutTotal.Load())},
-		{"* SSH Illegal Request (SFTP)", fmt.Sprintf("%d", sshIllegalSubsystemTotal.Load())},
-		{"* SSH Illegal Request (SCP/EXEC)", fmt.Sprintf("%d", sshExecRejectedTotal.Load())},
-		{"* SSH Accept Errors", fmt.Sprintf("%d", acceptErrorsTotal.Load())},
-		{"* SSH Handshake Errors", fmt.Sprintf("%d", sshHandshakeFailedTotal.Load())},
-		{"Connections Killed by Admin", fmt.Sprintf("%d", adminKillsTotal.Load())},
-		{"Connections Killed for Idle Time", fmt.Sprintf("%d", idleKillsTotal.Load())},
-		{"Connections Killed for Max Time", fmt.Sprintf("%d", timeKillsTotal.Load())},
-		{"Connections Killed via Delay", fmt.Sprintf("%d", delayAbandonedTotal.Load())},
-		{"Blacklist Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load())},
-		{"Whitelist Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load())},
+		{"TELNET Total Connections", fmt.Sprintf("%d", telnetConnectionsTotal.Load()), fmt.Sprintf("%d", lifetimeTelnetConnectionsTotal.Load()+telnetConnectionsTotal.Load())},           //nolint:lll
+		{"* TELNET Alt-Host Routings", fmt.Sprintf("%d", altHostRoutesTotal.Load()), fmt.Sprintf("%d", lifetimeAltHostRoutesTotal.Load()+altHostRoutesTotal.Load())},                     //nolint:lll
+		{"* TELNET Connection Failures", fmt.Sprintf("%d", telnetFailuresTotal.Load()), fmt.Sprintf("%d", lifetimeTelnetFailuresTotal.Load()+telnetFailuresTotal.Load())},                //nolint:lll
+		{"Peak Concurrent Connections", fmt.Sprintf("%d", peakUsersTotal.Load()), fmt.Sprintf("%d", lifetimePeakUsersTotal.Load())},                                                      //nolint:lll
+		{"Total Proxy Traffic Inbound", formatBytes(trafficOutTotal.Load()), formatBytes(lifetimeTrafficOutTotal.Load() + trafficOutTotal.Load())},                                       //nolint:lll
+		{"Total Proxy Traffic Outbound", formatBytes(trafficInTotal.Load()), formatBytes(lifetimeTrafficInTotal.Load() + trafficInTotal.Load())},                                         //nolint:lll
+		{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load()), fmt.Sprintf("%d", lifetimeSSHconnectionsTotal.Load()+sshConnectionsTotal.Load())},                       //nolint:lll
+		{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load()), fmt.Sprintf("%d", lifetimeSSHsessionsTotal.Load()+sshSessionsTotal.Load())},                                  //nolint:lll
+		{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load()), fmt.Sprintf("%d", lifetimeMonitorSessionsTotal.Load()+monitorSessionsTotal.Load())},                //nolint:lll
+		{"* SSH Session Request Timeout", fmt.Sprintf("%d", sshRequestTimeoutTotal.Load()), fmt.Sprintf("%d", lifetimeSSHrequestTimeoutTotal.Load()+sshRequestTimeoutTotal.Load())},      //nolint:lll
+		{"* SSH Illegal Request (SFTP)", fmt.Sprintf("%d", sshIllegalSubsystemTotal.Load()), fmt.Sprintf("%d", lifetimeSSHillegalSubsystemTotal.Load()+sshIllegalSubsystemTotal.Load())}, //nolint:lll
+		{"* SSH Illegal Request (SCP/EXEC)", fmt.Sprintf("%d", sshExecRejectedTotal.Load()), fmt.Sprintf("%d", lifetimeSSHexecRejectedTotal.Load()+sshExecRejectedTotal.Load())},         //nolint:lll
+		{"* SSH Accept Errors", fmt.Sprintf("%d", acceptErrorsTotal.Load()), fmt.Sprintf("%d", lifetimeAcceptErrorsTotal.Load()+acceptErrorsTotal.Load())},                               //nolint:lll
+		{"* SSH Handshake Errors", fmt.Sprintf("%d", sshHandshakeFailedTotal.Load()), fmt.Sprintf("%d", lifetimeSSHhandshakeFailedTotal.Load()+sshHandshakeFailedTotal.Load())},          //nolint:lll
+		{"Connections Killed by Admin", fmt.Sprintf("%d", adminKillsTotal.Load()), fmt.Sprintf("%d", lifetimeAdminKillsTotal.Load()+adminKillsTotal.Load())},                             //nolint:lll
+		{"Connections Killed for Idle Time", fmt.Sprintf("%d", idleKillsTotal.Load()), fmt.Sprintf("%d", lifetimeIdleKillsTotal.Load()+idleKillsTotal.Load())},                           //nolint:lll
+		{"Connections Killed for Max Time", fmt.Sprintf("%d", timeKillsTotal.Load()), fmt.Sprintf("%d", lifetimeTimeKillsTotal.Load()+timeKillsTotal.Load())},                            //nolint:lll
+		{"Connections Killed via Delay", fmt.Sprintf("%d", delayAbandonedTotal.Load()), fmt.Sprintf("%d", lifetimeDelayAbandonedTotal.Load()+delayAbandonedTotal.Load())},                //nolint:lll
+		{"Blacklist Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load()), fmt.Sprintf("%d", lifetimeRejectedTotal.Load()+rejectedTotal.Load())},                                //nolint:lll
+		{"Whitelist Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load()), fmt.Sprintf("%d", lifetimeExemptedTotal.Load()+exemptedTotal.Load())},                                //nolint:lll
 	}
 
 	maxName := len("Statistic")
 	maxVal := len("Value")
+	maxLifetime := len("Lifetime")
 
 	for _, r := range rows {
 		if len(r.Name) > maxName {
 			maxName = len(r.Name)
 		}
-
 		if len(r.Value) > maxVal {
 			maxVal = len(r.Value)
 		}
+		if len(r.Lifetime) > maxLifetime {
+			maxLifetime = len(r.Lifetime)
+		}
 	}
 
-	border := fmt.Sprintf("\r+=%s=+=%s=+\r\n",
-		strings.Repeat("=", maxName), strings.Repeat("=", maxVal),
-	)
+	border := fmt.Sprintf("\r+=%s=+=%s=+=%s=+\r\n",
+		strings.Repeat("=", maxName),
+		strings.Repeat("=", maxVal),
+		strings.Repeat("=", maxLifetime))
 
 	fmt.Print("\r\n")
-
 	fmt.Print(border)
-
-	fmt.Printf("\r| %-*s | %*s |\r\n",
-		maxName, "Statistic", maxVal, "Value")
-
+	fmt.Printf("\r| %-*s | %*s | %*s |\r\n",
+		maxName, "Statistic",
+		maxVal, "Value",
+		maxLifetime, "Lifetime")
 	fmt.Print(border)
 
 	for i, r := range rows {
-		fmt.Printf("\r| %-*s | %*s |\r\n",
-			maxName, r.Name, maxVal, r.Value)
-
-		switch i {
-		case 2, 5, 13, 17, 19:
+		fmt.Printf("\r| %-*s | %*s | %*s |\r\n",
+			maxName, r.Name, maxVal, r.Value, maxLifetime, r.Lifetime)
+		if i == 2 || i == 5 || i == 13 || i == 17 || i == 19 {
 			fmt.Print(border)
 		}
 	}
+
 	fmt.Print("\r\n")
 }
 
@@ -1166,11 +1241,7 @@ func toggleGracefulShutdown() {
 		if len(connections) == 0 {
 			connectionsMutex.Unlock()
 
-			select {
-			case shutdownSignal <- struct{}{}:
-
-			default:
-			}
+			shutdownOnce.Do(func() { close(shutdownSignal) })
 		} else {
 			connectionsMutex.Unlock()
 		}
@@ -1263,6 +1334,8 @@ func immediateShutdown() {
 		}
 
 		loggingWg.Wait()
+
+		closeDB()
 
 		if isConsoleLogQuiet {
 			fmt.Fprintf(os.Stderr,
@@ -1532,9 +1605,31 @@ func listConfiguration() {
 
 	uptimeString := fmt.Sprintf("%dh%dm%ds (since %s)",
 		int(uptime.Hours())%24, int(uptime.Minutes())%60, int(uptime.Seconds())%60,
-		startTime.Format("2006-Jan-02 15:04:24"))
+		startTime.Format("2006-Jan-02 15:04:05"))
 
-	updateMaxLength("Uptime: " + uptimeString)
+	updateMaxLength("Proxy Uptime: " + uptimeString)
+
+	var lifetimeString string
+	if !persistedStartTime.IsZero() {
+		lifetime := time.Since(persistedStartTime)
+		days := int(lifetime.Hours() / 24)
+		hours := int(lifetime.Hours()) % 24
+		minutes := int(lifetime.Minutes()) % 60
+		seconds := int(lifetime.Seconds()) % 60
+		lifetimeString = fmt.Sprintf("%dd%dh%dm%ds (created %s)",
+			days, hours, minutes, seconds,
+			persistedStartTime.Format("2006-Jan-02 15:04:05"))
+		updateMaxLength("Database age: " + lifetimeString)
+	}
+
+	if dbTime > 1 && lifetimeString != "" { //nolint:gocritic
+		updateMaxLength(fmt.Sprintf("Database updates: %d seconds between writes",
+			dbTime))
+	} else if dbTime == 1 && lifetimeString != "" {
+		updateMaxLength("Database updates: 1 second between writes")
+	} else if dbTime == 0 && lifetimeString != "" {
+		updateMaxLength("Database updates: Periodic updates disabled")
+	}
 
 	var m runtime.MemStats
 
@@ -1610,8 +1705,13 @@ func listConfiguration() {
 
 	if len(altHosts) > 0 {
 		printRow(&b, "Alt Targets:")
-
-		for user, hostPort := range altHosts {
+		users := make([]string, 0, len(altHosts))
+		for user := range altHosts {
+			users = append(users, user)
+		}
+		sort.Strings(users)
+		for _, user := range users {
+			hostPort := altHosts[user]
 			printRow(&b, fmt.Sprintf("* %s [%s]",
 				hostPort, user))
 		}
@@ -1682,7 +1782,21 @@ func listConfiguration() {
 	}
 
 	printRow(&b, "Debug HTTP Server: "+debugHTTP)
-	printRow(&b, "Uptime: "+uptimeString)
+	printRow(&b, "Proxy Uptime: "+uptimeString)
+
+	if lifetimeString != "" {
+		printRow(&b, "Database age: "+lifetimeString)
+	}
+
+	if dbTime > 1 && lifetimeString != "" { //nolint:gocritic
+		printRow(&b, fmt.Sprintf("Database updates: %d seconds between writes",
+			dbTime))
+	} else if dbTime == 1 && lifetimeString != "" {
+		printRow(&b, "Database updates: 1 second between writes")
+	} else if dbTime == 0 && lifetimeString != "" {
+		printRow(&b, "Database updates: Periodic updates disabled")
+	}
+
 	printRow(&b, "Memory: "+memStatsStr)
 	printRow(&b, fmt.Sprintf("Runtime: %d active Goroutines (use 'cg' for details)",
 		runtime.NumGoroutine()))
@@ -2120,11 +2234,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		if gracefulShutdownMode.Load() && len(connections) == 0 {
 			connectionsMutex.Unlock()
 
-			select {
-			case shutdownSignal <- struct{}{}:
-
-			default:
-			}
+			shutdownOnce.Do(func() { close(shutdownSignal) })
 		} else {
 			connectionsMutex.Unlock()
 		}
