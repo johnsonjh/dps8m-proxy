@@ -2275,6 +2275,11 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 	if currentLen := uint64(len(connections)); currentLen > peakUsersTotal.Load() {
 		peakUsersTotal.Store(currentLen)
+		if dbEnabled {
+			if currentLen > lifetimePeakUsersTotal.Load() {
+				lifetimePeakUsersTotal.Store(currentLen)
+			}
+		}
 	}
 
 	connectionsMutex.Unlock()
