@@ -194,14 +194,14 @@ tags ctags gtags GRPATH GRTAGS GTAGS:
 	@$(RM) ./tags > /dev/null 2>&1
 	@command -v gotags > /dev/null 2>&1 && \
 		{ printf '%s\n' "🏷️ Building gotags database..."; \
-		  gotags -f tags -R . > /dev/null 2>&1 || true; } || true
+		  gotags -f tags -R . > /dev/null 2>&1 || :; } || :
 	@test -f ./tags || { \
 		command -v ctags > /dev/null 2>&1 && \
 			{ printf '%s\n' "🏷️ Building ctags database..."; \
-			  ctags -R . > /dev/null 2>&1 || true; } || true; } || true
+			  ctags -R . > /dev/null 2>&1 || :; } || :; } || :
 	@command -v gogtags > /dev/null 2>&1 && \
 		{ printf '%s\n' "🏷️ Building gogtags database..."; \
-		gogtags > /dev/null 2>&1 || true; } || true
+		gogtags > /dev/null 2>&1 || :; } || :
 
 ##############################################################################
 # Target: govet
@@ -255,6 +255,74 @@ cross: .cross.sh
 	@printf '\n%s\n\n' "🛫 Starting cross-compilation (errors are non-fatal!)"
 	@./.cross.sh
 	@printf '\n%s\n\n' "🛬 Back from cross-compilation"
+
+##############################################################################
+# Target: strip
+
+.PHONY: strip
+strip:
+	@printf '%s\n' "📥 Stripping proxy binary..."
+	@test -x "proxy" || \
+		{ printf '%s\n' "🚫 'proxy' not found, try running '$(MAKE)'"; \
+		  exit 1; }
+	env OBJECT_MODE=32_64 strip proxy
+
+##############################################################################
+# Target: install-strip
+
+.PHONY: install-strip
+install-strip:
+	$(MAKE) strip
+	$(MAKE) install
+
+##############################################################################
+# Target: install
+
+DEST_NAME=dps8m-proxy
+DEST_CONF=dps8m-proxy.conf
+DEST_UNIT=dps8m-proxy.service
+
+PREFIX?=/usr/local
+FNLDIR=$(DESTDIR)$(PREFIX)
+BINDIR=$(FNLDIR)/bin
+ETCDIR=$(FNLDIR)/etc
+UNTDIR=$(FNLDIR)/lib/systemd/system
+
+INSTALL?=install
+INSTALL_BIN=$(INSTALL) -m 0755
+INSTALL_UNT=$(INSTALL) -m 0644
+
+SETCAP?=$$(command -v setcap || true)
+SETCAP_FLAGS='cap_net_bind_service+ep'
+
+.PHONY: install
+install:
+	@printf '%s\n' "📥 Starting proxy installation..."
+	@test -x "proxy" || \
+		{ printf '%s\n' "🚫 'proxy' not found, try running '$(MAKE)'"; \
+		  exit 1; }
+	@printf '\n%s\n' "🔧 Check installation directories, create if missing..."
+	mkdir -p \
+		"$(BINDIR)" \
+		"$(ETCDIR)" \
+		"$(UNTDIR)"
+	@printf '\n%s\n' "🔧 Backing up '$(DEST_NAME)' if possible..."
+	test -f "$(BINDIR)"/$(DEST_NAME) && { \
+		cp -fp "$(BINDIR)"/"$(DEST_NAME)" "$(BINDIR)"/"$(DEST_NAME).old"; \
+		rm -f "$(BINDIR)"/"$(DEST_NAME)"; } || :
+	@printf '\n%s\n' "🔧 Touching '$(DEST_CONF)' if missing..."
+	test -f "$(ETCDIR)"/"$(DEST_CONF)" || \
+		{ touch "$(ETCDIR)"/"$(DEST_CONF)"; } || :
+	@printf '\n%s\n' "🔧 Installing new '$(DEST_NAME)'"
+	$(INSTALL_BIN) "proxy" "$(BINDIR)"/"$(DEST_NAME)"
+	@printf '\n%s\n' "🔧 Try to granting CAP_NET_BIND_SERVICE to $(DEST_NAME)"
+	$(SETCAP) $(SETCAP_FLAGS) \
+		"$(BINDIR)"/"$(DEST_NAME)" > /dev/null 2>&1 || :
+	@printf '\n%s\n' "🔧 Installing new '$(DEST_UNIT)'"
+	$(INSTALL_UNT) "systemd/dps8m-proxy.service" \
+		"$(UNTDIR)"/"$(DEST_UNIT)"
+	test -z "$(DESTDIR)" && { systemctl daemon-reload || :; } || :
+	@printf '\n%s\n' "✅ Installation successful..."
 
 ##############################################################################
 # vim: set ft=make noexpandtab tabstop=4 cc=78 :
