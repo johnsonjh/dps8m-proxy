@@ -75,7 +75,7 @@ lint check:
 	$(MAKE) revive reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
 		errcheck shellcheck shfmt codespell golangci-lint
 	@printf '\n%s\n' "🧩 Running 'make cross'..."
-	$(MAKE) cross
+	env MAX_CPU=1 $(MAKE) cross
 	@printf '\n%s\n' "🧩 Running 'make clean'..."
 	$(MAKE) clean
 	@printf '\n%s\n\n' "🥇 Linting complete; carefully review the output."
