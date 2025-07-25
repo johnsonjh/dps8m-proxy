@@ -363,6 +363,9 @@ func (op *octalPermValue) Type() string {
 func init() {
 	pflag.CommandLine.SortFlags = false
 
+	// NOTE: Ensure that all pflag --help / -h output renders in less
+	//       than 79 columns and that indentation renders as 3 spaces.
+
 	pflag.BoolVarP(&allowRoot,
 		"allow-root", "0", false,
 		"Allow running as root (UID 0)")
@@ -395,11 +398,11 @@ func init() {
 	if gopsEnabled {
 		pflag.BoolVarP(&noGops,
 			"no-gops", "g", false,
-			"Disable the \"gops\" diagnostic agent\n   (See https://github.com/google/gops)")
+			"Disable the \"gops\" diagnostic agent\n   (see https://github.com/google/gops)")
 	}
 
 	pflag.StringVarP(&logDir,
-		"log-dir", "d", "./log",
+		"log-dir", "d", "log",
 		"Base directory for logs")
 
 	pflag.BoolVarP(&noLog,
@@ -408,7 +411,7 @@ func init() {
 
 	pflag.StringVarP(&consoleLog,
 		"console-log", "c", "",
-		"Enable console logging [\"quiet\", \"noquiet\"]")
+		"Enable console logging [\"quiet\", \"noquiet\"]\n   (disabled by default)")
 
 	pflag.StringVarP(&compressAlgo,
 		"compress-algo", "s", "gzip",
@@ -420,7 +423,7 @@ func init() {
 
 	pflag.BoolVarP(&noCompress,
 		"no-compress", "x", false,
-		"Disable session and console log compression")
+		"Disable session and/or console log compression")
 
 	pflag.VarP((*octalPermValue)(&logPerm),
 		"log-perm", "p",
@@ -435,7 +438,7 @@ func init() {
 	if dbEnabled {
 		pflag.StringVarP(&dbPath,
 			"db-file", "u", "",
-			"Path to file for persistent statistics storage\n   (no default)")
+			"Path to persistent statistics storage database\n   (disabled by default)")
 
 		pflag.Uint64VarP(&dbTime,
 			"db-time", "j", 30,
@@ -540,7 +543,7 @@ func main() {
 	}
 
 	switch compressAlgo {
-	case "gzip", "xz", "zstd":
+	case "gzip", "xz", "zstd": //nolint:goconst
 
 	default:
 		log.Fatalf("%sERROR: Invalid --compress-algo: %s",
@@ -601,8 +604,13 @@ func main() {
 
 	if !noLog || consoleLog != "" {
 		if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
-			log.Fatalf("%sERROR: Failed to create log directory: %v",
-				errorPrefix(), err) // LINTED: Fatalf
+			fmt.Fprintf(os.Stderr,
+				"%s %sERROR: Failed to create session log directory: %v\r\n",
+				nowStamp(), warnPrefix(), err)
+			fmt.Fprintf(os.Stderr,
+				"%s %sSession logging disabled.\r\n",
+				nowStamp(), alertPrefix())
+			noLog = true
 		}
 
 		if p, err := filepath.EvalSymlinks(logDir); err == nil {
@@ -613,7 +621,7 @@ func main() {
 			logDir = p
 		}
 
-		logDir = filepath.Clean(logDir)
+		logDir = filepath.Clean(strings.TrimSpace(logDir))
 	}
 
 	reloadLists()
@@ -4221,7 +4229,17 @@ func setupConsoleLogging() {
 		return
 	}
 
-	rotateConsoleLog()
+	if isConsoleLogQuiet {
+		fmt.Fprintf(os.Stderr,
+			"%s %sConsole logging requested (suppressing console output)\n",
+			nowStamp(), alertPrefix())
+	} else {
+		fmt.Fprintf(os.Stderr,
+			"%s %sConsole logging requested (not suppressing console output)\n",
+			nowStamp(), alertPrefix())
+	}
+
+	rotateConsoleLogAt(time.Now())
 
 	go func() {
 		for {
@@ -4229,68 +4247,74 @@ func setupConsoleLogging() {
 			nextMidnight := now.Add(24 * time.Hour).Truncate(24 * time.Hour)
 			time.Sleep(time.Until(nextMidnight))
 
-			rotateConsoleLog()
+			rotateConsoleLogAt(time.Now())
 		}
 	}()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func rotateConsoleLog() {
-	debug.FreeOSMemory()
-
+func rotateConsoleLogAt(t time.Time) {
 	consoleLogMutex.Lock()
-
 	defer consoleLogMutex.Unlock()
 
+	var oldLogPath string
 	if consoleLogFile != nil {
-		if !noCompress {
-			yesterdayLogPath := getConsoleLogPath(time.Now().AddDate(0, 0, -1))
-			compressLogFile(yesterdayLogPath)
-		}
-
+		oldLogPath = consoleLogFile.Name()
 		if err := consoleLogFile.Close(); err != nil {
-			log.Printf("%sError closing console log file: %v",
-				warnPrefix(), err)
+			fmt.Fprintf(os.Stderr,
+				"%s %sError closing previous console log file: %v\r\n",
+				nowStamp(), warnPrefix(), err)
+			isConsoleLogQuiet = false
+			consoleLog = ""
+			consoleLogFile = nil
+			fmt.Fprintf(os.Stderr,
+				"%s %sConsole logging disabled.\r\n",
+				nowStamp(), alertPrefix())
 		}
 	}
 
-	logPath := getConsoleLogPath(time.Now())
+	logPath := getConsoleLogPath(t)
 	logDir := filepath.Dir(logPath)
 
 	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
-		consoleLogMutex.Unlock()
-		log.Fatalf( //nolint:gocritic
-			"%sERROR: Failed to create console log directory: %v",
-			errorPrefix(), err) // LINTED: Fatalf
-	}
-
-	var err error
-	consoleLogFile, err = os.OpenFile(logPath,
-		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
-	if err != nil {
-		consoleLogMutex.Unlock()
-		log.Fatalf(
-			"%sERROR: Failed to open console log file: %v",
-			errorPrefix(), err) // LINTED: Fatalf
-	}
-
-	if isConsoleLogQuiet {
 		fmt.Fprintf(os.Stderr,
-			"%s %sConsole logging enabled (suppressing console output)\n",
+			"%s %sERROR: Failed to create console log directory: %v\r\n",
+			nowStamp(), warnPrefix(), err)
+		isConsoleLogQuiet = false
+		consoleLog = ""
+		consoleLogFile = nil
+		fmt.Fprintf(os.Stderr,
+			"%s %sConsole logging disabled.\r\n",
 			nowStamp(), alertPrefix())
 	} else {
-		fmt.Fprintf(os.Stderr,
-			"%s %sConsole logging enabled (not suppressing console output)\n",
-			nowStamp(), alertPrefix())
+		var err error
+		consoleLogFile, err = os.OpenFile(
+			logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
+		if err != nil {
+			if isConsoleLogQuiet {
+				isConsoleLogQuiet = false
+			}
+			fmt.Fprintf(os.Stderr, "%s %sERROR: Failed to open console log file: %v\r\n",
+				nowStamp(), warnPrefix(), err)
+			isConsoleLogQuiet = false
+			consoleLog = ""
+			consoleLogFile = nil
+			fmt.Fprintf(os.Stderr,
+				"%s %sConsole logging disabled.\r\n",
+				nowStamp(), alertPrefix())
+		}
 	}
 
 	fileWriter := &emojiStripperWriter{w: consoleLogFile}
-
 	if isConsoleLogQuiet {
 		log.SetOutput(fileWriter)
 	} else {
 		log.SetOutput(io.MultiWriter(os.Stdout, fileWriter))
+	}
+
+	if oldLogPath != "" && !noCompress {
+		compressLogFile(oldLogPath)
 	}
 }
 

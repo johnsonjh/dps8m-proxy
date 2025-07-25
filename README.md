@@ -98,23 +98,24 @@ Usage of ./proxy:
   -y, --debug-server string     Enable HTTP debug server listening address
                                    [e.g., ":6060", "[::1]:6060"]
   -g, --no-gops                 Disable the "gops" diagnostic agent
-                                   (See https://github.com/google/gops)
-  -d, --log-dir string          Base directory for logs (default "./log")
+                                   (see https://github.com/google/gops)
+  -d, --log-dir string          Base directory for logs (default "log")
   -o, --no-log                  Disable all session logging
                                    (for console logging see "--console-log")
   -c, --console-log string      Enable console logging ["quiet", "noquiet"]
+                                   (disabled by default)
   -s, --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
                                    (default "gzip")
   -z, --compress-level string   Compression level for gzip and zstd algorithms
                                    ["fast", "normal", "high"]
                                    (default "normal")
-  -x, --no-compress             Disable session and console log compression
+  -x, --no-compress             Disable session and/or console log compression
   -p, --log-perm octal          Permissions (octal) for new log files
                                    [e.g., "600", "644"] (default "600")
   -r, --log-dir-perm octal      Permissions (octal) for new log directories
                                    [e.g., "755", "750"] (default "750")
-  -u, --db-file string          Path to file for persistent statistics storage
-                                   (no default)
+  -u, --db-file string          Path to persistent statistics storage database
+                                   (disabled by default)
   -j, --db-time uint            Elapsed seconds between database updates
                                    [0 to disable periodic writes] (default 30)
   -f, --db-perm octal           Permissions (octal) for new database files
@@ -139,6 +140,12 @@ are, hopefully, documented here:
     `noquiet`.  In `quiet` mode, all non‑fatal messages are logged
     **only** to the log file, where in `noquiet` mode, messages are
     logged to **both** the console and the log file.
+
+  * If the proxy fails to create log directories or files, a warning
+    will be displayed on the console and the session and/or console
+    logging feature will be disabled.  In a future version, this
+    behavior will be configurable (*e.g.,* allow to either immediately
+    or gracefully exit on log failure).
 
 * All incoming SSH users are connected to the default TELNET target,
   unless their supplied SSH username matches an alternate target
@@ -201,12 +208,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.7 (2025-Jul-23 ga8fb2b0) [linux/amd64]
+DPS8M Proxy v0.0.8* (2025-Jul-25 g552c6e5+) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.7  |
+| dps8m/proxy               | v0.0.8* |
 | arl/statsviz              | v0.6.0  |
 | google/gops               | v0.3.28 |
 | gorilla/websocket         | v1.5.3  |
@@ -423,44 +430,44 @@ predecessor (code statistics 📈 provided by
 	</tr></thead>
 	<tbody><tr>
 		<th>Go</th>
-		<th>14</th>
-		<th>5910</th>
-		<th>1240</th>
-		<th>287</th>
-		<th>4383</th>
-		<th>1131</th>
-		<th>155908</th>
-		<th>2837</th>
+		<th>15</th>
+		<th>6062</th>
+		<th>1262</th>
+		<th>301</th>
+		<th>4499</th>
+		<th>1154</th>
+		<th>160179</th>
+		<th>2909</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
-		<th>261</th>
-		<th>50</th>
-		<th>59</th>
-		<th>152</th>
-		<th>30</th>
-		<th>8190</th>
-		<th>180</th>
+		<th>342</th>
+		<th>62</th>
+		<th>67</th>
+		<th>213</th>
+		<th>44</th>
+		<th>10736</th>
+		<th>243</th>
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>501</th>
-		<th>98</th>
+		<th>508</th>
+		<th>99</th>
 		<th>0</th>
-		<th>403</th>
+		<th>409</th>
 		<th>0</th>
-		<th>22489</th>
-		<th>386</th>
+		<th>22950</th>
+		<th>392</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
-		<th>49</th>
-		<th>13</th>
-		<th>22</th>
-		<th>14</th>
-		<th>0</th>
-		<th>1501</th>
-		<th>30</th>
+		<th>116</th>
+		<th>25</th>
+		<th>29</th>
+		<th>62</th>
+		<th>12</th>
+		<th>3024</th>
+		<th>78</th>
 	</tr><tr>
 		<th>Systemd</th>
 		<th>1</th>
@@ -474,14 +481,14 @@ predecessor (code statistics 📈 provided by
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
-		<th>18</th>
-		<th>6928</th>
-		<th>1436</th>
-		<th>473</th>
-		<th>5019</th>
-		<th>1161</th>
-		<th>195550</th>
-		<th>3556</th>
+		<th>19</th>
+		<th>7235</th>
+		<th>1483</th>
+		<th>502</th>
+		<th>5250</th>
+		<th>1210</th>
+		<th>204351</th>
+		<th>3744</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -626,6 +633,7 @@ and that you know what you’re doing!
   | [libcap/cap](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/cap) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   | [libcap/psx](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/psx) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                  [spf13/pflag](https://github.com/spf13/pflag) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                            [uber-go/goleak](https://github.com/uber-go/goleak) | [MIT](https://opensource.org/license/mit)                   |
   |                                [ulikunitz/xz](https://github.com/ulikunitz/xz) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                                [x/crypto](golang.org/x/crypto) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                                      [x/sys](golang.org/x/sys) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |

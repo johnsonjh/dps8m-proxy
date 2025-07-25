@@ -99,6 +99,12 @@ are, hopefully, documented here:
     **only** to the log file, where in `noquiet` mode, messages are
     logged to **both** the console and the log file.
 
+  * If the proxy fails to create log directories or files, a warning
+    will be displayed on the console and the session and/or console
+    logging feature *may*—but is not guaranteed—to be disabled.  In a
+    future version, this behavior will be configurable (*e.g.,* allow
+    to either immediately or gracefully exit on logging failure).
+
 * All incoming SSH users are connected to the default TELNET target,
   unless their supplied SSH username matches an alternate target
   enabled with the `‑‑alt‑host` flag.  The alt‑host syntax is
@@ -493,6 +499,7 @@ and that you know what you’re doing!
   | [libcap/cap](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/cap) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   | [libcap/psx](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/psx) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                  [spf13/pflag](https://github.com/spf13/pflag) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                            [uber-go/goleak](https://github.com/uber-go/goleak) | [MIT](https://opensource.org/license/mit)                   |
   |                                [ulikunitz/xz](https://github.com/ulikunitz/xz) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                                [x/crypto](golang.org/x/crypto) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                                      [x/sys](golang.org/x/sys) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |

@@ -61,6 +61,14 @@ distclean: clean
 	$(RM) -r ./log/
 
 ##############################################################################
+# Target: test
+
+.PHONY: test
+test:
+	@printf '%s\n' "🧪 Running 'go test -v .'"
+	env GOTOOLCHAIN=auto go test -v .
+
+##############################################################################
 # Target: lint
 
 .PHONY: lint check
@@ -69,6 +77,8 @@ lint check:
 	$(MAKE) clean
 	@printf '\n%s\n' "🧩 Running 'make doc'..."
 	$(MAKE) doc
+	@printf '\n%s\n' "🧩 Running 'make test'..."
+	$(MAKE) test
 	@printf '\n%s\n' "🧩 Running 'make clean'..."
 	$(MAKE) clean
 	@printf '\n%s\n' "⚙️ Running linters..."
@@ -76,8 +86,11 @@ lint check:
 		errcheck shellcheck shfmt codespell golangci-lint
 	@printf '\n%s\n' "🧩 Running 'make cross'..."
 	env MAX_CPU=1 $(MAKE) cross
-	@printf '\n%s\n' "🧩 Running 'make clean'..."
 	$(MAKE) clean
+	@printf '\n%s\n' "ℹ️ Finding any outdated dependencies..."
+	@go list -u -f \
+		'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} → {{.Update.Version}}{{end}}' \
+		-m all
 	@printf '\n%s\n\n' "🥇 Linting complete; carefully review the output."
 
 ##############################################################################
