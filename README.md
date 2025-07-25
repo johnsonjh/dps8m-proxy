@@ -143,9 +143,9 @@ are, hopefully, documented here:
 
   * If the proxy fails to create log directories or files, a warning
     will be displayed on the console and the session and/or console
-    logging feature will be disabled.  In a future version, this
-    behavior will be configurable (*e.g.,* allow to either immediately
-    or gracefully exit on log failure).
+    logging feature *may*—but is not guaranteed—to be disabled.  In a
+    future version, this behavior will be configurable (*e.g.,* allow
+    to either immediately or gracefully exit on logging failure).
 
 * All incoming SSH users are connected to the default TELNET target,
   unless their supplied SSH username matches an alternate target
@@ -208,12 +208,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.8* (2025-Jul-25 g552c6e5+) [linux/amd64]
+DPS8M Proxy v0.0.8 (2025-Jul-25 g92a92d0) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.8* |
+| dps8m/proxy               | v0.0.8  |
 | arl/statsviz              | v0.6.0  |
 | google/gops               | v0.3.28 |
 | gorilla/websocket         | v1.5.3  |
@@ -456,7 +456,7 @@ predecessor (code statistics 📈 provided by
 		<th>0</th>
 		<th>409</th>
 		<th>0</th>
-		<th>22950</th>
+		<th>22984</th>
 		<th>392</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -487,7 +487,7 @@ predecessor (code statistics 📈 provided by
 		<th>502</th>
 		<th>5250</th>
 		<th>1210</th>
-		<th>204351</th>
+		<th>204385</th>
 		<th>3744</th>
 	</tr></tfoot></table>
 
