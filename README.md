@@ -208,12 +208,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.9* (2025-Jul-25 g3d85972+) [linux/amd64]
+DPS8M Proxy v0.0.9 (2025-Jul-25 gb922624) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.9* |
+| dps8m/proxy               | v0.0.9  |
 | arl/statsviz              | v0.6.0  |
 | google/gops               | v0.3.28 |
 | gorilla/websocket         | v1.5.3  |
@@ -451,12 +451,12 @@ predecessor (code statistics 📈 provided by
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>508</th>
-		<th>99</th>
+		<th>507</th>
+		<th>98</th>
 		<th>0</th>
 		<th>409</th>
 		<th>0</th>
-		<th>22984</th>
+		<th>22983</th>
 		<th>392</th>
 	</tr><tr>
 		<th>Shell</th>
@@ -482,12 +482,12 @@ predecessor (code statistics 📈 provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>7235</th>
-		<th>1483</th>
+		<th>7234</th>
+		<th>1482</th>
 		<th>502</th>
 		<th>5250</th>
 		<th>1210</th>
-		<th>204385</th>
+		<th>204384</th>
 		<th>3744</th>
 	</tr></tfoot></table>
 
@@ -622,18 +622,17 @@ and that you know what you’re doing!
   [MIT No Attribution License](https://opensource.org/license/mit-0).
 * All direct and indirect dependencies are licensed under permissive
   open-source licenses:
-
   |                                                                     Dependency | License                                                     |
   |-------------------------------------------------------------------------------:|:------------------------------------------------------------|
   |                                [arl/statsviz](https://github.com/arl/statsviz) | [MIT](https://opensource.org/license/mit)                   |
   |                              [etcd-io/bbolt](https://github.com/etcd-io/bbolt) | [MIT](https://opensource.org/license/mit)                   |
-  |                                  [google/gops](https://github.com/google/gops) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                            [uber-go/goleak](https://github.com/uber-go/goleak) | [MIT](https://opensource.org/license/mit)                   |
   |                      [gorilla/websocket](https://github.com/gorilla/websocket) | [BSD-2-Clause](https://opensource.org/license/bsd-2-clause) |
+  |                                  [google/gops](https://github.com/google/gops) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                    [klauspost/compress](https://github.com/klauspost/compress) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   | [libcap/cap](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/cap) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   | [libcap/psx](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/psx) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                  [spf13/pflag](https://github.com/spf13/pflag) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
-  |                            [uber-go/goleak](https://github.com/uber-go/goleak) | [MIT](https://opensource.org/license/mit)                   |
   |                                [ulikunitz/xz](https://github.com/ulikunitz/xz) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                                [x/crypto](golang.org/x/crypto) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                                      [x/sys](golang.org/x/sys) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
