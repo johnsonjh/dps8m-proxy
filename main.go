@@ -167,6 +167,7 @@ var (
 	consoleLogFile                   *os.File
 	consoleLogMutex                  sync.Mutex
 	consoleLog                       string
+	lastLogDate                      string
 	isConsoleLogQuiet                bool
 	debugNegotiation                 bool
 	debugAddr                        string
@@ -4240,71 +4241,88 @@ func setupConsoleLogging() {
 	}
 
 	rotateConsoleLogAt(time.Now())
+	go startConsoleLogRolloverChecker()
+}
 
-	go func() {
-		for {
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func startConsoleLogRolloverChecker() {
+	ticker := time.NewTicker(1 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
 			now := time.Now()
-			nextMidnight := now.Add(24 * time.Hour).Truncate(24 * time.Hour)
-			time.Sleep(time.Until(nextMidnight))
-
-			rotateConsoleLogAt(time.Now())
+			currentDate := now.Format("2006-01-02")
+			if lastLogDate != currentDate {
+				log.Printf("%sDate changed, rotating console log.",
+					bellPrefix())
+				rotateConsoleLogAt(now)
+			}
+		case <-shutdownSignal:
+			return
 		}
-	}()
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func rotateConsoleLogAt(t time.Time) {
 	consoleLogMutex.Lock()
-	defer consoleLogMutex.Unlock()
-
-	var oldLogPath string
-	if consoleLogFile != nil {
-		oldLogPath = consoleLogFile.Name()
-		if err := consoleLogFile.Close(); err != nil {
-			fmt.Fprintf(os.Stderr,
-				"%s %sError closing previous console log file: %v\r\n",
-				nowStamp(), warnPrefix(), err)
-			isConsoleLogQuiet = false
-			consoleLog = ""
-			consoleLogFile = nil
-			fmt.Fprintf(os.Stderr,
-				"%s %sConsole logging disabled.\r\n",
-				nowStamp(), alertPrefix())
-		}
-	}
 
 	logPath := getConsoleLogPath(t)
 	logDir := filepath.Dir(logPath)
 
-	if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
-		fmt.Fprintf(os.Stderr,
-			"%s %sERROR: Failed to create console log directory: %v\r\n",
+	if err := os.MkdirAll(
+		logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
+		fmt.Fprintf(os.Stderr, "%s %sERROR: Failed to create console log directory: %v\r\n",
 			nowStamp(), warnPrefix(), err)
 		isConsoleLogQuiet = false
 		consoleLog = ""
-		consoleLogFile = nil
-		fmt.Fprintf(os.Stderr,
-			"%s %sConsole logging disabled.\r\n",
-			nowStamp(), alertPrefix())
-	} else {
-		var err error
-		consoleLogFile, err = os.OpenFile(
-			logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
-		if err != nil {
-			if isConsoleLogQuiet {
-				isConsoleLogQuiet = false
-			}
-			fmt.Fprintf(os.Stderr, "%s %sERROR: Failed to open console log file: %v\r\n",
-				nowStamp(), warnPrefix(), err)
-			isConsoleLogQuiet = false
-			consoleLog = ""
-			consoleLogFile = nil
-			fmt.Fprintf(os.Stderr,
-				"%s %sConsole logging disabled.\r\n",
-				nowStamp(), alertPrefix())
+
+		if consoleLogFile != nil {
+			_ = consoleLogFile.Close()
 		}
+
+		consoleLogFile = nil
+		log.SetOutput(os.Stdout)
+		fmt.Fprintf(os.Stderr, "%s %sConsole logging disabled.\r\n",
+			nowStamp(), alertPrefix())
+
+		consoleLogMutex.Unlock()
+
+		return
 	}
+
+	file, err := os.OpenFile(
+		logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
+	if err != nil {
+		if isConsoleLogQuiet {
+			isConsoleLogQuiet = false
+		}
+
+		fmt.Fprintf(os.Stderr, "%s %sERROR: Failed to open new console log file: %v\r\n",
+			nowStamp(), warnPrefix(), err)
+		consoleLog = ""
+
+		if consoleLogFile != nil {
+			_ = consoleLogFile.Close()
+		}
+
+		consoleLogFile = nil
+		log.SetOutput(os.Stdout)
+		fmt.Fprintf(os.Stderr, "%s %sConsole logging disabled.\r\n",
+			nowStamp(), alertPrefix())
+
+		consoleLogMutex.Unlock()
+
+		return
+	}
+
+	oldLogFile := consoleLogFile
+	consoleLogFile = file
+	lastLogDate = t.Format("2006-01-02")
 
 	fileWriter := &emojiStripperWriter{w: consoleLogFile}
 	if isConsoleLogQuiet {
@@ -4313,8 +4331,16 @@ func rotateConsoleLogAt(t time.Time) {
 		log.SetOutput(io.MultiWriter(os.Stdout, fileWriter))
 	}
 
-	if oldLogPath != "" && !noCompress {
-		compressLogFile(oldLogPath)
+	consoleLogMutex.Unlock()
+
+	if oldLogFile != nil {
+		oldLogPath := oldLogFile.Name()
+		if err := oldLogFile.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "%s %sError closing previous console log file: %v\r\n", nowStamp(), warnPrefix(), err)
+		}
+		if !noCompress {
+			compressLogFile(oldLogPath)
+		}
 	}
 }
 

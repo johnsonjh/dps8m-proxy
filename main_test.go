@@ -14,7 +14,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -24,15 +23,71 @@ import (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func TestRotateConsoleLog(t *testing.T) { //nolint:paralleltest
+func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 	defer goleak.VerifyNone(t)
 
 	tmpDir := t.TempDir()
-
 	logDir = tmpDir
 	consoleLog = "noquiet"
 	noCompress = false
 	compressAlgo = "gzip"
+	logPerm = 0o644
+	logDirPerm = 0o755
+
+	originalOutput := log.Writer()
+	log.SetOutput(io.Discard)
+	defer log.SetOutput(originalOutput)
+
+	defer func() {
+		consoleLogMutex.Lock()
+		if consoleLogFile != nil {
+			if err := consoleLogFile.Close(); err != nil {
+				t.Errorf("Failed to close console log file: %v",
+					err)
+			}
+
+			consoleLogFile = nil
+		}
+
+		consoleLogMutex.Unlock()
+	}()
+
+	now := time.Date(2025, 7, 25, 10, 0, 0, 0, time.UTC)
+	rotateConsoleLogAt(now)
+
+	logPath := getConsoleLogPath(now)
+	if _, err := os.Stat(logPath); os.IsNotExist(err) {
+		t.Fatalf("Log file was not created at %s",
+			logPath)
+	}
+
+	log.Printf("Test message")
+	if err := consoleLogFile.Sync(); err != nil {
+		t.Fatalf("Failed to sync log file: %v",
+			err)
+	}
+
+	content, err := os.ReadFile(logPath)
+	if err != nil {
+		t.Fatalf("Failed to read log file: %v",
+			err)
+	}
+
+	if !strings.Contains(string(content), "Test message") {
+		t.Errorf("Log file does not contain the test message. Content:\r\n%s",
+			string(content))
+	}
+}
+
+func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
+	defer goleak.VerifyNone(t)
+
+	tmpDir := t.TempDir()
+	logDir = tmpDir
+	consoleLog = "noquiet"
+	noCompress = false
+	compressAlgo = "gzip"
+
 	logPerm = 0o644
 	logDirPerm = 0o755
 
@@ -43,23 +98,21 @@ func TestRotateConsoleLog(t *testing.T) { //nolint:paralleltest
 
 	defer func() {
 		consoleLogMutex.Lock()
-
 		if consoleLogFile != nil {
 			if err := consoleLogFile.Close(); err != nil {
-				t.Errorf("Failed to close console log file: %v",
-					err)
+				t.Errorf("Failed to close console log file: %v", err)
 			}
+
 			consoleLogFile = nil
 		}
 
 		consoleLogMutex.Unlock()
-		log.SetOutput(originalOutput)
 	}()
 
-	now := time.Date(2025, 7, 25, 10, 0, 0, 0, time.UTC)
-	rotateConsoleLogAt(now)
+	day1 := time.Date(2025, 7, 25, 10, 0, 0, 0, time.UTC)
+	rotateConsoleLogAt(day1)
 
-	day1LogPath := getConsoleLogPath(now)
+	day1LogPath := getConsoleLogPath(day1)
 	if _, err := os.Stat(day1LogPath); os.IsNotExist(err) {
 		t.Fatalf("Log file for day 1 was not created at %s",
 			day1LogPath)
@@ -71,8 +124,8 @@ func TestRotateConsoleLog(t *testing.T) { //nolint:paralleltest
 			err)
 	}
 
-	tomorrow := now.Add(24 * time.Hour)
-	rotateConsoleLogAt(tomorrow)
+	day2 := day1.Add(24 * time.Hour)
+	rotateConsoleLogAt(day2)
 
 	day1CompressedLogPath := day1LogPath + ".gz"
 	if _, err := os.Stat(day1CompressedLogPath); os.IsNotExist(err) {
@@ -85,7 +138,7 @@ func TestRotateConsoleLog(t *testing.T) { //nolint:paralleltest
 			day1LogPath)
 	}
 
-	day2LogPath := getConsoleLogPath(tomorrow)
+	day2LogPath := getConsoleLogPath(day2)
 	if _, err := os.Stat(day2LogPath); os.IsNotExist(err) {
 		t.Fatalf("Log file for day 2 was not created at %s",
 			day2LogPath)
@@ -101,15 +154,6 @@ func TestRotateConsoleLog(t *testing.T) { //nolint:paralleltest
 	if err != nil {
 		t.Fatalf("Failed to read day 2 log file: %v",
 			err)
-	}
-
-	if !filepath.IsAbs(day2LogPath) {
-		absPath, _ := filepath.Abs(day2LogPath)
-		t.Logf("Checking for 'Test message day 2' in %s",
-			absPath)
-	} else {
-		t.Logf("Checking for 'Test message day 2' in %s",
-			day2LogPath)
 	}
 
 	if !strings.Contains(string(content), "Test message day 2") {
