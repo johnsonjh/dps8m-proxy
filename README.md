@@ -208,13 +208,13 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.9* (2025-Jul-25 g1d83214+) [linux/amd64]
+DPS8M Proxy v0.0.9 (2025-Jul-26 g2e82261) [linux/amd64]
 
 +===========================+=========+
 | Component                 | Version |
 +===========================+=========+
-| dps8m/proxy               | v0.0.9* |
-| arl/statsviz              | v0.6.0  |
+| dps8m/proxy               | v0.0.9  |
+| arl/statsviz              | v0.7.0  |
 | google/gops               | v0.3.28 |
 | gorilla/websocket         | v1.5.3  |
 | klauspost/compress        | v1.18.0 |
