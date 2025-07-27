@@ -41,6 +41,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/arl/statsviz"
 	"github.com/klauspost/compress/gzip"
@@ -154,6 +155,7 @@ const (
 // Global variables.
 var (
 	startTime                        = time.Now()
+	forceUTC                         bool
 	allowRoot                        bool
 	dbPerm                           uint = 0o600
 	logPerm                          uint = 0o600
@@ -471,6 +473,10 @@ func init() {
 		"ssh-delay", "e", 0,
 		"Delay for incoming SSH connections\n   [\"0.0\" to \"30.0\" seconds] (no default)")
 
+	pflag.BoolVarP(&forceUTC,
+		"utc", "U", false,
+		"Use UTC (Coordinated Universal Time) for time\n   display and when writing to log files")
+
 	pflag.BoolVarP(&showVersion,
 		"version", "v", false,
 		"Show version information")
@@ -510,6 +516,15 @@ func shutdownWatchdog() {
 
 func main() {
 	pflag.Parse()
+
+	if forceUTC {
+		tz, err := time.LoadLocation("UTC")
+		if err != nil {
+			log.Fatalf("%sERROR: Failed to load UTC zoneinfo: %v",
+				errorPrefix(), err) // LINTED: Fatalf
+		}
+		time.Local = tz //nolint:gosmopolitan
+	}
 
 	if consoleLog != "" {
 		cl := strings.ToLower(consoleLog)
@@ -702,6 +717,7 @@ func main() {
 					}
 
 					acceptErrorsTotal.Add(1)
+
 					log.Printf("%sERROR: Accept error: %v",
 						warnPrefix(), err)
 
@@ -790,6 +806,7 @@ func main() {
 
 					if idleMax > 0 && idleTime > time.Duration(idleMax)*time.Second {
 						idleKillsTotal.Add(1)
+
 						connUptime := time.Since(conn.startTime)
 						log.Printf("%sIDLEKILL [%s] %s@%s (idle %s, link %s)",
 							yellowDotPrefix(), id, conn.userName,
@@ -812,6 +829,7 @@ func main() {
 						delete(connections, id)
 					} else if timeMax > 0 && connUptime > time.Duration(timeMax)*time.Second {
 						timeKillsTotal.Add(1)
+
 						connUptime := time.Since(conn.startTime)
 						log.Printf("%sTIMEKILL [%s] %s@%s (link time %s)",
 							yellowDotPrefix(), id, conn.userName,
@@ -1148,26 +1166,135 @@ func showStats() {
 	if dbPath == "" {
 		type row struct{ Name, Value string }
 		rows := []row{
-			{"TELNET Total Connections", fmt.Sprintf("%d", telnetConnectionsTotal.Load())},
-			{"* TELNET Alt-Host Routings", fmt.Sprintf("%d", altHostRoutesTotal.Load())},
-			{"* TELNET Connection Failures", fmt.Sprintf("%d", telnetFailuresTotal.Load())},
-			{"Peak Concurrent Connections", fmt.Sprintf("%d", peakUsersTotal.Load())},
-			{"Total Proxy Traffic Inbound", formatBytes(trafficOutTotal.Load())},
-			{"Total Proxy Traffic Outbound", formatBytes(trafficInTotal.Load())},
-			{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load())},
-			{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load())},
-			{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load())},
-			{"* SSH Session Request Timeout", fmt.Sprintf("%d", sshRequestTimeoutTotal.Load())},
-			{"* SSH Illegal Request (SFTP)", fmt.Sprintf("%d", sshIllegalSubsystemTotal.Load())},
-			{"* SSH Illegal Request (SCP/EXEC)", fmt.Sprintf("%d", sshExecRejectedTotal.Load())},
-			{"* SSH Accept Errors", fmt.Sprintf("%d", acceptErrorsTotal.Load())},
-			{"* SSH Handshake Errors", fmt.Sprintf("%d", sshHandshakeFailedTotal.Load())},
-			{"Connections Killed by Admin", fmt.Sprintf("%d", adminKillsTotal.Load())},
-			{"Connections Killed for Idle Time", fmt.Sprintf("%d", idleKillsTotal.Load())},
-			{"Connections Killed for Max Time", fmt.Sprintf("%d", timeKillsTotal.Load())},
-			{"Connections Killed via Delay", fmt.Sprintf("%d", delayAbandonedTotal.Load())},
-			{"Blacklist Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load())},
-			{"Whitelist Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load())},
+			{
+				"TELNET Total Connections",
+				fmt.Sprintf("%d",
+					telnetConnectionsTotal.Load()),
+			},
+
+			{
+				"* TELNET Alt-Host Routings",
+				fmt.Sprintf("%d",
+					altHostRoutesTotal.Load()),
+			},
+
+			{
+				"* TELNET Connection Failures",
+				fmt.Sprintf("%d",
+					telnetFailuresTotal.Load()),
+			},
+
+			{
+				"Peak Concurrent Connections",
+				fmt.Sprintf("%d",
+					peakUsersTotal.Load()),
+			},
+
+			{
+				"Total Proxy Traffic Inbound",
+				formatBytes(trafficOutTotal.Load()),
+			},
+
+			{
+				"Total Proxy Traffic Outbound",
+				formatBytes(trafficInTotal.Load()),
+			},
+
+			{
+				"SSH Total Connections",
+				fmt.Sprintf("%d",
+					sshConnectionsTotal.Load()),
+			},
+
+			{
+				"* SSH User Sessions",
+				fmt.Sprintf("%d",
+					sshSessionsTotal.Load()),
+			},
+
+			{
+				"* SSH Monitoring Sessions",
+				fmt.Sprintf("%d",
+					monitorSessionsTotal.Load()),
+			},
+
+			{
+				"* SSH Session Request Timeout",
+				fmt.Sprintf("%d",
+					sshRequestTimeoutTotal.Load()),
+			},
+
+			{
+				"* SSH Illegal Request (SFTP)",
+				fmt.Sprintf("%d",
+					sshIllegalSubsystemTotal.Load()),
+			},
+
+			{
+				"* SSH Illegal Request (SCP/EXEC)",
+				fmt.Sprintf("%d",
+					sshExecRejectedTotal.Load()),
+			},
+
+			{
+				"* SSH Accept Errors",
+				fmt.Sprintf("%d",
+					acceptErrorsTotal.Load()),
+			},
+
+			{
+				"* SSH Handshake Errors",
+				fmt.Sprintf("%d",
+					sshHandshakeFailedTotal.Load()),
+			},
+
+			{
+				"* SSH Other Errors/Disconnects",
+				fmt.Sprintf("%d",
+					sshSessionsTotal.Load()-
+						monitorSessionsTotal.Load()-
+						sshRequestTimeoutTotal.Load()-
+						sshIllegalSubsystemTotal.Load()-
+						sshExecRejectedTotal.Load()-
+						acceptErrorsTotal.Load()-
+						sshHandshakeFailedTotal.Load()),
+			},
+
+			{
+				"Connections Killed by Admin",
+				fmt.Sprintf("%d",
+					adminKillsTotal.Load()),
+			},
+
+			{
+				"Connections Killed for Idle Time",
+				fmt.Sprintf("%d",
+					idleKillsTotal.Load()),
+			},
+
+			{
+				"Connections Killed for Max Time",
+				fmt.Sprintf("%d",
+					timeKillsTotal.Load()),
+			},
+
+			{
+				"Connections Killed via Delay",
+				fmt.Sprintf("%d",
+					delayAbandonedTotal.Load()),
+			},
+
+			{
+				"Blacklist Rejected Connections",
+				fmt.Sprintf("%d",
+					rejectedTotal.Load()),
+			},
+
+			{
+				"Whitelist Exempted Connections",
+				fmt.Sprintf("%d",
+					exemptedTotal.Load()),
+			},
 		}
 
 		maxName := len("Statistic")
@@ -1195,7 +1322,7 @@ func showStats() {
 			fmt.Printf("\r| %-*s | %*s |\r\n",
 				maxName, r.Name, maxVal, r.Value)
 
-			if i == 2 || i == 5 || i == 13 || i == 17 || i == 19 {
+			if i == 2 || i == 5 || i == 14 || i == 18 || i == 20 {
 				fmt.Print(border)
 			}
 		}
@@ -1204,26 +1331,182 @@ func showStats() {
 	} else {
 		type row struct{ Name, Value, Lifetime string }
 		rows := []row{
-			{"TELNET Total Connections", fmt.Sprintf("%d", telnetConnectionsTotal.Load()), fmt.Sprintf("%d", lifetimeTelnetConnectionsTotal.Load()+telnetConnectionsTotal.Load())},           //nolint:lll
-			{"* TELNET Alt-Host Routings", fmt.Sprintf("%d", altHostRoutesTotal.Load()), fmt.Sprintf("%d", lifetimeAltHostRoutesTotal.Load()+altHostRoutesTotal.Load())},                     //nolint:lll
-			{"* TELNET Connection Failures", fmt.Sprintf("%d", telnetFailuresTotal.Load()), fmt.Sprintf("%d", lifetimeTelnetFailuresTotal.Load()+telnetFailuresTotal.Load())},                //nolint:lll
-			{"Peak Concurrent Connections", fmt.Sprintf("%d", peakUsersTotal.Load()), fmt.Sprintf("%d", lifetimePeakUsersTotal.Load())},                                                      //nolint:lll
-			{"Total Proxy Traffic Inbound", formatBytes(trafficOutTotal.Load()), formatBytes(lifetimeTrafficOutTotal.Load() + trafficOutTotal.Load())},                                       //nolint:lll
-			{"Total Proxy Traffic Outbound", formatBytes(trafficInTotal.Load()), formatBytes(lifetimeTrafficInTotal.Load() + trafficInTotal.Load())},                                         //nolint:lll
-			{"SSH Total Connections", fmt.Sprintf("%d", sshConnectionsTotal.Load()), fmt.Sprintf("%d", lifetimeSSHconnectionsTotal.Load()+sshConnectionsTotal.Load())},                       //nolint:lll
-			{"* SSH User Sessions", fmt.Sprintf("%d", sshSessionsTotal.Load()), fmt.Sprintf("%d", lifetimeSSHsessionsTotal.Load()+sshSessionsTotal.Load())},                                  //nolint:lll
-			{"* SSH Monitoring Sessions", fmt.Sprintf("%d", monitorSessionsTotal.Load()), fmt.Sprintf("%d", lifetimeMonitorSessionsTotal.Load()+monitorSessionsTotal.Load())},                //nolint:lll
-			{"* SSH Session Request Timeout", fmt.Sprintf("%d", sshRequestTimeoutTotal.Load()), fmt.Sprintf("%d", lifetimeSSHrequestTimeoutTotal.Load()+sshRequestTimeoutTotal.Load())},      //nolint:lll
-			{"* SSH Illegal Request (SFTP)", fmt.Sprintf("%d", sshIllegalSubsystemTotal.Load()), fmt.Sprintf("%d", lifetimeSSHillegalSubsystemTotal.Load()+sshIllegalSubsystemTotal.Load())}, //nolint:lll
-			{"* SSH Illegal Request (SCP/EXEC)", fmt.Sprintf("%d", sshExecRejectedTotal.Load()), fmt.Sprintf("%d", lifetimeSSHexecRejectedTotal.Load()+sshExecRejectedTotal.Load())},         //nolint:lll
-			{"* SSH Accept Errors", fmt.Sprintf("%d", acceptErrorsTotal.Load()), fmt.Sprintf("%d", lifetimeAcceptErrorsTotal.Load()+acceptErrorsTotal.Load())},                               //nolint:lll
-			{"* SSH Handshake Errors", fmt.Sprintf("%d", sshHandshakeFailedTotal.Load()), fmt.Sprintf("%d", lifetimeSSHhandshakeFailedTotal.Load()+sshHandshakeFailedTotal.Load())},          //nolint:lll
-			{"Connections Killed by Admin", fmt.Sprintf("%d", adminKillsTotal.Load()), fmt.Sprintf("%d", lifetimeAdminKillsTotal.Load()+adminKillsTotal.Load())},                             //nolint:lll
-			{"Connections Killed for Idle Time", fmt.Sprintf("%d", idleKillsTotal.Load()), fmt.Sprintf("%d", lifetimeIdleKillsTotal.Load()+idleKillsTotal.Load())},                           //nolint:lll
-			{"Connections Killed for Max Time", fmt.Sprintf("%d", timeKillsTotal.Load()), fmt.Sprintf("%d", lifetimeTimeKillsTotal.Load()+timeKillsTotal.Load())},                            //nolint:lll
-			{"Connections Killed via Delay", fmt.Sprintf("%d", delayAbandonedTotal.Load()), fmt.Sprintf("%d", lifetimeDelayAbandonedTotal.Load()+delayAbandonedTotal.Load())},                //nolint:lll
-			{"Blacklist Rejected Connections", fmt.Sprintf("%d", rejectedTotal.Load()), fmt.Sprintf("%d", lifetimeRejectedTotal.Load()+rejectedTotal.Load())},                                //nolint:lll
-			{"Whitelist Exempted Connections", fmt.Sprintf("%d", exemptedTotal.Load()), fmt.Sprintf("%d", lifetimeExemptedTotal.Load()+exemptedTotal.Load())},                                //nolint:lll
+			{
+				"TELNET Total Connections",
+				fmt.Sprintf("%d",
+					telnetConnectionsTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeTelnetConnectionsTotal.Load()+telnetConnectionsTotal.Load()),
+			},
+
+			{
+				"* TELNET Alt-Host Routings",
+				fmt.Sprintf("%d",
+					altHostRoutesTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeAltHostRoutesTotal.Load()+altHostRoutesTotal.Load()),
+			},
+
+			{
+				"* TELNET Connection Failures",
+				fmt.Sprintf("%d",
+					telnetFailuresTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeTelnetFailuresTotal.Load()+telnetFailuresTotal.Load()),
+			},
+
+			{
+				"Peak Concurrent Connections",
+				fmt.Sprintf("%d",
+					peakUsersTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimePeakUsersTotal.Load()),
+			},
+
+			{
+				"Total Proxy Traffic Inbound",
+				formatBytes(trafficOutTotal.Load()),
+				formatBytes(lifetimeTrafficOutTotal.Load() + trafficOutTotal.Load()),
+			},
+
+			{
+				"Total Proxy Traffic Outbound",
+				formatBytes(trafficInTotal.Load()),
+				formatBytes(lifetimeTrafficInTotal.Load() + trafficInTotal.Load()),
+			},
+
+			{
+				"SSH Total Connections",
+				fmt.Sprintf("%d",
+					sshConnectionsTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeSSHconnectionsTotal.Load()+sshConnectionsTotal.Load()),
+			},
+
+			{
+				"* SSH User Sessions",
+				fmt.Sprintf("%d",
+					sshSessionsTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeSSHsessionsTotal.Load()+sshSessionsTotal.Load()),
+			},
+
+			{
+				"* SSH Monitoring Sessions",
+				fmt.Sprintf("%d",
+					monitorSessionsTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeMonitorSessionsTotal.Load()+monitorSessionsTotal.Load()),
+			},
+
+			{
+				"* SSH Session Request Timeout",
+				fmt.Sprintf("%d",
+					sshRequestTimeoutTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeSSHrequestTimeoutTotal.Load()+sshRequestTimeoutTotal.Load()),
+			},
+
+			{
+				"* SSH Illegal Request (SFTP)",
+				fmt.Sprintf("%d",
+					sshIllegalSubsystemTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeSSHillegalSubsystemTotal.Load()+sshIllegalSubsystemTotal.Load()),
+			},
+
+			{
+				"* SSH Illegal Request (SCP/EXEC)",
+				fmt.Sprintf("%d",
+					sshExecRejectedTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeSSHexecRejectedTotal.Load()+sshExecRejectedTotal.Load()),
+			},
+
+			{
+				"* SSH Accept Errors",
+				fmt.Sprintf("%d",
+					acceptErrorsTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeAcceptErrorsTotal.Load()+acceptErrorsTotal.Load()),
+			},
+
+			{
+				"* SSH Handshake Errors",
+				fmt.Sprintf("%d",
+					sshHandshakeFailedTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeSSHhandshakeFailedTotal.Load()+sshHandshakeFailedTotal.Load()),
+			},
+
+			{
+				"* SSH Other Errors/Disconnects",
+				fmt.Sprintf("%d",
+					sshConnectionsTotal.Load()-
+						sshSessionsTotal.Load()-
+						monitorSessionsTotal.Load()-
+						sshRequestTimeoutTotal.Load()-
+						sshIllegalSubsystemTotal.Load()-
+						sshExecRejectedTotal.Load()-
+						acceptErrorsTotal.Load()-
+						sshHandshakeFailedTotal.Load()),
+				fmt.Sprintf("%d",
+					(lifetimeSSHconnectionsTotal.Load()+sshConnectionsTotal.Load())-
+						(lifetimeSSHsessionsTotal.Load()+sshSessionsTotal.Load())-
+						(lifetimeMonitorSessionsTotal.Load()+monitorSessionsTotal.Load())-
+						(lifetimeSSHrequestTimeoutTotal.Load()+sshRequestTimeoutTotal.Load())-
+						(lifetimeSSHillegalSubsystemTotal.Load()+sshIllegalSubsystemTotal.Load())-
+						(lifetimeSSHexecRejectedTotal.Load()+sshExecRejectedTotal.Load())-
+						(lifetimeAcceptErrorsTotal.Load()+acceptErrorsTotal.Load())-
+						(lifetimeSSHhandshakeFailedTotal.Load()+sshHandshakeFailedTotal.Load())),
+			},
+
+			{
+				"Connections Killed by Admin",
+				fmt.Sprintf("%d",
+					adminKillsTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeAdminKillsTotal.Load()+adminKillsTotal.Load()),
+			},
+
+			{
+				"Connections Killed for Idle Time",
+				fmt.Sprintf("%d", idleKillsTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeIdleKillsTotal.Load()+idleKillsTotal.Load()),
+			},
+
+			{
+				"Connections Killed for Max Time",
+				fmt.Sprintf("%d",
+					timeKillsTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeTimeKillsTotal.Load()+timeKillsTotal.Load()),
+			},
+
+			{
+				"Connections Killed via Delay",
+				fmt.Sprintf("%d",
+					delayAbandonedTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeDelayAbandonedTotal.Load()+delayAbandonedTotal.Load()),
+			},
+
+			{
+				"Blacklist Rejected Connections",
+				fmt.Sprintf("%d",
+					rejectedTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeRejectedTotal.Load()+rejectedTotal.Load()),
+			},
+
+			{
+				"Whitelist Exempted Connections",
+				fmt.Sprintf("%d",
+					exemptedTotal.Load()),
+				fmt.Sprintf("%d",
+					lifetimeExemptedTotal.Load()+exemptedTotal.Load()),
+			},
 		}
 
 		maxName := len("Statistic")
@@ -1260,7 +1543,7 @@ func showStats() {
 			fmt.Printf("\r| %-*s | %*s | %*s |\r\n",
 				maxName, r.Name, maxVal, r.Value, maxLifetime, r.Lifetime)
 
-			if i == 2 || i == 5 || i == 13 || i == 17 || i == 19 {
+			if i == 2 || i == 5 || i == 14 || i == 18 || i == 20 {
 				fmt.Print(border)
 			}
 		}
@@ -2215,6 +2498,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	sshConn, chans, reqs, err := ssh.NewServerConn(rawConn, config)
 	if err != nil {
 		sshHandshakeFailedTotal.Add(1)
+
 		log.Printf("%sTEARDOWN [%s] HANDSHAKE FAILED: %v",
 			yellowDotPrefix(), sid, err)
 
@@ -2505,6 +2789,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							}
 
 							sshIllegalSubsystemTotal.Add(1)
+
 							if err := req.Reply(false, nil); err != nil {
 								log.Printf("%sError replying to request: %v",
 									warnPrefix(), err)
@@ -2611,6 +2896,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					greenHeartPrefix(), conn.ID,
 					conn.sshConn.RemoteAddr().String(), exemptedByRule)
 			}
+
 			exemptedTotal.Add(1)
 		} else {
 			if !suppressLogs {
@@ -2618,6 +2904,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					redDotPrefix(), conn.ID,
 					conn.sshConn.RemoteAddr().String(), rejectedByRule)
 			}
+
 			rejectedTotal.Add(1)
 
 			if raw, err := getFileContent(blockFile, conn.userName); err == nil {
@@ -2664,8 +2951,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				char))); err != nil {
 				if errors.Is(err, io.EOF) {
 					delayAbandonedTotal.Add(1)
+
 					log.Printf("%sWAITKILL [%s] %s@%s: %v",
 						yellowDotPrefix(), conn.ID, conn.userName, conn.hostName, err)
+
 					if err := conn.sshConn.Close(); err != nil {
 						if !strings.Contains(err.Error(), "use of closed network connection") {
 							log.Printf("%sError closing SSH connection for %s: %v",
@@ -2689,8 +2978,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		if _, err := channel.Write([]byte("\r \r")); err != nil {
 			if errors.Is(err, io.EOF) {
 				delayAbandonedTotal.Add(1)
+
 				log.Printf("%sWAITKILL [%s] %s@%s: %v",
 					yellowDotPrefix(), conn.ID, conn.userName, conn.hostName, err)
+
 				if err := conn.sshConn.Close(); err != nil {
 					if !strings.Contains(err.Error(), "use of closed network connection") {
 						log.Printf("%sError closing SSH connection for %s: %v",
@@ -2870,10 +3161,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 			return
 		}
+
 		log.Printf("%sALTROUTE [%s] %s -> %s:%d",
 			greenDotPrefix(), conn.ID, conn.userName, targetHost, targetPort)
+
 		conn.targetHost = targetHost
 		conn.targetPort = targetPort
+
 		altHostRoutesTotal.Add(1)
 	} else {
 		var err error
@@ -2915,6 +3209,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	remote, err := net.Dial("tcp", fmt.Sprintf("%s:%d", targetHost, targetPort))
 	if err != nil {
 		telnetFailuresTotal.Add(1)
+
 		if _, err := fmt.Fprintf(channel,
 			"%v\r\n\r\n",
 			err); err != nil {
@@ -2923,6 +3218,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		}
 
 		log.Printf("%v", err)
+
 		if err := channel.Close(); err != nil {
 			log.Printf("%sError closing channel for %s: %v",
 				warnPrefix(), conn.ID, err)
@@ -3157,6 +3453,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				log.Printf("%sError setting read deadline for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
+
 			n, err := remote.Read(buf)
 			trafficInTotal.Add(uint64(n)) //nolint:gosec
 			if err != nil {
@@ -4336,7 +4633,8 @@ func rotateConsoleLogAt(t time.Time) {
 	if oldLogFile != nil {
 		oldLogPath := oldLogFile.Name()
 		if err := oldLogFile.Close(); err != nil {
-			fmt.Fprintf(os.Stderr, "%s %sError closing previous console log file: %v\r\n", nowStamp(), warnPrefix(), err)
+			fmt.Fprintf(os.Stderr, "%s %sError closing previous console log file: %v\r\n",
+				nowStamp(), warnPrefix(), err)
 		}
 		if !noCompress {
 			compressLogFile(oldLogPath)

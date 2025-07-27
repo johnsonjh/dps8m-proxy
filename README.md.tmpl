@@ -99,6 +99,11 @@ are, hopefully, documented here:
     **only** to the log file, where in `noquiet` mode, messages are
     logged to **both** the console and the log file.
 
+  * By default, the local time zone is used for time display and
+    writing log files.  Users can specify the `-U` (`‑‑utc`) option
+    to use UTC (Coordinated Universal Time) instead.  Additionally, on
+    Unix-like systems, the `TZ` environment variable is respected.
+
   * If the proxy fails to create log directories or files, a warning
     will be displayed on the console and the session and/or console
     logging feature *may* be (but is not guaranteed to be) disabled.
