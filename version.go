@@ -24,6 +24,10 @@ var nameReplacements = []struct{ old, new string }{
 	{"gitlab.com/", ""},
 }
 
+var versionReplacements = []struct{ old, new string }{
+	{"v0.3.29-0.20250514124927-a2d8f7790eac", "v0.3.29* (2025-May-14, ga2d8f77)"},
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func printVersionTable() {
@@ -40,7 +44,7 @@ func printVersionTable() {
 
 		rows = append(rows, row{
 			Name:    sanitizeName(info.Main.Path),
-			Version: v,
+			Version: sanitizeVersion(v),
 		})
 
 		for _, dep := range info.Deps {
@@ -53,7 +57,7 @@ func printVersionTable() {
 
 			rows = append(rows, row{
 				Name:    sanitizeName(dep.Path),
-				Version: v,
+				Version: sanitizeVersion(v),
 			})
 		}
 	}
@@ -148,6 +152,16 @@ func sanitizeName(name string) string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+func sanitizeVersion(version string) string {
+	for _, rep := range versionReplacements {
+		version = strings.ReplaceAll(version, rep.old, rep.new)
+	}
+
+	return version
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func trimVersion(version, sum string) string {
 	if sum == "" {
 		if i := strings.Index(version, "-"); i != -1 {
@@ -193,7 +207,7 @@ func getMainModuleVersion() string {
 		v += "*"
 	}
 
-	return v
+	return sanitizeVersion(v)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
