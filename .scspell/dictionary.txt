@@ -35,6 +35,7 @@ linted
 mccp
 mssp
 naws
+noinlineerr
 nolint
 nolintlint
 noquiet
@@ -54,6 +55,7 @@ sigterm
 sigusr
 sprintf
 sshuser
+staticcheck
 statsviz
 stdin
 stdout
@@ -90,10 +92,14 @@ gochecknoglobals
 gochecknoinits
 gocognit
 gocyclo
+goimports
+golines
 ireturn
 maintidx
 nestif
+noctx
 perfsprint
+swaggo
 tenv
 varnamelen
 wrapcheck
@@ -254,12 +260,15 @@ emacs
 emoji
 entrypoint
 etcd
+formatters
 formfeed
 gccgo
 gibibyte
 gibibytes
 github
 gitlab
+gofmt
+gofumpt
 golang
 google
 goroutines

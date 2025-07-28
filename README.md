@@ -85,7 +85,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```
-DPS8M Proxy v0.1.1 (2025-Jul-28 g61b6436) [linux/amd64]
+DPS8M Proxy v0.1.1* (2025-Jul-28 gaf5b195+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -222,12 +222,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.1.1 (2025-Jul-28 g61b6436) [linux/amd64]
+DPS8M Proxy v0.1.1* (2025-Jul-28 gaf5b195+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.1                           |
+| dps8m/proxy               | v0.1.1*                          |
 | arl/statsviz              | v0.7.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -445,13 +445,13 @@ predecessor (code statistics 📈 provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>15</th>
-		<th>6512</th>
-		<th>1350</th>
+		<th>6675</th>
+		<th>1353</th>
 		<th>318</th>
-		<th>4844</th>
+		<th>5004</th>
 		<th>1176</th>
-		<th>165606</th>
-		<th>3031</th>
+		<th>166464</th>
+		<th>3046</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -459,19 +459,19 @@ predecessor (code statistics 📈 provided by
 		<th>66</th>
 		<th>72</th>
 		<th>239</th>
-		<th>46</th>
-		<th>12026</th>
-		<th>262</th>
+		<th>48</th>
+		<th>12142</th>
+		<th>263</th>
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>514</th>
+		<th>515</th>
 		<th>99</th>
 		<th>0</th>
-		<th>415</th>
+		<th>416</th>
 		<th>0</th>
-		<th>23376</th>
-		<th>398</th>
+		<th>23383</th>
+		<th>399</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
@@ -496,13 +496,13 @@ predecessor (code statistics 📈 provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>7728</th>
-		<th>1575</th>
+		<th>7892</th>
+		<th>1578</th>
 		<th>526</th>
-		<th>5627</th>
-		<th>1234</th>
-		<th>211596</th>
-		<th>3893</th>
+		<th>5788</th>
+		<th>1236</th>
+		<th>212577</th>
+		<th>3910</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -609,9 +609,10 @@ and that you know what you’re doing!
 ### Recommended
 
 * While not absolutely required, it’s a good idea to have the latest
-  [`golangci-lint`](https://golangci-lint.run/) installed.  We ship a
-  [config file](.golangci.yml) file for it, and try to make sure that
-  all the tests pass when using the most recently released version.
+  [`golangci-lint`](https://golangci-lint.run/) (v2) installed.  We
+  ship a [config file](.golangci.yml) file for it, and try to make
+  sure that all the tests pass when using the most recently released
+  version.
 * It’s also recommended to (*manually*) use
   [`hunspell`](https://hunspell.github.io/) for spell
   checking—in addition to using `codespell` and `scspell`.

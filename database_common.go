@@ -94,10 +94,12 @@ func initDB() {
 
 		startTimeVal := bucket.Get(initialStartTimeKey)
 		if startTimeVal == nil {
-			if err := bucket.Put(initialStartTimeKey,
-				[]byte(startTime.Format(time.RFC3339))); err != nil {
+			err := bucket.Put(initialStartTimeKey,
+				[]byte(startTime.Format(time.RFC3339)))
+			if err != nil {
 				return err
 			}
+
 			persistedStartTime = startTime
 		} else {
 			pStartTime, err := time.Parse(time.RFC3339, string(startTimeVal))
@@ -157,7 +159,8 @@ func writeCountersToDB() {
 		for key, val := range counters {
 			buf := make([]byte, 8)
 			binary.BigEndian.PutUint64(buf, val)
-			if err := bucket.Put([]byte(key), buf); err != nil {
+			err := bucket.Put([]byte(key), buf)
+			if err != nil {
 				return err
 			}
 		}

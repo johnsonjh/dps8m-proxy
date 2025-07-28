@@ -104,7 +104,8 @@ func isUTF8windows() bool {
 
 	defer func() {
 		os.Stdout = original
-		if err := null.Close(); err != nil {
+		err := null.Close()
+		if err != nil {
 			log.Printf("%sError closing null: %v",
 				warnPrefix(), err)
 		}

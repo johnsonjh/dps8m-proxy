@@ -29,9 +29,9 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 
 	tmpDir := t.TempDir()
 	logDir = tmpDir
-	consoleLog = "noquiet"
+	consoleLog = "noquiet" //nolint:goconst
 	noCompress = false
-	compressAlgo = "gzip"
+	compressAlgo = "gzip" //nolint:goconst
 	logPerm = 0o644
 	logDirPerm = 0o755
 
@@ -42,7 +42,8 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 	defer func() {
 		consoleLogMutex.Lock()
 		if consoleLogFile != nil {
-			if err := consoleLogFile.Close(); err != nil {
+			err := consoleLogFile.Close()
+			if err != nil {
 				t.Errorf("Failed to close console log file: %v",
 					err)
 			}
@@ -57,18 +58,19 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 	rotateConsoleLogAt(now)
 
 	logPath := getConsoleLogPath(now)
-	if _, err := os.Stat(logPath); os.IsNotExist(err) {
+	if _, err := os.Stat(logPath); os.IsNotExist(err) { //nolint:noinlineerr
 		t.Fatalf("Log file was not created at %s",
 			logPath)
 	}
 
 	log.Printf("Test message")
-	if err := consoleLogFile.Sync(); err != nil {
+	err := consoleLogFile.Sync()
+	if err != nil {
 		t.Fatalf("Failed to sync log file: %v",
 			err)
 	}
 
-	content, err := os.ReadFile(logPath)
+	content, err := os.ReadFile(logPath) //nolint:gosec
 	if err != nil {
 		t.Fatalf("Failed to read log file: %v",
 			err)
@@ -100,7 +102,8 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	defer func() {
 		consoleLogMutex.Lock()
 		if consoleLogFile != nil {
-			if err := consoleLogFile.Close(); err != nil {
+			err := consoleLogFile.Close()
+			if err != nil {
 				t.Errorf("Failed to close console log file: %v", err)
 			}
 
@@ -114,13 +117,14 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	rotateConsoleLogAt(day1)
 
 	day1LogPath := getConsoleLogPath(day1)
-	if _, err := os.Stat(day1LogPath); os.IsNotExist(err) {
+	if _, err := os.Stat(day1LogPath); os.IsNotExist(err) { //nolint:noinlineerr
 		t.Fatalf("Log file for day 1 was not created at %s",
 			day1LogPath)
 	}
 
 	log.Printf("Test message day 1")
-	if err := consoleLogFile.Sync(); err != nil {
+	err := consoleLogFile.Sync()
+	if err != nil {
 		t.Fatalf("Failed to sync log file for day 1: %v",
 			err)
 	}
@@ -129,29 +133,30 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	rotateConsoleLogAt(day2)
 
 	day1CompressedLogPath := day1LogPath + ".gz"
-	if _, err := os.Stat(day1CompressedLogPath); os.IsNotExist(err) {
+	if _, err := os.Stat(day1CompressedLogPath); os.IsNotExist(err) { //nolint:noinlineerr
 		t.Fatalf("Compressed log file for day 1 was not created at %s",
 			day1CompressedLogPath)
 	}
 
-	if _, err := os.Stat(day1LogPath); !os.IsNotExist(err) {
+	if _, err := os.Stat(day1LogPath); !os.IsNotExist(err) { //nolint:noinlineerr
 		t.Fatalf("Old log file for day 1 was not removed after compression from %s",
 			day1LogPath)
 	}
 
 	day2LogPath := getConsoleLogPath(day2)
-	if _, err := os.Stat(day2LogPath); os.IsNotExist(err) {
+	if _, err := os.Stat(day2LogPath); os.IsNotExist(err) { //nolint:noinlineerr
 		t.Fatalf("Log file for day 2 was not created at %s",
 			day2LogPath)
 	}
 
 	log.Printf("Test message day 2")
-	if err := consoleLogFile.Sync(); err != nil {
+	err = consoleLogFile.Sync()
+	if err != nil {
 		t.Fatalf("Failed to sync log file for day 2: %v",
 			err)
 	}
 
-	content, err := os.ReadFile(day2LogPath)
+	content, err := os.ReadFile(day2LogPath) //nolint:gosec
 	if err != nil {
 		t.Fatalf("Failed to read day 2 log file: %v",
 			err)

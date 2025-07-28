@@ -603,7 +603,7 @@ func main() {
 	}
 
 	switch compressAlgo {
-	case "gzip", "xz", "zstd": //nolint:goconst
+	case "gzip", "xz", "zstd":
 
 	default:
 		log.Fatalf("%sERROR: Invalid --compress-algo: %s",
@@ -663,7 +663,8 @@ func main() {
 	setupConsoleLogging()
 
 	if !noLog || consoleLog != "" {
-		if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
+		err := os.MkdirAll(logDir, os.FileMode(logDirPerm)) //nolint:gosec
+		if err != nil {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: Failed to create session log directory: %v\r\n",
 				nowStamp(), warnPrefix(), err)
@@ -673,11 +674,13 @@ func main() {
 			noLog = true
 		}
 
-		if p, err := filepath.EvalSymlinks(logDir); err == nil {
+		p, err := filepath.EvalSymlinks(logDir)
+		if err == nil {
 			logDir = p
 		}
 
-		if p, err := filepath.Abs(logDir); err == nil {
+		p, err = filepath.Abs(logDir)
+		if err == nil {
 			logDir = p
 		}
 
@@ -747,7 +750,8 @@ func main() {
 					errorPrefix(), addr, err) // LINTED: Fatalf
 			}
 			defer func() {
-				if err := listener.Close(); err != nil {
+				err := listener.Close()
+				if err != nil {
 					log.Printf("%sFailed to close listener for %s: %v",
 						warnPrefix(), addr, err)
 				}
@@ -857,15 +861,17 @@ func main() {
 							conn.hostName, idleTime.Round(time.Second),
 							connUptime.Round(time.Second))
 
-						if _, err := conn.channel.Write([]byte(fmt.Sprintf(
+						_, err := conn.channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 							"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
-							connUptime.Round(time.Second)))); err != nil {
+							connUptime.Round(time.Second))))
+						if err != nil {
 							log.Printf(
 								"%sError writing idle timeout message to channel for %s: %v",
 								warnPrefix(), id, err)
 						}
 
-						if err := conn.sshConn.Close(); err != nil {
+						err = conn.sshConn.Close()
+						if err != nil {
 							log.Printf("%sError closing SSH connection for %s: %v",
 								warnPrefix(), id, err)
 						}
@@ -879,15 +885,17 @@ func main() {
 							yellowDotPrefix(), id, conn.userName,
 							conn.hostName, connUptime.Round(time.Second))
 
-						if _, err := conn.channel.Write([]byte(fmt.Sprintf(
+						_, err := conn.channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 							"\r\n\r\nCONNECTION TIMEOUT (link time %s)\r\n\r\n",
-							connUptime.Round(time.Second)))); err != nil {
+							connUptime.Round(time.Second))))
+						if err != nil {
 							log.Printf(
 								"%sError writing connection timeout message to channel for %s: %v",
 								warnPrefix(), id, err)
 						}
 
-						if err := conn.sshConn.Close(); err != nil {
+						err = conn.sshConn.Close()
+						if err != nil {
 							log.Printf("%sError closing SSH connection for %s: %v",
 								warnPrefix(), id, err)
 						}
@@ -1116,9 +1124,10 @@ func handleConsoleInput() {
 
 		case "r", "R":
 			if blacklistFile == "" || whitelistFile == "" {
-				if _, err := fmt.Fprintf(os.Stdout,
+				_, err := fmt.Fprintf(os.Stdout,
 					"%s %sReload requested but no lists enabled.\r\n",
-					nowStamp(), alertPrefix()); err != nil {
+					nowStamp(), alertPrefix())
+				if err != nil {
 					log.Printf("%sError writing to stdout: %v",
 						boomPrefix(), err)
 				}
@@ -1147,9 +1156,10 @@ func handleConsoleInput() {
 		case "":
 
 		default:
-			if _, err := fmt.Fprintf(os.Stdout,
+			_, err := fmt.Fprintf(os.Stdout,
 				"%s Unknown command: %s\r\n",
-				nowStamp(), cmd); err != nil {
+				nowStamp(), cmd)
+			if err != nil {
 				log.Printf("%sError writing to stdout: %v",
 					boomPrefix(), err)
 			}
@@ -1690,8 +1700,9 @@ func immediateShutdown() {
 
 		for _, conn := range connections {
 			if conn.channel != nil {
-				if _, err := conn.channel.Write(
-					[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n")); err != nil {
+				_, err := conn.channel.Write(
+					[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
@@ -1707,7 +1718,8 @@ func immediateShutdown() {
 			}
 
 			if conn.sshConn != nil {
-				if err := conn.sshConn.Close(); err != nil {
+				err := conn.sshConn.Close()
+				if err != nil {
 					log.Printf("%sError closing SSH connection for %s: %v",
 						alertPrefix(), conn.ID, err)
 				}
@@ -2305,9 +2317,10 @@ func killConnection(id string) {
 	}
 
 	if isConsoleLogQuiet {
-		if _, err := fmt.Fprintf(os.Stdout,
+		_, err := fmt.Fprintf(os.Stdout,
 			"%s %sKilling connection %s...\r\n",
-			nowStamp(), skullPrefix(), id); err != nil {
+			nowStamp(), skullPrefix(), id)
+		if err != nil {
 			log.Printf("%sError writing to Stdout: %v",
 				warnPrefix(), err)
 		}
@@ -2315,8 +2328,9 @@ func killConnection(id string) {
 	log.Printf("%sKilling connection %s...\r\n",
 		skullPrefix(), id)
 
-	if _, err := conn.channel.Write(
-		[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n")); err != nil {
+	_, err := conn.channel.Write(
+		[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+	if err != nil {
 		log.Printf("%sError writing to channel for %s: %v",
 			warnPrefix(), conn.ID, err)
 	}
@@ -2329,7 +2343,8 @@ func killConnection(id string) {
 
 	adminKillsTotal.Add(1)
 
-	if err := conn.sshConn.Close(); err != nil {
+	err = conn.sshConn.Close()
+	if err != nil {
 		log.Printf("%sError closing SSH connection for %s: %v",
 			warnPrefix(), conn.ID, err)
 	}
@@ -2365,17 +2380,19 @@ func killAllConnections() {
 		}
 
 		if isConsoleLogQuiet {
-			if _, err := fmt.Fprintf(os.Stdout,
+			_, err := fmt.Fprintf(os.Stdout,
 				"%s %sKilling connection %s...\r\n",
-				nowStamp(), skullPrefix(), id); err != nil {
+				nowStamp(), skullPrefix(), id)
+			if err != nil {
 				log.Printf("%sError writing to Stdout: %v",
 					warnPrefix(), err)
 			}
 		}
 
 		if conn.channel != nil {
-			if _, err := conn.channel.Write(
-				[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n")); err != nil {
+			_, err := conn.channel.Write(
+				[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+			if err != nil {
 				log.Printf("%sError writing to channel for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
@@ -2388,7 +2405,8 @@ func killAllConnections() {
 
 		adminKillsTotal.Add(1)
 
-		if err := conn.sshConn.Close(); err != nil {
+		err := conn.sshConn.Close()
+		if err != nil {
 			log.Printf("%sError closing SSH connection for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
@@ -2420,7 +2438,8 @@ func sendNaws(conn *Connection, width, height uint32) {
 		TelcmdIAC, TelcmdSE,
 	}
 
-	if _, err := conn.telnetConn.Write(packet); err != nil {
+	_, err := conn.telnetConn.Write(packet)
+	if err != nil {
 		log.Printf("%sError sending NAWS to TELNET target for %s: %v",
 			warnPrefix(), conn.ID, err)
 	}
@@ -2429,7 +2448,8 @@ func sendNaws(conn *Connection, width, height uint32) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
-	if data, err := os.ReadFile(path); err == nil {
+	data, err := os.ReadFile(path) //nolint:gosec
+	if err == nil {
 		return ssh.ParsePrivateKey(data)
 	}
 
@@ -2448,7 +2468,8 @@ func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
 
 		const rsaPerm = 0o600
 		data := pem.EncodeToMemory(block)
-		if err := os.WriteFile(path, data, rsaPerm); err != nil {
+		err = os.WriteFile(path, data, rsaPerm)
+		if err != nil {
 			return nil, err
 		}
 
@@ -2468,7 +2489,8 @@ func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
 		const ed25519perm = 0o600
 		block := &pem.Block{Type: "PRIVATE KEY", Bytes: pkcs8}
 		data := pem.EncodeToMemory(block)
-		if err := os.WriteFile(path, data, ed25519perm); err != nil {
+		err = os.WriteFile(path, data, ed25519perm)
+		if err != nil {
 			return nil, err
 		}
 
@@ -2632,7 +2654,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		connectionsMutex.Lock()
 
 		if conn.sshConn != nil {
-			if err := conn.sshConn.Close(); err != nil {
+			err := conn.sshConn.Close()
+			if err != nil {
 				if !strings.Contains(err.Error(), "use of closed network connection") {
 					log.Printf("%sError closing SSH connection for %s: %v",
 						warnPrefix(), conn.ID, err)
@@ -2696,8 +2719,9 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 
 	for newCh := range chans {
 		if newCh.ChannelType() != "session" {
-			if err := newCh.Reject(
-				ssh.UnknownChannelType, "only session allowed"); err != nil {
+			err := newCh.Reject(
+				ssh.UnknownChannelType, "only session allowed")
+			if err != nil {
 				log.Printf("%sError rejecting channel: %v",
 					warnPrefix(), err)
 			}
@@ -2757,14 +2781,16 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 					if conn.telnetConn != nil {
 						nawsWill := []byte{TelcmdIAC, TelcmdWILL, TeloptNAWS}
-						if _, err := conn.telnetConn.Write(nawsWill); err != nil {
+						_, err := conn.telnetConn.Write(nawsWill)
+						if err != nil {
 							log.Printf("%sError sending IAC WILL NAWS to TELNET target for %s: %v",
 								warnPrefix(), conn.ID, err)
 						}
 					}
 				}
 
-				if err := req.Reply(true, nil); err != nil {
+				err := req.Reply(true, nil)
+				if err != nil {
 					log.Printf("%sError replying to request: %v",
 						warnPrefix(), err)
 				}
@@ -2778,12 +2804,14 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						sendNaws(conn, width, height)
 					}
 
-					if err := req.Reply(true, nil); err != nil {
+					err := req.Reply(true, nil)
+					if err != nil {
 						log.Printf("%sError replying to window-change request: %v",
 							warnPrefix(), err)
 					}
 				} else {
-					if err := req.Reply(false, nil); err != nil {
+					err := req.Reply(false, nil)
+					if err != nil {
 						log.Printf("%sError replying to window-change request (failure): %v",
 							warnPrefix(), err)
 					}
@@ -2795,7 +2823,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				default:
 				}
 
-				if err := req.Reply(true, nil); err != nil {
+				err := req.Reply(true, nil)
+				if err != nil {
 					log.Printf("%sError replying to request: %v",
 						warnPrefix(), err)
 				}
@@ -2808,7 +2837,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 				sshExecRejectedTotal.Add(1)
 
-				if err := req.Reply(false, nil); err != nil {
+				err := req.Reply(false, nil)
+				if err != nil {
 					log.Printf("%sError replying to request: %v",
 						warnPrefix(), err)
 				}
@@ -2818,7 +2848,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				default:
 				}
 
-				if err := conn.sshConn.Close(); err != nil {
+				err = conn.sshConn.Close()
+				if err != nil {
 					log.Printf("%sError closing SSH connection for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
@@ -2840,7 +2871,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 							sshIllegalSubsystemTotal.Add(1)
 
-							if err := req.Reply(false, nil); err != nil {
+							err := req.Reply(false, nil)
+							if err != nil {
 								log.Printf("%sError replying to request: %v",
 									warnPrefix(), err)
 							}
@@ -2850,7 +2882,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							default:
 							}
 
-							if err := conn.sshConn.Close(); err != nil {
+							err = conn.sshConn.Close()
+							if err != nil {
 								log.Printf("%sError closing SSH connection for %s: %v",
 									warnPrefix(), conn.ID, err)
 							}
@@ -2860,13 +2893,15 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					}
 				}
 
-				if err := req.Reply(false, nil); err != nil {
+				err := req.Reply(false, nil)
+				if err != nil {
 					log.Printf("%sError replying to request: %v",
 						warnPrefix(), err)
 				}
 
 			default:
-				if err := req.Reply(false, nil); err != nil {
+				err := req.Reply(false, nil)
+				if err != nil {
 					log.Printf("%sError replying to request: %v",
 						warnPrefix(), err)
 				}
@@ -2888,7 +2923,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				yellowDotPrefix(), conn.ID, conn.sshConn.RemoteAddr().String())
 		}
 
-		if err := conn.sshConn.Close(); err != nil {
+		err := conn.sshConn.Close()
+		if err != nil {
 			log.Printf("%sError closing SSH connection for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
@@ -2908,12 +2944,14 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				yellowDotPrefix(), conn.ID, remoteHost)
 		}
 
-		if err := channel.Close(); err != nil {
+		err := channel.Close()
+		if err != nil {
 			log.Printf("%sError closing channel for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
 
-		if err := conn.sshConn.Close(); err != nil {
+		err = conn.sshConn.Close()
+		if err != nil {
 			log.Printf("%sError closing SSH connection for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
@@ -2957,28 +2995,33 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 			rejectedTotal.Add(1)
 
-			if raw, err := getFileContent(blockFile, conn.userName); err == nil {
+			raw, err := getFileContent(blockFile, conn.userName)
+			if err == nil {
 				blockMessageContent := strings.ReplaceAll(
 					strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
-				if _, err := channel.Write(
-					[]byte(blockMessageContent + "\r\n")); err != nil {
+				_, err := channel.Write(
+					[]byte(blockMessageContent + "\r\n"))
+				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
 			} else {
-				if _, err := channel.Write(
-					[]byte("Connection blocked.\r\n")); err != nil {
+				_, err := channel.Write(
+					[]byte("Connection blocked.\r\n"))
+				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
 			}
 
-			if err := channel.Close(); err != nil {
+			err = channel.Close()
+			if err != nil {
 				log.Printf("%sError closing channel for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
 
-			if err := conn.sshConn.Close(); err != nil {
+			err = conn.sshConn.Close()
+			if err != nil {
 				log.Printf("%sError closing SSH connection for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
@@ -2997,15 +3040,17 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		for time.Since(startTime).Seconds() < sshDelay {
 			char := string(spinner[spinnerIndex])
 
-			if _, err := channel.Write([]byte(fmt.Sprintf("\r%s",
-				char))); err != nil {
+			_, err := channel.Write([]byte(fmt.Sprintf("\r%s", //nolint:staticcheck
+				char)))
+			if err != nil {
 				if errors.Is(err, io.EOF) {
 					delayAbandonedTotal.Add(1)
 
 					log.Printf("%sWAITKILL [%s] %s@%s: %v",
 						yellowDotPrefix(), conn.ID, conn.userName, conn.hostName, err)
 
-					if err := conn.sshConn.Close(); err != nil {
+					err := conn.sshConn.Close()
+					if err != nil {
 						if !strings.Contains(err.Error(), "use of closed network connection") {
 							log.Printf("%sError closing SSH connection for %s: %v",
 								warnPrefix(), conn.ID, err)
@@ -3025,14 +3070,16 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			time.Sleep(100 * time.Millisecond)
 		}
 
-		if _, err := channel.Write([]byte("\r \r")); err != nil {
+		_, err := channel.Write([]byte("\r \r"))
+		if err != nil {
 			if errors.Is(err, io.EOF) {
 				delayAbandonedTotal.Add(1)
 
 				log.Printf("%sWAITKILL [%s] %s@%s: %v",
 					yellowDotPrefix(), conn.ID, conn.userName, conn.hostName, err)
 
-				if err := conn.sshConn.Close(); err != nil {
+				err := conn.sshConn.Close()
+				if err != nil {
 					if !strings.Contains(err.Error(), "use of closed network connection") {
 						log.Printf("%sError closing SSH connection for %s: %v",
 							warnPrefix(), conn.ID, err)
@@ -3067,7 +3114,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				}
 
 				if buf[0] == 0x1d { // Ctrl-]
-					if err := channel.Close(); err != nil {
+					err := channel.Close()
+					if err != nil {
 						log.Printf("%sError closing channel for %s: %v",
 							warnPrefix(), conn.ID, err)
 					}
@@ -3080,14 +3128,16 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		<-conn.monitoredConnection.cancelCtx.Done()
 		dur := time.Since(conn.startTime)
 
-		if _, err := channel.Write([]byte(fmt.Sprintf(
+		_, err := channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 			"\r\nMONITORING SESSION CLOSED (monitored for %s)\r\n\r\n",
-			dur.Round(time.Second)))); err != nil {
+			dur.Round(time.Second))))
+		if err != nil {
 			log.Printf("%sError writing to channel for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
 
-		if err := channel.Close(); err != nil {
+		err = channel.Close()
+		if err != nil {
 			log.Printf("%sError closing channel for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
@@ -3096,26 +3146,32 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}
 
 	if gracefulShutdownMode.Load() || denyNewConnectionsMode.Load() {
-		if denyMsg, err := getFileContent(denyFile, conn.userName); err == nil {
+		denyMsg, err := getFileContent(denyFile, conn.userName)
+		if err == nil {
 			txt := strings.ReplaceAll(
 				strings.ReplaceAll(string(denyMsg), "\r\n", "\n"), "\n", "\r\n")
 
-			if _, err := channel.Write([]byte("\r\n")); err != nil {
+			_, err := channel.Write([]byte("\r\n"))
+			if err != nil {
 				log.Printf("%sError writing to channel for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
 
-			if _, err := channel.Write([]byte(txt)); err != nil {
+			_, err = channel.Write([]byte(txt))
+			if err != nil {
 				log.Printf("%sError writing to channel for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
 
-			if _, err := channel.Write([]byte("\r\n")); err != nil {
+			_, err = channel.Write([]byte("\r\n"))
+			if err != nil {
 				log.Printf("%sError writing to channel for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
 		}
-		if err := channel.Close(); err != nil {
+
+		err = channel.Close()
+		if err != nil {
 			log.Printf("%sError closing channel for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
@@ -3123,11 +3179,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		return
 	}
 
-	if raw, err := getFileContent(issueFile, conn.userName); err == nil {
+	raw, err := getFileContent(issueFile, conn.userName)
+	if err == nil {
 		txt := strings.ReplaceAll(
 			strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
 
-		if _, err := channel.Write([]byte(txt + "\r\n")); err != nil {
+		_, err := channel.Write([]byte(txt + "\r\n"))
+		if err != nil {
 			log.Printf("%sError writing to channel for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
@@ -3143,13 +3201,15 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	if !noLog {
 		logfile, basePath, err = createDatedLog(conn.ID, conn.sshConn.RemoteAddr())
 		if err != nil {
-			if _, err := fmt.Fprintf(channel,
-				"%v\r\n", err); err != nil {
+			_, err := fmt.Fprintf(channel,
+				"%v\r\n", err)
+			if err != nil {
 				log.Printf("%sError writing to channel for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
 
-			if err := channel.Close(); err != nil {
+			err = channel.Close()
+			if err != nil {
 				log.Printf("%sError closing channel for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
@@ -3160,14 +3220,16 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		conn.basePath = basePath
 		logwriter = logfile
 
-		if _, err := logwriter.Write(
-			[]byte(nowStamp() + " Session start\r\n")); err != nil {
+		_, err := logwriter.Write(
+			[]byte(nowStamp() + " Session start\r\n"))
+		if err != nil {
 			log.Printf("%sError writing to log for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
 
 		for _, line := range keyLog {
-			if _, err := logwriter.Write([]byte(nowStamp() + " " + line + "\r\n")); err != nil {
+			_, err := logwriter.Write([]byte(nowStamp() + " " + line + "\r\n"))
+			if err != nil {
 				log.Printf("%sError writing to log for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
@@ -3175,9 +3237,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 		defer func() {
 			dur := time.Since(start)
-			if _, err := logwriter.Write([]byte(fmt.Sprintf(
+			_, err := logwriter.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 				nowStamp()+" Session end (link time %s)\r\n",
-				dur.Round(time.Second)))); err != nil {
+				dur.Round(time.Second))))
+			if err != nil {
 				log.Printf("%sError writing to log: %v",
 					warnPrefix(), err)
 			}
@@ -3194,9 +3257,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		var err error
 		targetHost, targetPort, err = parseHostPort(altHostPort)
 		if err != nil {
-			if _, err := fmt.Fprintf(channel,
+			_, err := fmt.Fprintf(channel,
 				"%sError parsing alt-host for user %s: %v\r\n\r\n",
-				warnPrefix(), conn.userName, err); err != nil {
+				warnPrefix(), conn.userName, err)
+			if err != nil {
 				log.Printf("%sError writing to channel for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
@@ -3204,7 +3268,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			log.Printf("%sError parsing alt-host for user %s: %v",
 				warnPrefix(), conn.userName, err)
 
-			if err := channel.Close(); err != nil {
+			err = channel.Close()
+			if err != nil {
 				log.Printf("%sError closing channel for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
@@ -3223,15 +3288,17 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		var err error
 		targetHost, targetPort, err = parseHostPort(telnetHostPort)
 		if err != nil {
-			if _, err := fmt.Fprintf(channel,
-				"Error parsing default telnet-host: %v\r\n\r\n", err); err != nil {
+			_, err := fmt.Fprintf(channel,
+				"Error parsing default telnet-host: %v\r\n\r\n", err)
+			if err != nil {
 				log.Printf("%sError writing to channel for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
 
 			log.Printf("%sError parsing default telnet-host: %v",
 				warnPrefix(), err)
-			if err := channel.Close(); err != nil {
+			err = channel.Close()
+			if err != nil {
 				log.Printf("%sError closing channel for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
@@ -3241,15 +3308,17 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}
 
 	if !noLog {
-		if _, err := logwriter.Write([]byte(fmt.Sprintf(
-			nowStamp()+" Target: %s:%d\r\n", targetHost, targetPort))); err != nil {
+		_, err := logwriter.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+			nowStamp()+" Target: %s:%d\r\n", targetHost, targetPort)))
+		if err != nil {
 			log.Printf("%sError writing to log for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
 
-		if _, err := logwriter.Write([]byte(fmt.Sprintf(
+		_, err = logwriter.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 			nowStamp()+" Connection sharing username: '%s'\r\n",
-			conn.shareableUsername))); err != nil {
+			conn.shareableUsername)))
+		if err != nil {
 			log.Printf("%sError writing to log for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
@@ -3260,16 +3329,18 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	if err != nil {
 		telnetFailuresTotal.Add(1)
 
-		if _, err := fmt.Fprintf(channel,
+		_, err := fmt.Fprintf(channel,
 			"%v\r\n\r\n",
-			err); err != nil {
+			err)
+		if err != nil {
 			log.Printf("%sError writing to channel for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
 
 		log.Printf("%v", err)
 
-		if err := channel.Close(); err != nil {
+		err = channel.Close()
+		if err != nil {
 			log.Printf("%sError closing channel for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
@@ -3284,7 +3355,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	conn.telnetConn = remote
 
 	defer func() {
-		if err := remote.Close(); err != nil {
+		err := remote.Close()
+		if err != nil {
 			log.Printf("%sError closing remote connection for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
@@ -3337,12 +3409,14 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			select {
 			case <-ctx.Done():
 				if len(escSequence) > 0 {
-					if _, err := remote.Write(escSequence); err != nil {
+					_, err := remote.Write(escSequence)
+					if err != nil {
 						log.Printf("%sError writing to remote for %s: %v",
 							warnPrefix(), conn.ID, err)
 					}
 
-					if _, err := logwriter.Write(escSequence); err != nil {
+					_, err = logwriter.Write(escSequence)
+					if err != nil {
 						log.Printf("%sError writing to log for %s: %v",
 							warnPrefix(), conn.ID, err)
 					}
@@ -3358,7 +3432,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				}
 
 				atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
-				if _, err := logwriter.Write(escSequence); err != nil {
+				_, err = logwriter.Write(escSequence)
+				if err != nil {
 					log.Printf("%sError writing to log for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
@@ -3402,7 +3477,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 							trafficOutTotal.Add(uint64(m)) //nolint:gosec
 
-							if _, err := logwriter.Write([]byte(replacement)); err != nil {
+							_, err = logwriter.Write([]byte(replacement))
+							if err != nil {
 								log.Printf("%sError writing to log for %s: %v",
 									warnPrefix(), conn.ID, err)
 							}
@@ -3423,7 +3499,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 							trafficOutTotal.Add(uint64(m)) //nolint:gosec
 
-							if _, err := logwriter.Write(escSequence); err != nil {
+							_, err = logwriter.Write(escSequence)
+							if err != nil {
 								log.Printf("%sError writing to log for %s: %v",
 									warnPrefix(), conn.ID, err)
 							}
@@ -3442,7 +3519,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 						trafficOutTotal.Add(uint64(m)) //nolint:gosec
 
-						if _, err := logwriter.Write(escSequence); err != nil {
+						_, err = logwriter.Write(escSequence)
+						if err != nil {
 							log.Printf("%sError writing to log for %s: %v",
 								warnPrefix(), conn.ID, err)
 						}
@@ -3464,7 +3542,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 					trafficOutTotal.Add(uint64(m)) //nolint:gosec
 
-					if _, err := logwriter.Write([]byte{b}); err != nil {
+					_, err = logwriter.Write([]byte{b})
+					if err != nil {
 						log.Printf("%sError writing to log for %s: %v",
 							warnPrefix(), conn.ID, err)
 					}
@@ -3472,12 +3551,14 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 			case err := <-errorChan:
 				if len(escSequence) > 0 {
-					if _, err := remote.Write(escSequence); err != nil {
+					_, err := remote.Write(escSequence)
+					if err != nil {
 						log.Printf("%sError writing to remote for %s: %v",
 							warnPrefix(), conn.ID, err)
 					}
 
-					if _, err := logwriter.Write(escSequence); err != nil {
+					_, err = logwriter.Write(escSequence)
+					if err != nil {
 						log.Printf("%sError writing to log for %s: %v",
 							warnPrefix(), conn.ID, err)
 					}
@@ -3497,8 +3578,9 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		buf := make([]byte, 1024)
 
 		for {
-			if err := remote.SetReadDeadline(
-				time.Now().Add(100 * time.Millisecond)); err != nil {
+			err := remote.SetReadDeadline(
+				time.Now().Add(100 * time.Millisecond))
+			if err != nil {
 				log.Printf("%sError setting read deadline for %s: %v",
 					warnPrefix(), conn.ID, err)
 			}
@@ -3524,9 +3606,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					yellowDotPrefix(), conn.ID, conn.userName,
 					conn.hostName, dur.Round(time.Second))
 
-				if _, err := channel.Write([]byte(fmt.Sprintf(
+				_, err := channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 					"\r\nCONNECTION CLOSED (link time %s)\r\n\r\n",
-					dur.Round(time.Second)))); err != nil {
+					dur.Round(time.Second))))
+				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
@@ -3536,32 +3619,36 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				inRateNVT := uint64(float64(atomic.LoadUint64(&telnetIn)) / dur.Seconds())
 				outRateNVT := uint64(float64(atomic.LoadUint64(&telnetOut)) / dur.Seconds())
 
-				if _, err := channel.Write([]byte(fmt.Sprintf(
+				_, err = channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 					">> SSH - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
 					formatBytes(atomic.LoadUint64(&sshIn)),
 					formatBytes(atomic.LoadUint64(&sshOut)),
 					formatBytes(inRateSSH),
-					formatBytes(outRateSSH)))); err != nil {
+					formatBytes(outRateSSH))))
+				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
 
-				if _, err := channel.Write([]byte(fmt.Sprintf(
+				_, err = channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 					">> NVT - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
 					formatBytes(atomic.LoadUint64(&telnetIn)),
 					formatBytes(atomic.LoadUint64(&telnetOut)),
 					formatBytes(inRateNVT),
-					formatBytes(outRateNVT)))); err != nil {
+					formatBytes(outRateNVT))))
+				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
 
-				if _, err := channel.Write([]byte("\r\n")); err != nil {
+				_, err = channel.Write([]byte("\r\n"))
+				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
 
-				if err := channel.Close(); err != nil {
+				err = channel.Close()
+				if err != nil {
 					log.Printf("%sError closing channel for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
@@ -3580,7 +3667,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				atomic.AddUint64(&sshOut, uint64(len(fwd)))
 				atomic.AddUint64(&conn.sshOutTotal, uint64(len(fwd)))
 
-				if _, err := channel.Write(fwd); err != nil {
+				_, err := channel.Write(fwd)
+				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
@@ -3589,7 +3677,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 				for _, c := range connections {
 					if c.monitoring && c.monitoredConnection.ID == conn.ID {
-						if _, err := c.channel.Write(fwd); err != nil {
+						_, err := c.channel.Write(fwd)
+						if err != nil {
 							log.Printf("%sError writing to channel for %s: %v",
 								warnPrefix(), c.ID, err)
 						}
@@ -3598,7 +3687,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 				connectionsMutex.Unlock()
 
-				if _, err := logwriter.Write(buf[:n]); err != nil {
+				_, err = logwriter.Write(buf[:n])
+				if err != nil {
 					log.Printf("%sError writing to log for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
@@ -3634,35 +3724,40 @@ func sendBanner(sshConn *ssh.ServerConn, ch ssh.Channel, conn *Connection) {
 
 	now := nowStamp()
 
-	if _, err := fmt.Fprintf(ch,
-		"Session with %s active at %s.\r\n", origin, now); err != nil {
+	_, err := fmt.Fprintf(ch,
+		"Session with %s active at %s.\r\n", origin, now)
+	if err != nil {
 		log.Printf("%sError writing session active message to channel: %v",
 			warnPrefix(), err)
 	}
 
 	if conn.monitoring {
-		if _, err := fmt.Fprint(ch,
-			"This is a READ-ONLY shared monitoring session.\r\n"); err != nil {
+		_, err := fmt.Fprint(ch,
+			"This is a READ-ONLY shared monitoring session.\r\n")
+		if err != nil {
 			log.Printf("%sError writing monitoring session message to channel: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := fmt.Fprint(ch,
-			"Send Control-] to disconnect.\r\n"); err != nil {
+		_, err = fmt.Fprint(ch,
+			"Send Control-] to disconnect.\r\n")
+		if err != nil {
 			log.Printf("%sError writing disconnect message to channel: %v",
 				warnPrefix(), err)
 		}
 	} else if conn.invalidShare {
-		if _, err := fmt.Fprintf(ch,
+		_, err := fmt.Fprintf(ch,
 			"The username '%s' was NOT active for session sharing!\r\n",
-			conn.userName); err != nil {
+			conn.userName)
+		if err != nil {
 			log.Printf("%sError writing invalid share message to channel: %v",
 				warnPrefix(), err)
 		}
 	}
 
-	if _, err := fmt.Fprint(ch,
-		"\r\n"); err != nil {
+	_, err = fmt.Fprint(ch,
+		"\r\n")
+	if err != nil {
 		log.Printf("%sError writing newline to channel: %v",
 			warnPrefix(), err)
 	}
@@ -3688,13 +3783,15 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 		TeloptTTYPE:           true,
 	}
 
-	if err := remote.SetReadDeadline(time.Now().Add(time.Second / 3)); err != nil {
+	err := remote.SetReadDeadline(time.Now().Add(time.Second / 3))
+	if err != nil {
 		log.Printf("%sError setting read deadline: %v",
 			warnPrefix(), err)
 	}
 
 	defer func() {
-		if err := remote.SetReadDeadline(time.Time{}); err != nil {
+		err := remote.SetReadDeadline(time.Time{})
+		if err != nil {
 			log.Printf("%sError clearing TELNET negotiation read deadline: %v",
 				warnPrefix(), err)
 		}
@@ -3817,7 +3914,8 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 									data := []byte{TelcmdIAC, TelcmdSB, TeloptTTYPE, TelnetIs}
 									data = append(data, []byte(conn.termType)...)
 									data = append(data, TelcmdIAC, TelcmdSE)
-									if _, err := remote.Write(data); err != nil {
+									_, err := remote.Write(data)
+									if err != nil {
 										log.Printf("%sError writing TELNET TTYPE response: %v",
 											warnPrefix(), err)
 									}
@@ -3865,13 +3963,15 @@ func writeNegotiation(ch io.Writer, logw io.Writer, line string, username string
 	}
 	msg += "\r\n"
 
-	if _, err := logw.Write([]byte(msg)); err != nil {
+	_, err := logw.Write([]byte(msg))
+	if err != nil {
 		log.Printf("%sError writing TELNET negotiation message to log: %v",
 			warnPrefix(), err)
 	}
 
 	if debugNegotiation {
-		if _, err := ch.Write([]byte(msg)); err != nil {
+		_, err := ch.Write([]byte(msg))
+		if err != nil {
 			log.Printf("%sError writing TELNET negotiation message to channel: %v",
 				warnPrefix(), err)
 		}
@@ -3883,7 +3983,8 @@ func writeNegotiation(ch io.Writer, logw io.Writer, line string, username string
 func sendIAC(w io.Writer, cmd byte, opts ...byte) {
 	data := []byte{TelcmdIAC, cmd}
 	data = append(data, opts...)
-	if _, err := w.Write(data); err != nil {
+	_, err := w.Write(data)
+	if err != nil {
 		log.Printf("%sError writing TELNET IAC command to writer: %v",
 			warnPrefix(), err)
 	}
@@ -4155,7 +4256,8 @@ func showMenu(ch ssh.Channel) {
 		"\r |  X  | Disconnect      | \r\n" +
 		"\r +=====+=================+ \r\n"
 
-	if _, err := ch.Write([]byte(menu)); err != nil {
+	_, err := ch.Write([]byte(menu))
+	if err != nil {
 		log.Printf("%sError writing menu to channel: %v",
 			warnPrefix(), err)
 	}
@@ -4168,73 +4270,86 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 ) {
 	switch sel {
 	case '0':
-		if _, err := remote.Write([]byte{0}); err != nil {
+		_, err := remote.Write([]byte{0})
+		if err != nil {
 			log.Printf("%sError writing NUL to remote: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := logw.Write([]byte{0}); err != nil {
+		_, err = logw.Write([]byte{0})
+		if err != nil {
 			log.Printf("%sError writing NUL to log: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n>> Sent NUL\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n>> Sent NUL\r\n"))
+		if err != nil {
 			log.Printf("%sError writing 'Sent NUL' message to channel: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+		if err != nil {
 			log.Printf("%sError writing '[BACK TO HOST]' message to channel: %v",
 				warnPrefix(), err)
 		}
 
 	case 'a', 'A':
 		sendIAC(remote, TelcmdAYT)
-		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdAYT}); err != nil {
+		_, err := logw.Write([]byte{TelcmdIAC, TelcmdAYT})
+		if err != nil {
 			log.Printf("%sError writing AYT to log: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n>> Sent AYT\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n>> Sent AYT\r\n"))
+		if err != nil {
 			log.Printf("%sError writing 'Sent AYT' message to channel: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+		if err != nil {
 			log.Printf("%sError writing 'BACK TO HOST' message after AYT to channel: %v",
 				warnPrefix(), err)
 		}
 
 	case 'b', 'B':
 		sendIAC(remote, TelcmdBreak)
-		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdBreak}); err != nil {
+		_, err := logw.Write([]byte{TelcmdIAC, TelcmdBreak})
+		if err != nil {
 			log.Printf("%sError writing BREAK to log: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n>> Sent BREAK\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n>> Sent BREAK\r\n"))
+		if err != nil {
 			log.Printf("%sError writing 'Sent BREAK' message to channel: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+		if err != nil {
 			log.Printf("%sError writing '[BACK TO HOST]' message to channel: %v",
 				warnPrefix(), err)
 		}
 
 	case 'i', 'I':
 		sendIAC(remote, TelcmdIP)
-		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdIP}); err != nil {
+		_, err := logw.Write([]byte{TelcmdIAC, TelcmdIP})
+		if err != nil {
 			log.Printf("%sError writing Interrupt to log: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n>> Sent Interrupt\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n>> Sent Interrupt\r\n"))
+		if err != nil {
 			log.Printf("%sError writing 'Sent Interrupt' message to channel: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+		if err != nil {
 			log.Printf("%sError writing '[BACK TO HOST]' message to channel: %v",
 				warnPrefix(), err)
 		}
@@ -4242,48 +4357,56 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 	case 'k', 'K':
 		conn.emacsKeymapEnabled = !conn.emacsKeymapEnabled
 		if conn.emacsKeymapEnabled {
-			if _, err := ch.Write([]byte("\r\n>> Emacs keymap ENABLED\r\n")); err != nil {
+			_, err := ch.Write([]byte("\r\n>> Emacs keymap ENABLED\r\n"))
+			if err != nil {
 				log.Printf("%sError writing 'Emacs keymap ENABLED' message to channel: %v",
 					warnPrefix(), err)
 			}
 		} else {
-			if _, err := ch.Write([]byte("\r\n>> Emacs keymap DISABLED\r\n")); err != nil {
+			_, err := ch.Write([]byte("\r\n>> Emacs keymap DISABLED\r\n"))
+			if err != nil {
 				log.Printf("%sError writing 'Emacs keymap DISABLED' message to channel: %v",
 					warnPrefix(), err)
 			}
 		}
 
-		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+		_, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+		if err != nil {
 			log.Printf("%sError writing '[BACK TO HOST]' message to channel: %v",
 				warnPrefix(), err)
 		}
 
 	case 'n', 'N':
 		sendIAC(remote, TelcmdNOP)
-		if _, err := logw.Write([]byte{TelcmdIAC, TelcmdNOP}); err != nil {
+		_, err := logw.Write([]byte{TelcmdIAC, TelcmdNOP})
+		if err != nil {
 			log.Printf("%sError writing NOP to log: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n>> Sent NOP\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n>> Sent NOP\r\n"))
+		if err != nil {
 			log.Printf("%sError writing 'Sent NOP' message to channel: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+		if err != nil {
 			log.Printf("%sError writing '[BACK TO HOST]' message to channel: %v",
 				warnPrefix(), err)
 		}
 	case 's', 'S':
 		dur := time.Since(start)
-		if _, err := ch.Write([]byte("\r\n")); err != nil {
+		_, err := ch.Write([]byte("\r\n"))
+		if err != nil {
 			log.Printf("%sError writing newline to channel: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte(fmt.Sprintf(
+		_, err = ch.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 			">> LNK - Username '%s' can be used to share this session.\r\n",
-			conn.shareableUsername))); err != nil {
+			conn.shareableUsername)))
+		if err != nil {
 			log.Printf("%sError writing sharable username to channel: %v",
 				warnPrefix(), err)
 		}
@@ -4311,9 +4434,10 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 				userStr = "user"
 			}
 
-			if _, err := ch.Write([]byte(fmt.Sprintf(
+			_, err := ch.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 				">> MON - Shared session has been viewed %d %s; %d %s currently online.\r\n",
-				conn.totalMonitors, timesStr, currentMonitors, userStr))); err != nil {
+				conn.totalMonitors, timesStr, currentMonitors, userStr)))
+			if err != nil {
 				log.Printf("%sError writing shared session information to channel: %v",
 					warnPrefix(), err)
 			}
@@ -4329,18 +4453,20 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		inRateNVT := uint64(float64(atomic.LoadUint64(telnetIn)) / dur.Seconds())
 		outRateNVT := uint64(float64(atomic.LoadUint64(telnetOut)) / dur.Seconds())
 
-		if _, err := ch.Write([]byte(fmt.Sprintf(
+		_, err = ch.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 			">> SSH - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
 			formatBytes(inSSH), formatBytes(outSSH),
-			formatBytes(inRateSSH), formatBytes(outRateSSH)))); err != nil {
+			formatBytes(inRateSSH), formatBytes(outRateSSH))))
+		if err != nil {
 			log.Printf("%sError writing SSH statistics to channel: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte(fmt.Sprintf(
+		_, err = ch.Write([]byte(fmt.Sprintf( //nolint:staticcheck
 			">> NVT - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
 			formatBytes(inNVT), formatBytes(outNVT),
-			formatBytes(inRateNVT), formatBytes(outRateNVT)))); err != nil {
+			formatBytes(inRateNVT), formatBytes(outRateNVT))))
+		if err != nil {
 			log.Printf("%sError writing NVT statistics to channel: %v",
 				warnPrefix(), err)
 		}
@@ -4350,51 +4476,60 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 			keymapStatus = " (Emacs keymap enabled)"
 		}
 
-		if _, err := ch.Write([]byte(">> LNK - link time: " +
-			dur.Round(time.Second).String() + keymapStatus + "\r\n")); err != nil {
+		_, err = ch.Write([]byte(">> LNK - link time: " +
+			dur.Round(time.Second).String() + keymapStatus + "\r\n"))
+		if err != nil {
 			log.Printf("%sError writing link time and keymap status message to channel: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+		if err != nil {
 			log.Printf("%sError writing 'BACK TO HOST' message after link time to channel: %v",
 				warnPrefix(), err)
 		}
 
 	case 'x', 'X':
-		if _, err := ch.Write([]byte("\r\n>> DISCONNECTING...\r\n")); err != nil {
+		_, err := ch.Write([]byte("\r\n>> DISCONNECTING...\r\n"))
+		if err != nil {
 			log.Printf("%sError writing 'DISCONNECTING' message to channel: %v",
 				warnPrefix(), err)
 		}
 
-		if err := ch.Close(); err != nil {
+		err = ch.Close()
+		if err != nil {
 			log.Printf("%sError closing channel: %v",
 				warnPrefix(), err)
 		}
 
 	case ']':
-		if _, err := remote.Write([]byte{0x1d}); err != nil {
+		_, err := remote.Write([]byte{0x1d})
+		if err != nil {
 			log.Printf("%sError writing Ctrl-] to remote: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := logw.Write([]byte{0x1d}); err != nil {
+		_, err = logw.Write([]byte{0x1d})
+		if err != nil {
 			log.Printf("%sError writing Ctrl-] to log: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n>> Sent Ctrl-]\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n>> Sent Ctrl-]\r\n"))
+		if err != nil {
 			log.Printf("%sError writing 'Sent Ctrl-]' message to channel: %v",
 				warnPrefix(), err)
 		}
 
-		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+		_, err = ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+		if err != nil {
 			log.Printf("%sError writing '[BACK TO HOST]' message to channel: %v",
 				warnPrefix(), err)
 		}
 
 	default:
-		if _, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n")); err != nil {
+		_, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+		if err != nil {
 			log.Printf("%sError writing 'BACK TO HOST' message for default case to channel: %v",
 				warnPrefix(), err)
 		}
@@ -4414,13 +4549,15 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 		fmt.Sprintf("%02d", now.Day()),
 	)
 
-	if err := os.MkdirAll(dir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
+	err := os.MkdirAll(dir, os.FileMode(logDirPerm)) //nolint:gosec
+	if err != nil {
 		return nil, "", err
 	}
 
 	dir = filepath.Join(dir, ipDir)
 
-	if err := os.MkdirAll(dir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
+	err = os.MkdirAll(dir, os.FileMode(logDirPerm)) //nolint:gosec
+	if err != nil {
 		return nil, "", err
 	}
 
@@ -4433,7 +4570,8 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 		if strings.HasPrefix(f.Name(), prefix) {
 			parts := strings.SplitN(f.Name()[len(prefix):], ".", 2)
 
-			if n, err := strconv.Atoi(parts[0]); err == nil && n > maxSeq {
+			n, err := strconv.Atoi(parts[0])
+			if err == nil && n > maxSeq {
 				maxSeq = n
 			}
 		}
@@ -4445,7 +4583,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	base := fmt.Sprintf("%s_%s_%d",
 		ts, sid, seq)
 	pathBase := filepath.Join(dir, base)
-	f, err := os.OpenFile(pathBase+".log",
+	f, err := os.OpenFile(pathBase+".log", //nolint:gosec
 		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
 
 	return f, pathBase, err
@@ -4479,7 +4617,8 @@ func newSessionID(connections map[string]*Connection, mutex *sync.Mutex) string 
 	for {
 		b := make([]byte, 3)
 
-		if _, err := rand.Read(b); err != nil {
+		_, err := rand.Read(b)
+		if err != nil {
 			log.Printf("%sError reading random bytes for session ID: %v",
 				warnPrefix(), err)
 		}
@@ -4505,7 +4644,8 @@ func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex)
 	for {
 		b := make([]byte, 20)
 
-		if _, err := rand.Read(b); err != nil {
+		_, err := rand.Read(b)
+		if err != nil {
 			log.Printf("%sError reading random bytes for shareable username: %v",
 				warnPrefix(), err)
 		}
@@ -4547,12 +4687,12 @@ func nowStamp() string {
 func getFileContent(baseFilename, username string) ([]byte, error) {
 	userSpecificFile := fmt.Sprintf(
 		"%s-%s.txt", strings.TrimSuffix(baseFilename, ".txt"), username)
-	content, err := os.ReadFile(userSpecificFile)
+	content, err := os.ReadFile(userSpecificFile) //nolint:gosec
 	if err == nil {
 		return content, nil
 	}
 
-	return os.ReadFile(baseFilename)
+	return os.ReadFile(baseFilename) //nolint:gosec
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4621,8 +4761,9 @@ func rotateConsoleLogAt(t time.Time) {
 	logPath := getConsoleLogPath(t)
 	logDir := filepath.Dir(logPath)
 
-	if err := os.MkdirAll(
-		logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
+	err := os.MkdirAll(
+		logDir, os.FileMode(logDirPerm)) //nolint:gosec
+	if err != nil {
 		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sERROR: Failed to create console log directory: %v\r\n",
 			nowStamp(), warnPrefix(), err)
@@ -4644,7 +4785,7 @@ func rotateConsoleLogAt(t time.Time) {
 		return
 	}
 
-	file, err := os.OpenFile(
+	file, err := os.OpenFile( //nolint:gosec
 		logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
 	if err != nil {
 		if isConsoleLogQuiet {
@@ -4686,7 +4827,8 @@ func rotateConsoleLogAt(t time.Time) {
 
 	if oldLogFile != nil {
 		oldLogPath := oldLogFile.Name()
-		if err := oldLogFile.Close(); err != nil {
+		err := oldLogFile.Close()
+		if err != nil {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sError closing previous console log file: %v\r\n",
 				nowStamp(), warnPrefix(), err)
@@ -4700,11 +4842,11 @@ func rotateConsoleLogAt(t time.Time) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func compressLogFile(logFilePath string) {
-	if _, err := os.Stat(logFilePath); os.IsNotExist(err) {
+	if _, err := os.Stat(logFilePath); os.IsNotExist(err) { //nolint:noinlineerr
 		return
 	}
 
-	data, err := os.ReadFile(logFilePath)
+	data, err := os.ReadFile(logFilePath) //nolint:gosec
 	if err != nil {
 		log.Printf("%sFailed to read log %q for compression: %v",
 			warnPrefix(), logFilePath, err)
@@ -4745,7 +4887,7 @@ func compressLogFile(logFilePath string) {
 	switch compressAlgo {
 	case "gzip":
 		compressedFilePath = logFilePath + ".gz"
-		compressedFile, err = os.Create(compressedFilePath)
+		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
 		if err != nil {
 			log.Printf("%sFailed to create compressed file %q: %v",
 				warnPrefix(), compressedFilePath, err)
@@ -4758,7 +4900,8 @@ func compressLogFile(logFilePath string) {
 			log.Printf("%sError creating gzip writer for %q: %v",
 				warnPrefix(), compressedFilePath, err)
 
-			if err := compressedFile.Close(); err != nil {
+			err := compressedFile.Close()
+			if err != nil {
 				log.Printf("%sError closing compressed file after gzip writer error: %v",
 					warnPrefix(), err)
 			}
@@ -4768,7 +4911,7 @@ func compressLogFile(logFilePath string) {
 
 	case "xz":
 		compressedFilePath = logFilePath + ".xz"
-		compressedFile, err = os.Create(compressedFilePath)
+		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
 		if err != nil {
 			log.Printf("%sFailed to create compressed file %q: %v",
 				warnPrefix(), compressedFilePath, err)
@@ -4781,7 +4924,8 @@ func compressLogFile(logFilePath string) {
 			log.Printf("%sError creating xz writer for %q: %v",
 				warnPrefix(), compressedFilePath, err)
 
-			if err := compressedFile.Close(); err != nil {
+			err := compressedFile.Close()
+			if err != nil {
 				log.Printf("%sError closing compressed file after xz writer error: %v",
 					warnPrefix(), err)
 			}
@@ -4791,7 +4935,7 @@ func compressLogFile(logFilePath string) {
 
 	case "zstd":
 		compressedFilePath = logFilePath + ".zst"
-		compressedFile, err = os.Create(compressedFilePath)
+		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
 		if err != nil {
 			log.Printf("%sFailed to create compressed file %q: %v",
 				warnPrefix(), compressedFilePath, err)
@@ -4805,7 +4949,8 @@ func compressLogFile(logFilePath string) {
 			log.Printf("%sError creating zstd writer for %q: %v",
 				warnPrefix(), compressedFilePath, err)
 
-			if err := compressedFile.Close(); err != nil {
+			err := compressedFile.Close()
+			if err != nil {
 				log.Printf("%sError closing compressed file after zstd writer error: %v",
 					warnPrefix(), err)
 			}
@@ -4821,7 +4966,8 @@ func compressLogFile(logFilePath string) {
 	}
 
 	defer func() {
-		if err := compressedFile.Close(); err != nil {
+		err := compressedFile.Close()
+		if err != nil {
 			if strings.Contains(err.Error(), "writer already closed") {
 				log.Printf("%sError closing compressed file: %v",
 					warnPrefix(), err)
@@ -4830,7 +4976,8 @@ func compressLogFile(logFilePath string) {
 	}()
 
 	defer func() {
-		if err := writer.Close(); err != nil {
+		err := writer.Close()
+		if err != nil {
 			if strings.Contains(err.Error(), "file already closed") {
 				log.Printf("%sError closing writer: %v",
 					warnPrefix(), err)
@@ -4872,13 +5019,14 @@ func compressLogFile(logFilePath string) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func parseIPListFile(filePath string) ([]*net.IPNet, error) {
-	file, err := os.Open(filePath)
+	file, err := os.Open(filePath) //nolint:gosec
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
 
 	defer func() {
-		if err := file.Close(); err != nil {
+		err := file.Close()
+		if err != nil {
 			log.Printf("Error closing file: %v", err)
 		}
 	}()
@@ -4917,7 +5065,8 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 			line, lineNumber, filePath)
 	}
 
-	if err := scanner.Err(); err != nil {
+	err = scanner.Err()
+	if err != nil {
 		return nil, fmt.Errorf("%s: %w", filePath, err)
 	}
 
@@ -5049,7 +5198,8 @@ func resolveExePath() string {
 
 	exe, err = os.Executable()
 	if err != nil { // Fallback to /proc
-		if realPath, err2 := os.Readlink("/proc/self/exe"); err2 == nil {
+		realPath, err2 := os.Readlink("/proc/self/exe")
+		if err2 == nil {
 			exe = realPath
 			err = nil
 		}
@@ -5063,11 +5213,13 @@ func resolveExePath() string {
 		}
 	}
 
-	if realPath, err := filepath.EvalSymlinks(exe); err == nil {
+	realPath, err := filepath.EvalSymlinks(exe)
+	if err == nil {
 		exe = realPath
 	}
 
-	if abs, err := filepath.Abs(exe); err == nil {
+	abs, err := filepath.Abs(exe)
+	if err == nil {
 		exe = abs
 	}
 

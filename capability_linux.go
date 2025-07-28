@@ -40,11 +40,13 @@ func showCapabilityMessage(exePath string) {
 
 func checkCapability() {
 	hasBindCap := false
-	if cv, err := cap.FromName("cap_net_bind_service"); err == nil {
+	cv, err := cap.FromName("cap_net_bind_service")
+	if err == nil {
 		hasBindCap, _ = cap.GetProc().GetFlag(cap.Effective, cv)
 	}
 
 	exePath := resolveExePath()
+
 	if !hasBindCap && os.Getuid() != 0 {
 		showCapabilityMessage(exePath)
 	}
