@@ -12,6 +12,7 @@ SHELL=/bin/sh
 CP=cp -f
 PERL=perl
 RM=rm -f
+SED?=sed
 SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
 		 .whitesource,.golangci.yml,dependabot.yml,.txt"            \
 		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown'       \
@@ -251,6 +252,7 @@ README.md doc docs: README.md.tmpl proxy
 	'BEGIN { ($$v=qx(scc $(SCCFLAGS) -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===SCC===!$$v!g' README.md
 	grep -q '===SCC===' README.md || exit 0
+	$(SED) -i "s/$$(printf '\t')//g" README.md
 	@printf '\n%s\n\n' "📗 README.md generation successful."
 
 ##############################################################################
