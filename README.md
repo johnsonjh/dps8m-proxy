@@ -84,51 +84,57 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```
-Usage of ./proxy:
+DPS8M Proxy v0.0.11* (2025-Jul-28 g8e581ba+) [linux/amd64]
+
+Usage for /home/jhj/dps8m-proxy/proxy:
+
   -0, --allow-root              Allow running as root (UID 0)
   -l, --ssh-addr strings        SSH listener address(es)
-                                   [e.g., ":2222", "[::1]:8000"]
-                                   (multiple allowed) (default ":2222")
+                                    [e.g., ":2222", "[::1]:8000"]
+                                    (multiple allowed) (default ":2222")
+  -e, --ssh-delay float         Delay for incoming SSH connections
+                                    ["0.0" to "30.0" seconds] (no default)
   -n, --no-banner               Disable SSH connection banner
   -t, --telnet-host string      Default TELNET target [host:port]
-                                   (default "127.0.0.1:6180")
+                                    (default "127.0.0.1:6180")
   -a, --alt-host string         Alternate TELNET target(s) [sshuser@host:port]
-                                   (multiple allowed)
+                                    (multiple allowed)
   -k, --debug-telnet            Debug TELNET option negotiation
   -y, --debug-server string     Enable HTTP debug server listening address
-                                   [e.g., ":6060", "[::1]:6060"]
+                                    [e.g., ":6060", "[::1]:6060"]
   -g, --no-gops                 Disable the "gops" diagnostic agent
-                                   (see https://github.com/google/gops)
+                                    (see https://github.com/google/gops)
   -d, --log-dir string          Base directory for logs (default "log")
   -o, --no-log                  Disable all session logging
-                                   (for console logging see "--console-log")
+                                    (for console logging see "--console-log")
   -c, --console-log string      Enable console logging ["quiet", "noquiet"]
-                                   (disabled by default)
+                                    (disabled by default)
   -s, --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
-                                   (default "gzip")
+                                    (default "gzip")
   -z, --compress-level string   Compression level for gzip and zstd algorithms
-                                   ["fast", "normal", "high"]
-                                   (default "normal")
+                                    ["fast", "normal", "high"]
+                                    (default "normal")
   -x, --no-compress             Disable session and/or console log compression
   -p, --log-perm octal          Permissions (octal) for new log files
-                                   [e.g., "600", "644"] (default "600")
+                                    [e.g., "600", "644"] (default "600")
   -r, --log-dir-perm octal      Permissions (octal) for new log directories
-                                   [e.g., "755", "750"] (default "750")
+                                    [e.g., "755", "750"] (default "750")
   -u, --db-file string          Path to persistent statistics storage database
-                                   (disabled by default)
+                                    (disabled by default)
   -j, --db-time uint            Elapsed seconds between database updates
-                                   [0 to disable periodic writes] (default 30)
+                                    [0 disables periodic writes] (default 30)
   -f, --db-perm octal           Permissions (octal) for new database files
-                                   [e.g., "600", "644"] (default 600)
+                                    [e.g., "600", "644"] (default 600)
   -i, --idle-max int            Maximum connection idle time allowed [seconds]
   -m, --time-max int            Maximum connection link time allowed [seconds]
   -b, --blacklist string        Enable blacklist [filename] (no default)
   -w, --whitelist string        Enable whitelist [filename] (no default)
-  -e, --ssh-delay float         Delay for incoming SSH connections
-                                   ["0.0" to "30.0" seconds] (no default)
   -U, --utc                     Use UTC (Coordinated Universal Time) for time
-                                   display and when writing to log files
+                                    display and timestamping in log files
   -v, --version                 Show version information
+  -h, --help                    Show this help and usage information
+
+proxy home page (bug reports): <https://gitlab.com/dps8m/proxy/>
 ```
 
 Most of these command‑line arguments are straightforward with
@@ -215,12 +221,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.11 (2025-Jul-28 g964ad28) [linux/amd64]
+DPS8M Proxy v0.0.11* (2025-Jul-28 g8e581ba+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.0.11                          |
+| dps8m/proxy               | v0.0.11*                         |
 | arl/statsviz              | v0.7.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -438,13 +444,13 @@ predecessor (code statistics 📈 provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>15</th>
-		<th>6444</th>
-		<th>1347</th>
+		<th>6494</th>
+		<th>1350</th>
 		<th>303</th>
-		<th>4794</th>
-		<th>1170</th>
-		<th>163929</th>
-		<th>2986</th>
+		<th>4841</th>
+		<th>1176</th>
+		<th>164779</th>
+		<th>3015</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -489,13 +495,13 @@ predecessor (code statistics 📈 provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>7621</th>
-		<th>1568</th>
+		<th>7671</th>
+		<th>1571</th>
 		<th>504</th>
-		<th>5549</th>
-		<th>1226</th>
-		<th>208410</th>
-		<th>3825</th>
+		<th>5596</th>
+		<th>1232</th>
+		<th>209260</th>
+		<th>3854</th>
 	</tr></tfoot></table>
 
 ## Future plans
