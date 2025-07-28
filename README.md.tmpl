@@ -2,6 +2,7 @@
 <!-- Copyright (c) 2025 The DPS8M Development Team -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- vim: set ft=markdown expandtab cc=72 : -->
+<!-- scspell-id: 698e77d8-6bd2-11f0-9441-80ee73e9b8e7 -->
 <!-- NB: Do not modify README.md directly; modify README.md.tmpl -->
 # proxy
 
@@ -447,6 +448,7 @@ and that you know what you’re doing!
   [`errcheck`](https://github.com/kisielk/errcheck),
   [`gofumpt`](https://github.com/mvdan/gofumpt),
   [`scc`](https://github.com/boyter/scc),
+  [`scspell`](https://github.com/myint/scspell),
   [`codespell`](https://github.com/codespell-project/codespell), and
   [Perl](https://www.perl.org/).
 * If you plan to make any changes to the [`Makefile`](Makefile) (or
@@ -459,6 +461,8 @@ and that you know what you’re doing!
   (with `PDPMAKE_POSIXLY_CORRECT` set) and
   [`yash`](https://magicant.github.io/yash/) to ensure POSIX
   conformance.
+* The [`Makefile`](Makefile) provides a `lint` convenience target to
+  help you run all this stuff.
 
 ### Recommended
 
@@ -466,11 +470,9 @@ and that you know what you’re doing!
   [`golangci-lint`](https://golangci-lint.run/) installed.  We ship a
   [config file](.golangci.yml) file for it, and try to make sure that
   all the tests pass when using the most recently released version.
-* It’s also recommended to (manually) use
+* It’s also recommended to (*manually*) use
   [`hunspell`](https://hunspell.github.io/) for spell
-  checking—`codespell` doesn’t catch everything.
-* The [`Makefile`](Makefile) provides a `lint` convenience target to
-  help you run all this stuff.
+  checking—in addition to using `codespell` and `scspell`.
 
 ## Security
 

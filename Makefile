@@ -3,6 +3,7 @@
 # Copyright (c) 2025 Jeffrey H. Johnson
 # Copyright (c) 2025 The DPS8M Development Team
 # SPDX-License-Identifier: MIT
+# scspell-id: 5865f38c-6bd2-11f0-882d-80ee73e9b8e7
 
 ##############################################################################
 # Configuration
@@ -83,7 +84,7 @@ lint check:
 	$(MAKE) clean
 	@printf '\n%s\n' "⚙️ Running linters..."
 	$(MAKE) revive reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
-		errcheck shellcheck shfmt codespell golangci-lint
+		errcheck shellcheck shfmt codespell scspell golangci-lint
 	@printf '\n%s\n' "🧩 Running 'make cross'..."
 	env MAX_CPU=1 $(MAKE) cross
 	$(MAKE) clean
@@ -268,6 +269,21 @@ cross: .cross.sh
 	@printf '\n%s\n\n' "🛫 Starting cross-compilation (errors are non-fatal!)"
 	@./.cross.sh
 	@printf '\n%s\n\n' "🛬 Back from cross-compilation"
+
+##############################################################################
+# Target: scspell
+
+.PHONY: scspell
+scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
+	@command -v scspell > /dev/null 2>&1 || \
+		{ printf '%s\n' "⚠️ scspell not found!"; exit 1; }
+	scspell \
+		--override-dictionary ./.scspell/dictionary.txt \
+		--base-dict ./.scspell/basedict.txt \
+		$$( find . \( -path ./.git -o -name '.doc.tmpl' \
+				-o -name 'README.md' \) -prune -o \
+				-type f -exec \
+					grep -l 'scspell-id:' {} \; )
 
 ##############################################################################
 # Target: strip

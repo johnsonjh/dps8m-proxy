@@ -2,6 +2,7 @@
 <!-- Copyright (c) 2025 The DPS8M Development Team -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- vim: set ft=markdown expandtab cc=72 : -->
+<!-- scspell-id: 698e77d8-6bd2-11f0-9441-80ee73e9b8e7 -->
 <!-- NB: Do not modify README.md directly; modify README.md.tmpl -->
 # proxy
 
@@ -84,7 +85,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```
-DPS8M Proxy v0.0.11 (2025-Jul-28 g7a7802d) [linux/amd64]
+DPS8M Proxy v0.0.11+dirty* (2025-Jul-28 g8946cd1+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -221,12 +222,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.11 (2025-Jul-28 g7a7802d) [linux/amd64]
+DPS8M Proxy v0.0.11+dirty* (2025-Jul-28 g8946cd1+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.0.11                          |
+| dps8m/proxy               | v0.0.11+dirty*                   |
 | arl/statsviz              | v0.7.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -444,64 +445,64 @@ predecessor (code statistics 📈 provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>15</th>
-		<th>6493</th>
+		<th>6508</th>
 		<th>1350</th>
-		<th>303</th>
+		<th>318</th>
 		<th>4840</th>
 		<th>1176</th>
-		<th>164958</th>
-		<th>3015</th>
+		<th>165738</th>
+		<th>3030</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
-		<th>342</th>
-		<th>62</th>
-		<th>67</th>
-		<th>213</th>
-		<th>44</th>
-		<th>10736</th>
-		<th>243</th>
+		<th>358</th>
+		<th>64</th>
+		<th>70</th>
+		<th>224</th>
+		<th>45</th>
+		<th>11319</th>
+		<th>256</th>
 	</tr><tr>
 		<th>Markdown</th>
 		<th>1</th>
-		<th>512</th>
+		<th>514</th>
 		<th>99</th>
 		<th>0</th>
-		<th>413</th>
+		<th>415</th>
 		<th>0</th>
-		<th>23259</th>
-		<th>396</th>
+		<th>23376</th>
+		<th>398</th>
 	</tr><tr>
 		<th>Shell</th>
 		<th>1</th>
-		<th>116</th>
+		<th>117</th>
 		<th>25</th>
-		<th>29</th>
+		<th>30</th>
 		<th>62</th>
 		<th>12</th>
-		<th>3024</th>
-		<th>78</th>
+		<th>3075</th>
+		<th>79</th>
 	</tr><tr>
 		<th>Systemd</th>
 		<th>1</th>
-		<th>207</th>
+		<th>208</th>
 		<th>35</th>
-		<th>105</th>
+		<th>106</th>
 		<th>67</th>
 		<th>0</th>
-		<th>7462</th>
-		<th>134</th>
+		<th>7513</th>
+		<th>135</th>
 	</tr></tbody>
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>7670</th>
-		<th>1571</th>
-		<th>504</th>
-		<th>5595</th>
-		<th>1232</th>
-		<th>209439</th>
-		<th>3854</th>
+		<th>7705</th>
+		<th>1573</th>
+		<th>524</th>
+		<th>5608</th>
+		<th>1233</th>
+		<th>211021</th>
+		<th>3886</th>
 	</tr></tfoot></table>
 
 ## Future plans
@@ -589,6 +590,7 @@ and that you know what you’re doing!
   [`errcheck`](https://github.com/kisielk/errcheck),
   [`gofumpt`](https://github.com/mvdan/gofumpt),
   [`scc`](https://github.com/boyter/scc),
+  [`scspell`](https://github.com/myint/scspell),
   [`codespell`](https://github.com/codespell-project/codespell), and
   [Perl](https://www.perl.org/).
 * If you plan to make any changes to the [`Makefile`](Makefile) (or
@@ -601,6 +603,8 @@ and that you know what you’re doing!
   (with `PDPMAKE_POSIXLY_CORRECT` set) and
   [`yash`](https://magicant.github.io/yash/) to ensure POSIX
   conformance.
+* The [`Makefile`](Makefile) provides a `lint` convenience target to
+  help you run all this stuff.
 
 ### Recommended
 
@@ -608,11 +612,9 @@ and that you know what you’re doing!
   [`golangci-lint`](https://golangci-lint.run/) installed.  We ship a
   [config file](.golangci.yml) file for it, and try to make sure that
   all the tests pass when using the most recently released version.
-* It’s also recommended to (manually) use
+* It’s also recommended to (*manually*) use
   [`hunspell`](https://hunspell.github.io/) for spell
-  checking—`codespell` doesn’t catch everything.
-* The [`Makefile`](Makefile) provides a `lint` convenience target to
-  help you run all this stuff.
+  checking—in addition to using `codespell` and `scspell`.
 
 ## Security
 

@@ -5,6 +5,7 @@
 // Copyright (c) 2025 Jeffrey H. Johnson
 // Copyright (c) 2025 The DPS8M Development Team
 // SPDX-License-Identifier: MIT
+// scspell-id: 61bf5b0e-6bd1-11f0-8085-80ee73e9b8e7
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // DPS8M Proxy

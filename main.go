@@ -3,6 +3,7 @@
 // Copyright (c) 2025 Jeffrey H. Johnson
 // Copyright (c) 2025 The DPS8M Development Team
 // SPDX-License-Identifier: MIT
+// scspell-id: 92e1502a-6bd1-11f0-8b9e-80ee73e9b8e7
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // DPS8M Proxy
@@ -240,7 +241,7 @@ var (
 	emacsKeymapPrefixes              = make(map[string]bool)
 	emacsKeymap                      = map[string]string{
 		"\x1b[1;5A": "\x1b\x5b", //    Control-Arrow_Up -> Escape, [
-		"\x1b[1;5B": "\x1b\x5d", // Control-Arrrow_Down -> Escape, ]
+		"\x1b[1;5B": "\x1b\x5d", //  Control-Arrow_Down -> Escape, ]
 		"\x1b[1;5C": "\x1b\x66", // Control-Arrow_Right -> Escape, f
 		"\x1b[1;5D": "\x1b\x62", //  Control-Arrow_Left -> Escape, b
 		"\x1b[1~":   "\x01",     //                Home -> Control-A
