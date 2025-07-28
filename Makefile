@@ -85,8 +85,9 @@ lint check:
 	@printf '\n%s\n' "⚙️ Running linters..."
 	$(MAKE) revive reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
 		errcheck shellcheck shfmt codespell scspell golangci-lint
-	@printf '\n%s\n' "🧩 Running 'make cross'..."
-	env MAX_CPU=1 $(MAKE) cross
+	@test -z "$${CI_NO_CROSS:-}" && { \
+		printf '\n%s\n' "🧩 Running 'make cross'..."; \
+		set -x; env MAX_CPU=1 $(MAKE) cross; exit $${?}; } || true
 	$(MAKE) clean
 	@printf '\n%s\n' "ℹ️ Finding any outdated dependencies..."
 	@go list -u -f \
@@ -277,7 +278,8 @@ cross: .cross.sh
 scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 	@command -v scspell > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ scspell not found!"; exit 1; }
-	@printf '%s\n' "ℹ️ Use scspell-fix target to run interactively"
+	@printf '%s\n' \
+		"ℹ️ Running scspell, use scspell-fix target to run interactively"
 	scspell \
 		--report-only \
 		--override-dictionary ./.scspell/dictionary.txt \
@@ -293,7 +295,8 @@ scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 	@command -v scspell > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ scspell not found!"; exit 1; }
-	@printf '%s\n' "ℹ️ Use scspell target to run non-interactively"
+	@printf '%s\n' \
+		"ℹ️ Running scspell-fix, use scspell target to run non-interactively"
 	scspell \
 		--override-dictionary ./.scspell/dictionary.txt \
 		--base-dict ./.scspell/basedict.txt \
