@@ -364,10 +364,24 @@ func (op *octalPermValue) Type() string {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func init() {
+	pflag.CommandLine.SetOutput(os.Stdout)
 	pflag.CommandLine.SortFlags = false
 
+	pflag.Usage = func() {
+		origVersion := showVersion
+		showVersion = true
+		printVersion(true)
+		showVersion = origVersion
+
+		exePath := resolveExePath()
+		fmt.Fprintf(os.Stdout,
+			"\r\nUsage for %s:\r\n\r\n",
+			exePath)
+		pflag.PrintDefaults()
+	}
+
 	// NOTE: Ensure that all pflag --help / -h output renders in less
-	//       than 79 columns and that indentation renders as 3 spaces.
+	//       than 79 columns and that indentation renders as 4 spaces.
 
 	pflag.BoolVarP(&allowRoot,
 		"allow-root", "0", false,
@@ -375,8 +389,15 @@ func init() {
 
 	pflag.StringSliceVarP(&sshAddr,
 		"ssh-addr", "l", []string{":2222"},
-		"SSH listener address(es)\n   [e.g., \":2222\", \"[::1]:8000\"]\n   (multiple allowed)")
+		"SSH listener address(es)\r\n"+
+			"    [e.g., \":2222\", \"[::1]:8000\"]\r\n"+
+			"    (multiple allowed)")
 	pflag.Lookup("ssh-addr").DefValue = "\":2222\""
+
+	pflag.Float64VarP(&sshDelay,
+		"ssh-delay", "e", 0,
+		"Delay for incoming SSH connections\r\n"+
+			"    [\"0.0\" to \"30.0\" seconds] (no default)")
 
 	pflag.BoolVarP(&noBanner,
 		"no-banner", "n", false,
@@ -384,11 +405,13 @@ func init() {
 
 	pflag.StringVarP(&telnetHostPort,
 		"telnet-host", "t", "127.0.0.1:6180",
-		"Default TELNET target [host:port]\n  ")
+		"Default TELNET target [host:port]\r\n"+
+			"   ")
 
 	pflag.VarP(&altHostFlag{},
 		"alt-host", "a",
-		"Alternate TELNET target(s) [sshuser@host:port]\n   (multiple allowed)")
+		"Alternate TELNET target(s) [sshuser@host:port]\r\n"+
+			"    (multiple allowed)")
 
 	pflag.BoolVarP(&debugNegotiation,
 		"debug-telnet", "k", false,
@@ -396,12 +419,14 @@ func init() {
 
 	pflag.StringVarP(&debugAddr,
 		"debug-server", "y", "",
-		"Enable HTTP debug server listening address\n   [e.g., \":6060\", \"[::1]:6060\"]")
+		"Enable HTTP debug server listening address\r\n"+
+			"    [e.g., \":6060\", \"[::1]:6060\"]")
 
 	if gopsEnabled {
 		pflag.BoolVarP(&noGops,
 			"no-gops", "g", false,
-			"Disable the \"gops\" diagnostic agent\n   (see https://github.com/google/gops)")
+			"Disable the \"gops\" diagnostic agent\r\n"+
+				"    (see https://github.com/google/gops)")
 	}
 
 	pflag.StringVarP(&logDir,
@@ -410,19 +435,24 @@ func init() {
 
 	pflag.BoolVarP(&noLog,
 		"no-log", "o", false,
-		"Disable all session logging\n   (for console logging see \"--console-log\")")
+		"Disable all session logging\r\n"+
+			"    (for console logging see \"--console-log\")")
 
 	pflag.StringVarP(&consoleLog,
 		"console-log", "c", "",
-		"Enable console logging [\"quiet\", \"noquiet\"]\n   (disabled by default)")
+		"Enable console logging [\"quiet\", \"noquiet\"]\r\n"+
+			"    (disabled by default)")
 
 	pflag.StringVarP(&compressAlgo,
 		"compress-algo", "s", "gzip",
-		"Compression algorithm [\"gzip\", \"xz\", \"zstd\"]\n  ")
+		"Compression algorithm [\"gzip\", \"xz\", \"zstd\"]\r\n"+
+			"   ")
 
 	pflag.StringVarP(&compressLevel,
 		"compress-level", "z", "normal",
-		"Compression level for gzip and zstd algorithms\n   [\"fast\", \"normal\", \"high\"]\n  ")
+		"Compression level for gzip and zstd algorithms\r\n"+
+			"    [\"fast\", \"normal\", \"high\"]\r\n"+
+			"   ")
 
 	pflag.BoolVarP(&noCompress,
 		"no-compress", "x", false,
@@ -430,26 +460,31 @@ func init() {
 
 	pflag.VarP((*octalPermValue)(&logPerm),
 		"log-perm", "p",
-		"Permissions (octal) for new log files\n   [e.g., \"600\", \"644\"]")
+		"Permissions (octal) for new log files\r\n"+
+			"    [e.g., \"600\", \"644\"]")
 	pflag.Lookup("log-perm").DefValue = "\"600\""
 
 	pflag.VarP((*octalPermValue)(&logDirPerm),
 		"log-dir-perm", "r",
-		"Permissions (octal) for new log directories\n   [e.g., \"755\", \"750\"]")
+		"Permissions (octal) for new log directories\r\n"+
+			"    [e.g., \"755\", \"750\"]")
 	pflag.Lookup("log-dir-perm").DefValue = "\"750\""
 
 	if dbEnabled {
 		pflag.StringVarP(&dbPath,
 			"db-file", "u", "",
-			"Path to persistent statistics storage database\n   (disabled by default)")
+			"Path to persistent statistics storage database\r\n"+
+				"    (disabled by default)")
 
 		pflag.Uint64VarP(&dbTime,
 			"db-time", "j", 30,
-			"Elapsed seconds between database updates\n   [0 to disable periodic writes]")
+			"Elapsed seconds between database updates\r\n"+
+				"    [0 disables periodic writes]")
 
 		pflag.VarP((*octalPermValue)(&dbPerm),
 			"db-perm", "f",
-			"Permissions (octal) for new database files\n   [e.g., \"600\", \"644\"]")
+			"Permissions (octal) for new database files\r\n"+
+				"    [e.g., \"600\", \"644\"]")
 		pflag.Lookup("log-perm").DefValue = "\"600\""
 	}
 
@@ -469,13 +504,10 @@ func init() {
 		"whitelist", "w", "",
 		"Enable whitelist [filename] (no default)")
 
-	pflag.Float64VarP(&sshDelay,
-		"ssh-delay", "e", 0,
-		"Delay for incoming SSH connections\n   [\"0.0\" to \"30.0\" seconds] (no default)")
-
 	pflag.BoolVarP(&forceUTC,
 		"utc", "U", false,
-		"Use UTC (Coordinated Universal Time) for time\n   display and when writing to log files")
+		"Use UTC (Coordinated Universal Time) for time\r\n"+
+			"    display and timestamping in log files")
 
 	pflag.BoolVarP(&showVersion,
 		"version", "v", false,
@@ -490,6 +522,17 @@ func init() {
 	}
 
 	haveUTF8console = haveUTF8support()
+
+	for _, arg := range os.Args[1:] {
+		if arg == "-h" || arg == "--help" {
+			pflag.Usage()
+			fmt.Fprintf(os.Stdout,
+				"  -h, --help"+
+					"                    Show this help and usage information\r\n\r\n"+
+					"proxy home page (bug reports): <https://gitlab.com/dps8m/proxy/>\r\n")
+			os.Exit(0)
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -501,7 +544,7 @@ func shutdownWatchdog() {
 	closeDB()
 
 	if isConsoleLogQuiet {
-		fmt.Fprintf(os.Stderr,
+		fmt.Fprintf(os.Stdout,
 			"%s %sAll connections closed. Exiting.\r\n",
 			nowStamp(), byePrefix())
 	}
@@ -537,7 +580,7 @@ func main() {
 		isConsoleLogQuiet = (cl == "quiet")
 	}
 
-	printVersion()
+	printVersion(false)
 
 	if showVersion {
 		os.Exit(0)
@@ -620,10 +663,10 @@ func main() {
 
 	if !noLog || consoleLog != "" {
 		if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sERROR: Failed to create session log directory: %v\r\n",
 				nowStamp(), warnPrefix(), err)
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sSession logging disabled.\r\n",
 				nowStamp(), alertPrefix())
 			noLog = true
@@ -644,7 +687,7 @@ func main() {
 
 	if strings.Contains(telnetHostPort, "@") {
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --telnet-host cannot contain a username (e.g., 'user@'); "+
 					"you specified: %s\r\n", nowStamp(), errorPrefix(), telnetHostPort)
 		}
@@ -655,7 +698,7 @@ func main() {
 
 	if idleMax > 0 && timeMax > 0 && idleMax >= timeMax {
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --idle-max (%d) cannot be greater than or equal to --time-max"+
 					" (%d)\r\n", nowStamp(), errorPrefix(), idleMax, timeMax)
 		}
@@ -667,7 +710,7 @@ func main() {
 	edSigner, err := loadOrCreateHostKey("ssh_host_ed25519_key.pem", "ed25519")
 	if err != nil {
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sERROR: Ed25519 host key error: %v\r\n",
 				nowStamp(), errorPrefix(), err)
 		}
@@ -679,7 +722,7 @@ func main() {
 	rsaSigner, err := loadOrCreateHostKey("ssh_host_rsa_key.pem", "rsa")
 	if err != nil {
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sERROR: RSA host key error: %v\r\n",
 				nowStamp(), errorPrefix(), err)
 		}
@@ -694,7 +737,7 @@ func main() {
 			listener, err := net.Listen("tcp", addr)
 			if err != nil {
 				if isConsoleLogQuiet {
-					fmt.Fprintf(os.Stderr,
+					fmt.Fprintf(os.Stdout,
 						"%s %sERROR: LISTEN on %s: %v\r\n",
 						nowStamp(), errorPrefix(), addr, err)
 				}
@@ -742,7 +785,7 @@ func main() {
 	}
 
 	if isConsoleLogQuiet {
-		fmt.Fprintf(os.Stderr,
+		fmt.Fprintf(os.Stdout,
 			"%s %s - Type '?' for help\r\n",
 			nowStamp(), startMsg)
 	}
@@ -758,7 +801,7 @@ func main() {
 	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
 	if err != nil {
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sERROR: Could not parse default TELNET target: %v\r\n",
 				nowStamp(), errorPrefix(), err)
 		}
@@ -906,7 +949,7 @@ func isGitSHA(s string) bool {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func printVersion() {
+func printVersion(short bool) {
 	versionString := "DPS8M Proxy"
 
 	versionString += func() string {
@@ -962,9 +1005,11 @@ func printVersion() {
 	if showVersion {
 		fmt.Printf("%s\r\n",
 			versionString)
-		fmt.Printf("\r\n")
-		printVersionTable()
-		fmt.Printf("\r\n")
+		if !short {
+			fmt.Printf("\r\n")
+			printVersionTable()
+			fmt.Printf("\r\n")
+		}
 	} else {
 		log.Printf("%s\r\n",
 			versionString)
@@ -1044,7 +1089,7 @@ func handleConsoleInput() {
 				log.SetOutput(os.Stdout)
 			}
 
-			printVersion()
+			printVersion(false)
 			fmt.Printf("\r\n")
 			printVersionTable()
 			fmt.Printf("\r\n")
@@ -1055,7 +1100,7 @@ func handleConsoleInput() {
 
 		case "k", "K":
 			if len(parts) < 2 {
-				fmt.Fprintf(os.Stderr,
+				fmt.Fprintf(os.Stdout,
 					"%s Error: Session ID or '*' required for 'k' command.\r\n",
 					nowStamp())
 
@@ -1562,7 +1607,7 @@ func toggleGracefulShutdown() {
 			bellPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sGraceful shutdown cancelled.\r\n",
 				nowStamp(), bellPrefix())
 		}
@@ -1573,7 +1618,7 @@ func toggleGracefulShutdown() {
 			skullPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sNo new connections will be accepted.\r\n",
 				nowStamp(), skullPrefix())
 		}
@@ -1582,7 +1627,7 @@ func toggleGracefulShutdown() {
 			bellPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sGraceful shutdown initiated.\r\n",
 				nowStamp(), bellPrefix())
 		}
@@ -1609,7 +1654,7 @@ func toggleDenyNewConnections() {
 			thumbsUpPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sDeny connections cancelled.\r\n",
 				nowStamp(), thumbsUpPrefix())
 		}
@@ -1620,7 +1665,7 @@ func toggleDenyNewConnections() {
 			skullPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sNo new connections will be accepted.\r\n",
 				nowStamp(), skullPrefix())
 		}
@@ -1635,7 +1680,7 @@ func immediateShutdown() {
 			boomPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sImmediate shutdown initiated.\r\n",
 				nowStamp(), boomPrefix())
 		}
@@ -1689,7 +1734,7 @@ func immediateShutdown() {
 		closeDB()
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stderr,
+			fmt.Fprintf(os.Stdout,
 				"%s %sExiting.\r\n",
 				nowStamp(), byePrefix())
 		}
@@ -2251,7 +2296,7 @@ func killConnection(id string) {
 	connectionsMutex.Unlock()
 
 	if !ok {
-		fmt.Fprintf(os.Stderr,
+		fmt.Fprintf(os.Stdout,
 			"%s Session ID '%s' not found.\r\n",
 			nowStamp(), id)
 
@@ -2259,10 +2304,10 @@ func killConnection(id string) {
 	}
 
 	if isConsoleLogQuiet {
-		if _, err := fmt.Fprintf(os.Stderr,
+		if _, err := fmt.Fprintf(os.Stdout,
 			"%s %sKilling connection %s...\r\n",
 			nowStamp(), skullPrefix(), id); err != nil {
-			log.Printf("%sError writing to stderr: %v",
+			log.Printf("%sError writing to Stdout: %v",
 				warnPrefix(), err)
 		}
 	}
@@ -2319,10 +2364,10 @@ func killAllConnections() {
 		}
 
 		if isConsoleLogQuiet {
-			if _, err := fmt.Fprintf(os.Stderr,
+			if _, err := fmt.Fprintf(os.Stdout,
 				"%s %sKilling connection %s...\r\n",
 				nowStamp(), skullPrefix(), id); err != nil {
-				log.Printf("%sError writing to stderr: %v",
+				log.Printf("%sError writing to Stdout: %v",
 					warnPrefix(), err)
 			}
 		}
@@ -4528,12 +4573,12 @@ func setupConsoleLogging() {
 	}
 
 	if isConsoleLogQuiet {
-		fmt.Fprintf(os.Stderr,
-			"%s %sConsole logging requested (suppressing console output)\n",
+		fmt.Fprintf(os.Stdout,
+			"%s %sConsole logging requested (suppressing console output)\r\n",
 			nowStamp(), alertPrefix())
 	} else {
-		fmt.Fprintf(os.Stderr,
-			"%s %sConsole logging requested (not suppressing console output)\n",
+		fmt.Fprintf(os.Stdout,
+			"%s %sConsole logging requested (not suppressing console output)\r\n",
 			nowStamp(), alertPrefix())
 	}
 
@@ -4573,7 +4618,8 @@ func rotateConsoleLogAt(t time.Time) {
 
 	if err := os.MkdirAll(
 		logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
-		fmt.Fprintf(os.Stderr, "%s %sERROR: Failed to create console log directory: %v\r\n",
+		fmt.Fprintf(os.Stdout,
+			"%s %sERROR: Failed to create console log directory: %v\r\n",
 			nowStamp(), warnPrefix(), err)
 		isConsoleLogQuiet = false
 		consoleLog = ""
@@ -4584,7 +4630,8 @@ func rotateConsoleLogAt(t time.Time) {
 
 		consoleLogFile = nil
 		log.SetOutput(os.Stdout)
-		fmt.Fprintf(os.Stderr, "%s %sConsole logging disabled.\r\n",
+		fmt.Fprintf(os.Stdout,
+			"%s %sConsole logging disabled.\r\n",
 			nowStamp(), alertPrefix())
 
 		consoleLogMutex.Unlock()
@@ -4599,7 +4646,8 @@ func rotateConsoleLogAt(t time.Time) {
 			isConsoleLogQuiet = false
 		}
 
-		fmt.Fprintf(os.Stderr, "%s %sERROR: Failed to open new console log file: %v\r\n",
+		fmt.Fprintf(os.Stdout,
+			"%s %sERROR: Failed to open new console log file: %v\r\n",
 			nowStamp(), warnPrefix(), err)
 		consoleLog = ""
 
@@ -4609,7 +4657,8 @@ func rotateConsoleLogAt(t time.Time) {
 
 		consoleLogFile = nil
 		log.SetOutput(os.Stdout)
-		fmt.Fprintf(os.Stderr, "%s %sConsole logging disabled.\r\n",
+		fmt.Fprintf(os.Stdout,
+			"%s %sConsole logging disabled.\r\n",
 			nowStamp(), alertPrefix())
 
 		consoleLogMutex.Unlock()
@@ -4633,7 +4682,8 @@ func rotateConsoleLogAt(t time.Time) {
 	if oldLogFile != nil {
 		oldLogPath := oldLogFile.Name()
 		if err := oldLogFile.Close(); err != nil {
-			fmt.Fprintf(os.Stderr, "%s %sError closing previous console log file: %v\r\n",
+			fmt.Fprintf(os.Stdout,
+				"%s %sError closing previous console log file: %v\r\n",
 				nowStamp(), warnPrefix(), err)
 		}
 		if !noCompress {
@@ -4956,13 +5006,13 @@ func listGoroutines() {
 	fmt.Print(border)
 
 	for _, g := range goroutines {
-		fmt.Printf("| %-*s | %-*s |\n",
+		fmt.Printf("| %-*s | %-*s |\r\n",
 			maxName, "Name", maxVal, "Goroutine #"+g.ID)
-		fmt.Printf("| %-*s | %-*s |\n",
+		fmt.Printf("| %-*s | %-*s |\r\n",
 			maxName, "State", maxVal, g.State)
-		fmt.Printf("| %-*s | %-*s |\n",
+		fmt.Printf("| %-*s | %-*s |\r\n",
 			maxName, "Entrypoint", maxVal, g.Entrypoint)
-		fmt.Printf("| %-*s | %-*s |\n",
+		fmt.Printf("| %-*s | %-*s |\r\n",
 			maxName, "Caller", maxVal, g.Caller)
 
 		fmt.Print(border)
