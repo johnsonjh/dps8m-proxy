@@ -282,10 +282,9 @@ scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 		--report-only \
 		--override-dictionary ./.scspell/dictionary.txt \
 		--base-dict ./.scspell/basedict.txt \
-		$$( find . \( -path ./.git -o -name '.doc.tmpl' \
-				-o -name 'README.md' \) -prune -o \
-				-type f -exec \
-					grep -l 'scspell-id:' {} \; )
+		$$( find . \( -path ./.git -o -path ./.venv -o -name '.doc.tmpl' \
+			-o -name 'README.md' \) -prune -o -type f -exec \
+			grep -l 'scspell-id:' {} \; )
 
 ##############################################################################
 # Target: scspell-fix
@@ -296,13 +295,11 @@ scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 		{ printf '%s\n' "⚠️ scspell not found!"; exit 1; }
 	@printf '%s\n' "ℹ️ Use scspell target to run non-interactively"
 	scspell \
-		--report-only \
 		--override-dictionary ./.scspell/dictionary.txt \
 		--base-dict ./.scspell/basedict.txt \
-		$$( find . \( -path ./.git -o -name '.doc.tmpl' \
-				-o -name 'README.md' \) -prune -o \
-				-type f -exec \
-					grep -l 'scspell-id:' {} \; )
+		$$( find . \( -path ./.git -o -path ./.venv -o -name '.doc.tmpl' \
+			-o -name 'README.md' \) -prune -o -type f -exec \
+			grep -l 'scspell-id:' {} \; )
 
 ##############################################################################
 # Target: strip
