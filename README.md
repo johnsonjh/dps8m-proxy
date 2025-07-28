@@ -215,26 +215,26 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```
-DPS8M Proxy v0.0.10 (2025-Jul-27 gabf53b5) [linux/amd64]
+DPS8M Proxy v0.0.11 (2025-Jul-28 g964ad28) [linux/amd64]
 
-+===========================+=========+
-| Component                 | Version |
-+===========================+=========+
-| dps8m/proxy               | v0.0.10 |
-| arl/statsviz              | v0.7.0  |
-| google/gops               | v0.3.28 |
-| gorilla/websocket         | v1.5.3  |
-| klauspost/compress        | v1.18.0 |
-| spf13/pflag               | v1.0.7  |
-| ulikunitz/xz              | v0.5.12 |
-| go.etcd.io/bbolt          | v1.4.2  |
-| golang.org/x/crypto       | v0.40.0 |
-| golang.org/x/sys          | v0.34.0 |
-| golang.org/x/term         | v0.33.0 |
-| kernel.org/.../libcap/cap | v1.2.76 |
-| kernel.org/.../libcap/psx | v1.2.76 |
-| Go compiler (gc)          | v1.24.5 |
-+===========================+=========+
++===========================+==================================+
+| Component                 | Version                          |
++===========================+==================================+
+| dps8m/proxy               | v0.0.11                          |
+| arl/statsviz              | v0.7.0                           |
+| google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
+| gorilla/websocket         | v1.5.3                           |
+| klauspost/compress        | v1.18.0                          |
+| spf13/pflag               | v1.0.7                           |
+| ulikunitz/xz              | v0.5.12                          |
+| go.etcd.io/bbolt          | v1.4.2                           |
+| golang.org/x/crypto       | v0.40.0                          |
+| golang.org/x/sys          | v0.34.0                          |
+| golang.org/x/term         | v0.33.0                          |
+| kernel.org/.../libcap/cap | v1.2.76                          |
+| kernel.org/.../libcap/psx | v1.2.76                          |
+| Go compiler (gc)          | v1.24.5                          |
++===========================+==================================+
 ```
 
 * If you need to see additional details about the `proxy` binary,
@@ -438,13 +438,13 @@ predecessor (code statistics 📈 provided by
 	<tbody><tr>
 		<th>Go</th>
 		<th>15</th>
-		<th>6430</th>
-		<th>1343</th>
-		<th>302</th>
-		<th>4785</th>
-		<th>1169</th>
-		<th>163469</th>
-		<th>2981</th>
+		<th>6444</th>
+		<th>1347</th>
+		<th>303</th>
+		<th>4794</th>
+		<th>1170</th>
+		<th>163929</th>
+		<th>2986</th>
 	</tr><tr>
 		<th>Makefile</th>
 		<th>1</th>
@@ -489,13 +489,13 @@ predecessor (code statistics 📈 provided by
 	<tfoot><tr>
 		<th>Total</th>
 		<th>19</th>
-		<th>7607</th>
-		<th>1564</th>
-		<th>503</th>
-		<th>5540</th>
-		<th>1225</th>
-		<th>207950</th>
-		<th>3820</th>
+		<th>7621</th>
+		<th>1568</th>
+		<th>504</th>
+		<th>5549</th>
+		<th>1226</th>
+		<th>208410</th>
+		<th>3825</th>
 	</tr></tfoot></table>
 
 ## Future plans
