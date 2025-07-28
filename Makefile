@@ -167,7 +167,7 @@ errcheck:
 gofumpt:
 	@command -v gofumpt > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ gofumpt not found!"; exit 0; } ; \
-		set -x; gofumpt -d -e -s .
+		set -x; gofumpt -d -e .
 
 ##############################################################################
 # Target: shfmt

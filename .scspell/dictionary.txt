@@ -324,6 +324,7 @@ tunables
 uber
 uptime
 username
+venv
 wasip
 wasm
 websocket

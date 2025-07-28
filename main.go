@@ -2503,13 +2503,15 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	config := &ssh.ServerConfig{
 		//revive:disable:unused-parameter
 		PasswordCallback: func(
-			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) { //nolint:gofumpt
+			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error,
+		) {
 			return &ssh.Permissions{
 				Extensions: map[string]string{"auth-method": "password"},
 			}, nil
 		},
 		PublicKeyCallback: func(
-			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) { //nolint:gofumpt
+			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error,
+		) {
 			line := fmt.Sprintf("VALIDATE [%s] %s@%s %q:%s",
 				sid, c.User(), c.RemoteAddr(),
 				pubKey.Type(), ssh.FingerprintSHA256(pubKey),
@@ -2527,7 +2529,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		},
 		KeyboardInteractiveCallback: func(
 			conn ssh.ConnMetadata,
-			challenge ssh.KeyboardInteractiveChallenge) (*ssh.Permissions, error) { //nolint:gofumpt
+			challenge ssh.KeyboardInteractiveChallenge) (*ssh.Permissions, error,
+		) {
 			return &ssh.Permissions{
 				Extensions: map[string]string{"auth-method": "keyboard-interactive"},
 			}, nil
@@ -2732,7 +2735,8 @@ func parseHostPort(hostPort string) (string, int, error) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
-	requests <-chan *ssh.Request, keyLog []string) { //nolint:gofumpt
+	requests <-chan *ssh.Request, keyLog []string,
+) {
 	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
 
 	sessionStarted := make(chan bool, 1)
@@ -3387,8 +3391,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				if len(escSequence) > 0 { //nolint:gocritic
 					escSequence = append(escSequence, b)
 					if conn.emacsKeymapEnabled {
-						if replacement, ok := //nolint:gofumpt,nolintlint
-							emacsKeymap[string(escSequence)]; ok {
+						if replacement, ok := emacsKeymap[string(escSequence)]; ok {
 							m, err := remote.Write([]byte(replacement))
 							if err != nil {
 								log.Printf("%sError writing to remote for %s: %v",
@@ -3406,8 +3409,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 							escSequence = nil
 							escTimer = nil
-						} else if _, isPrefix := //nolint:gofumpt,nolintlint
-							emacsKeymapPrefixes[string(escSequence)]; isPrefix {
+						} else if _,
+							isPrefix := emacsKeymapPrefixes[string(escSequence)]; isPrefix {
 							escTimer = time.After(50 * time.Millisecond)
 						} else {
 							m, err := remote.Write(escSequence)
@@ -4161,7 +4164,8 @@ func showMenu(ch ssh.Channel) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.Conn,
-	logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time) { //nolint:gofumpt
+	logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time,
+) {
 	switch sel {
 	case '0':
 		if _, err := remote.Write([]byte{0}); err != nil {
