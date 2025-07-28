@@ -15,7 +15,6 @@ package main
 import (
 	"log"
 	"os"
-	"path/filepath"
 	"sync"
 
 	"kernel.org/pub/linux/libs/security/libcap/cap"
@@ -24,39 +23,6 @@ import (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 var oneTime sync.Once
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-func resolveExePath() string {
-	var exe string
-	var err error
-
-	exe, err = os.Executable()
-	if err != nil { // Fallback to /proc
-		if realPath, err2 := os.Readlink("/proc/self/exe"); err2 == nil {
-			exe = realPath
-			err = nil
-		}
-	}
-
-	if err != nil || exe == "" { // Fallback to argv[0]
-		if len(os.Args) > 0 && os.Args[0] != "" {
-			exe = os.Args[0]
-		} else { // Fallback to "proxy"
-			exe = "proxy"
-		}
-	}
-
-	if realPath, err := filepath.EvalSymlinks(exe); err == nil {
-		exe = realPath
-	}
-
-	if abs, err := filepath.Abs(exe); err == nil {
-		exe = abs
-	}
-
-	return exe
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

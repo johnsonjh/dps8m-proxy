@@ -374,7 +374,7 @@ func init() {
 		showVersion = origVersion
 
 		exePath := resolveExePath()
-		fmt.Fprintf(os.Stdout,
+		_, _ = fmt.Fprintf(os.Stdout,
 			"\r\nUsage for %s:\r\n\r\n",
 			exePath)
 		pflag.PrintDefaults()
@@ -526,7 +526,7 @@ func init() {
 	for _, arg := range os.Args[1:] {
 		if arg == "-h" || arg == "--help" {
 			pflag.Usage()
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"  -h, --help"+
 					"                    Show this help and usage information\r\n\r\n"+
 					"proxy home page (bug reports): <https://gitlab.com/dps8m/proxy/>\r\n")
@@ -544,7 +544,7 @@ func shutdownWatchdog() {
 	closeDB()
 
 	if isConsoleLogQuiet {
-		fmt.Fprintf(os.Stdout,
+		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sAll connections closed. Exiting.\r\n",
 			nowStamp(), byePrefix())
 	}
@@ -663,10 +663,10 @@ func main() {
 
 	if !noLog || consoleLog != "" {
 		if err := os.MkdirAll(logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: Failed to create session log directory: %v\r\n",
 				nowStamp(), warnPrefix(), err)
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sSession logging disabled.\r\n",
 				nowStamp(), alertPrefix())
 			noLog = true
@@ -687,7 +687,7 @@ func main() {
 
 	if strings.Contains(telnetHostPort, "@") {
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --telnet-host cannot contain a username (e.g., 'user@'); "+
 					"you specified: %s\r\n", nowStamp(), errorPrefix(), telnetHostPort)
 		}
@@ -698,7 +698,7 @@ func main() {
 
 	if idleMax > 0 && timeMax > 0 && idleMax >= timeMax {
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --idle-max (%d) cannot be greater than or equal to --time-max"+
 					" (%d)\r\n", nowStamp(), errorPrefix(), idleMax, timeMax)
 		}
@@ -710,7 +710,7 @@ func main() {
 	edSigner, err := loadOrCreateHostKey("ssh_host_ed25519_key.pem", "ed25519")
 	if err != nil {
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: Ed25519 host key error: %v\r\n",
 				nowStamp(), errorPrefix(), err)
 		}
@@ -722,7 +722,7 @@ func main() {
 	rsaSigner, err := loadOrCreateHostKey("ssh_host_rsa_key.pem", "rsa")
 	if err != nil {
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: RSA host key error: %v\r\n",
 				nowStamp(), errorPrefix(), err)
 		}
@@ -737,7 +737,7 @@ func main() {
 			listener, err := net.Listen("tcp", addr)
 			if err != nil {
 				if isConsoleLogQuiet {
-					fmt.Fprintf(os.Stdout,
+					_, _ = fmt.Fprintf(os.Stdout,
 						"%s %sERROR: LISTEN on %s: %v\r\n",
 						nowStamp(), errorPrefix(), addr, err)
 				}
@@ -785,7 +785,7 @@ func main() {
 	}
 
 	if isConsoleLogQuiet {
-		fmt.Fprintf(os.Stdout,
+		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %s - Type '?' for help\r\n",
 			nowStamp(), startMsg)
 	}
@@ -801,7 +801,7 @@ func main() {
 	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
 	if err != nil {
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: Could not parse default TELNET target: %v\r\n",
 				nowStamp(), errorPrefix(), err)
 		}
@@ -1100,7 +1100,7 @@ func handleConsoleInput() {
 
 		case "k", "K":
 			if len(parts) < 2 {
-				fmt.Fprintf(os.Stdout,
+				_, _ = fmt.Fprintf(os.Stdout,
 					"%s Error: Session ID or '*' required for 'k' command.\r\n",
 					nowStamp())
 
@@ -1607,7 +1607,7 @@ func toggleGracefulShutdown() {
 			bellPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sGraceful shutdown cancelled.\r\n",
 				nowStamp(), bellPrefix())
 		}
@@ -1618,7 +1618,7 @@ func toggleGracefulShutdown() {
 			skullPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sNo new connections will be accepted.\r\n",
 				nowStamp(), skullPrefix())
 		}
@@ -1627,7 +1627,7 @@ func toggleGracefulShutdown() {
 			bellPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sGraceful shutdown initiated.\r\n",
 				nowStamp(), bellPrefix())
 		}
@@ -1654,7 +1654,7 @@ func toggleDenyNewConnections() {
 			thumbsUpPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sDeny connections cancelled.\r\n",
 				nowStamp(), thumbsUpPrefix())
 		}
@@ -1665,7 +1665,7 @@ func toggleDenyNewConnections() {
 			skullPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sNo new connections will be accepted.\r\n",
 				nowStamp(), skullPrefix())
 		}
@@ -1680,7 +1680,7 @@ func immediateShutdown() {
 			boomPrefix())
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sImmediate shutdown initiated.\r\n",
 				nowStamp(), boomPrefix())
 		}
@@ -1734,7 +1734,7 @@ func immediateShutdown() {
 		closeDB()
 
 		if isConsoleLogQuiet {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sExiting.\r\n",
 				nowStamp(), byePrefix())
 		}
@@ -2296,7 +2296,7 @@ func killConnection(id string) {
 	connectionsMutex.Unlock()
 
 	if !ok {
-		fmt.Fprintf(os.Stdout,
+		_, _ = fmt.Fprintf(os.Stdout,
 			"%s Session ID '%s' not found.\r\n",
 			nowStamp(), id)
 
@@ -4573,11 +4573,11 @@ func setupConsoleLogging() {
 	}
 
 	if isConsoleLogQuiet {
-		fmt.Fprintf(os.Stdout,
+		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sConsole logging requested (suppressing console output)\r\n",
 			nowStamp(), alertPrefix())
 	} else {
-		fmt.Fprintf(os.Stdout,
+		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sConsole logging requested (not suppressing console output)\r\n",
 			nowStamp(), alertPrefix())
 	}
@@ -4618,7 +4618,7 @@ func rotateConsoleLogAt(t time.Time) {
 
 	if err := os.MkdirAll(
 		logDir, os.FileMode(logDirPerm)); err != nil { //nolint:gosec
-		fmt.Fprintf(os.Stdout,
+		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sERROR: Failed to create console log directory: %v\r\n",
 			nowStamp(), warnPrefix(), err)
 		isConsoleLogQuiet = false
@@ -4630,7 +4630,7 @@ func rotateConsoleLogAt(t time.Time) {
 
 		consoleLogFile = nil
 		log.SetOutput(os.Stdout)
-		fmt.Fprintf(os.Stdout,
+		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sConsole logging disabled.\r\n",
 			nowStamp(), alertPrefix())
 
@@ -4646,7 +4646,7 @@ func rotateConsoleLogAt(t time.Time) {
 			isConsoleLogQuiet = false
 		}
 
-		fmt.Fprintf(os.Stdout,
+		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sERROR: Failed to open new console log file: %v\r\n",
 			nowStamp(), warnPrefix(), err)
 		consoleLog = ""
@@ -4657,7 +4657,7 @@ func rotateConsoleLogAt(t time.Time) {
 
 		consoleLogFile = nil
 		log.SetOutput(os.Stdout)
-		fmt.Fprintf(os.Stdout,
+		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sConsole logging disabled.\r\n",
 			nowStamp(), alertPrefix())
 
@@ -4682,7 +4682,7 @@ func rotateConsoleLogAt(t time.Time) {
 	if oldLogFile != nil {
 		oldLogPath := oldLogFile.Name()
 		if err := oldLogFile.Close(); err != nil {
-			fmt.Fprintf(os.Stdout,
+			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sError closing previous console log file: %v\r\n",
 				nowStamp(), warnPrefix(), err)
 		}
@@ -5034,6 +5034,39 @@ func checkPrivilegedPorts(addrs []string) {
 			return
 		}
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func resolveExePath() string {
+	var exe string
+	var err error
+
+	exe, err = os.Executable()
+	if err != nil { // Fallback to /proc
+		if realPath, err2 := os.Readlink("/proc/self/exe"); err2 == nil {
+			exe = realPath
+			err = nil
+		}
+	}
+
+	if err != nil || exe == "" { // Fallback to argv[0]
+		if len(os.Args) > 0 && os.Args[0] != "" {
+			exe = os.Args[0]
+		} else { // Fallback to "proxy"
+			exe = "proxy"
+		}
+	}
+
+	if realPath, err := filepath.EvalSymlinks(exe); err == nil {
+		exe = realPath
+	}
+
+	if abs, err := filepath.Abs(exe); err == nil {
+		exe = abs
+	}
+
+	return exe
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
