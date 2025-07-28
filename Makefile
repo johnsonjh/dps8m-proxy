@@ -277,7 +277,26 @@ cross: .cross.sh
 scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 	@command -v scspell > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ scspell not found!"; exit 1; }
+	@printf '%s\n' "ℹ️ Use scspell-fix target to run interactively"
 	scspell \
+		--report-only \
+		--override-dictionary ./.scspell/dictionary.txt \
+		--base-dict ./.scspell/basedict.txt \
+		$$( find . \( -path ./.git -o -name '.doc.tmpl' \
+				-o -name 'README.md' \) -prune -o \
+				-type f -exec \
+					grep -l 'scspell-id:' {} \; )
+
+##############################################################################
+# Target: scspell-fix
+
+.PHONY: scspell-fix
+scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
+	@command -v scspell > /dev/null 2>&1 || \
+		{ printf '%s\n' "⚠️ scspell not found!"; exit 1; }
+	@printf '%s\n' "ℹ️ Use scspell target to run non-interactively"
+	scspell \
+		--report-only \
 		--override-dictionary ./.scspell/dictionary.txt \
 		--base-dict ./.scspell/basedict.txt \
 		$$( find . \( -path ./.git -o -name '.doc.tmpl' \
