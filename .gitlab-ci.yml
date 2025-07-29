@@ -4,6 +4,8 @@
 pages:
   stage: deploy
   image: alpine:edge
+  tags:
+    - saas-linux-2xlarge-amd64
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
