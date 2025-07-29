@@ -244,9 +244,32 @@ FILEID: 71899d82-6bd2-11f0-8342-80ee73e9b8e7
 basedict
 codespellrc
 
+FILEID: 1fa03764-6c0f-11f0-adcf-80ee73e9b8e7
+boyter
+errcheck
+githubusercontent
+goflags
+golangci
+gopath
+gotoolchain
+honnef
+kisielk
+ldflags
+metafirst
+mgechev
+mvdan
+nproc
+posixly
+printf
+shfmt
+staticcheck
+xargs
+zipname
+
 NATURAL:
 adduser
 bbolt
+brotli
 captcha
 charset
 cidr
@@ -278,6 +301,7 @@ hostname
 href
 https
 illumos
+interruptible
 jeffrey
 johnson
 johnsonjh
@@ -304,7 +328,9 @@ multics
 namespaces
 noexpandtab
 openssh
+pdpmake
 perl
+pigz
 pkcs
 proxying
 realtime
@@ -314,6 +340,7 @@ roadmap
 sbin
 scspell
 sftp
+shellcheck
 socat
 solaris
 spdx
