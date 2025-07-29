@@ -85,7 +85,7 @@ lint check:
 	$(MAKE) clean
 	@printf '\n%s\n' "⚙️ Running linters..."
 	$(MAKE) revive reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
-		errcheck shellcheck shfmt codespell scspell golangci-lint
+		errcheck shellcheck shfmt codespell scspell golangci-lint glab-lint
 	@test -z "$${CI_NO_CROSS:-}" && { \
 		printf '\n%s\n' "🧩 Running 'make cross'..."; \
 		set -x; env MAX_CPU=1 $(MAKE) cross; exit $${?}; } || true
@@ -95,6 +95,15 @@ lint check:
 		'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} → {{.Update.Version}}{{end}}' \
 		-m all
 	@printf '\n%s\n\n' "🥇 Linting complete; carefully review the output."
+
+##############################################################################
+# Target: glab-lint
+
+.PHONY: glab-lint
+glab-lint:
+	@command -v glab > /dev/null 2>&1 || \
+		{ printf '%s\n' "⚠️ glab not found"; exit 0; } ; \
+		set -x; glab ci lint || true
 
 ##############################################################################
 # Target: reuse

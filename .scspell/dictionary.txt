@@ -116,6 +116,7 @@ distclean
 errcheck
 etcdir
 fnldir
+glab
 gofmt
 gofumpt
 gogtags
