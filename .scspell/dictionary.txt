@@ -264,6 +264,7 @@ printf
 shfmt
 staticcheck
 xargs
+xdigit
 zipname
 
 NATURAL:
