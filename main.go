@@ -603,7 +603,7 @@ func main() {
 	}
 
 	switch compressAlgo {
-	case "gzip", "xz", "zstd":
+	case "gzip", "xz", "zstd": //nolint:goconst,nolintlint
 
 	default:
 		log.Fatalf("%sERROR: Invalid --compress-algo: %s",

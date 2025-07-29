@@ -29,9 +29,9 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 
 	tmpDir := t.TempDir()
 	logDir = tmpDir
-	consoleLog = "noquiet" //nolint:goconst
+	consoleLog = "noquiet" //nolint:goconst,nolintlint
 	noCompress = false
-	compressAlgo = "gzip" //nolint:goconst
+	compressAlgo = "gzip" //nolint:goconst,nolintlint
 	logPerm = 0o644
 	logDirPerm = 0o755
 
