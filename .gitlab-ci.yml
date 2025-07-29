@@ -7,6 +7,8 @@ variables:
   GIT_DEPTH: 0
 
 before_script:
+  - apk update || true
+  - apk add git
   - git fetch origin
   - git checkout -B "$CI_COMMIT_REF_NAME" "origin/$CI_COMMIT_REF_NAME"
 
@@ -18,7 +20,7 @@ pages:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
-    - apk update
+    - apk update || true
     - apk -U upgrade --prune || true
     - apk -U add brotli curl gawk git glab go grep make pdpmake perl pigz py3-pip python3 sed shellcheck time tree yash zip
     - ln -fs "$(command -v yash)" /bin/sh
