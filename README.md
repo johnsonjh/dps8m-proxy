@@ -1,10 +1,10 @@
+# proxy
+
 <!-- Copyright (c) 2025 Jeffrey H. Johnson -->
 <!-- Copyright (c) 2025 The DPS8M Development Team -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- vim: set ft=markdown expandtab cc=72 : -->
 <!-- scspell-id: 698e77d8-6bd2-11f0-9441-80ee73e9b8e7 -->
 <!-- NB: Do not modify README.md directly; modify README.md.tmpl -->
-# proxy
 
 [![Go Report Card](https://goreportcard.com/badge/gitlab.com/dps8m/proxy)](https://goreportcard.com/report/gitlab.com/dps8m/proxy)
 [![REUSE status](https://api.reuse.software/badge/gitlab.com/dps8m/proxy)](https://api.reuse.software/info/gitlab.com/dps8m/proxy)
@@ -84,8 +84,8 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
 * The `proxy` command can be invoked with the following command‑line
   arguments:
 
-```
-DPS8M Proxy v0.1.1 (2025-Jul-28 g1270de8) [linux/amd64]
+```plaintext
+DPS8M Proxy v0.1.1 (2025-Jul-29 g782fd83) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -221,8 +221,8 @@ are, hopefully, documented here:
   including the versions of any embedded dependencies as well as the
   version of the Go compiler used to build the software:
 
-```
-DPS8M Proxy v0.1.1 (2025-Jul-28 g1270de8) [linux/amd64]
+```plaintext
+DPS8M Proxy v0.1.1 (2025-Jul-29 g782fd83) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -382,7 +382,7 @@ features:
 * `S` — displays the status the session, sharing information, and some
   statistics:
 
-  ```
+  ```plaintext
   >> LNK ‑ The username '_gRSyWHxPcMp2MWvtmWWF' can be used to share this session.
   >> SSH ‑ in:   58 B,   out: 4.82 KiB, in rate:   4 B/s, out rate: 381 B/s
   >> NVT ‑ in: 4.82 KiB, out:   57 B,   in rate: 381 B/s, out rate:   4 B/s
@@ -431,79 +431,89 @@ predecessor (code statistics 📈 provided by
 [`scc`](https://github.com/boyter/scc)):
 
 <table id="scc-table">
-	<thead><tr>
-		<th>Language</th>
-		<th>Files</th>
-		<th>Lines</th>
-		<th>Blank</th>
-		<th>Comment</th>
-		<th>Code</th>
-		<th>Complexity</th>
-		<th>Bytes</th>
-		<th>Uloc</th>
-	</tr></thead>
-	<tbody><tr>
-		<th>Go</th>
-		<th>15</th>
-		<th>6675</th>
-		<th>1353</th>
-		<th>318</th>
-		<th>5004</th>
-		<th>1176</th>
-		<th>166464</th>
-		<th>3046</th>
-	</tr><tr>
-		<th>Makefile</th>
-		<th>1</th>
-		<th>377</th>
-		<th>66</th>
-		<th>72</th>
-		<th>239</th>
-		<th>48</th>
-		<th>12142</th>
-		<th>263</th>
-	</tr><tr>
-		<th>Markdown</th>
-		<th>1</th>
-		<th>515</th>
-		<th>99</th>
-		<th>0</th>
-		<th>416</th>
-		<th>0</th>
-		<th>23383</th>
-		<th>399</th>
-	</tr><tr>
-		<th>Shell</th>
-		<th>1</th>
-		<th>117</th>
-		<th>25</th>
-		<th>30</th>
-		<th>62</th>
-		<th>12</th>
-		<th>3075</th>
-		<th>79</th>
-	</tr><tr>
-		<th>Systemd</th>
-		<th>1</th>
-		<th>208</th>
-		<th>35</th>
-		<th>106</th>
-		<th>67</th>
-		<th>0</th>
-		<th>7513</th>
-		<th>135</th>
-	</tr></tbody>
-	<tfoot><tr>
-		<th>Total</th>
-		<th>19</th>
-		<th>7892</th>
-		<th>1578</th>
-		<th>526</th>
-		<th>5788</th>
-		<th>1236</th>
-		<th>212577</th>
-		<th>3910</th>
-	</tr></tfoot></table>
+<thead><tr>
+<th>Language</th>
+<th>Files</th>
+<th>Lines</th>
+<th>Blank</th>
+<th>Comment</th>
+<th>Code</th>
+<th>Complexity</th>
+<th>Bytes</th>
+<th>Uloc</th>
+</tr></thead>
+<tbody><tr>
+<th>Go</th>
+<th>15</th>
+<th>6675</th>
+<th>1353</th>
+<th>318</th>
+<th>5004</th>
+<th>1176</th>
+<th>166464</th>
+<th>3046</th>
+</tr><tr>
+<th>Makefile</th>
+<th>1</th>
+<th>379</th>
+<th>66</th>
+<th>72</th>
+<th>241</th>
+<th>48</th>
+<th>12195</th>
+<th>265</th>
+</tr><tr>
+<th>Markdown</th>
+<th>1</th>
+<th>517</th>
+<th>101</th>
+<th>0</th>
+<th>416</th>
+<th>0</th>
+<th>23412</th>
+<th>401</th>
+</tr><tr>
+<th>Shell</th>
+<th>1</th>
+<th>117</th>
+<th>25</th>
+<th>30</th>
+<th>62</th>
+<th>12</th>
+<th>3075</th>
+<th>79</th>
+</tr><tr>
+<th>Systemd</th>
+<th>1</th>
+<th>208</th>
+<th>35</th>
+<th>106</th>
+<th>67</th>
+<th>0</th>
+<th>7513</th>
+<th>135</th>
+</tr><tr>
+<th>YAML</th>
+<th>1</th>
+<th>52</th>
+<th>0</th>
+<th>3</th>
+<th>49</th>
+<th>0</th>
+<th>2678</th>
+<th>52</th>
+</tr></tbody>
+<tfoot><tr>
+<th>Total</th>
+<th>20</th>
+<th>7948</th>
+<th>1580</th>
+<th>529</th>
+<th>5839</th>
+<th>1236</th>
+<th>215337</th>
+<th>3964</th>
+</tr></tfoot></table>
 
 ## Future plans
 
@@ -581,6 +591,7 @@ and that you know what you’re doing!
 ## Development
 
 ### Required
+
 * For `proxy` development, along with the most recent version of
   [Go](https://go.dev/), you’ll also need to have a standard POSIX.1
   shell environment (at a minimum `sh`, `make`, `grep`, `awk`, &
@@ -654,4 +665,5 @@ and that you know what you’re doing!
   |                                                      [x/sys](golang.org/x/sys) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                                    [x/term](golang.org/x/term) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
 
+<!-- vim: set ft=markdown expandtab cc=72 : -->
 <!-- EOF -->
