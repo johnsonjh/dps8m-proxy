@@ -9,38 +9,56 @@ pages:
   script:
     - apk update
     - apk -U upgrade --prune || true
-    - apk -U add brotli curl gawk git go grep make pdpmake perl pigz py3-pip python3 sed shellcheck tree yash zip
+    - apk -U add brotli curl gawk git go grep make pdpmake perl pigz py3-pip python3 sed shellcheck time tree yash zip
     - ln -fs "$(command -v yash)" /bin/sh
     - export SHELL=/bin/sh
     - export PATH=$HOME/go/bin:$PATH
     - export GOTOOLCHAIN="$(grep '^go .*$' go.mod | tr -cd 'go0-9.\n')+auto"
     - export PDPMAKE_POSIXLY_CORRECT=1
-    - go install github.com/boyter/scc/v3@master
-    - go install github.com/kisielk/errcheck@master
-    - go install github.com/mgechev/revive@master
-    - go install honnef.co/go/tools/cmd/staticcheck@master
-    - go install mvdan.cc/gofumpt@master
-    - go install mvdan.cc/sh/v3/cmd/shfmt@master
-    - curl -fsSL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | yash -s -- -b $(go env GOPATH)/bin latest
-    - python3 -m venv $(pwd)/.venv
+    - export TZ=UTC
+    - curl --version | head -1 || true
+    - gawk --version | head -1 || true
+    - git --version | head -1 || true
+    - go version | head -1 || true
+    - grep --version | head -1 || true
+    - pdpmake --version 2>&1 | grep supports | head -1 || true
+    - perl -v | grep -i version | head -1 || true
+    - pigz --version | head -1 || true
+    - python3 --version | head -1 || true
+    - sed --version | head -1 || true
+    - shellcheck --version | grep -i version | head -1 || true
+    - time --version | head -1 || true
+    - tree --version | head -1 || true
+    - yash --version | head -1 || true
+    - zip --version | grep Zip | head -1 || true
+    - time go install github.com/boyter/scc/v3@master
+    - time go install github.com/kisielk/errcheck@master
+    - time go install github.com/mgechev/revive@master
+    - time go install honnef.co/go/tools/cmd/staticcheck@master
+    - time go install mvdan.cc/gofumpt@master
+    - time go install mvdan.cc/sh/v3/cmd/shfmt@master
+    - time curl -fsSL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | yash -s -- -b $(go env GOPATH)/bin latest
+    - time python3 -m venv $(pwd)/.venv
     - . $(pwd)/.venv/bin/activate
-    - pip install --upgrade pip || true
-    - pip install --upgrade scspell3k
-    - pip install --upgrade codespell
-    - pip install --upgrade reuse
-    - env CI_NO_CROSS=1 pdpmake lint
+    - time pip install --upgrade pip || true
+    - time pip install --upgrade scspell3k
+    - time pip install --upgrade codespell
+    - time pip install --upgrade reuse
+    - time env CI_NO_CROSS=1 pdpmake lint
     - git restore README.md || true
     - git diff --exit-code
-    - env GOFLAGS="-ldflags=-s -w" pdpmake cross
+    - time env GOFLAGS="-ldflags=-s -w" pdpmake
+    - time env GOFLAGS="-ldflags=-s -w" pdpmake cross
     - mv -f cross.bin public
     - cd public
     - for i in proxy.windows.*; do [ -f "${i:?}" ] || continue; mv -f -- "${i:?}" "${i:?}.exe"; done
-    - for f in proxy.windows.*.exe; do [ -f "${f:?}" ] || continue; base="${f%.exe}"; zipname="$(echo "${base:?}" | awk -F. '{ for (i = 1; i < NF; i++) printf "%s-", $i; print $NF ".zip" }')"; (go version -m "${f:?}" || echo .) | zip -z9 "${zipname:?}" "${f:?}"; done && rm -f *.exe
+    - for f in proxy.windows.*.exe; do [ -f "${f:?}" ] || continue; base="${f%.exe}"; zipname="$(printf '%s\n' "${base:?}" | awk -F. '{ for (i = 1; i < NF; i++) printf "%s-", $i; print $NF ".zip" }')"; (go version -m "${f:?}" || printf '%s\n' ".") | zip -z9 "${zipname:?}" "${f:?}"; done && rm -f *.exe
     - find . -name 'proxy.*' -print0 | xargs -0 -I{} -P $(nproc) sh -c 'pigz -C "$(go version -m {} | tr -d \" || true)" -MN9 "{}"'
-    - tree -H '.' -L 1 --charset utf-8 -h -F -v -P 'proxy*' --metafirst -o index.html
-    - sed -i 's#<a href="../">.</a>#<a href="https://gitlab.com/dps8m/proxy/">Home</a>#' index.html
-    - sed -i 's#>Directory Tree<#>DPS8M Proxy<#g' index.html
-    - sed '/<p class="VERSION">/,/<\/p>/d' index.html > clean.html && mv -f clean.html index.html
+    - tree -H 'https://dps8m.gitlab.io/proxy/' -L 1 --charset utf-8 -h -F -v -P 'proxy*' --metafirst -o index.html
+    - sed -i 's#<a href="https://dps8m.gitlab.io/proxy/./">.</a>#<a href="https://gitlab.com/dps8m/proxy/">Home</a>#' index.html
+    - sed -i "s#>Directory Tree<#>$(../proxy --version | head -n1 | cut -d '[' -f 1)<#g" index.html
+    - sed -i '/<p class="VERSION">/,/<\/p>/d' index.html
+    - sed -i 's#4\.0K#....#' index.html
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k -v -Z -- "{}" \; || true
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec pigz -9 -f -k -m -v -- "{}" \; || true
   artifacts:

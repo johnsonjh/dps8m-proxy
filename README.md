@@ -44,6 +44,18 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 
 ### Installation
 
+#### Binaries
+
+* You can download pre-compiled binaries at
+  [`https://dps8m.gitlab.io/proxy/`](https://dps8m.gitlab.io/proxy/).
+
+ * We currently publish more than 40 binaries supporting 12
+   operating systems (IBM AIX, Android, Apple macOS, Dragonfly BSD,
+   FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
+   Microsoft Windows) on 13 hardware architectures.
+
+#### Source
+
 A recent version of [Go](https://go.dev/) 🐹 is required to build
 `proxy` from source code.
 
@@ -63,11 +75,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   * A [`.cross.sh`](.cross.sh) cross‑compilation helper script is
     provided (which can be called with `make cross`) that attempts to
     build `proxy` binaries for *all* supported `GOOS` and `GOARCH`
-    combinations.  At the time of writing, 41 usable binaries are
-    built for 12 operating systems (IBM AIX, Android, Apple macOS,
-    Dragonfly BSD, FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9,
-    Solaris, and Microsoft Windows) running on 13 different hardware
-    architectures.
+    combinations.
 
 * You can also install this software using `go install` 📦:
 
@@ -85,7 +93,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.1 (2025-Jul-29 g782fd83) [linux/amd64]
+DPS8M Proxy v0.1.1* (2025-Jul-29 g704e9eb+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -222,12 +230,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.1 (2025-Jul-29 g782fd83) [linux/amd64]
+DPS8M Proxy v0.1.1* (2025-Jul-29 g704e9eb+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.1                           |
+| dps8m/proxy               | v0.1.1*                          |
 | arl/statsviz              | v0.7.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -450,7 +458,7 @@ predecessor (code statistics 📈 provided by
 <th>318</th>
 <th>5004</th>
 <th>1176</th>
-<th>166464</th>
+<th>166514</th>
 <th>3046</th>
 </tr><tr>
 <th>Makefile</th>
@@ -465,13 +473,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>517</th>
-<th>101</th>
+<th>525</th>
+<th>105</th>
 <th>0</th>
-<th>416</th>
+<th>420</th>
 <th>0</th>
-<th>23412</th>
-<th>401</th>
+<th>23530</th>
+<th>405</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
@@ -495,24 +503,24 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>YAML</th>
 <th>1</th>
-<th>52</th>
+<th>70</th>
 <th>0</th>
 <th>3</th>
-<th>49</th>
+<th>67</th>
 <th>0</th>
-<th>2678</th>
-<th>52</th>
+<th>3588</th>
+<th>70</th>
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>7948</th>
-<th>1580</th>
+<th>7974</th>
+<th>1584</th>
 <th>529</th>
-<th>5839</th>
+<th>5861</th>
 <th>1236</th>
-<th>215337</th>
-<th>3964</th>
+<th>216415</th>
+<th>3986</th>
 </tr></tfoot></table>
 
 ## Future plans

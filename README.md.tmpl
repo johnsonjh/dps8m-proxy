@@ -44,6 +44,18 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 
 ### Installation
 
+#### Binaries
+
+* You can download pre-compiled binaries at
+  [`https://dps8m.gitlab.io/proxy/`](https://dps8m.gitlab.io/proxy/).
+
+ * We currently publish more than 40 binaries supporting 12
+   operating systems (IBM AIX, Android, Apple macOS, Dragonfly BSD,
+   FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
+   Microsoft Windows) on 13 hardware architectures.
+
+#### Source
+
 A recent version of [Go](https://go.dev/) 🐹 is required to build
 `proxy` from source code.
 
@@ -63,11 +75,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   * A [`.cross.sh`](.cross.sh) cross‑compilation helper script is
     provided (which can be called with `make cross`) that attempts to
     build `proxy` binaries for *all* supported `GOOS` and `GOARCH`
-    combinations.  At the time of writing, 41 usable binaries are
-    built for 12 operating systems (IBM AIX, Android, Apple macOS,
-    Dragonfly BSD, FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9,
-    Solaris, and Microsoft Windows) running on 13 different hardware
-    architectures.
+    combinations.
 
 * You can also install this software using `go install` 📦:
 
