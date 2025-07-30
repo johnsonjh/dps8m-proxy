@@ -93,7 +93,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.1+dirty* (2025-Jul-29 gc42b187+) [linux/amd64]
+DPS8M Proxy v0.1.2* (2025-Jul-30 g1a92b14+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -230,12 +230,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.1+dirty* (2025-Jul-29 gc42b187+) [linux/amd64]
+DPS8M Proxy v0.1.2* (2025-Jul-30 g1a92b14+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.1+dirty*                    |
+| dps8m/proxy               | v0.1.2*                          |
 | arl/statsviz              | v0.7.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -463,12 +463,12 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>388</th>
+<th>389</th>
 <th>68</th>
-<th>74</th>
+<th>75</th>
 <th>246</th>
 <th>50</th>
-<th>12463</th>
+<th>12542</th>
 <th>271</th>
 </tr><tr>
 <th>Markdown</th>
@@ -483,44 +483,44 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
-<th>117</th>
+<th>119</th>
 <th>25</th>
-<th>30</th>
+<th>32</th>
 <th>62</th>
 <th>12</th>
-<th>3075</th>
+<th>3182</th>
 <th>79</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
-<th>208</th>
+<th>209</th>
 <th>35</th>
-<th>106</th>
+<th>107</th>
 <th>67</th>
 <th>0</th>
-<th>7513</th>
+<th>7601</th>
 <th>135</th>
 </tr><tr>
 <th>YAML</th>
 <th>1</th>
-<th>83</th>
-<th>3</th>
-<th>3</th>
+<th>93</th>
+<th>6</th>
+<th>10</th>
 <th>77</th>
 <th>0</th>
-<th>3878</th>
-<th>81</th>
+<th>4360</th>
+<th>84</th>
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8002</th>
-<th>1592</th>
-<th>534</th>
+<th>8016</th>
+<th>1595</th>
+<th>545</th>
 <th>5876</th>
 <th>1238</th>
-<th>217276</th>
-<th>4002</th>
+<th>218032</th>
+<th>4004</th>
 </tr></tfoot></table>
 
 ## Future plans

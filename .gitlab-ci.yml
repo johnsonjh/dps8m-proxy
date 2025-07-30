@@ -1,16 +1,24 @@
+###############################################################################
+# DPS8M Proxy - .gitlab-ci.yml
 # Copyright (c) 2025 Jeffrey H. Johnson
+# Copyright (c) 2025 The DPS8M Development Team
 # SPDX-License-Identifier: MIT-0
 # scspell-id: 1fa03764-6c0f-11f0-adcf-80ee73e9b8e7
+###############################################################################
 
 variables:
   GIT_STRATEGY: clone
   GIT_DEPTH: 0
+
+###############################################################################
 
 before_script:
   - apk update || true
   - apk add git
   - git fetch origin
   - git checkout -B "$CI_COMMIT_REF_NAME" "origin/$CI_COMMIT_REF_NAME"
+
+###############################################################################
 
 pages:
   stage: deploy
@@ -81,3 +89,5 @@ pages:
   retry: 2
   timeout: 60 minutes
   interruptible: false
+
+###############################################################################
