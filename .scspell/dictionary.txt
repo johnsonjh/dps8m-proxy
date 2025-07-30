@@ -16,6 +16,7 @@ fprint
 fprintf
 getpid
 getuid
+getwd
 gmcp
 goarch
 goconst
@@ -93,6 +94,7 @@ gochecknoinits
 gocognit
 gocyclo
 goimports
+golangci
 golines
 ireturn
 maintidx
@@ -160,6 +162,7 @@ shellcheck
 trimpath
 
 FILEID: 49b70692-6bd1-11f0-b2b1-80ee73e9b8e7
+gitignore
 gpath
 grtags
 gtags
@@ -207,6 +210,7 @@ oldunix
 onlcr
 opensource
 opost
+pase
 pdpmake
 pflag
 posixly
@@ -271,6 +275,9 @@ xdigit
 xlarge
 zipname
 
+FILEID: 379629a2-6bd1-11f0-92b3-80ee73e9b8e7
+codespellrc
+
 NATURAL:
 adduser
 bbolt
@@ -280,6 +287,7 @@ charset
 cidr
 ckwin
 cocomo
+codeql
 codespell
 ctags
 davidrg
@@ -372,6 +380,7 @@ websocket
 whitelist
 whitelisted
 whitesource
+workflows
 xauth
 xterm
 xyzzy

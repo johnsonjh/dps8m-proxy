@@ -93,55 +93,59 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.1 (2025-Jul-29 gf995bd9) [linux/amd64]
+DPS8M Proxy v0.1.2* (2025-Jul-30 g5ae8cbf+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
-  -0, --allow-root              Allow running as root (UID 0)
-  -l, --ssh-addr strings        SSH listener address(es)
+      --allow-root              Allow running as root (UID 0)
+      --cert-dir string         Directory containing SSH host certificates
+                                    (default: current working directory)
+      --cert-perm octal         Permissions (octal) for new certificate files
+                                    [e.g., "600", "644"] (default "600")
+      --ssh-addr strings        SSH listener address(es)
                                     [e.g., ":2222", "[::1]:8000"]
                                     (multiple allowed) (default ":2222")
-  -e, --ssh-delay float         Delay for incoming SSH connections
+      --ssh-delay float         Delay for incoming SSH connections
                                     ["0.0" to "30.0" seconds] (no default)
-  -n, --no-banner               Disable SSH connection banner
-  -t, --telnet-host string      Default TELNET target [host:port]
+      --no-banner               Disable SSH connection banner
+      --telnet-host string      Default TELNET target [host:port]
                                     (default "127.0.0.1:6180")
-  -a, --alt-host string         Alternate TELNET target(s) [sshuser@host:port]
+      --alt-host string         Alternate TELNET target(s) [sshuser@host:port]
                                     (multiple allowed)
-  -k, --debug-telnet            Debug TELNET option negotiation
-  -y, --debug-server string     Enable HTTP debug server listening address
+      --debug-telnet            Debug TELNET option negotiation
+      --debug-server string     Enable HTTP debug server listening address
                                     [e.g., ":6060", "[::1]:6060"]
-  -g, --no-gops                 Disable the "gops" diagnostic agent
+      --no-gops                 Disable the "gops" diagnostic agent
                                     (see https://github.com/google/gops)
-  -d, --log-dir string          Base directory for logs (default "log")
-  -o, --no-log                  Disable all session logging
+      --log-dir string          Base directory for logs (default "log")
+      --no-log                  Disable all session logging
                                     (for console logging see "--console-log")
-  -c, --console-log string      Enable console logging ["quiet", "noquiet"]
+      --console-log string      Enable console logging ["quiet", "noquiet"]
                                     (disabled by default)
-  -s, --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
+      --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
                                     (default "gzip")
-  -z, --compress-level string   Compression level for gzip and zstd algorithms
+      --compress-level string   Compression level for gzip and zstd algorithms
                                     ["fast", "normal", "high"]
                                     (default "normal")
-  -x, --no-compress             Disable session and/or console log compression
-  -p, --log-perm octal          Permissions (octal) for new log files
+      --no-compress             Disable session and/or console log compression
+      --log-perm octal          Permissions (octal) for new log files
                                     [e.g., "600", "644"] (default "600")
-  -r, --log-dir-perm octal      Permissions (octal) for new log directories
+      --log-dir-perm octal      Permissions (octal) for new log directories
                                     [e.g., "755", "750"] (default "750")
-  -u, --db-file string          Path to persistent statistics storage database
+      --db-file string          Path to persistent statistics storage database
                                     (disabled by default)
-  -j, --db-time uint            Elapsed seconds between database updates
+      --db-time uint            Elapsed seconds between database updates
                                     [0 disables periodic writes] (default 30)
-  -f, --db-perm octal           Permissions (octal) for new database files
+      --db-perm octal           Permissions (octal) for new database files
                                     [e.g., "600", "644"] (default 600)
-  -i, --idle-max int            Maximum connection idle time allowed [seconds]
-  -m, --time-max int            Maximum connection link time allowed [seconds]
-  -b, --blacklist string        Enable blacklist [filename] (no default)
-  -w, --whitelist string        Enable whitelist [filename] (no default)
-  -U, --utc                     Use UTC (Coordinated Universal Time) for time
+      --idle-max int            Maximum connection idle time allowed [seconds]
+      --time-max int            Maximum connection link time allowed [seconds]
+      --blacklist string        Enable blacklist [filename] (no default)
+      --whitelist string        Enable whitelist [filename] (no default)
+      --utc                     Use UTC (Coordinated Universal Time) for time
                                     display and timestamping in log files
-  -v, --version                 Show version information
-  -h, --help                    Show this help and usage information
+      --version                 Show version information
+      --help                    Show this help and usage information
 
 proxy home page (bug reports): <https://gitlab.com/dps8m/proxy/>
 ```
@@ -230,26 +234,60 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.1 (2025-Jul-29 gf995bd9) [linux/amd64]
+unknown shorthand flag: 'v' in -v
+DPS8M Proxy v0.1.2* (2025-Jul-30 g5ae8cbf+) [linux/amd64]
 
-+===========================+==================================+
-| Component                 | Version                          |
-+===========================+==================================+
-| dps8m/proxy               | v0.1.1                           |
-| arl/statsviz              | v0.7.0                           |
-| google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
-| gorilla/websocket         | v1.5.3                           |
-| klauspost/compress        | v1.18.0                          |
-| spf13/pflag               | v1.0.7                           |
-| ulikunitz/xz              | v0.5.12                          |
-| go.etcd.io/bbolt          | v1.4.2                           |
-| golang.org/x/crypto       | v0.40.0                          |
-| golang.org/x/sys          | v0.34.0                          |
-| golang.org/x/term         | v0.33.0                          |
-| kernel.org/.../libcap/cap | v1.2.76                          |
-| kernel.org/.../libcap/psx | v1.2.76                          |
-| Go compiler (gc)          | v1.24.5                          |
-+===========================+==================================+
+Usage for /home/jhj/dps8m-proxy/proxy:
+
+      --allow-root              Allow running as root (UID 0)
+      --cert-dir string         Directory containing SSH host certificates
+                                    (default: current working directory)
+      --cert-perm octal         Permissions (octal) for new certificate files
+                                    [e.g., "600", "644"] (default "600")
+      --ssh-addr strings        SSH listener address(es)
+                                    [e.g., ":2222", "[::1]:8000"]
+                                    (multiple allowed) (default ":2222")
+      --ssh-delay float         Delay for incoming SSH connections
+                                    ["0.0" to "30.0" seconds] (no default)
+      --no-banner               Disable SSH connection banner
+      --telnet-host string      Default TELNET target [host:port]
+                                    (default "127.0.0.1:6180")
+      --alt-host string         Alternate TELNET target(s) [sshuser@host:port]
+                                    (multiple allowed)
+      --debug-telnet            Debug TELNET option negotiation
+      --debug-server string     Enable HTTP debug server listening address
+                                    [e.g., ":6060", "[::1]:6060"]
+      --no-gops                 Disable the "gops" diagnostic agent
+                                    (see https://github.com/google/gops)
+      --log-dir string          Base directory for logs (default "log")
+      --no-log                  Disable all session logging
+                                    (for console logging see "--console-log")
+      --console-log string      Enable console logging ["quiet", "noquiet"]
+                                    (disabled by default)
+      --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
+                                    (default "gzip")
+      --compress-level string   Compression level for gzip and zstd algorithms
+                                    ["fast", "normal", "high"]
+                                    (default "normal")
+      --no-compress             Disable session and/or console log compression
+      --log-perm octal          Permissions (octal) for new log files
+                                    [e.g., "600", "644"] (default "600")
+      --log-dir-perm octal      Permissions (octal) for new log directories
+                                    [e.g., "755", "750"] (default "750")
+      --db-file string          Path to persistent statistics storage database
+                                    (disabled by default)
+      --db-time uint            Elapsed seconds between database updates
+                                    [0 disables periodic writes] (default 30)
+      --db-perm octal           Permissions (octal) for new database files
+                                    [e.g., "600", "644"] (default 600)
+      --idle-max int            Maximum connection idle time allowed [seconds]
+      --time-max int            Maximum connection link time allowed [seconds]
+      --blacklist string        Enable blacklist [filename] (no default)
+      --whitelist string        Enable whitelist [filename] (no default)
+      --utc                     Use UTC (Coordinated Universal Time) for time
+                                    display and timestamping in log files
+      --version                 Show version information
+unknown shorthand flag: 'v' in -v
 ```
 
 * If you need to see additional details about the `proxy` binary,
@@ -453,22 +491,22 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>15</th>
-<th>6675</th>
-<th>1353</th>
-<th>318</th>
-<th>5004</th>
-<th>1176</th>
-<th>166514</th>
-<th>3046</th>
+<th>6713</th>
+<th>1363</th>
+<th>321</th>
+<th>5029</th>
+<th>1182</th>
+<th>167381</th>
+<th>3065</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>388</th>
+<th>389</th>
 <th>68</th>
-<th>74</th>
+<th>75</th>
 <th>246</th>
 <th>50</th>
-<th>12463</th>
+<th>12542</th>
 <th>271</th>
 </tr><tr>
 <th>Markdown</th>
@@ -483,44 +521,44 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
-<th>117</th>
+<th>119</th>
 <th>25</th>
-<th>30</th>
+<th>32</th>
 <th>62</th>
 <th>12</th>
-<th>3075</th>
+<th>3182</th>
 <th>79</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
-<th>208</th>
+<th>209</th>
 <th>35</th>
-<th>106</th>
+<th>107</th>
 <th>67</th>
 <th>0</th>
-<th>7513</th>
+<th>7601</th>
 <th>135</th>
 </tr><tr>
 <th>YAML</th>
 <th>1</th>
-<th>81</th>
-<th>3</th>
-<th>3</th>
-<th>75</th>
+<th>93</th>
+<th>6</th>
+<th>10</th>
+<th>77</th>
 <th>0</th>
-<th>3826</th>
-<th>79</th>
+<th>4360</th>
+<th>84</th>
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>7994</th>
-<th>1589</th>
-<th>531</th>
-<th>5874</th>
-<th>1238</th>
-<th>216921</th>
-<th>4000</th>
+<th>8048</th>
+<th>1602</th>
+<th>545</th>
+<th>5901</th>
+<th>1244</th>
+<th>218596</th>
+<th>4023</th>
 </tr></tfoot></table>
 
 ## Future plans

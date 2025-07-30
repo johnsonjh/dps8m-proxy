@@ -1,7 +1,9 @@
+###############################################################################
 # SPDX-License-Identifier: MIT-0
 # Copyright (c) 2025 Jeffrey H. Johnson
 # Copyright (c) 2025 The DPS8M Development Team
 # scspell-id: 71899d82-6bd2-11f0-8342-80ee73e9b8e7
+###############################################################################
 
 version = 1
 SPDX-PackageName = "dps8m-proxy"
@@ -9,7 +11,7 @@ SPDX-PackageSupplier = "The DPS8M Development Team <contact-project+dps8m-dps8m-
 SPDX-PackageDownloadLocation = "https://gitlab.com/dps8m/proxy"
 
 [[annotations]]
-path = ["block.txt", "deny.txt", "go.mod", "go.sum", "issue.txt", "renovate.json", ".whitesource", ".codespellrc", ".scspell/basedict.txt", ".scspell/dictionary.txt"]
+path = ["block.txt", "deny.txt", "go.mod", "go.sum", "issue.txt", "renovate.json", ".whitesource", ".scspell/basedict.txt", ".scspell/dictionary.txt"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2025 Jeffrey H. Johnson"
 SPDX-License-Identifier = "MIT-0"
