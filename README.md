@@ -12,7 +12,7 @@
 [![CodeQL](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql)
 [![Dependabot Updates](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates)
 [![Pipeline Status](https://gitlab.com/dps8m/proxy/badges/master/pipeline.svg)](https://gitlab.com/dps8m/proxy/-/pipelines/)
-[![License](https://img.shields.io/github/license/johnsonjh/dps8m-proxy.svg))](LICENSE)
+[![License](https://img.shields.io/github/license/johnsonjh/dps8m-proxy.svg)](LICENSE)
 
 ## Overview
 
@@ -103,7 +103,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.2 (2025-Jul-30 g6537713) [linux/amd64]
+DPS8M Proxy v0.1.2 (2025-Jul-30 g56a1873) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -245,7 +245,7 @@ are, hopefully, documented here:
 
 ```plaintext
 unknown shorthand flag: 'v' in -v
-DPS8M Proxy v0.1.2 (2025-Jul-30 g6537713) [linux/amd64]
+DPS8M Proxy v0.1.2 (2025-Jul-30 g56a1873) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -564,7 +564,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>429</th>
 <th>0</th>
-<th>24407</th>
+<th>24406</th>
 <th>414</th>
 </tr><tr>
 <th>Shell</th>
@@ -605,7 +605,7 @@ predecessor (code statistics 📈 provided by
 <th>545</th>
 <th>5910</th>
 <th>1244</th>
-<th>219473</th>
+<th>219472</th>
 <th>4032</th>
 </tr></tfoot></table>
 
