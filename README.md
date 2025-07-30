@@ -103,7 +103,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.2 (2025-Jul-30 g56a1873) [linux/amd64]
+DPS8M Proxy v0.1.2 (2025-Jul-30 gdaa8494) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -245,7 +245,7 @@ are, hopefully, documented here:
 
 ```plaintext
 unknown shorthand flag: 'v' in -v
-DPS8M Proxy v0.1.2 (2025-Jul-30 g56a1873) [linux/amd64]
+DPS8M Proxy v0.1.2 (2025-Jul-30 gdaa8494) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
