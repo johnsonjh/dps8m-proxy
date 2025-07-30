@@ -16,6 +16,7 @@ fprint
 fprintf
 getpid
 getuid
+getwd
 gmcp
 goarch
 goconst

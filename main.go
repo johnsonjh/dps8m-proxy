@@ -161,7 +161,9 @@ var (
 	dbPerm                           uint = 0o600
 	logPerm                          uint = 0o600
 	logDirPerm                       uint = 0o750
-	altHosts                              = make(map[string]string)
+	certPerm                         uint = 0o600
+	certDir                          string
+	altHosts                         = make(map[string]string)
 	blacklistedNetworks              []*net.IPNet
 	blacklistFile                    string
 	connections                      = make(map[string]*Connection)
@@ -384,134 +386,145 @@ func init() {
 	// NOTE: Ensure that all pflag --help / -h output renders in less
 	//       than 79 columns and that indentation renders as 4 spaces.
 
-	pflag.BoolVarP(&allowRoot,
-		"allow-root", "0", false,
+	pflag.BoolVar(&allowRoot,
+		"allow-root", false,
 		"Allow running as root (UID 0)")
 
-	pflag.StringSliceVarP(&sshAddr,
-		"ssh-addr", "l", []string{":2222"},
+	pflag.StringVar(&certDir,
+		"cert-dir", "",
+		"Directory containing SSH host certificates\r\n"+
+			"    (default: current working directory)")
+
+	pflag.Var((*octalPermValue)(&certPerm),
+		"cert-perm",
+		"Permissions (octal) for new certificate files\r\n"+
+			"    [e.g., \"600\", \"644\"]")
+	pflag.Lookup("cert-perm").DefValue = "\"600\"" //nolint:goconst
+
+	pflag.StringSliceVar(&sshAddr,
+		"ssh-addr", []string{":2222"},
 		"SSH listener address(es)\r\n"+
 			"    [e.g., \":2222\", \"[::1]:8000\"]\r\n"+
 			"    (multiple allowed)")
 	pflag.Lookup("ssh-addr").DefValue = "\":2222\""
 
-	pflag.Float64VarP(&sshDelay,
-		"ssh-delay", "e", 0,
+	pflag.Float64Var(&sshDelay,
+		"ssh-delay", 0,
 		"Delay for incoming SSH connections\r\n"+
 			"    [\"0.0\" to \"30.0\" seconds] (no default)")
 
-	pflag.BoolVarP(&noBanner,
-		"no-banner", "n", false,
+	pflag.BoolVar(&noBanner,
+		"no-banner", false,
 		"Disable SSH connection banner")
 
-	pflag.StringVarP(&telnetHostPort,
-		"telnet-host", "t", "127.0.0.1:6180",
+	pflag.StringVar(&telnetHostPort,
+		"telnet-host", "127.0.0.1:6180",
 		"Default TELNET target [host:port]\r\n"+
 			"   ")
 
-	pflag.VarP(&altHostFlag{},
-		"alt-host", "a",
+	pflag.Var(&altHostFlag{},
+		"alt-host",
 		"Alternate TELNET target(s) [sshuser@host:port]\r\n"+
 			"    (multiple allowed)")
 
-	pflag.BoolVarP(&debugNegotiation,
-		"debug-telnet", "k", false,
+	pflag.BoolVar(&debugNegotiation,
+		"debug-telnet", false,
 		"Debug TELNET option negotiation")
 
-	pflag.StringVarP(&debugAddr,
-		"debug-server", "y", "",
+	pflag.StringVar(&debugAddr,
+		"debug-server", "",
 		"Enable HTTP debug server listening address\r\n"+
 			"    [e.g., \":6060\", \"[::1]:6060\"]")
 
 	if gopsEnabled {
-		pflag.BoolVarP(&noGops,
-			"no-gops", "g", false,
+		pflag.BoolVar(&noGops,
+			"no-gops", false,
 			"Disable the \"gops\" diagnostic agent\r\n"+
 				"    (see https://github.com/google/gops)")
 	}
 
-	pflag.StringVarP(&logDir,
-		"log-dir", "d", "log",
+	pflag.StringVar(&logDir,
+		"log-dir", "log",
 		"Base directory for logs")
 
-	pflag.BoolVarP(&noLog,
-		"no-log", "o", false,
+	pflag.BoolVar(&noLog,
+		"no-log", false,
 		"Disable all session logging\r\n"+
 			"    (for console logging see \"--console-log\")")
 
-	pflag.StringVarP(&consoleLog,
-		"console-log", "c", "",
+	pflag.StringVar(&consoleLog,
+		"console-log", "",
 		"Enable console logging [\"quiet\", \"noquiet\"]\r\n"+
 			"    (disabled by default)")
 
-	pflag.StringVarP(&compressAlgo,
-		"compress-algo", "s", "gzip",
+	pflag.StringVar(&compressAlgo,
+		"compress-algo", "gzip",
 		"Compression algorithm [\"gzip\", \"xz\", \"zstd\"]\r\n"+
 			"   ")
 
-	pflag.StringVarP(&compressLevel,
-		"compress-level", "z", "normal",
+	pflag.StringVar(&compressLevel,
+		"compress-level", "normal",
 		"Compression level for gzip and zstd algorithms\r\n"+
 			"    [\"fast\", \"normal\", \"high\"]\r\n"+
 			"   ")
 
-	pflag.BoolVarP(&noCompress,
-		"no-compress", "x", false,
+	pflag.BoolVar(&noCompress,
+		"no-compress", false,
 		"Disable session and/or console log compression")
 
-	pflag.VarP((*octalPermValue)(&logPerm),
-		"log-perm", "p",
+	pflag.Var((*octalPermValue)(&logPerm),
+		"log-perm",
 		"Permissions (octal) for new log files\r\n"+
 			"    [e.g., \"600\", \"644\"]")
 	pflag.Lookup("log-perm").DefValue = "\"600\""
 
-	pflag.VarP((*octalPermValue)(&logDirPerm),
-		"log-dir-perm", "r",
+	pflag.Var((*octalPermValue)(&logDirPerm),
+		"log-dir-perm",
 		"Permissions (octal) for new log directories\r\n"+
 			"    [e.g., \"755\", \"750\"]")
 	pflag.Lookup("log-dir-perm").DefValue = "\"750\""
 
 	if dbEnabled {
-		pflag.StringVarP(&dbPath,
-			"db-file", "u", "",
+		pflag.StringVar(&dbPath,
+			"db-file", "",
 			"Path to persistent statistics storage database\r\n"+
 				"    (disabled by default)")
 
-		pflag.Uint64VarP(&dbTime,
-			"db-time", "j", 30,
+		pflag.Uint64Var(&dbTime,
+			"db-time", 30,
 			"Elapsed seconds between database updates\r\n"+
 				"    [0 disables periodic writes]")
 
-		pflag.VarP((*octalPermValue)(&dbPerm),
-			"db-perm", "f",
+		pflag.Var((*octalPermValue)(&dbPerm),
+			"db-perm",
 			"Permissions (octal) for new database files\r\n"+
 				"    [e.g., \"600\", \"644\"]")
 		pflag.Lookup("log-perm").DefValue = "\"600\""
 	}
 
-	pflag.IntVarP(&idleMax,
-		"idle-max", "i", 0,
+	pflag.IntVar(&idleMax,
+		"idle-max", 0,
 		"Maximum connection idle time allowed [seconds]")
 
-	pflag.IntVarP(&timeMax,
-		"time-max", "m", 0,
+	pflag.IntVar(&timeMax,
+		"time-max", 0,
 		"Maximum connection link time allowed [seconds]")
 
-	pflag.StringVarP(&blacklistFile,
-		"blacklist", "b", "",
+	pflag.StringVar(&blacklistFile,
+		"blacklist", "",
 		"Enable blacklist [filename] (no default)")
 
-	pflag.StringVarP(&whitelistFile,
-		"whitelist", "w", "",
+	pflag.StringVar(&whitelistFile,
+		"whitelist", "",
 		"Enable whitelist [filename] (no default)")
 
-	pflag.BoolVarP(&forceUTC,
-		"utc", "U", false,
+	pflag.BoolVar(&forceUTC,
+		"utc", false,
 		"Use UTC (Coordinated Universal Time) for time\r\n"+
 			"    display and timestamping in log files")
 
-	pflag.BoolVarP(&showVersion,
-		"version", "v", false,
+	pflag.BoolVar(&showVersion,
+		"version", false,
 		"Show version information")
 
 	shutdownSignal = make(chan struct{})
@@ -525,10 +538,10 @@ func init() {
 	haveUTF8console = haveUTF8support()
 
 	for _, arg := range os.Args[1:] {
-		if arg == "-h" || arg == "--help" {
+		if arg == "-?" || arg == "-h" || arg == "--help" {
 			pflag.Usage()
 			_, _ = fmt.Fprintf(os.Stdout,
-				"  -h, --help"+
+				"      --help"+
 					"                    Show this help and usage information\r\n\r\n"+
 					"proxy home page (bug reports): <https://gitlab.com/dps8m/proxy/>\r\n")
 			os.Exit(0)
@@ -711,7 +724,10 @@ func main() {
 			errorPrefix(), idleMax, timeMax) // LINTED: Fatalf
 	}
 
-	edSigner, err := loadOrCreateHostKey("ssh_host_ed25519_key.pem", "ed25519")
+	edSigner, err := loadOrCreateHostKey(filepath.Join(
+		certDir,
+		"ssh_host_ed25519_key.pem"),
+		"ed25519")
 	if err != nil {
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
@@ -723,7 +739,10 @@ func main() {
 			errorPrefix(), err) // LINTED: Fatalf
 	}
 
-	rsaSigner, err := loadOrCreateHostKey("ssh_host_rsa_key.pem", "rsa")
+	rsaSigner, err := loadOrCreateHostKey(filepath.Join(
+		certDir,
+		"ssh_host_rsa_key.pem"),
+		"rsa")
 	if err != nil {
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
@@ -1898,15 +1917,29 @@ func listConfiguration() {
 		}
 	}
 
-	s1 := fmt.Sprintf("DPS8M Proxy Configuration and Status - PID: %-8d",
+	bHerald := fmt.Sprintf("DPS8M Proxy Configuration and Status - PID: %-8d",
 		pid)
 
-	updateMaxLength(s1)
+	updateMaxLength(bHerald)
 
 	updateMaxLength("SSH listeners on:")
 	for _, addr := range sshAddr {
 		updateMaxLength("* " + addr)
 	}
+
+	certDirStr, err := os.Getwd()
+	if err != nil {
+		certDirStr = "."
+	}
+
+	if certDir != "" {
+		certDirStr = certDir
+	}
+
+	s10 := fmt.Sprintf("SSH Certificate Directory: %s",
+		certDirStr)
+
+	updateMaxLength(s10)
 
 	updateMaxLength("Default TELNET target: " + telnetHostPort)
 
@@ -2088,8 +2121,7 @@ func listConfiguration() {
 
 	b.WriteString(separator)
 
-	printRow(&b, fmt.Sprintf("DPS8M Proxy Configuration and Status - PID: %-8d",
-		pid))
+	printRow(&b, bHerald)
 
 	b.WriteString(separator)
 
@@ -2107,6 +2139,8 @@ func listConfiguration() {
 	for _, addr := range sshAddr {
 		printRow(&b, "* "+addr)
 	}
+
+	printRow(&b, s10) // Certificate Directory
 
 	b.WriteString(separator)
 
@@ -2466,9 +2500,8 @@ func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
 			Bytes: x509.MarshalPKCS1PrivateKey(rsaKey),
 		}
 
-		const rsaPerm = 0o600
 		data := pem.EncodeToMemory(block)
-		err = os.WriteFile(path, data, rsaPerm)
+		err = os.WriteFile(path, data, os.FileMode(certPerm)) //nolint:gosec
 		if err != nil {
 			return nil, err
 		}
@@ -2486,10 +2519,9 @@ func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
 			return nil, err
 		}
 
-		const ed25519perm = 0o600
 		block := &pem.Block{Type: "PRIVATE KEY", Bytes: pkcs8}
 		data := pem.EncodeToMemory(block)
-		err = os.WriteFile(path, data, ed25519perm)
+		err = os.WriteFile(path, data, os.FileMode(certPerm)) //nolint:gosec
 		if err != nil {
 			return nil, err
 		}
