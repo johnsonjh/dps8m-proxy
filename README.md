@@ -9,6 +9,10 @@
 [![Go Report Card](https://goreportcard.com/badge/gitlab.com/dps8m/proxy)](https://goreportcard.com/report/gitlab.com/dps8m/proxy)
 [![REUSE status](https://api.reuse.software/badge/gitlab.com/dps8m/proxy)](https://api.reuse.software/info/gitlab.com/dps8m/proxy)
 [![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://www.mend.io/renovate/)
+[![CodeQL](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql)
+[![Dependabot Updates](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates)
+[![Pipeline Status](https://gitlab.com/dps8m/proxy/badges/master/pipeline.svg)](https://gitlab.com/dps8m/proxy/-/pipelines/)
+[![License](https://img.shields.io/github/license/johnsonjh/dps8m-proxy.svg))](LICENSE)
 
 ## Overview
 
@@ -40,11 +44,9 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 * ✅ Live streaming connection sharing (read‑only)
   * 🤝 Allows users to share their session with one or more viewers
 
-## Usage
+## Installation
 
-### Installation
-
-#### Binaries
+### Binaries
 
 * You can download pre-compiled binaries at
   [`https://dps8m.gitlab.io/proxy/`](https://dps8m.gitlab.io/proxy/).
@@ -54,7 +56,13 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
    FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
    Microsoft Windows) on 13 hardware architectures.
 
-#### Source
+ * [Look here](https://gitlab.com/dps8m/proxy/-/snippets) if you need
+   binaries for [IBM i](https://www.ibm.com/products/ibm-i) (OS/400)
+   that run under the
+   [PASE](https://www.ibm.com/docs/en/i/latest?topic=i-pase-overview)
+   subsystem.
+
+### Source
 
 A recent version of [Go](https://go.dev/) 🐹 is required to build
 `proxy` from source code.
@@ -87,13 +95,15 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
     compile, and install the binary to `${GOEXE}/proxy` (which will
     be `${HOME}/go/bin/proxy` for most users).
 
+## Usage
+
 ### Invocation
 
 * The `proxy` command can be invoked with the following command‑line
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.2* (2025-Jul-30 g5ae8cbf+) [linux/amd64]
+DPS8M Proxy v0.1.2 (2025-Jul-30 g6537713) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -235,7 +245,7 @@ are, hopefully, documented here:
 
 ```plaintext
 unknown shorthand flag: 'v' in -v
-DPS8M Proxy v0.1.2* (2025-Jul-30 g5ae8cbf+) [linux/amd64]
+DPS8M Proxy v0.1.2 (2025-Jul-30 g6537713) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -452,6 +462,44 @@ features:
   Send Control‑] to disconnect.
   ```
 
+## Compressed logs
+
+* By default, all session log files are compressed 🗜️ automatically
+  when the session terminates, and console log files are compressed
+  when the log rolls over (*i.e.*, when starting a new day).
+
+* When reviewing logs, administrators often need to search through all
+  the past data, including through the compressed files. We recommend
+  using [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the
+  `‑z` option) for this task.
+
+## Using OpenSSH host keys
+
+If you have existing [OpenSSH](https://www.openssh.com/) Ed25519 or
+RSA host keys that you want to use with the proxy, you’ll first need
+to convert those keys to standard PEM format.
+
+🚨 **NB**: These instructions *do not* include any specific details
+for safe handling of key file permissions—we assume you are `root`
+and that you know what you’re doing!
+
+1. Make a *copy* of the key files you wish to convert.  Be aware that
+   these copies will be *overwritten* in the conversion process:
+
+   ```sh
+   cp /etc/ssh/ssh_host_rsa_key ssh_host_rsa_key.tmp
+   cp /etc/ssh/ssh_host_ed25519_key ssh_host_ed25519_key.tmp
+   ```
+
+2. Convert the keys (using `ssh‑keygen`) and rename them appropriately:
+
+   ```sh
+   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
+   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ed25519_key.tmp
+   mv ssh_host_rsa_key.tmp ssh_host_rsa_key.pem
+   mv ssh_host_ed25519_key.tmp ssh_host_ed25519_key.pem 
+   ```
+
 ## History
 
 This is a from‑scratch re‑implementation (in [Go](https://go.dev/) 🐹)
@@ -470,7 +518,7 @@ This new implementation uses many lightweight *Goroutines* 🚀 instead
 of spawning multiple processes, resulting in significantly improved
 performance and reduced system overhead.
 
-### Stats
+## Code statistics
 
 The new `proxy` program is considerably simpler than its legacy
 predecessor (code statistics 📈 provided by
@@ -511,13 +559,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>525</th>
-<th>105</th>
+<th>535</th>
+<th>106</th>
 <th>0</th>
-<th>420</th>
+<th>429</th>
 <th>0</th>
-<th>23530</th>
-<th>405</th>
+<th>24407</th>
+<th>414</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
@@ -552,13 +600,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8048</th>
-<th>1602</th>
+<th>8058</th>
+<th>1603</th>
 <th>545</th>
-<th>5901</th>
+<th>5910</th>
 <th>1244</th>
-<th>218596</th>
-<th>4023</th>
+<th>219473</th>
+<th>4032</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -595,44 +643,6 @@ predecessor (code statistics 📈 provided by
     more involved than one might imagine.  *Safely* configuring the
     proxy for this type of operation is possible, but beyond the scope
     of this documentation.
-
-## Compressed logs
-
-* By default, all session log files are compressed 🗜️ automatically
-  when the session terminates, and console log files are compressed
-  when the log rolls over (*i.e.*, when starting a new day).
-
-* When reviewing logs, administrators often need to search through all
-  the past data, including through the compressed files. We recommend
-  using [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the
-  `‑z` option) for this task.
-
-## Using OpenSSH host keys
-
-If you have existing [OpenSSH](https://www.openssh.com/) Ed25519 or
-RSA host keys that you want to use with the proxy, you’ll first need
-to convert those keys to standard PEM format.
-
-🚨 **NB**: These instructions *do not* include any specific details
-for safe handling of key file permissions—we assume you are `root`
-and that you know what you’re doing!
-
-1. Make a *copy* of the key files you wish to convert.  Be aware that
-   these copies will be *overwritten* in the conversion process:
-
-   ```sh
-   cp /etc/ssh/ssh_host_rsa_key ssh_host_rsa_key.tmp
-   cp /etc/ssh/ssh_host_ed25519_key ssh_host_ed25519_key.tmp
-   ```
-
-2. Convert the keys (using `ssh‑keygen`) and rename them appropriately:
-
-   ```sh
-   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
-   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ed25519_key.tmp
-   mv ssh_host_rsa_key.tmp ssh_host_rsa_key.pem
-   mv ssh_host_ed25519_key.tmp ssh_host_ed25519_key.pem 
-   ```
 
 ## Development
 
