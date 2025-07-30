@@ -210,6 +210,7 @@ oldunix
 onlcr
 opensource
 opost
+pase
 pdpmake
 pflag
 posixly
@@ -286,6 +287,7 @@ charset
 cidr
 ckwin
 cocomo
+codeql
 codespell
 ctags
 davidrg
@@ -378,6 +380,7 @@ websocket
 whitelist
 whitelisted
 whitesource
+workflows
 xauth
 xterm
 xyzzy
