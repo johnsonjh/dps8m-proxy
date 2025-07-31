@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.3* (2025-Jul-31 g3b4b767+) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 g32a8b8d+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -243,7 +243,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.3* (2025-Jul-31 g3b4b767+) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 g32a8b8d+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -524,13 +524,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>535</th>
+<th>536</th>
 <th>106</th>
 <th>0</th>
-<th>429</th>
+<th>430</th>
 <th>0</th>
-<th>24446</th>
-<th>414</th>
+<th>24509</th>
+<th>415</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
@@ -554,24 +554,24 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>YAML</th>
 <th>1</th>
-<th>94</th>
+<th>79</th>
 <th>6</th>
 <th>10</th>
-<th>78</th>
+<th>63</th>
 <th>0</th>
-<th>4423</th>
-<th>85</th>
+<th>3687</th>
+<th>70</th>
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8092</th>
+<th>8078</th>
 <th>1607</th>
 <th>549</th>
-<th>5936</th>
+<th>5922</th>
 <th>1245</th>
-<th>220075</th>
-<th>4060</th>
+<th>219402</th>
+<th>4046</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -637,7 +637,8 @@ predecessor (code statistics 📈 provided by
   [`yash`](https://magicant.github.io/yash/) to ensure POSIX
   conformance.
 * The [`Makefile`](Makefile) provides a `lint` convenience target to
-  help you run all this stuff.
+  help you run all this.  You can also examine our
+  [`.gitlab-ci.yml`](.gitlab-ci.yml) file.
 
 ### Recommended
 
