@@ -195,8 +195,10 @@ goexe
 gofumpt
 golangci
 goleak
+googlesource
 gops
 goreportcard
+govulncheck
 hunspell
 icrnl
 kisielk
