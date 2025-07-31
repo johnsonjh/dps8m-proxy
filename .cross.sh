@@ -115,5 +115,12 @@ wait
 exec 3>&- 3<&-
 
 ###############################################################################
+# Build linux/mipssf
+
+export GOOS=linux GOARCH=mips GOMIPS=softfloat \
+  && printf "🧩 %s/%s\n" "${GOOS:?}" "${GOARCH:?}sf" \
+  && go build -trimpath -o ./cross.bin/proxy."${GOOS:?}"."${GOARCH:?}"sf
+
+###############################################################################
 # vim: set ft=sh expandtab tabstop=2 cc=80 :
 ###############################################################################

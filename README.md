@@ -48,16 +48,17 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 ### Binaries
 
 * You can download pre-compiled binaries at
-  [`https://dps8m.gitlab.io/proxy/`](https://dps8m.gitlab.io/proxy/).
+  **[`https://dps8m.gitlab.io/proxy/`](https://dps8m.gitlab.io/proxy/)**.
+[]()
 
+[]()
  * We currently publish more than 40 binaries supporting 12
    operating systems (IBM AIX, Android, Apple macOS, Dragonfly BSD,
    FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
-   Microsoft Windows) on 13 hardware architectures.
-
- * [Look here](https://gitlab.com/dps8m/proxy/-/snippets) if you need
-   binaries for [IBM i](https://www.ibm.com/products/ibm-i) (OS/400)
-   that run under the
+   Microsoft Windows) on 14 hardware architectures.
+ * Look [**here**](https://gitlab.com/dps8m/proxy/-/snippets) if you
+   need binaries for [IBM i](https://www.ibm.com/products/ibm-i)
+   (OS/400) that run under the
    [PASE](https://www.ibm.com/docs/en/i/latest?topic=i-pase-overview)
    subsystem.
 
@@ -102,7 +103,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.3* (2025-Jul-31 g32a8b8d+) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 gd3f2a80+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -243,7 +244,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.3* (2025-Jul-31 g32a8b8d+) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 gd3f2a80+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -524,23 +525,23 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>536</th>
-<th>106</th>
+<th>537</th>
+<th>105</th>
 <th>0</th>
-<th>430</th>
+<th>432</th>
 <th>0</th>
-<th>24509</th>
+<th>24526</th>
 <th>415</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
-<th>119</th>
-<th>25</th>
-<th>32</th>
-<th>62</th>
-<th>12</th>
-<th>3182</th>
-<th>79</th>
+<th>126</th>
+<th>27</th>
+<th>34</th>
+<th>65</th>
+<th>14</th>
+<th>3464</th>
+<th>83</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -565,13 +566,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8078</th>
-<th>1607</th>
-<th>549</th>
-<th>5922</th>
-<th>1245</th>
-<th>219402</th>
-<th>4046</th>
+<th>8086</th>
+<th>1608</th>
+<th>551</th>
+<th>5927</th>
+<th>1247</th>
+<th>219701</th>
+<th>4050</th>
 </tr></tfoot></table>
 
 ## Future plans
