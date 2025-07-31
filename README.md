@@ -7,11 +7,11 @@
 <!-- NB: Do not modify README.md directly; modify README.md.tmpl -->
 
 [![Go Report Card](https://goreportcard.com/badge/gitlab.com/dps8m/proxy)](https://goreportcard.com/report/gitlab.com/dps8m/proxy)
-[![REUSE status](https://api.reuse.software/badge/gitlab.com/dps8m/proxy)](https://api.reuse.software/info/gitlab.com/dps8m/proxy)
-[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://www.mend.io/renovate/)
+[![Pipeline Status](https://gitlab.com/dps8m/proxy/badges/master/pipeline.svg)](https://gitlab.com/dps8m/proxy/-/pipelines/)
 [![CodeQL](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql)
 [![Dependabot Updates](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates)
-[![Pipeline Status](https://gitlab.com/dps8m/proxy/badges/master/pipeline.svg)](https://gitlab.com/dps8m/proxy/-/pipelines/)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=johnsonjh_dps8m-proxy&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=johnsonjh_dps8m-proxy)
+[![REUSE status](https://api.reuse.software/badge/gitlab.com/dps8m/proxy)](https://api.reuse.software/info/gitlab.com/dps8m/proxy)
 
 ## Overview
 
@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.3* (2025-Jul-31 ga7308c5+) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 g7a429d9+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -243,7 +243,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.3* (2025-Jul-31 ga7308c5+) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 g7a429d9+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -514,13 +514,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>420</th>
+<th>421</th>
 <th>72</th>
 <th>79</th>
-<th>269</th>
+<th>270</th>
 <th>51</th>
-<th>12989</th>
-<th>296</th>
+<th>13018</th>
+<th>297</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
@@ -529,7 +529,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>428</th>
 <th>0</th>
-<th>24319</th>
+<th>24393</th>
 <th>413</th>
 </tr><tr>
 <th>Shell</th>
@@ -565,13 +565,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8090</th>
+<th>8091</th>
 <th>1607</th>
 <th>549</th>
-<th>5934</th>
+<th>5935</th>
 <th>1245</th>
-<th>219919</th>
-<th>4058</th>
+<th>220022</th>
+<th>4059</th>
 </tr></tfoot></table>
 
 ## Future plans
