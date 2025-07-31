@@ -12,7 +12,6 @@
 [![CodeQL](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql)
 [![Dependabot Updates](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates)
 [![Pipeline Status](https://gitlab.com/dps8m/proxy/badges/master/pipeline.svg)](https://gitlab.com/dps8m/proxy/-/pipelines/)
-[![License](https://img.shields.io/github/license/johnsonjh/dps8m-proxy.svg)](LICENSE)
 
 ## Overview
 
@@ -103,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.2 (2025-Jul-30 ga5fb7a1) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 gf429a67+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -244,60 +243,26 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-unknown shorthand flag: 'v' in -v
-DPS8M Proxy v0.1.2 (2025-Jul-30 ga5fb7a1) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 gf429a67+) [linux/amd64]
 
-Usage for /home/jhj/dps8m-proxy/proxy:
-
-      --allow-root              Allow running as root (UID 0)
-      --cert-dir string         Directory containing SSH host certificates
-                                    (default: current working directory)
-      --cert-perm octal         Permissions (octal) for new certificate files
-                                    [e.g., "600", "644"] (default "600")
-      --ssh-addr strings        SSH listener address(es)
-                                    [e.g., ":2222", "[::1]:8000"]
-                                    (multiple allowed) (default ":2222")
-      --ssh-delay float         Delay for incoming SSH connections
-                                    ["0.0" to "30.0" seconds] (no default)
-      --no-banner               Disable SSH connection banner
-      --telnet-host string      Default TELNET target [host:port]
-                                    (default "127.0.0.1:6180")
-      --alt-host string         Alternate TELNET target(s) [sshuser@host:port]
-                                    (multiple allowed)
-      --debug-telnet            Debug TELNET option negotiation
-      --debug-server string     Enable HTTP debug server listening address
-                                    [e.g., ":6060", "[::1]:6060"]
-      --no-gops                 Disable the "gops" diagnostic agent
-                                    (see https://github.com/google/gops)
-      --log-dir string          Base directory for logs (default "log")
-      --no-log                  Disable all session logging
-                                    (for console logging see "--console-log")
-      --console-log string      Enable console logging ["quiet", "noquiet"]
-                                    (disabled by default)
-      --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
-                                    (default "gzip")
-      --compress-level string   Compression level for gzip and zstd algorithms
-                                    ["fast", "normal", "high"]
-                                    (default "normal")
-      --no-compress             Disable session and/or console log compression
-      --log-perm octal          Permissions (octal) for new log files
-                                    [e.g., "600", "644"] (default "600")
-      --log-dir-perm octal      Permissions (octal) for new log directories
-                                    [e.g., "755", "750"] (default "750")
-      --db-file string          Path to persistent statistics storage database
-                                    (disabled by default)
-      --db-time uint            Elapsed seconds between database updates
-                                    [0 disables periodic writes] (default 30)
-      --db-perm octal           Permissions (octal) for new database files
-                                    [e.g., "600", "644"] (default 600)
-      --idle-max int            Maximum connection idle time allowed [seconds]
-      --time-max int            Maximum connection link time allowed [seconds]
-      --blacklist string        Enable blacklist [filename] (no default)
-      --whitelist string        Enable whitelist [filename] (no default)
-      --utc                     Use UTC (Coordinated Universal Time) for time
-                                    display and timestamping in log files
-      --version                 Show version information
-unknown shorthand flag: 'v' in -v
++===========================+==================================+
+| Component                 | Version                          |
++===========================+==================================+
+| dps8m/proxy               | v0.1.3*                          |
+| arl/statsviz              | v0.7.0                           |
+| google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
+| gorilla/websocket         | v1.5.3                           |
+| klauspost/compress        | v1.18.0                          |
+| spf13/pflag               | v1.0.7                           |
+| ulikunitz/xz              | v0.5.12                          |
+| go.etcd.io/bbolt          | v1.4.2                           |
+| golang.org/x/crypto       | v0.40.0                          |
+| golang.org/x/sys          | v0.34.0                          |
+| golang.org/x/term         | v0.33.0                          |
+| kernel.org/.../libcap/cap | v1.2.76                          |
+| kernel.org/.../libcap/psx | v1.2.76                          |
+| Go compiler (gc)          | v1.24.5                          |
++===========================+==================================+
 ```
 
 * If you need to see additional details about the `proxy` binary,
@@ -554,18 +519,18 @@ predecessor (code statistics 📈 provided by
 <th>75</th>
 <th>246</th>
 <th>50</th>
-<th>12542</th>
+<th>12509</th>
 <th>271</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>535</th>
+<th>534</th>
 <th>106</th>
 <th>0</th>
-<th>429</th>
+<th>428</th>
 <th>0</th>
-<th>24406</th>
-<th>414</th>
+<th>24319</th>
+<th>413</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
@@ -600,13 +565,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8058</th>
+<th>8057</th>
 <th>1603</th>
 <th>545</th>
-<th>5910</th>
+<th>5909</th>
 <th>1244</th>
-<th>219472</th>
-<th>4032</th>
+<th>219352</th>
+<th>4031</th>
 </tr></tfoot></table>
 
 ## Future plans
