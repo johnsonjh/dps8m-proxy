@@ -124,11 +124,13 @@ gofmt
 gofumpt
 gogtags
 golangci
+golist
 gotags
 gotidydiff
 gotoolchain
 goverify
 govet
+govulncheck
 gpath
 grpath
 grtags
@@ -259,6 +261,7 @@ goflags
 golangci
 gopath
 gotoolchain
+govulncheck
 honnef
 kisielk
 ldflags
