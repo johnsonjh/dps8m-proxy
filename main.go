@@ -3357,7 +3357,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}
 
 	telnetConnectionsTotal.Add(1)
-	remote, err := net.Dial("tcp", fmt.Sprintf("%s:%d", targetHost, targetPort))
+	addr := net.JoinHostPort(targetHost, strconv.Itoa(targetPort))
+	remote, err := net.Dial("tcp", addr)
 	if err != nil {
 		telnetFailuresTotal.Add(1)
 
