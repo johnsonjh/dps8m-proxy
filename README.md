@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.3* (2025-Jul-31 g7a429d9+) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 g3b4b767+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -243,7 +243,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.3* (2025-Jul-31 g7a429d9+) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 g3b4b767+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -524,13 +524,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>534</th>
+<th>535</th>
 <th>106</th>
 <th>0</th>
-<th>428</th>
+<th>429</th>
 <th>0</th>
-<th>24393</th>
-<th>413</th>
+<th>24446</th>
+<th>414</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
@@ -565,13 +565,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8091</th>
+<th>8092</th>
 <th>1607</th>
 <th>549</th>
-<th>5935</th>
+<th>5936</th>
 <th>1245</th>
-<th>220022</th>
-<th>4059</th>
+<th>220075</th>
+<th>4060</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -621,6 +621,7 @@ predecessor (code statistics 📈 provided by
   [`revive`](https://revive.run/),
   [`errcheck`](https://github.com/kisielk/errcheck),
   [`gofumpt`](https://github.com/mvdan/gofumpt),
+  [`govulncheck`](https://go.googlesource.com/vuln),
   [`scc`](https://github.com/boyter/scc),
   [`scspell`](https://github.com/myint/scspell),
   [`codespell`](https://github.com/codespell-project/codespell), and
