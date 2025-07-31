@@ -183,7 +183,7 @@ var (
 	loggingWg                        sync.WaitGroup
 	noBanner                         bool
 	noCompress                       bool
-	noGops                           bool
+	enableGops                       bool
 	noLog                            bool
 	showVersion                      bool
 	shutdownOnce                     sync.Once
@@ -399,7 +399,7 @@ func init() {
 		"cert-perm",
 		"Permissions (octal) for new certificate files\r\n"+
 			"    [e.g., \"600\", \"644\"]")
-	pflag.Lookup("cert-perm").DefValue = "\"600\"" //nolint:goconst
+	pflag.Lookup("cert-perm").DefValue = "600"
 
 	pflag.StringSliceVar(&sshAddr,
 		"ssh-addr", []string{":2222"},
@@ -437,9 +437,9 @@ func init() {
 			"    [e.g., \":6060\", \"[::1]:6060\"]")
 
 	if gopsEnabled {
-		pflag.BoolVar(&noGops,
-			"no-gops", false,
-			"Disable the \"gops\" diagnostic agent\r\n"+
+		pflag.BoolVar(&enableGops,
+			"gops", false,
+			"Enable the \"gops\" diagnostic agent\r\n"+
 				"    (see https://github.com/google/gops)")
 	}
 
@@ -476,13 +476,13 @@ func init() {
 		"log-perm",
 		"Permissions (octal) for new log files\r\n"+
 			"    [e.g., \"600\", \"644\"]")
-	pflag.Lookup("log-perm").DefValue = "\"600\""
+	pflag.Lookup("log-perm").DefValue = "600"
 
 	pflag.Var((*octalPermValue)(&logDirPerm),
 		"log-dir-perm",
 		"Permissions (octal) for new log directories\r\n"+
 			"    [e.g., \"755\", \"750\"]")
-	pflag.Lookup("log-dir-perm").DefValue = "\"750\""
+	pflag.Lookup("log-dir-perm").DefValue = "750"
 
 	if dbEnabled {
 		pflag.StringVar(&dbPath,
@@ -499,7 +499,7 @@ func init() {
 			"db-perm",
 			"Permissions (octal) for new database files\r\n"+
 				"    [e.g., \"600\", \"644\"]")
-		pflag.Lookup("log-perm").DefValue = "\"600\""
+		pflag.Lookup("log-perm").DefValue = "600"
 	}
 
 	pflag.IntVar(&idleMax,
@@ -631,7 +631,8 @@ func main() {
 			errorPrefix(), compressLevel) // LINTED: Fatalf
 	}
 
-	if !noGops {
+	if enableGops {
+		log.Printf("📋 Starting gops diagnostic agent")
 		gopsInit()
 	}
 

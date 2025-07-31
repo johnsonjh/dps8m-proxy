@@ -103,7 +103,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.3* (2025-Jul-31 gd3f2a80+) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 g0eac52c+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -111,7 +111,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
       --cert-dir string         Directory containing SSH host certificates
                                     (default: current working directory)
       --cert-perm octal         Permissions (octal) for new certificate files
-                                    [e.g., "600", "644"] (default "600")
+                                    [e.g., "600", "644"] (default 600)
       --ssh-addr strings        SSH listener address(es)
                                     [e.g., ":2222", "[::1]:8000"]
                                     (multiple allowed) (default ":2222")
@@ -125,7 +125,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
       --debug-telnet            Debug TELNET option negotiation
       --debug-server string     Enable HTTP debug server listening address
                                     [e.g., ":6060", "[::1]:6060"]
-      --no-gops                 Disable the "gops" diagnostic agent
+      --gops                    Enable the "gops" diagnostic agent
                                     (see https://github.com/google/gops)
       --log-dir string          Base directory for logs (default "log")
       --no-log                  Disable all session logging
@@ -139,9 +139,9 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     (default "normal")
       --no-compress             Disable session and/or console log compression
       --log-perm octal          Permissions (octal) for new log files
-                                    [e.g., "600", "644"] (default "600")
+                                    [e.g., "600", "644"] (default 600)
       --log-dir-perm octal      Permissions (octal) for new log directories
-                                    [e.g., "755", "750"] (default "750")
+                                    [e.g., "755", "750"] (default 750)
       --db-file string          Path to persistent statistics storage database
                                     (disabled by default)
       --db-time uint            Elapsed seconds between database updates
@@ -244,7 +244,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.3* (2025-Jul-31 gd3f2a80+) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 g0eac52c+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -505,13 +505,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>15</th>
-<th>6714</th>
+<th>6711</th>
 <th>1363</th>
 <th>321</th>
-<th>5030</th>
+<th>5027</th>
 <th>1182</th>
-<th>167405</th>
-<th>3066</th>
+<th>167427</th>
+<th>3063</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -566,13 +566,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8086</th>
+<th>8083</th>
 <th>1608</th>
 <th>551</th>
-<th>5927</th>
+<th>5924</th>
 <th>1247</th>
-<th>219701</th>
-<th>4050</th>
+<th>219723</th>
+<th>4047</th>
 </tr></tfoot></table>
 
 ## Future plans
