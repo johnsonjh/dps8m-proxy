@@ -73,10 +73,6 @@ var logLevelMap = map[string]LogLevel{
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func SetDbLogLevel(level string) error {
-	if dbPath == "" {
-		return fmt.Errorf("--db-loglevel specified but database not enabled; see \"--db-file\"")
-	}
-
 	level = strings.ToLower(level)
 	if l, ok := logLevelMap[level]; ok {
 		currentDbLogLevel = l
