@@ -7,11 +7,11 @@
 <!-- NB: Do not modify README.md directly; modify README.md.tmpl -->
 
 [![Go Report Card](https://goreportcard.com/badge/gitlab.com/dps8m/proxy)](https://goreportcard.com/report/gitlab.com/dps8m/proxy)
-[![REUSE status](https://api.reuse.software/badge/gitlab.com/dps8m/proxy)](https://api.reuse.software/info/gitlab.com/dps8m/proxy)
-[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://www.mend.io/renovate/)
+[![Pipeline Status](https://gitlab.com/dps8m/proxy/badges/master/pipeline.svg)](https://gitlab.com/dps8m/proxy/-/pipelines/)
 [![CodeQL](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql)
 [![Dependabot Updates](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates)
-[![Pipeline Status](https://gitlab.com/dps8m/proxy/badges/master/pipeline.svg)](https://gitlab.com/dps8m/proxy/-/pipelines/)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=johnsonjh_dps8m-proxy&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=johnsonjh_dps8m-proxy)
+[![REUSE status](https://api.reuse.software/badge/gitlab.com/dps8m/proxy)](https://api.reuse.software/info/gitlab.com/dps8m/proxy)
 
 ## Overview
 
@@ -47,19 +47,18 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 
 ### Binaries
 
-* You can download pre-compiled binaries at
-  [`https://dps8m.gitlab.io/proxy/`](https://dps8m.gitlab.io/proxy/).
-
- * We currently publish more than 40 binaries supporting 12
-   operating systems (IBM AIX, Android, Apple macOS, Dragonfly BSD,
-   FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
-   Microsoft Windows) on 13 hardware architectures.
-
- * [Look here](https://gitlab.com/dps8m/proxy/-/snippets) if you need
-   binaries for [IBM i](https://www.ibm.com/products/ibm-i) (OS/400)
-   that run under the
-   [PASE](https://www.ibm.com/docs/en/i/latest?topic=i-pase-overview)
-   subsystem.
+ * We currently publish more than 40 binaries supporting 13
+   operating systems (IBM AIX, IBM i, Android, Apple macOS, Dragonfly
+   BSD, FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
+   Microsoft Windows) on 14 hardware architectures.
+   * You can download pre-compiled binaries for all of these systems
+     (except IBM i) from
+     **[`https://dps8m.gitlab.io/proxy/`](https://dps8m.gitlab.io/proxy/)**.
+   * Look [**here**](https://gitlab.com/dps8m/proxy/-/snippets) if you
+     need binaries for [IBM i](https://www.ibm.com/products/ibm-i)
+     (OS/400) that run under the
+     [PASE](https://www.ibm.com/docs/en/i/latest?topic=i-pase-overview)
+     subsystem.
 
 ### Source
 
@@ -465,6 +464,7 @@ predecessor (code statistics 📈 provided by
   [`revive`](https://revive.run/),
   [`errcheck`](https://github.com/kisielk/errcheck),
   [`gofumpt`](https://github.com/mvdan/gofumpt),
+  [`govulncheck`](https://go.googlesource.com/vuln),
   [`scc`](https://github.com/boyter/scc),
   [`scspell`](https://github.com/myint/scspell),
   [`codespell`](https://github.com/codespell-project/codespell), and
@@ -480,7 +480,8 @@ predecessor (code statistics 📈 provided by
   [`yash`](https://magicant.github.io/yash/) to ensure POSIX
   conformance.
 * The [`Makefile`](Makefile) provides a `lint` convenience target to
-  help you run all this stuff.
+  help you run all this.  You can also examine our
+  [`.gitlab-ci.yml`](.gitlab-ci.yml) file.
 
 ### Recommended
 

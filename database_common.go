@@ -16,8 +16,11 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -39,7 +42,195 @@ var (
 	countersBucketName  = []byte("counters")
 	shutdownMarkerKey   = []byte("shutdown-marker")
 	initialStartTimeKey = []byte("initial-start-time")
+	currentDbLogLevel   LogLevel
 )
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+const (
+	LogNone    LogLevel = iota // 0
+	LogPanic                   // 1
+	LogFatal                   // 2
+	LogError                   // 3
+	LogWarning                 // 4
+	LogInfo                    // 5
+	LogDebug                   // 6
+)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+var logLevelMap = map[string]LogLevel{
+	"none":    LogNone,    // 0
+	"panic":   LogPanic,   // 1
+	"fatal":   LogFatal,   // 2
+	"error":   LogError,   // 3
+	"warn":    LogWarning, // 4
+	"warning": LogWarning, // 4
+	"info":    LogInfo,    // 5
+	"debug":   LogDebug,   // 6
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func SetDbLogLevel(level string) error {
+	if dbPath == "" {
+		return fmt.Errorf("--db-loglevel specified but database not enabled; see \"--db-file\"")
+	}
+
+	level = strings.ToLower(level)
+	if l, ok := logLevelMap[level]; ok {
+		currentDbLogLevel = l
+
+		return nil
+	}
+
+	i, err := strconv.Atoi(level)
+	if err == nil {
+		if i >= int(LogNone) && i <= int(LogDebug) {
+			currentDbLogLevel = LogLevel(i)
+
+			return nil
+		}
+	}
+
+	return fmt.Errorf("invalid database log level \"%s\"; specify 0 through 6, or,"+
+		" \"none\", \"panic\", \"fatal\", \"error\", \"warning\", \"info\", or \"debug\"",
+		level)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+type LogLevel int
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func logLevelEnabled(level LogLevel) bool {
+	return level <= currentDbLogLevel
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+type stdLogger struct{}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Debug(v ...interface{}) {
+	if !logLevelEnabled(LogDebug) {
+		return
+	}
+
+	log.Print(bugPrefix(), fmt.Sprint(v...))
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Debugf(format string, v ...interface{}) {
+	if !logLevelEnabled(LogDebug) {
+		return
+	}
+
+	log.Printf(bugPrefix()+format, v...)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Info(v ...interface{}) {
+	if !logLevelEnabled(LogInfo) {
+		return
+	}
+
+	log.Print(dbPrefix(), fmt.Sprint(v...))
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Infof(format string, v ...interface{}) {
+	if !logLevelEnabled(LogInfo) {
+		return
+	}
+
+	log.Printf(dbPrefix()+format, v...)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Warning(v ...interface{}) {
+	if !logLevelEnabled(LogWarning) {
+		return
+	}
+
+	log.Print(alertPrefix() + fmt.Sprint(v...))
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Warningf(format string, v ...interface{}) {
+	if !logLevelEnabled(LogWarning) {
+		return
+	}
+
+	log.Printf(alertPrefix()+format, v...)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Error(v ...interface{}) {
+	if !logLevelEnabled(LogError) {
+		return
+	}
+
+	log.Print(warnPrefix(), fmt.Sprint(v...))
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Errorf(format string, v ...interface{}) {
+	if !logLevelEnabled(LogError) {
+		return
+	}
+
+	log.Printf(warnPrefix()+format, v...)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Fatal(v ...interface{}) {
+	if !logLevelEnabled(LogFatal) {
+		return
+	}
+
+	log.Fatal(errorPrefix(), fmt.Sprint(v...))
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Fatalf(format string, v ...interface{}) {
+	if !logLevelEnabled(LogFatal) {
+		return
+	}
+
+	log.Fatalf(errorPrefix()+format, v...)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Panic(v ...interface{}) {
+	if !logLevelEnabled(LogPanic) {
+		return
+	}
+
+	log.Panic(boomPrefix(), fmt.Sprint(v...))
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (l *stdLogger) Panicf(format string, v ...interface{}) {
+	if !logLevelEnabled(LogPanic) {
+		return
+	}
+
+	log.Panicf(boomPrefix()+format, v...)
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -63,6 +254,7 @@ func initDB() {
 	options := &bbolt.Options{
 		Timeout:      1 * time.Second,
 		FreelistType: bbolt.FreelistMapType,
+		Logger:       &stdLogger{},
 	}
 
 	db, err = bbolt.Open(dbPath, os.FileMode(dbPerm), options) //nolint:gosec
@@ -118,6 +310,7 @@ func initDB() {
 		log.Printf("%sERROR: Failed to initialize database metadata: %v",
 			errorPrefix(), err)
 	}
+
 	loadCountersFromDB()
 }
 
@@ -134,26 +327,64 @@ func writeCountersToDB() {
 		}
 
 		counters := map[string]uint64{
-			"telnetConnectionsTotal":   lifetimeTelnetConnectionsTotal.Load() + telnetConnectionsTotal.Load(),
-			"altHostRoutesTotal":       lifetimeAltHostRoutesTotal.Load() + altHostRoutesTotal.Load(),
-			"telnetFailuresTotal":      lifetimeTelnetFailuresTotal.Load() + telnetFailuresTotal.Load(),
-			"peakUsersTotal":           lifetimePeakUsersTotal.Load(),
-			"trafficOutTotal":          lifetimeTrafficOutTotal.Load() + trafficOutTotal.Load(),
-			"trafficInTotal":           lifetimeTrafficInTotal.Load() + trafficInTotal.Load(),
-			"sshConnectionsTotal":      lifetimeSSHconnectionsTotal.Load() + sshConnectionsTotal.Load(),
-			"sshSessionsTotal":         lifetimeSSHsessionsTotal.Load() + sshSessionsTotal.Load(),
-			"monitorSessionsTotal":     lifetimeMonitorSessionsTotal.Load() + monitorSessionsTotal.Load(),
-			"sshRequestTimeoutTotal":   lifetimeSSHrequestTimeoutTotal.Load() + sshRequestTimeoutTotal.Load(),
-			"sshIllegalSubsystemTotal": lifetimeSSHillegalSubsystemTotal.Load() + sshIllegalSubsystemTotal.Load(),
-			"sshExecRejectedTotal":     lifetimeSSHexecRejectedTotal.Load() + sshExecRejectedTotal.Load(),
-			"acceptErrorsTotal":        lifetimeAcceptErrorsTotal.Load() + acceptErrorsTotal.Load(),
-			"sshHandshakeFailedTotal":  lifetimeSSHhandshakeFailedTotal.Load() + sshHandshakeFailedTotal.Load(),
-			"adminKillsTotal":          lifetimeAdminKillsTotal.Load() + adminKillsTotal.Load(),
-			"idleKillsTotal":           lifetimeIdleKillsTotal.Load() + idleKillsTotal.Load(),
-			"timeKillsTotal":           lifetimeTimeKillsTotal.Load() + timeKillsTotal.Load(),
-			"delayAbandonedTotal":      lifetimeDelayAbandonedTotal.Load() + delayAbandonedTotal.Load(),
-			"rejectedTotal":            lifetimeRejectedTotal.Load() + rejectedTotal.Load(),
-			"exemptedTotal":            lifetimeExemptedTotal.Load() + exemptedTotal.Load(),
+			"telnetConnectionsTotal": lifetimeTelnetConnectionsTotal.Load() +
+				telnetConnectionsTotal.Load(),
+
+			"altHostRoutesTotal": lifetimeAltHostRoutesTotal.Load() +
+				altHostRoutesTotal.Load(),
+
+			"telnetFailuresTotal": lifetimeTelnetFailuresTotal.Load() +
+				telnetFailuresTotal.Load(),
+
+			"peakUsersTotal": lifetimePeakUsersTotal.Load(),
+
+			"trafficOutTotal": lifetimeTrafficOutTotal.Load() +
+				trafficOutTotal.Load(),
+
+			"trafficInTotal": lifetimeTrafficInTotal.Load() +
+				trafficInTotal.Load(),
+
+			"sshConnectionsTotal": lifetimeSSHconnectionsTotal.Load() +
+				sshConnectionsTotal.Load(),
+
+			"sshSessionsTotal": lifetimeSSHsessionsTotal.Load() +
+				sshSessionsTotal.Load(),
+
+			"monitorSessionsTotal": lifetimeMonitorSessionsTotal.Load() +
+				monitorSessionsTotal.Load(),
+
+			"sshRequestTimeoutTotal": lifetimeSSHrequestTimeoutTotal.Load() +
+				sshRequestTimeoutTotal.Load(),
+
+			"sshIllegalSubsystemTotal": lifetimeSSHillegalSubsystemTotal.Load() +
+				sshIllegalSubsystemTotal.Load(),
+
+			"sshExecRejectedTotal": lifetimeSSHexecRejectedTotal.Load() +
+				sshExecRejectedTotal.Load(),
+
+			"acceptErrorsTotal": lifetimeAcceptErrorsTotal.Load() +
+				acceptErrorsTotal.Load(),
+
+			"sshHandshakeFailedTotal": lifetimeSSHhandshakeFailedTotal.Load() +
+				sshHandshakeFailedTotal.Load(),
+
+			"adminKillsTotal": lifetimeAdminKillsTotal.Load() +
+				adminKillsTotal.Load(),
+
+			"idleKillsTotal": lifetimeIdleKillsTotal.Load() +
+				idleKillsTotal.Load(),
+
+			"timeKillsTotal": lifetimeTimeKillsTotal.Load() +
+				timeKillsTotal.Load(),
+
+			"delayAbandonedTotal": lifetimeDelayAbandonedTotal.Load() +
+				delayAbandonedTotal.Load(),
+
+			"rejectedTotal": lifetimeRejectedTotal.Load() +
+				rejectedTotal.Load(),
+
+			"exemptedTotal": lifetimeExemptedTotal.Load() +
+				exemptedTotal.Load(),
 		}
 
 		for key, val := range counters {

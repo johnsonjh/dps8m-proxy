@@ -85,17 +85,40 @@ lint check:
 	@printf '\n%s\n' "🧩 Running 'make clean'..."
 	$(MAKE) clean
 	@printf '\n%s\n' "⚙️ Running linters..."
-	$(MAKE) revive reuse gofumpt gofmt goverify gotidydiff govet staticcheck \
-		errcheck shellcheck shfmt codespell scspell golangci-lint glab-lint
+	$(MAKE) \
+		codespell \
+		scspell \
+		revive \
+		reuse \
+		gofmt \
+		gofumpt \
+		govet \
+		goverify \
+		gotidydiff \
+		staticcheck \
+		errcheck \
+		shellcheck \
+		shfmt \
+		golangci-lint \
+		glab-lint \
+		golist \
+		govulncheck
 	@test -z "$${CI_NO_CROSS:-}" && { \
 		printf '\n%s\n' "🧩 Running 'make cross'..."; \
 		set -x; env MAX_CPU=1 $(MAKE) cross; exit $${?}; } || true
 	$(MAKE) clean
-	@printf '\n%s\n' "ℹ️ Finding any outdated dependencies..."
+	@printf '\n%s\n\n' "🥇 Linting complete; carefully review the output."
+
+##############################################################################
+# Target: golist
+
+.PHONY: golist
+golist:
+	@printf '\n%s\n' \
+		"ℹ️ Finding any outdated dependencies... (may take a few moments)"
 	@go list -u -f \
 		'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} → {{.Update.Version}}{{end}}' \
 		-m all
-	@printf '\n%s\n\n' "🥇 Linting complete; carefully review the output."
 
 ##############################################################################
 # Target: glab-lint
@@ -171,6 +194,15 @@ errcheck:
 	@command -v errcheck > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ errcheck not found!"; exit 0; } ; \
 		set -x; errcheck
+
+##############################################################################
+# Target: govulncheck
+
+.PHONY: govulncheck
+govulncheck:
+	@command -v govulncheck > /dev/null 2>&1 || \
+		{ printf '%s\n' "⚠️ govulncheck not found!"; exit 0; } ; \
+		set -x; govulncheck ./...
 
 ##############################################################################
 # Target: gofumpt

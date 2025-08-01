@@ -183,7 +183,7 @@ var (
 	loggingWg                        sync.WaitGroup
 	noBanner                         bool
 	noCompress                       bool
-	noGops                           bool
+	enableGops                       bool
 	noLog                            bool
 	showVersion                      bool
 	shutdownOnce                     sync.Once
@@ -198,6 +198,7 @@ var (
 	blockFile                        = "block.txt"
 	compressAlgo                     string
 	compressLevel                    string
+	dbLogLevel                       string
 	sshDelay                         float64
 	acceptErrorsTotal                atomic.Uint64
 	adminKillsTotal                  atomic.Uint64
@@ -399,7 +400,7 @@ func init() {
 		"cert-perm",
 		"Permissions (octal) for new certificate files\r\n"+
 			"    [e.g., \"600\", \"644\"]")
-	pflag.Lookup("cert-perm").DefValue = "\"600\"" //nolint:goconst
+	pflag.Lookup("cert-perm").DefValue = "600"
 
 	pflag.StringSliceVar(&sshAddr,
 		"ssh-addr", []string{":2222"},
@@ -437,9 +438,9 @@ func init() {
 			"    [e.g., \":6060\", \"[::1]:6060\"]")
 
 	if gopsEnabled {
-		pflag.BoolVar(&noGops,
-			"no-gops", false,
-			"Disable the \"gops\" diagnostic agent\r\n"+
+		pflag.BoolVar(&enableGops,
+			"gops", false,
+			"Enable the \"gops\" diagnostic agent\r\n"+
 				"    (see https://github.com/google/gops)")
 	}
 
@@ -476,13 +477,13 @@ func init() {
 		"log-perm",
 		"Permissions (octal) for new log files\r\n"+
 			"    [e.g., \"600\", \"644\"]")
-	pflag.Lookup("log-perm").DefValue = "\"600\""
+	pflag.Lookup("log-perm").DefValue = "600"
 
 	pflag.Var((*octalPermValue)(&logDirPerm),
 		"log-dir-perm",
 		"Permissions (octal) for new log directories\r\n"+
 			"    [e.g., \"755\", \"750\"]")
-	pflag.Lookup("log-dir-perm").DefValue = "\"750\""
+	pflag.Lookup("log-dir-perm").DefValue = "750"
 
 	if dbEnabled {
 		pflag.StringVar(&dbPath,
@@ -499,7 +500,13 @@ func init() {
 			"db-perm",
 			"Permissions (octal) for new database files\r\n"+
 				"    [e.g., \"600\", \"644\"]")
-		pflag.Lookup("log-perm").DefValue = "\"600\""
+		pflag.Lookup("log-perm").DefValue = "600"
+
+		pflag.StringVar(&dbLogLevel,
+			"db-loglevel", "error",
+			"Database engine (BBoltDB) logging output level\r\n"+
+				"    [level: \"0\" - \"6\", or \"none\" - \"debug\"]\r\n"+
+				"   ")
 	}
 
 	pflag.IntVar(&idleMax,
@@ -600,6 +607,14 @@ func main() {
 		os.Exit(0)
 	}
 
+	if dbEnabled {
+		err := SetDbLogLevel(dbLogLevel)
+		if err != nil {
+			log.Fatalf("%sERROR: %v",
+				errorPrefix(), err) // LINTED: Fatalf
+		}
+	}
+
 	if sshDelay < 0 {
 		log.Fatalf("%sERROR: --ssh-delay cannot be negative!",
 			errorPrefix()) // LINTED: Fatalf
@@ -631,7 +646,9 @@ func main() {
 			errorPrefix(), compressLevel) // LINTED: Fatalf
 	}
 
-	if !noGops {
+	if enableGops {
+		log.Printf("%sStarting gops diagnostic agent",
+			gopsPrefix())
 		gopsInit()
 	}
 
@@ -3357,7 +3374,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}
 
 	telnetConnectionsTotal.Add(1)
-	remote, err := net.Dial("tcp", fmt.Sprintf("%s:%d", targetHost, targetPort))
+	addr := net.JoinHostPort(targetHost, strconv.Itoa(targetPort))
+	remote, err := net.Dial("tcp", addr)
 	if err != nil {
 		telnetFailuresTotal.Add(1)
 

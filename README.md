@@ -7,11 +7,11 @@
 <!-- NB: Do not modify README.md directly; modify README.md.tmpl -->
 
 [![Go Report Card](https://goreportcard.com/badge/gitlab.com/dps8m/proxy)](https://goreportcard.com/report/gitlab.com/dps8m/proxy)
-[![REUSE status](https://api.reuse.software/badge/gitlab.com/dps8m/proxy)](https://api.reuse.software/info/gitlab.com/dps8m/proxy)
-[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://www.mend.io/renovate/)
+[![Pipeline Status](https://gitlab.com/dps8m/proxy/badges/master/pipeline.svg)](https://gitlab.com/dps8m/proxy/-/pipelines/)
 [![CodeQL](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql)
 [![Dependabot Updates](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates)
-[![Pipeline Status](https://gitlab.com/dps8m/proxy/badges/master/pipeline.svg)](https://gitlab.com/dps8m/proxy/-/pipelines/)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=johnsonjh_dps8m-proxy&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=johnsonjh_dps8m-proxy)
+[![REUSE status](https://api.reuse.software/badge/gitlab.com/dps8m/proxy)](https://api.reuse.software/info/gitlab.com/dps8m/proxy)
 
 ## Overview
 
@@ -48,16 +48,17 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 ### Binaries
 
 * You can download pre-compiled binaries at
-  [`https://dps8m.gitlab.io/proxy/`](https://dps8m.gitlab.io/proxy/).
+  **[`https://dps8m.gitlab.io/proxy/`](https://dps8m.gitlab.io/proxy/)**.
+[]()
 
+[]()
  * We currently publish more than 40 binaries supporting 12
    operating systems (IBM AIX, Android, Apple macOS, Dragonfly BSD,
    FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
-   Microsoft Windows) on 13 hardware architectures.
-
- * [Look here](https://gitlab.com/dps8m/proxy/-/snippets) if you need
-   binaries for [IBM i](https://www.ibm.com/products/ibm-i) (OS/400)
-   that run under the
+   Microsoft Windows) on 14 hardware architectures.
+ * Look [**here**](https://gitlab.com/dps8m/proxy/-/snippets) if you
+   need binaries for [IBM i](https://www.ibm.com/products/ibm-i)
+   (OS/400) that run under the
    [PASE](https://www.ibm.com/docs/en/i/latest?topic=i-pase-overview)
    subsystem.
 
@@ -102,7 +103,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.2 (2025-Jul-30 g20cf51c) [linux/amd64]
+DPS8M Proxy v0.1.3 (2025-Aug-01 ge1637a9) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -110,7 +111,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
       --cert-dir string         Directory containing SSH host certificates
                                     (default: current working directory)
       --cert-perm octal         Permissions (octal) for new certificate files
-                                    [e.g., "600", "644"] (default "600")
+                                    [e.g., "600", "644"] (default 600)
       --ssh-addr strings        SSH listener address(es)
                                     [e.g., ":2222", "[::1]:8000"]
                                     (multiple allowed) (default ":2222")
@@ -124,7 +125,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
       --debug-telnet            Debug TELNET option negotiation
       --debug-server string     Enable HTTP debug server listening address
                                     [e.g., ":6060", "[::1]:6060"]
-      --no-gops                 Disable the "gops" diagnostic agent
+      --gops                    Enable the "gops" diagnostic agent
                                     (see https://github.com/google/gops)
       --log-dir string          Base directory for logs (default "log")
       --no-log                  Disable all session logging
@@ -138,15 +139,18 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     (default "normal")
       --no-compress             Disable session and/or console log compression
       --log-perm octal          Permissions (octal) for new log files
-                                    [e.g., "600", "644"] (default "600")
+                                    [e.g., "600", "644"] (default 600)
       --log-dir-perm octal      Permissions (octal) for new log directories
-                                    [e.g., "755", "750"] (default "750")
+                                    [e.g., "755", "750"] (default 750)
       --db-file string          Path to persistent statistics storage database
                                     (disabled by default)
       --db-time uint            Elapsed seconds between database updates
                                     [0 disables periodic writes] (default 30)
       --db-perm octal           Permissions (octal) for new database files
                                     [e.g., "600", "644"] (default 600)
+      --db-loglevel string      Database engine (BBoltDB) logging output level
+                                    [level: "0" - "6", or "none" - "debug"]
+                                    (default "error")
       --idle-max int            Maximum connection idle time allowed [seconds]
       --time-max int            Maximum connection link time allowed [seconds]
       --blacklist string        Enable blacklist [filename] (no default)
@@ -243,12 +247,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.2 (2025-Jul-30 g20cf51c) [linux/amd64]
+DPS8M Proxy v0.1.3 (2025-Aug-01 ge1637a9) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.2                           |
+| dps8m/proxy               | v0.1.3                           |
 | arl/statsviz              | v0.7.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -504,43 +508,43 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>15</th>
-<th>6713</th>
-<th>1363</th>
-<th>321</th>
-<th>5029</th>
-<th>1182</th>
-<th>167381</th>
-<th>3065</th>
+<th>6984</th>
+<th>1446</th>
+<th>342</th>
+<th>5196</th>
+<th>1206</th>
+<th>173217</th>
+<th>3158</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>389</th>
-<th>68</th>
-<th>75</th>
-<th>246</th>
-<th>50</th>
-<th>12509</th>
-<th>271</th>
+<th>421</th>
+<th>72</th>
+<th>79</th>
+<th>270</th>
+<th>51</th>
+<th>13018</th>
+<th>297</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>534</th>
-<th>106</th>
+<th>537</th>
+<th>105</th>
 <th>0</th>
-<th>428</th>
+<th>432</th>
 <th>0</th>
-<th>24319</th>
-<th>413</th>
+<th>24526</th>
+<th>415</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
-<th>119</th>
-<th>25</th>
-<th>32</th>
-<th>62</th>
-<th>12</th>
-<th>3182</th>
-<th>79</th>
+<th>126</th>
+<th>27</th>
+<th>34</th>
+<th>65</th>
+<th>14</th>
+<th>3464</th>
+<th>83</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -554,24 +558,24 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>YAML</th>
 <th>1</th>
-<th>93</th>
+<th>79</th>
 <th>6</th>
 <th>10</th>
-<th>77</th>
+<th>63</th>
 <th>0</th>
-<th>4360</th>
-<th>84</th>
+<th>3687</th>
+<th>70</th>
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8057</th>
-<th>1603</th>
-<th>545</th>
-<th>5909</th>
-<th>1244</th>
-<th>219352</th>
-<th>4031</th>
+<th>8356</th>
+<th>1691</th>
+<th>572</th>
+<th>6093</th>
+<th>1271</th>
+<th>225513</th>
+<th>4142</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -621,6 +625,7 @@ predecessor (code statistics 📈 provided by
   [`revive`](https://revive.run/),
   [`errcheck`](https://github.com/kisielk/errcheck),
   [`gofumpt`](https://github.com/mvdan/gofumpt),
+  [`govulncheck`](https://go.googlesource.com/vuln),
   [`scc`](https://github.com/boyter/scc),
   [`scspell`](https://github.com/myint/scspell),
   [`codespell`](https://github.com/codespell-project/codespell), and
@@ -636,7 +641,8 @@ predecessor (code statistics 📈 provided by
   [`yash`](https://magicant.github.io/yash/) to ensure POSIX
   conformance.
 * The [`Makefile`](Makefile) provides a `lint` convenience target to
-  help you run all this stuff.
+  help you run all this.  You can also examine our
+  [`.gitlab-ci.yml`](.gitlab-ci.yml) file.
 
 ### Recommended
 

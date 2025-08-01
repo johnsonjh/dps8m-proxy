@@ -7,6 +7,7 @@ atoi
 bufio
 conns
 ctype
+debugf
 deps
 errorf
 expvar
@@ -31,8 +32,11 @@ hhandshake
 hillegal
 hrequest
 hsessions
+infof
+itoa
 klauspost
 linted
+loglevel
 mccp
 mssp
 naws
@@ -40,6 +44,7 @@ noinlineerr
 nolint
 nolintlint
 noquiet
+panicf
 paralleltest
 pflag
 pprof
@@ -67,6 +72,7 @@ teardown
 ttype
 tzdata
 ulikunitz
+warningf
 wronly
 
 FILETYPE: Shell; .sh
@@ -123,11 +129,13 @@ gofmt
 gofumpt
 gogtags
 golangci
+golist
 gotags
 gotidydiff
 gotoolchain
 goverify
 govet
+govulncheck
 gpath
 grpath
 grtags
@@ -156,9 +164,12 @@ sigdanger
 FILEID: 3fdac6e0-6bd1-11f0-8c81-80ee73e9b8e7
 expandtab
 goarch
+gomips
 gotoolchain
+mipssf
 oldifs
 shellcheck
+softfloat
 trimpath
 
 FILEID: 49b70692-6bd1-11f0-b2b1-80ee73e9b8e7
@@ -192,8 +203,10 @@ goexe
 gofumpt
 golangci
 goleak
+googlesource
 gops
 goreportcard
+govulncheck
 hunspell
 icrnl
 kisielk
@@ -225,6 +238,7 @@ sighup
 sigint
 sigquit
 sigusr
+sonarcloud
 sshuser
 staticcheck
 statsviz
@@ -258,6 +272,7 @@ goflags
 golangci
 gopath
 gotoolchain
+govulncheck
 honnef
 kisielk
 ldflags
@@ -278,6 +293,17 @@ zipname
 FILEID: 379629a2-6bd1-11f0-92b3-80ee73e9b8e7
 codespellrc
 pase
+
+FILEID: 07ec62c0-6dbb-11f0-b70f-80ee73e9b8e7
+bccde
+goleak
+gomod
+gops
+klauspost
+libcap
+pflag
+statsviz
+ulikunitz
 
 NATURAL:
 adduser
@@ -337,6 +363,7 @@ makefile
 mebibyte
 mebibytes
 microsoft
+mips
 mkdir
 multics
 namespaces
