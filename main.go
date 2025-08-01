@@ -198,6 +198,7 @@ var (
 	blockFile                        = "block.txt"
 	compressAlgo                     string
 	compressLevel                    string
+	dbLogLevel                       string
 	sshDelay                         float64
 	acceptErrorsTotal                atomic.Uint64
 	adminKillsTotal                  atomic.Uint64
@@ -500,6 +501,12 @@ func init() {
 			"Permissions (octal) for new database files\r\n"+
 				"    [e.g., \"600\", \"644\"]")
 		pflag.Lookup("log-perm").DefValue = "600"
+
+		pflag.StringVar(&dbLogLevel,
+			"db-loglevel", "error",
+			"Database engine (BBoltDB) logging output level\r\n"+
+				"    [level: \"0\" - \"6\", or \"none\" - \"debug\"]\r\n"+
+				"   ")
 	}
 
 	pflag.IntVar(&idleMax,
@@ -598,6 +605,14 @@ func main() {
 
 	if showVersion {
 		os.Exit(0)
+	}
+
+	if dbEnabled {
+		err := SetDbLogLevel(dbLogLevel)
+		if err != nil {
+			log.Fatalf("%sERROR: %v",
+				errorPrefix(), err) // LINTED: Fatalf
+		}
 	}
 
 	if sshDelay < 0 {

@@ -103,7 +103,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.3 (2025-Jul-31 gc7e7944) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 g124da16+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -148,6 +148,9 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     [0 disables periodic writes] (default 30)
       --db-perm octal           Permissions (octal) for new database files
                                     [e.g., "600", "644"] (default 600)
+      --db-loglevel string      Database engine (BBoltDB) logging output level
+                                    [level: "0" - "6", or "none" - "debug"]
+                                    (default "error")
       --idle-max int            Maximum connection idle time allowed [seconds]
       --time-max int            Maximum connection link time allowed [seconds]
       --blacklist string        Enable blacklist [filename] (no default)
@@ -244,12 +247,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.3 (2025-Jul-31 gc7e7944) [linux/amd64]
+DPS8M Proxy v0.1.3* (2025-Jul-31 g124da16+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.3                           |
+| dps8m/proxy               | v0.1.3*                          |
 | arl/statsviz              | v0.7.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -505,13 +508,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>15</th>
-<th>6711</th>
-<th>1363</th>
-<th>321</th>
-<th>5027</th>
-<th>1182</th>
-<th>167427</th>
-<th>3063</th>
+<th>6963</th>
+<th>1440</th>
+<th>340</th>
+<th>5183</th>
+<th>1204</th>
+<th>172809</th>
+<th>3153</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -566,13 +569,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8083</th>
-<th>1608</th>
-<th>551</th>
-<th>5924</th>
-<th>1247</th>
-<th>219723</th>
-<th>4047</th>
+<th>8335</th>
+<th>1685</th>
+<th>570</th>
+<th>6080</th>
+<th>1269</th>
+<th>225105</th>
+<th>4137</th>
 </tr></tfoot></table>
 
 ## Future plans

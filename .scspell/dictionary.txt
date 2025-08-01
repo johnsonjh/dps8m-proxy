@@ -7,6 +7,7 @@ atoi
 bufio
 conns
 ctype
+debugf
 deps
 errorf
 expvar
@@ -31,9 +32,11 @@ hhandshake
 hillegal
 hrequest
 hsessions
+infof
 itoa
 klauspost
 linted
+loglevel
 mccp
 mssp
 naws
@@ -41,6 +44,7 @@ noinlineerr
 nolint
 nolintlint
 noquiet
+panicf
 paralleltest
 pflag
 pprof
@@ -68,6 +72,7 @@ teardown
 ttype
 tzdata
 ulikunitz
+warningf
 wronly
 
 FILETYPE: Shell; .sh
