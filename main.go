@@ -647,7 +647,8 @@ func main() {
 	}
 
 	if enableGops {
-		log.Printf("📋 Starting gops diagnostic agent")
+		log.Printf("%sStarting gops diagnostic agent",
+			gopsPrefix())
 		gopsInit()
 	}
 
