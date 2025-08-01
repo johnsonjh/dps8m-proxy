@@ -19,6 +19,8 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/pem"
@@ -757,9 +759,9 @@ func main() {
 	}
 
 	rsaSigner, err := loadOrCreateHostKey(filepath.Join(
-		certDir,
-		"ssh_host_rsa_key.pem"),
-		"rsa")
+			certDir,
+			"ssh_host_rsa_key.pem"),
+			"rsa")
 	if err != nil {
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
@@ -768,6 +770,21 @@ func main() {
 		}
 
 		log.Fatalf("%sERROR: RSA host key error: %v",
+			errorPrefix(), err) // LINTED: Fatalf
+	}
+
+	ecdsaSigner, err := loadOrCreateHostKey(filepath.Join(
+			certDir,
+			"ssh_host_ecdsa_key.pem"),
+			"ecdsa")
+	if err != nil {
+		if isConsoleLogQuiet {
+			_, _ = fmt.Fprintf(os.Stdout,
+				"%s %sERROR: ECDSA host key error: %v\r\n",
+				nowStamp(), errorPrefix(), err)
+		}
+
+		log.Fatalf("%sERROR: ECDSA host key error: %v",
 			errorPrefix(), err) // LINTED: Fatalf
 	}
 
@@ -808,7 +825,7 @@ func main() {
 					continue
 				}
 
-				go handleConn(rawConn, edSigner, rsaSigner)
+				go handleConn(rawConn, edSigner, rsaSigner, ecdsaSigner)
 			}
 		}(addr)
 	}
@@ -2498,61 +2515,78 @@ func sendNaws(conn *Connection, width, height uint32) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
-	data, err := os.ReadFile(path) //nolint:gosec
+func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) {
+	keyData, err := os.ReadFile(keyPath)
 	if err == nil {
-		return ssh.ParsePrivateKey(data)
+		return ssh.ParsePrivateKey(keyData)
 	}
+
+	if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read key: %w", err)
+	}
+
+	var privateKey interface{}
+	var pemBlock *pem.Block
 
 	switch keyType {
 	case "rsa":
-		const rsaBits = 2048
-		rsaKey, err := rsa.GenerateKey(rand.Reader, rsaBits)
+		privateKey, err = rsa.GenerateKey(rand.Reader, 2048)
 		if err != nil {
 			return nil, err
 		}
-
-		block := &pem.Block{
+		pemBlock = &pem.Block{
 			Type:  "RSA PRIVATE KEY",
-			Bytes: x509.MarshalPKCS1PrivateKey(rsaKey),
+			Bytes: x509.MarshalPKCS1PrivateKey(privateKey.(*rsa.PrivateKey)),
 		}
-
-		data := pem.EncodeToMemory(block)
-		err = os.WriteFile(path, data, os.FileMode(certPerm)) //nolint:gosec
-		if err != nil {
-			return nil, err
-		}
-
-		return ssh.ParsePrivateKey(data)
-
 	case "ed25519":
-		_, priv, err := ed25519.GenerateKey(rand.Reader)
+		_, privateKey, err = ed25519.GenerateKey(rand.Reader)
 		if err != nil {
 			return nil, err
 		}
-
-		pkcs8, err := x509.MarshalPKCS8PrivateKey(priv)
+		derBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
 		if err != nil {
 			return nil, err
 		}
-
-		block := &pem.Block{Type: "PRIVATE KEY", Bytes: pkcs8}
-		data := pem.EncodeToMemory(block)
-		err = os.WriteFile(path, data, os.FileMode(certPerm)) //nolint:gosec
+		pemBlock = &pem.Block{
+			Type:  "PRIVATE KEY",
+			Bytes: derBytes,
+		}
+	case "ecdsa":
+		privateKey, err = ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 		if err != nil {
 			return nil, err
 		}
-
-		return ssh.ParsePrivateKey(data)
-
+		derBytes, err := x509.MarshalECPrivateKey(privateKey.(*ecdsa.PrivateKey))
+		if err != nil {
+			return nil, err
+		}
+		pemBlock = &pem.Block{
+			Type:  "EC PRIVATE KEY",
+			Bytes: derBytes,
+		}
 	default:
-		return nil, fmt.Errorf("UNSUPPORTED KEY TYPE %q", keyType)
+		return nil, fmt.Errorf("unsupported key type %s", keyType)
 	}
+
+	keyPath, err = filepath.Abs(keyPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get absolute path for key: %w", err)
+	}
+
+	err = os.WriteFile(keyPath, pem.EncodeToMemory(pemBlock), os.FileMode(certPerm))
+	if err != nil {
+		return nil, fmt.Errorf("failed to write new key: %w", err)
+	}
+
+	log.Printf("%sNew %s host key generated at %s",
+		keyPrefix(), strings.ToUpper(keyType), keyPath)
+
+	return ssh.NewSignerFromKey(privateKey)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
+func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	sid := newSessionID(connections, &connectionsMutex)
 	keyLog := []string{}
 
@@ -2610,6 +2644,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	}
 	config.AddHostKey(edSigner)
 	config.AddHostKey(rsaSigner)
+	config.AddHostKey(ecdsaSigner)
 
 	if tcp, ok := rawConn.(*net.TCPConn); ok {
 		_ = tcp.SetNoDelay(true)
