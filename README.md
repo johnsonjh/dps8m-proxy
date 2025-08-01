@@ -47,20 +47,18 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 
 ### Binaries
 
-* You can download pre-compiled binaries at
-  **[`https://dps8m.gitlab.io/proxy/`](https://dps8m.gitlab.io/proxy/)**.
-[]()
-
-[]()
- * We currently publish more than 40 binaries supporting 12
-   operating systems (IBM AIX, Android, Apple macOS, Dragonfly BSD,
-   FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
+ * We currently publish more than 40 binaries supporting 13
+   operating systems (IBM AIX, IBM i, Android, Apple macOS, Dragonfly
+   BSD, FreeBSD, illumos, Linux, NetBSD, OpenBSD, Plan 9, Solaris, and
    Microsoft Windows) on 14 hardware architectures.
- * Look [**here**](https://gitlab.com/dps8m/proxy/-/snippets) if you
-   need binaries for [IBM i](https://www.ibm.com/products/ibm-i)
-   (OS/400) that run under the
-   [PASE](https://www.ibm.com/docs/en/i/latest?topic=i-pase-overview)
-   subsystem.
+   * You can download pre-compiled binaries for all of these systems
+     (except IBM i) from
+     **[`https://dps8m.gitlab.io/proxy/`](https://dps8m.gitlab.io/proxy/)**.
+   * Look [**here**](https://gitlab.com/dps8m/proxy/-/snippets) if you
+     need binaries for [IBM i](https://www.ibm.com/products/ibm-i)
+     (OS/400) that run under the
+     [PASE](https://www.ibm.com/docs/en/i/latest?topic=i-pase-overview)
+     subsystem.
 
 ### Source
 
@@ -103,7 +101,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.3 (2025-Aug-01 ge1637a9) [linux/amd64]
+DPS8M Proxy v0.1.3 (2025-Aug-01 g9fed7fc) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -247,7 +245,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.3 (2025-Aug-01 ge1637a9) [linux/amd64]
+DPS8M Proxy v0.1.3 (2025-Aug-01 g9fed7fc) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -508,13 +506,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>15</th>
-<th>6984</th>
-<th>1446</th>
-<th>342</th>
-<th>5196</th>
-<th>1206</th>
-<th>173217</th>
-<th>3158</th>
+<th>6974</th>
+<th>1443</th>
+<th>341</th>
+<th>5190</th>
+<th>1205</th>
+<th>173016</th>
+<th>3156</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -528,13 +526,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>537</th>
-<th>105</th>
+<th>535</th>
+<th>104</th>
 <th>0</th>
-<th>432</th>
+<th>431</th>
 <th>0</th>
-<th>24526</th>
-<th>415</th>
+<th>24584</th>
+<th>416</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
@@ -569,13 +567,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8356</th>
-<th>1691</th>
-<th>572</th>
-<th>6093</th>
-<th>1271</th>
-<th>225513</th>
-<th>4142</th>
+<th>8344</th>
+<th>1687</th>
+<th>571</th>
+<th>6086</th>
+<th>1270</th>
+<th>225370</th>
+<th>4141</th>
 </tr></tfoot></table>
 
 ## Future plans
