@@ -15,12 +15,12 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/ecdsa"
 	"crypto/ed25519"
+	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/pem"
@@ -759,9 +759,9 @@ func main() {
 	}
 
 	rsaSigner, err := loadOrCreateHostKey(filepath.Join(
-			certDir,
-			"ssh_host_rsa_key.pem"),
-			"rsa")
+		certDir,
+		"ssh_host_rsa_key.pem"),
+		"rsa")
 	if err != nil {
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
@@ -774,9 +774,9 @@ func main() {
 	}
 
 	ecdsaSigner, err := loadOrCreateHostKey(filepath.Join(
-			certDir,
-			"ssh_host_ecdsa_key.pem"),
-			"ecdsa")
+		certDir,
+		"ssh_host_ecdsa_key.pem"),
+		"ecdsa")
 	if err != nil {
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
