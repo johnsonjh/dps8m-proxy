@@ -101,7 +101,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.4 (2025-Aug-01 g7d60fb8) [linux/amd64]
+DPS8M Proxy v0.1.5* (2025-Aug-02 gdd903a9+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -245,12 +245,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.4 (2025-Aug-01 g7d60fb8) [linux/amd64]
+DPS8M Proxy v0.1.5* (2025-Aug-02 gdd903a9+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.4                           |
+| dps8m/proxy               | v0.1.5*                          |
 | arl/statsviz              | v0.7.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -442,9 +442,9 @@ features:
 
 ## Using OpenSSH host keys
 
-If you have existing [OpenSSH](https://www.openssh.com/) Ed25519 or
-RSA host keys that you want to use with the proxy, you’ll first need
-to convert those keys to standard PEM format.
+If you have existing [OpenSSH](https://www.openssh.com/) Ed25519, RSA,
+or ECDSA host keys that you want to use with the proxy, you’ll first
+need to convert those keys to standard PEM format.
 
 🚨 **NB**: These instructions *do not* include any specific details
 for safe handling of key file permissions—we assume you are `root`
@@ -454,17 +454,20 @@ and that you know what you’re doing!
    these copies will be *overwritten* in the conversion process:
 
    ```sh
-   cp /etc/ssh/ssh_host_rsa_key ssh_host_rsa_key.tmp
    cp /etc/ssh/ssh_host_ed25519_key ssh_host_ed25519_key.tmp
+   cp /etc/ssh/ssh_host_rsa_key ssh_host_rsa_key.tmp
+   cp /etc/ssh/ssh_host_ecdsa_key ssh_host_ecdsa_key.tmp
    ```
 
 2. Convert the keys (using `ssh‑keygen`) and rename them appropriately:
 
    ```sh
-   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
    ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ed25519_key.tmp
-   mv ssh_host_rsa_key.tmp ssh_host_rsa_key.pem
+   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
+   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ecdsa_key.tmp
    mv ssh_host_ed25519_key.tmp ssh_host_ed25519_key.pem 
+   mv ssh_host_rsa_key.tmp ssh_host_rsa_key.pem
+   mv ssh_host_ecdsa_key.tmp ssh_host_ecdsa_key.pem
    ```
 
 ## History
@@ -506,13 +509,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>15</th>
-<th>6970</th>
-<th>1442</th>
-<th>341</th>
-<th>5187</th>
-<th>1203</th>
-<th>172902</th>
-<th>3155</th>
+<th>7060</th>
+<th>1456</th>
+<th>342</th>
+<th>5262</th>
+<th>1215</th>
+<th>174572</th>
+<th>3193</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -526,13 +529,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>535</th>
+<th>538</th>
 <th>104</th>
 <th>0</th>
-<th>431</th>
+<th>434</th>
 <th>0</th>
-<th>24584</th>
-<th>416</th>
+<th>24763</th>
+<th>419</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
@@ -567,13 +570,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8340</th>
-<th>1686</th>
-<th>571</th>
-<th>6083</th>
-<th>1268</th>
-<th>225256</th>
-<th>4140</th>
+<th>8433</th>
+<th>1700</th>
+<th>572</th>
+<th>6161</th>
+<th>1280</th>
+<th>227105</th>
+<th>4181</th>
 </tr></tfoot></table>
 
 ## Future plans

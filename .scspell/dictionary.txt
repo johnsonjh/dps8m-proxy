@@ -319,6 +319,7 @@ codespell
 ctags
 davidrg
 dependabot
+ecdsa
 emacs
 emoji
 entrypoint

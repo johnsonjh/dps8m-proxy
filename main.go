@@ -345,7 +345,8 @@ type octalPermValue uint
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (op *octalPermValue) String() string {
-	return fmt.Sprintf("%o", *op)
+	return fmt.Sprintf("%o",
+		*op)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1580,7 +1581,8 @@ func showStats() {
 
 			{
 				"Connections Killed for Idle Time",
-				fmt.Sprintf("%d", idleKillsTotal.Load()),
+				fmt.Sprintf("%d",
+					idleKillsTotal.Load()),
 				fmt.Sprintf("%d",
 					lifetimeIdleKillsTotal.Load()+idleKillsTotal.Load()),
 			},
@@ -2516,13 +2518,14 @@ func sendNaws(conn *Connection, width, height uint32) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) {
-	keyData, err := os.ReadFile(keyPath)
+	keyData, err := os.ReadFile(keyPath) //nolint:gosec
 	if err == nil {
 		return ssh.ParsePrivateKey(keyData)
 	}
 
 	if !os.IsNotExist(err) {
-		return nil, fmt.Errorf("failed to read key: %w", err)
+		return nil, fmt.Errorf("failed to read key: %w",
+			err)
 	}
 
 	var privateKey interface{}
@@ -2530,52 +2533,84 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) {
 
 	switch keyType {
 	case "rsa":
-		privateKey, err = rsa.GenerateKey(rand.Reader, 2048)
+		key, err := rsa.GenerateKey(rand.Reader, 2048)
 		if err != nil {
 			return nil, err
 		}
+
+		privateKey = key
+		rsaKey, ok := privateKey.(*rsa.PrivateKey)
+		if !ok {
+			return nil, fmt.Errorf("unexpected key type %T",
+				key)
+		}
+
 		pemBlock = &pem.Block{
 			Type:  "RSA PRIVATE KEY",
-			Bytes: x509.MarshalPKCS1PrivateKey(privateKey.(*rsa.PrivateKey)),
+			Bytes: x509.MarshalPKCS1PrivateKey(rsaKey),
 		}
+
 	case "ed25519":
-		_, privateKey, err = ed25519.GenerateKey(rand.Reader)
+		_, rawPriv, err := ed25519.GenerateKey(rand.Reader)
 		if err != nil {
 			return nil, err
 		}
-		derBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
+
+		privateKey = rawPriv
+		edKey, ok := privateKey.(ed25519.PrivateKey)
+		if !ok {
+			return nil, fmt.Errorf("unexpected key type %T",
+				privateKey)
+		}
+
+		derBytes, err := x509.MarshalPKCS8PrivateKey(edKey)
 		if err != nil {
 			return nil, err
 		}
+
 		pemBlock = &pem.Block{
 			Type:  "PRIVATE KEY",
 			Bytes: derBytes,
 		}
+
 	case "ecdsa":
-		privateKey, err = ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+		key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 		if err != nil {
 			return nil, err
 		}
-		derBytes, err := x509.MarshalECPrivateKey(privateKey.(*ecdsa.PrivateKey))
+
+		privateKey = key
+		ecKey, ok := privateKey.(*ecdsa.PrivateKey)
+		if !ok {
+			return nil, fmt.Errorf("unexpected key type %T",
+				key)
+		}
+
+		derBytes, err := x509.MarshalECPrivateKey(ecKey)
 		if err != nil {
 			return nil, err
 		}
+
 		pemBlock = &pem.Block{
 			Type:  "EC PRIVATE KEY",
 			Bytes: derBytes,
 		}
+
 	default:
-		return nil, fmt.Errorf("unsupported key type %s", keyType)
+		return nil, fmt.Errorf("unsupported key type %s",
+			keyType)
 	}
 
 	keyPath, err = filepath.Abs(keyPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get absolute path for key: %w", err)
+		return nil, fmt.Errorf("failed to get absolute path for key: %w",
+			err)
 	}
 
-	err = os.WriteFile(keyPath, pem.EncodeToMemory(pemBlock), os.FileMode(certPerm))
+	err = os.WriteFile(keyPath, pem.EncodeToMemory(pemBlock), os.FileMode(certPerm)) //nolint:gosec
 	if err != nil {
-		return nil, fmt.Errorf("failed to write new key: %w", err)
+		return nil, fmt.Errorf("failed to write new key: %w",
+			err)
 	}
 
 	log.Printf("%sNew %s host key generated at %s",
@@ -2623,7 +2658,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 			)
 
 			if !suppressLogs {
-				log.Printf("%s%s", blueDotPrefix(), line)
+				log.Printf("%s%s",
+					blueDotPrefix(), line)
 			}
 
 			keyLog = append(keyLog, line)
@@ -2794,7 +2830,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		}(), addr, authMethod)
 
 	if !suppressLogs {
-		log.Printf("%s%s", blueDotPrefix(), handshakeLog)
+		log.Printf("%s%s",
+			blueDotPrefix(), handshakeLog)
 	}
 
 	keyLog = append(keyLog, handshakeLog)
@@ -2834,7 +2871,8 @@ func parseHostPort(hostPort string) (string, int, error) {
 
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
-		return "", 0, fmt.Errorf("invalid port: %s", portStr)
+		return "", 0, fmt.Errorf("invalid port: %s",
+			portStr)
 	}
 
 	return host, port, nil
@@ -3422,7 +3460,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				warnPrefix(), conn.ID, err)
 		}
 
-		log.Printf("%v", err)
+		log.Printf("%v",
+			err)
 
 		err = channel.Close()
 		if err != nil {
@@ -4629,9 +4668,12 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	now := time.Now()
 	dir := filepath.Join(
 		logDir,
-		fmt.Sprintf("%04d", now.Year()),
-		fmt.Sprintf("%02d", now.Month()),
-		fmt.Sprintf("%02d", now.Day()),
+		fmt.Sprintf("%04d",
+			now.Year()),
+		fmt.Sprintf("%02d",
+			now.Month()),
+		fmt.Sprintf("%02d",
+			now.Day()),
 	)
 
 	err := os.MkdirAll(dir, os.FileMode(logDirPerm)) //nolint:gosec
@@ -5106,13 +5148,15 @@ func compressLogFile(logFilePath string) {
 func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 	file, err := os.Open(filePath) //nolint:gosec
 	if err != nil {
-		return nil, fmt.Errorf("%w", err)
+		return nil, fmt.Errorf("%w",
+			err)
 	}
 
 	defer func() {
 		err := file.Close()
 		if err != nil {
-			log.Printf("Error closing file: %v", err)
+			log.Printf("Error closing file: %v",
+				err)
 		}
 	}()
 
@@ -5152,7 +5196,8 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 
 	err = scanner.Err()
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", filePath, err)
+		return nil, fmt.Errorf("%s: %w",
+			filePath, err)
 	}
 
 	return networks, nil
