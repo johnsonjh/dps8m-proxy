@@ -264,33 +264,33 @@ var (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 type Connection struct {
-	basePath            string
-	cancelCtx           context.Context
-	cancelFunc          context.CancelFunc
-	channel             ssh.Channel
-	hostName            string
-	ID                  string
-	invalidShare        bool
+	startTime           time.Time
 	lastActivityTime    time.Time
+	telnetConn          net.Conn
+	cancelCtx           context.Context
+	channel             ssh.Channel
+	sshConn             *ssh.ServerConn
 	logFile             *os.File
 	monitoredConnection *Connection
-	monitoring          bool
-	shareableUsername   string
-	sshConn             *ssh.ServerConn
-	sshInTotal          uint64
-	sshOutTotal         uint64
-	startTime           time.Time
-	targetHost          string
-	targetPort          int
-	totalMonitors       uint64
-	userName            string
-	emacsKeymapEnabled  bool
-	wasMonitored        bool
+	cancelFunc          context.CancelFunc
+	ID                  string
+	hostName            string
 	termType            string
-	nawsActive          bool
+	shareableUsername   string
+	targetHost          string
+	userName            string
+	basePath            string
+	totalMonitors       uint64
+	targetPort          int
+	sshOutTotal         uint64
+	sshInTotal          uint64
 	initialWindowWidth  uint32
 	initialWindowHeight uint32
-	telnetConn          net.Conn
+	emacsKeymapEnabled  bool
+	wasMonitored        bool
+	monitoring          bool
+	nawsActive          bool
+	invalidShare        bool
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
