@@ -59,7 +59,7 @@ tidy: go.mod
 
 .PHONY: distclean
 distclean: clean
-	$(RM) ssh_host_ed25519_key.pem ssh_host_rsa_key.pem
+	$(RM) ssh_host_ecdsa_key.pem ssh_host_ed25519_key.pem ssh_host_rsa_key.pem
 	$(RM) ./tags ./GPATH ./GRTAGS ./GTAGS
 	$(RM) -r ./log/
 
