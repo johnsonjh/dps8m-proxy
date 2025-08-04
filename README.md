@@ -101,7 +101,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.5 (2025-Aug-02 g6a64956) [linux/amd64]
+DPS8M Proxy v0.1.5* (2025-Aug-04 g16e0f16+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -245,12 +245,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.5 (2025-Aug-02 g6a64956) [linux/amd64]
+DPS8M Proxy v0.1.5* (2025-Aug-04 g16e0f16+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.5                           |
+| dps8m/proxy               | v0.1.5*                          |
 | arl/statsviz              | v0.7.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -465,7 +465,7 @@ and that you know what you’re doing!
    ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ed25519_key.tmp
    ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
    ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ecdsa_key.tmp
-   mv ssh_host_ed25519_key.tmp ssh_host_ed25519_key.pem 
+   mv ssh_host_ed25519_key.tmp ssh_host_ed25519_key.pem
    mv ssh_host_rsa_key.tmp ssh_host_rsa_key.pem
    mv ssh_host_ecdsa_key.tmp ssh_host_ecdsa_key.pem
    ```
@@ -514,7 +514,7 @@ predecessor (code statistics 📈 provided by
 <th>342</th>
 <th>5262</th>
 <th>1215</th>
-<th>174572</th>
+<th>174592</th>
 <th>3193</th>
 </tr><tr>
 <th>Makefile</th>
@@ -524,7 +524,7 @@ predecessor (code statistics 📈 provided by
 <th>79</th>
 <th>270</th>
 <th>51</th>
-<th>13018</th>
+<th>13021</th>
 <th>297</th>
 </tr><tr>
 <th>Markdown</th>
@@ -534,7 +534,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>434</th>
 <th>0</th>
-<th>24763</th>
+<th>24762</th>
 <th>419</th>
 </tr><tr>
 <th>Shell</th>
@@ -575,7 +575,7 @@ predecessor (code statistics 📈 provided by
 <th>572</th>
 <th>6161</th>
 <th>1280</th>
-<th>227105</th>
+<th>227127</th>
 <th>4181</th>
 </tr></tfoot></table>
 
