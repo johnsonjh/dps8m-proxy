@@ -7,4 +7,4 @@
 ###############################################################################
 
 [codespell]
-ignore-words-list = WONT,sSome,PASE
+ignore-words-list = WONT,sSome,PASE,whitelist,blacklist,master,uint,DONT,dur,thead
