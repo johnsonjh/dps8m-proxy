@@ -373,7 +373,7 @@ func isEmojiRune(r rune) bool {
 
 func stripEmoji(s string) string {
 	runes := []rune(s)
-	var out []rune
+	out := make([]rune, 0, len(runes))
 
 	i := 0
 	for i < len(runes) {
