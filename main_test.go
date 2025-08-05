@@ -25,6 +25,10 @@ import (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
+	if enableGops {
+		gopsClose()
+	}
+
 	defer goleak.VerifyNone(t)
 
 	tmpDir := t.TempDir()

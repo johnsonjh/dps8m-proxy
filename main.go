@@ -565,6 +565,11 @@ func init() {
 				"      --help"+
 					"                    Show this help and usage information\r\n\r\n"+
 					"proxy home page (bug reports): <https://gitlab.com/dps8m/proxy/>\r\n")
+
+			if enableGops {
+				gopsClose()
+			}
+
 			os.Exit(0)
 		}
 	}
@@ -587,6 +592,10 @@ func shutdownWatchdog() {
 	log.Printf("%sAll connections closed. Exiting.\r\n",
 		byePrefix())
 
+	if enableGops {
+		gopsClose()
+	}
+
 	os.Exit(0)
 }
 
@@ -597,12 +606,21 @@ func main() {
 
 	if showLicense {
 		fmt.Println(licenseText)
+
+		if enableGops {
+			gopsClose()
+		}
+
 		os.Exit(0)
 	}
 
 	if forceUTC {
 		tz, err := time.LoadLocation("UTC")
 		if err != nil {
+			if enableGops {
+				gopsClose()
+			}
+
 			log.Fatalf("%sERROR: Failed to load UTC zoneinfo: %v",
 				errorPrefix(), err) // LINTED: Fatalf
 		}
@@ -614,6 +632,10 @@ func main() {
 		cl := strings.ToLower(consoleLog)
 
 		if cl != "quiet" && cl != "noquiet" { //nolint:goconst
+			if enableGops {
+				gopsClose()
+			}
+
 			log.Fatalf("%sERROR: Invalid --console-log value: %s.  Must be 'quiet' or 'noquiet'",
 				errorPrefix(), consoleLog) // LINTED: Fatalf
 		}
@@ -624,28 +646,48 @@ func main() {
 	printVersion(false)
 
 	if showVersion {
+		if enableGops {
+			gopsClose()
+		}
+
 		os.Exit(0)
 	}
 
 	if dbEnabled {
 		err := SetDbLogLevel(dbLogLevel)
 		if err != nil {
+			if enableGops {
+				gopsClose()
+			}
+
 			log.Fatalf("%sERROR: %v",
 				errorPrefix(), err) // LINTED: Fatalf
 		}
 	}
 
 	if sshDelay < 0 {
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: --ssh-delay cannot be negative!",
 			errorPrefix()) // LINTED: Fatalf
 	}
 
 	if sshDelay > 30 {
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: --ssh-delay cannot be greater than 30!",
 			errorPrefix()) // LINTED: Fatalf
 	}
 
 	if os.Getuid() == 0 && !allowRoot {
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: Running as root/UID 0 is not allowed without the --allow-root flag!",
 			errorPrefix()) // LINTED: Fatalf
 	}
@@ -654,6 +696,10 @@ func main() {
 	case "gzip", "xz", "zstd": //nolint:goconst,nolintlint
 
 	default:
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: Invalid --compress-algo: %s",
 			errorPrefix(), compressAlgo) // LINTED: Fatalf
 	}
@@ -662,6 +708,10 @@ func main() {
 	case "fast", "normal", "high": //nolint:goconst
 
 	default:
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: Invalid --compress-level: %s",
 			errorPrefix(), compressLevel) // LINTED: Fatalf
 	}
@@ -746,6 +796,10 @@ func main() {
 					"you specified: %s\r\n", nowStamp(), errorPrefix(), telnetHostPort)
 		}
 
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: --telnet-host cannot contain a username (e.g., 'user@'); "+
 			"you specified: %s", errorPrefix(), telnetHostPort) // LINTED: Fatalf
 	}
@@ -755,6 +809,10 @@ func main() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --idle-max (%d) cannot be greater than or equal to --time-max"+
 					" (%d)\r\n", nowStamp(), errorPrefix(), idleMax, timeMax)
+		}
+
+		if enableGops {
+			gopsClose()
 		}
 
 		log.Fatalf("%sERROR: --idle-max (%d) cannot be greater than or equal to --time-max (%d)",
@@ -772,6 +830,10 @@ func main() {
 				nowStamp(), errorPrefix(), err)
 		}
 
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: Ed25519 host key error: %v",
 			errorPrefix(), err) // LINTED: Fatalf
 	}
@@ -785,6 +847,10 @@ func main() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: RSA host key error: %v\r\n",
 				nowStamp(), errorPrefix(), err)
+		}
+
+		if enableGops {
+			gopsClose()
 		}
 
 		log.Fatalf("%sERROR: RSA host key error: %v",
@@ -802,6 +868,10 @@ func main() {
 				nowStamp(), errorPrefix(), err)
 		}
 
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: ECDSA host key error: %v",
 			errorPrefix(), err) // LINTED: Fatalf
 	}
@@ -815,6 +885,10 @@ func main() {
 					_, _ = fmt.Fprintf(os.Stdout,
 						"%s %sERROR: LISTEN on %s: %v\r\n",
 						nowStamp(), errorPrefix(), addr, err)
+				}
+
+				if enableGops {
+					gopsClose()
 				}
 
 				log.Fatalf("%sERROR: LISTEN on %s: %v",
@@ -880,6 +954,10 @@ func main() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: Could not parse default TELNET target: %v\r\n",
 				nowStamp(), errorPrefix(), err)
+		}
+
+		if enableGops {
+			gopsClose()
 		}
 
 		log.Fatalf("%sERROR: Could not parse default TELNET target: %v",
@@ -1827,6 +1905,10 @@ func immediateShutdown() {
 
 		log.Printf("%sExiting.\r\n",
 			byePrefix())
+
+		if enableGops {
+			gopsClose()
+		}
 
 		os.Exit(0)
 	})
