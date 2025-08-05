@@ -101,7 +101,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.5 (2025-Aug-05 gc4c4706) [linux/amd64]
+DPS8M Proxy v0.1.5 (2025-Aug-05 gf6d030d) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -245,7 +245,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.5 (2025-Aug-05 gc4c4706) [linux/amd64]
+DPS8M Proxy v0.1.5 (2025-Aug-05 gf6d030d) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -509,13 +509,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>15</th>
-<th>7060</th>
+<th>7061</th>
 <th>1456</th>
-<th>342</th>
+<th>343</th>
 <th>5262</th>
 <th>1215</th>
-<th>174592</th>
-<th>3193</th>
+<th>174652</th>
+<th>3194</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -539,13 +539,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
-<th>126</th>
+<th>128</th>
 <th>27</th>
-<th>34</th>
+<th>36</th>
 <th>65</th>
 <th>14</th>
-<th>3464</th>
-<th>83</th>
+<th>3584</th>
+<th>84</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -570,13 +570,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8433</th>
+<th>8436</th>
 <th>1700</th>
-<th>572</th>
+<th>575</th>
 <th>6161</th>
 <th>1280</th>
-<th>227120</th>
-<th>4181</th>
+<th>227300</th>
+<th>4183</th>
 </tr></tfoot></table>
 
 ## Future plans
