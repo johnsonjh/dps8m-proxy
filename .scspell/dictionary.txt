@@ -44,6 +44,7 @@ noinlineerr
 nolint
 nolintlint
 noquiet
+nosemgrep
 panicf
 paralleltest
 pflag
@@ -79,6 +80,7 @@ FILETYPE: Shell; .sh
 esac
 getconf
 mkfifo
+nosemgrep
 nproc
 nprocessors
 onln

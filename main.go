@@ -998,6 +998,7 @@ func debugInit(addr string) {
 		bugPrefix(), addr)
 	go func() {
 		log.Fatalf("%s%v", // LINTED: Fatalf
+			// nosemgrep: go.lang.security.audit.net.use-tls.use-tls
 			errorPrefix(), http.ListenAndServe(addr, mux)) //nolint:gosec
 	}()
 }
