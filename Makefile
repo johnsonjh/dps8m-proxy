@@ -10,6 +10,7 @@
 # Configuration
 
 SHELL=/bin/sh
+GO?=go
 CP=cp -f
 PERL=perl
 RM=rm -f
@@ -32,7 +33,7 @@ all: proxy
 .PHONY: proxy
 proxy: tags
 	@printf '%s\n' "🧩 Building proxy..."
-	@env GOTOOLCHAIN=auto CGO_ENABLED=0 go build -trimpath -v && \
+	@env GOTOOLCHAIN=auto CGO_ENABLED=0 $(GO) build -trimpath -v && \
 	test -x proxy 2> /dev/null && { \
 		printf '%s\n\n' "✅ Build successful!"; \
 		./proxy --version; exit 0; } || { \
@@ -44,7 +45,7 @@ proxy: tags
 .PHONY: clean
 clean:
 	@printf '%s\n' "🧹 Cleaning..."
-	env GOTOOLCHAIN=auto go clean -v
+	env GOTOOLCHAIN=auto $(GO) clean -v
 	$(RM) -r ./cross.bin/
 
 ##############################################################################
@@ -52,7 +53,7 @@ clean:
 
 .PHONY: tidy
 tidy: go.mod
-	env GOTOOLCHAIN=auto go mod tidy -v
+	env GOTOOLCHAIN=auto $(GO) mod tidy -v
 
 ##############################################################################
 # Target: distclean
@@ -69,7 +70,7 @@ distclean: clean
 .PHONY: test
 test:
 	@printf '%s\n' "🧪 Running 'go test -v .'"
-	env GOTOOLCHAIN=auto go test -v .
+	env GOTOOLCHAIN=auto $(GO) test -v .
 
 ##############################################################################
 # Target: lint
@@ -116,7 +117,7 @@ lint check:
 golist:
 	@printf '\n%s\n' \
 		"ℹ️ Finding any outdated dependencies... (may take a few moments)"
-	@go list -u -f \
+	@env GOTOOLCHAIN=auto $(GO) list -u -f \
 		'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} → {{.Update.Version}}{{end}}' \
 		-m all
 
@@ -150,14 +151,14 @@ gofmt:
 
 .PHONY: goverify
 goverify: go.mod
-	env GOTOOLCHAIN=auto go mod verify
+	env GOTOOLCHAIN=auto $(GO) mod verify
 
 ##############################################################################
 # Target: gotidydiff
 
 .PHONY: gotidydiff
 gotidydiff: go.mod
-	env GOTOOLCHAIN=auto go mod tidy -diff
+	env GOTOOLCHAIN=auto $(GO) mod tidy -diff
 
 ##############################################################################
 # Target: golangci-lint
@@ -266,7 +267,7 @@ tags ctags gtags GRPATH GRTAGS GTAGS:
 
 .PHONY: govet
 govet:
-	env GOTOOLCHAIN=auto go vet
+	env GOTOOLCHAIN=auto $(GO) vet
 
 ##############################################################################
 # Target: README.md
