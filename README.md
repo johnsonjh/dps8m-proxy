@@ -101,7 +101,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.5 (2025-Aug-05 gf6d030d) [linux/amd64]
+DPS8M Proxy v0.1.5 (2025-Aug-05 ge125cd4) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -155,6 +155,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
       --whitelist string        Enable whitelist [filename] (no default)
       --utc                     Use UTC (Coordinated Universal Time) for time
                                     display and timestamping in log files
+      --license                 Show license terms and conditions
       --version                 Show version information
       --help                    Show this help and usage information
 
@@ -245,7 +246,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.5 (2025-Aug-05 gf6d030d) [linux/amd64]
+DPS8M Proxy v0.1.5 (2025-Aug-05 ge125cd4) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -509,13 +510,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>15</th>
-<th>7061</th>
-<th>1456</th>
-<th>343</th>
-<th>5262</th>
-<th>1215</th>
-<th>174652</th>
-<th>3194</th>
+<th>7078</th>
+<th>1460</th>
+<th>344</th>
+<th>5274</th>
+<th>1218</th>
+<th>174927</th>
+<th>3204</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -570,13 +571,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>20</th>
-<th>8436</th>
-<th>1700</th>
-<th>575</th>
-<th>6161</th>
-<th>1280</th>
-<th>227300</th>
-<th>4183</th>
+<th>8453</th>
+<th>1704</th>
+<th>576</th>
+<th>6173</th>
+<th>1283</th>
+<th>227575</th>
+<th>4193</th>
 </tr></tfoot></table>
 
 ## Future plans
