@@ -68,10 +68,14 @@ pages:
     - sed -i 's#4\.0K#....#' index.html
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k -v -Z -- "{}" \; || true
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec pigz -9 -f -k -m -v -- "{}" \; || true
+    - cd ..
+    - go mod download || true
+    - go mod vendor || true
   artifacts:
     expire_in: 1 day
     paths:
       - public
+      - vendor
   retry: 2
   timeout: 60 minutes
   interruptible: false
