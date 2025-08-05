@@ -92,7 +92,7 @@ const (
 	TeloptOutputHTS         = 11  // Output Horizontal Tab Stops
 	TeloptOutputHTD         = 12  // Output Horizontal Tab Disposition
 	TeloptOutputFFD         = 13  // Output Formfeed Disposition
-	TeloptOutputVTS         = 14  // Output Vertical Tabstops
+	TeloptOutputVTS         = 14  // Output Vertical Tab Stops
 	TeloptOutputVTD         = 15  // Output Vertical Tab Disposition
 	TeloptOutputLFD         = 16  // Output Linefeed Disposition
 	TeloptExtendedASCII     = 17  // Extended ASCII
