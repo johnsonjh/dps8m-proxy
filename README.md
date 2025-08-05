@@ -101,7 +101,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.5* (2025-Aug-04 g16e0f16+) [linux/amd64]
+DPS8M Proxy v0.1.5 (2025-Aug-05 gc4c4706) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -174,8 +174,8 @@ are, hopefully, documented here:
     logged to **both** the console and the log file.
 
   * By default, the local time zone is used for time display and
-    writing log files.  Users can specify the `-U` (`‑‑utc`) option
-    to use UTC (Coordinated Universal Time) instead.  Additionally, on
+    writing log files.  Users can specify the `‑‑utc` option to use
+    UTC (Coordinated Universal Time) instead.  Additionally, on
     Unix-like systems, the `TZ` environment variable is respected.
 
   * If the proxy fails to create log directories or files, a warning
@@ -245,12 +245,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.5* (2025-Aug-04 g16e0f16+) [linux/amd64]
+DPS8M Proxy v0.1.5 (2025-Aug-05 gc4c4706) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.5*                          |
+| dps8m/proxy               | v0.1.5                           |
 | arl/statsviz              | v0.7.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -534,7 +534,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>434</th>
 <th>0</th>
-<th>24762</th>
+<th>24755</th>
 <th>419</th>
 </tr><tr>
 <th>Shell</th>
@@ -575,7 +575,7 @@ predecessor (code statistics 📈 provided by
 <th>572</th>
 <th>6161</th>
 <th>1280</th>
-<th>227127</th>
+<th>227120</th>
 <th>4181</th>
 </tr></tfoot></table>
 
