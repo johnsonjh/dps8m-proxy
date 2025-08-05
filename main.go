@@ -21,6 +21,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	_ "embed"
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/pem"
@@ -155,6 +156,9 @@ const (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+//go:embed LICENSE
+var licenseText string
+
 // Global variables.
 var (
 	startTime                        = time.Now()
@@ -188,6 +192,7 @@ var (
 	enableGops                       bool
 	noLog                            bool
 	showVersion                      bool
+	showLicense                      bool
 	shutdownOnce                     sync.Once
 	shutdownSignal                   chan struct{}
 	sshAddr                          []string
@@ -533,6 +538,12 @@ func init() {
 		"Use UTC (Coordinated Universal Time) for time\r\n"+
 			"    display and timestamping in log files")
 
+	if licenseText != "" {
+		pflag.BoolVar(&showLicense,
+			"license", false,
+			"Show license terms and conditions")
+	}
+
 	pflag.BoolVar(&showVersion,
 		"version", false,
 		"Show version information")
@@ -584,12 +595,18 @@ func shutdownWatchdog() {
 func main() {
 	pflag.Parse()
 
+	if showLicense {
+		fmt.Println(licenseText)
+		os.Exit(0)
+	}
+
 	if forceUTC {
 		tz, err := time.LoadLocation("UTC")
 		if err != nil {
 			log.Fatalf("%sERROR: Failed to load UTC zoneinfo: %v",
 				errorPrefix(), err) // LINTED: Fatalf
 		}
+
 		time.Local = tz //nolint:gosmopolitan
 	}
 

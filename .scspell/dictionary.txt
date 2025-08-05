@@ -50,6 +50,7 @@ paralleltest
 pflag
 pprof
 printf
+println
 publickey
 rcvd
 readlink
