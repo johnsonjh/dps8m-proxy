@@ -22,6 +22,7 @@ gmcp
 goarch
 goconst
 gocritic
+goexperiment
 gofumpt
 gops
 gosec
@@ -69,6 +70,7 @@ stdin
 stdout
 strconv
 syscall
+systemcrypto
 tdate
 teardown
 ttype

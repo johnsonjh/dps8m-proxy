@@ -193,6 +193,7 @@ var (
 	noLog                            bool
 	showVersion                      bool
 	showLicense                      bool
+	systemCrypto                     = isSystemCrypto()
 	shutdownOnce                     sync.Once
 	shutdownSignal                   chan struct{}
 	sshAddr                          []string
@@ -603,6 +604,12 @@ func shutdownWatchdog() {
 
 func main() {
 	pflag.Parse()
+
+	//revive:disable:empty-block
+	if systemCrypto { //nolint:staticcheck
+		// TBD.
+	}
+	//revive:enable:empty-block
 
 	if showLicense {
 		fmt.Println(licenseText)
