@@ -135,6 +135,7 @@ gofumpt
 gogtags
 golangci
 golist
+gosumdb
 gotags
 gotidydiff
 gotoolchain
@@ -277,6 +278,8 @@ glab
 goflags
 golangci
 gopath
+goproxy
+gosumdb
 gotoolchain
 govulncheck
 honnef

@@ -34,6 +34,8 @@ pages:
     - ln -fs "$(command -v yash)" /bin/sh
     - export SHELL=/bin/sh
     - export PATH=$HOME/go/bin:$PATH
+    - export GOPROXY=proxy.golang.org,direct
+    - export GOSUMDB=sum.golang.org
     - export GOTOOLCHAIN="$(grep '^go .*$' go.mod | tr -cd 'go0-9.\n')+auto"
     - export PDPMAKE_POSIXLY_CORRECT=1
     - export TZ=UTC
