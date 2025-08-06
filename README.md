@@ -101,7 +101,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.5 (2025-Aug-06 gcfd54ee) [linux/amd64]
+DPS8M Proxy v0.1.5 (2025-Aug-06 gab8ff0e) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -246,7 +246,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.5 (2025-Aug-06 gcfd54ee) [linux/amd64]
+DPS8M Proxy v0.1.5 (2025-Aug-06 gab8ff0e) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
