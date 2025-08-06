@@ -106,7 +106,6 @@ lint check:
 		shellcheck \
 		shfmt \
 		golangci-lint \
-		glab-lint \
 		golist \
 		govulncheck
 	@test -z "$${CI_NO_CROSS:-}" && { \
@@ -126,15 +125,6 @@ golist:
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) list -u -f \
 		'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} → {{.Update.Version}}{{end}}' \
 		-m all
-
-##############################################################################
-# Target: glab-lint
-
-.PHONY: glab-lint
-glab-lint:
-	@command -v glab > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ glab not found"; exit 0; } ; \
-		set -x; glab ci lint || true
 
 ##############################################################################
 # Target: reuse

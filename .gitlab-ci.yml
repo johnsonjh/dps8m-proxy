@@ -30,7 +30,7 @@ pages:
   script:
     - apk update || true
     - apk -U upgrade --prune || true
-    - apk -U add brotli curl gawk git glab go grep make pdpmake perl pigz py3-pip python3 sed shellcheck tree yash zip
+    - apk -U add brotli curl gawk git go grep make pdpmake perl pigz py3-pip python3 sed shellcheck tree yash zip
     - ln -fs "$(command -v yash)" /bin/sh
     - export SHELL=/bin/sh
     - export PATH=$HOME/go/bin:$PATH
