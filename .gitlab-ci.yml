@@ -37,6 +37,7 @@ pages:
     - export GOTOOLCHAIN="$(grep '^go .*$' go.mod | tr -cd 'go0-9.\n')+auto"
     - export PDPMAKE_POSIXLY_CORRECT=1
     - export TZ=UTC
+    - go telemetry off || true
     - go install github.com/boyter/scc/v3@master
     - go install github.com/kisielk/errcheck@master
     - go install github.com/mgechev/revive@master
