@@ -15,10 +15,13 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/ecdsa"
 	"crypto/ed25519"
+	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	_ "embed"
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/pem"
@@ -89,7 +92,7 @@ const (
 	TeloptOutputHTS         = 11  // Output Horizontal Tab Stops
 	TeloptOutputHTD         = 12  // Output Horizontal Tab Disposition
 	TeloptOutputFFD         = 13  // Output Formfeed Disposition
-	TeloptOutputVTS         = 14  // Output Vertical Tabstops
+	TeloptOutputVTS         = 14  // Output Vertical Tab Stops
 	TeloptOutputVTD         = 15  // Output Vertical Tab Disposition
 	TeloptOutputLFD         = 16  // Output Linefeed Disposition
 	TeloptExtendedASCII     = 17  // Extended ASCII
@@ -153,6 +156,9 @@ const (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+//go:embed LICENSE
+var licenseText string
+
 // Global variables.
 var (
 	startTime                        = time.Now()
@@ -186,6 +192,8 @@ var (
 	enableGops                       bool
 	noLog                            bool
 	showVersion                      bool
+	showLicense                      bool
+	systemCrypto                     = isSystemCrypto()
 	shutdownOnce                     sync.Once
 	shutdownSignal                   chan struct{}
 	sshAddr                          []string
@@ -262,33 +270,33 @@ var (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 type Connection struct {
-	basePath            string
-	cancelCtx           context.Context
-	cancelFunc          context.CancelFunc
-	channel             ssh.Channel
-	hostName            string
-	ID                  string
-	invalidShare        bool
+	startTime           time.Time
 	lastActivityTime    time.Time
+	telnetConn          net.Conn
+	cancelCtx           context.Context
+	channel             ssh.Channel
+	sshConn             *ssh.ServerConn
 	logFile             *os.File
 	monitoredConnection *Connection
-	monitoring          bool
-	shareableUsername   string
-	sshConn             *ssh.ServerConn
-	sshInTotal          uint64
-	sshOutTotal         uint64
-	startTime           time.Time
-	targetHost          string
-	targetPort          int
-	totalMonitors       uint64
-	userName            string
-	emacsKeymapEnabled  bool
-	wasMonitored        bool
+	cancelFunc          context.CancelFunc
+	ID                  string
+	hostName            string
 	termType            string
-	nawsActive          bool
+	shareableUsername   string
+	targetHost          string
+	userName            string
+	basePath            string
+	totalMonitors       uint64
+	targetPort          int
+	sshOutTotal         uint64
+	sshInTotal          uint64
 	initialWindowWidth  uint32
 	initialWindowHeight uint32
-	telnetConn          net.Conn
+	emacsKeymapEnabled  bool
+	wasMonitored        bool
+	monitoring          bool
+	nawsActive          bool
+	invalidShare        bool
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -343,7 +351,8 @@ type octalPermValue uint
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (op *octalPermValue) String() string {
-	return fmt.Sprintf("%o", *op)
+	return fmt.Sprintf("%o",
+		*op)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -530,6 +539,12 @@ func init() {
 		"Use UTC (Coordinated Universal Time) for time\r\n"+
 			"    display and timestamping in log files")
 
+	if licenseText != "" {
+		pflag.BoolVar(&showLicense,
+			"license", false,
+			"Show license terms and conditions")
+	}
+
 	pflag.BoolVar(&showVersion,
 		"version", false,
 		"Show version information")
@@ -551,6 +566,11 @@ func init() {
 				"      --help"+
 					"                    Show this help and usage information\r\n\r\n"+
 					"proxy home page (bug reports): <https://gitlab.com/dps8m/proxy/>\r\n")
+
+			if enableGops {
+				gopsClose()
+			}
+
 			os.Exit(0)
 		}
 	}
@@ -573,6 +593,10 @@ func shutdownWatchdog() {
 	log.Printf("%sAll connections closed. Exiting.\r\n",
 		byePrefix())
 
+	if enableGops {
+		gopsClose()
+	}
+
 	os.Exit(0)
 }
 
@@ -581,12 +605,33 @@ func shutdownWatchdog() {
 func main() {
 	pflag.Parse()
 
+	//revive:disable:empty-block
+	if systemCrypto { //nolint:staticcheck
+		// TBD.
+	}
+	//revive:enable:empty-block
+
+	if showLicense {
+		fmt.Println(licenseText)
+
+		if enableGops {
+			gopsClose()
+		}
+
+		os.Exit(0)
+	}
+
 	if forceUTC {
 		tz, err := time.LoadLocation("UTC")
 		if err != nil {
+			if enableGops {
+				gopsClose()
+			}
+
 			log.Fatalf("%sERROR: Failed to load UTC zoneinfo: %v",
 				errorPrefix(), err) // LINTED: Fatalf
 		}
+
 		time.Local = tz //nolint:gosmopolitan
 	}
 
@@ -594,6 +639,10 @@ func main() {
 		cl := strings.ToLower(consoleLog)
 
 		if cl != "quiet" && cl != "noquiet" { //nolint:goconst
+			if enableGops {
+				gopsClose()
+			}
+
 			log.Fatalf("%sERROR: Invalid --console-log value: %s.  Must be 'quiet' or 'noquiet'",
 				errorPrefix(), consoleLog) // LINTED: Fatalf
 		}
@@ -604,28 +653,48 @@ func main() {
 	printVersion(false)
 
 	if showVersion {
+		if enableGops {
+			gopsClose()
+		}
+
 		os.Exit(0)
 	}
 
 	if dbEnabled {
 		err := SetDbLogLevel(dbLogLevel)
 		if err != nil {
+			if enableGops {
+				gopsClose()
+			}
+
 			log.Fatalf("%sERROR: %v",
 				errorPrefix(), err) // LINTED: Fatalf
 		}
 	}
 
 	if sshDelay < 0 {
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: --ssh-delay cannot be negative!",
 			errorPrefix()) // LINTED: Fatalf
 	}
 
 	if sshDelay > 30 {
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: --ssh-delay cannot be greater than 30!",
 			errorPrefix()) // LINTED: Fatalf
 	}
 
 	if os.Getuid() == 0 && !allowRoot {
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: Running as root/UID 0 is not allowed without the --allow-root flag!",
 			errorPrefix()) // LINTED: Fatalf
 	}
@@ -634,6 +703,10 @@ func main() {
 	case "gzip", "xz", "zstd": //nolint:goconst,nolintlint
 
 	default:
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: Invalid --compress-algo: %s",
 			errorPrefix(), compressAlgo) // LINTED: Fatalf
 	}
@@ -642,6 +715,10 @@ func main() {
 	case "fast", "normal", "high": //nolint:goconst
 
 	default:
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: Invalid --compress-level: %s",
 			errorPrefix(), compressLevel) // LINTED: Fatalf
 	}
@@ -726,6 +803,10 @@ func main() {
 					"you specified: %s\r\n", nowStamp(), errorPrefix(), telnetHostPort)
 		}
 
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: --telnet-host cannot contain a username (e.g., 'user@'); "+
 			"you specified: %s", errorPrefix(), telnetHostPort) // LINTED: Fatalf
 	}
@@ -735,6 +816,10 @@ func main() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --idle-max (%d) cannot be greater than or equal to --time-max"+
 					" (%d)\r\n", nowStamp(), errorPrefix(), idleMax, timeMax)
+		}
+
+		if enableGops {
+			gopsClose()
 		}
 
 		log.Fatalf("%sERROR: --idle-max (%d) cannot be greater than or equal to --time-max (%d)",
@@ -752,6 +837,10 @@ func main() {
 				nowStamp(), errorPrefix(), err)
 		}
 
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: Ed25519 host key error: %v",
 			errorPrefix(), err) // LINTED: Fatalf
 	}
@@ -767,7 +856,30 @@ func main() {
 				nowStamp(), errorPrefix(), err)
 		}
 
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: RSA host key error: %v",
+			errorPrefix(), err) // LINTED: Fatalf
+	}
+
+	ecdsaSigner, err := loadOrCreateHostKey(filepath.Join(
+		certDir,
+		"ssh_host_ecdsa_key.pem"),
+		"ecdsa")
+	if err != nil {
+		if isConsoleLogQuiet {
+			_, _ = fmt.Fprintf(os.Stdout,
+				"%s %sERROR: ECDSA host key error: %v\r\n",
+				nowStamp(), errorPrefix(), err)
+		}
+
+		if enableGops {
+			gopsClose()
+		}
+
+		log.Fatalf("%sERROR: ECDSA host key error: %v",
 			errorPrefix(), err) // LINTED: Fatalf
 	}
 
@@ -780,6 +892,10 @@ func main() {
 					_, _ = fmt.Fprintf(os.Stdout,
 						"%s %sERROR: LISTEN on %s: %v\r\n",
 						nowStamp(), errorPrefix(), addr, err)
+				}
+
+				if enableGops {
+					gopsClose()
 				}
 
 				log.Fatalf("%sERROR: LISTEN on %s: %v",
@@ -808,7 +924,7 @@ func main() {
 					continue
 				}
 
-				go handleConn(rawConn, edSigner, rsaSigner)
+				go handleConn(rawConn, edSigner, rsaSigner, ecdsaSigner)
 			}
 		}(addr)
 	}
@@ -845,6 +961,10 @@ func main() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: Could not parse default TELNET target: %v\r\n",
 				nowStamp(), errorPrefix(), err)
+		}
+
+		if enableGops {
+			gopsClose()
 		}
 
 		log.Fatalf("%sERROR: Could not parse default TELNET target: %v",
@@ -980,6 +1100,7 @@ func debugInit(addr string) {
 		bugPrefix(), addr)
 	go func() {
 		log.Fatalf("%s%v", // LINTED: Fatalf
+			// nosemgrep: go.lang.security.audit.net.use-tls.use-tls
 			errorPrefix(), http.ListenAndServe(addr, mux)) //nolint:gosec
 	}()
 }
@@ -1563,7 +1684,8 @@ func showStats() {
 
 			{
 				"Connections Killed for Idle Time",
-				fmt.Sprintf("%d", idleKillsTotal.Load()),
+				fmt.Sprintf("%d",
+					idleKillsTotal.Load()),
 				fmt.Sprintf("%d",
 					lifetimeIdleKillsTotal.Load()+idleKillsTotal.Load()),
 			},
@@ -1790,6 +1912,10 @@ func immediateShutdown() {
 
 		log.Printf("%sExiting.\r\n",
 			byePrefix())
+
+		if enableGops {
+			gopsClose()
+		}
 
 		os.Exit(0)
 	})
@@ -2498,61 +2624,111 @@ func sendNaws(conn *Connection, width, height uint32) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func loadOrCreateHostKey(path, keyType string) (ssh.Signer, error) {
-	data, err := os.ReadFile(path) //nolint:gosec
+func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) {
+	keyData, err := os.ReadFile(keyPath) //nolint:gosec
 	if err == nil {
-		return ssh.ParsePrivateKey(data)
+		return ssh.ParsePrivateKey(keyData)
 	}
+
+	if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read key: %w",
+			err)
+	}
+
+	var privateKey interface{}
+	var pemBlock *pem.Block
 
 	switch keyType {
 	case "rsa":
-		const rsaBits = 2048
-		rsaKey, err := rsa.GenerateKey(rand.Reader, rsaBits)
+		key, err := rsa.GenerateKey(rand.Reader, 2048)
 		if err != nil {
 			return nil, err
 		}
 
-		block := &pem.Block{
+		privateKey = key
+		rsaKey, ok := privateKey.(*rsa.PrivateKey)
+		if !ok {
+			return nil, fmt.Errorf("unexpected key type %T",
+				key)
+		}
+
+		pemBlock = &pem.Block{
 			Type:  "RSA PRIVATE KEY",
 			Bytes: x509.MarshalPKCS1PrivateKey(rsaKey),
 		}
 
-		data := pem.EncodeToMemory(block)
-		err = os.WriteFile(path, data, os.FileMode(certPerm)) //nolint:gosec
-		if err != nil {
-			return nil, err
-		}
-
-		return ssh.ParsePrivateKey(data)
-
 	case "ed25519":
-		_, priv, err := ed25519.GenerateKey(rand.Reader)
+		_, rawPriv, err := ed25519.GenerateKey(rand.Reader)
 		if err != nil {
 			return nil, err
 		}
 
-		pkcs8, err := x509.MarshalPKCS8PrivateKey(priv)
+		privateKey = rawPriv
+		edKey, ok := privateKey.(ed25519.PrivateKey)
+		if !ok {
+			return nil, fmt.Errorf("unexpected key type %T",
+				privateKey)
+		}
+
+		derBytes, err := x509.MarshalPKCS8PrivateKey(edKey)
 		if err != nil {
 			return nil, err
 		}
 
-		block := &pem.Block{Type: "PRIVATE KEY", Bytes: pkcs8}
-		data := pem.EncodeToMemory(block)
-		err = os.WriteFile(path, data, os.FileMode(certPerm)) //nolint:gosec
+		pemBlock = &pem.Block{
+			Type:  "PRIVATE KEY",
+			Bytes: derBytes,
+		}
+
+	case "ecdsa":
+		key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 		if err != nil {
 			return nil, err
 		}
 
-		return ssh.ParsePrivateKey(data)
+		privateKey = key
+		ecKey, ok := privateKey.(*ecdsa.PrivateKey)
+		if !ok {
+			return nil, fmt.Errorf("unexpected key type %T",
+				key)
+		}
+
+		derBytes, err := x509.MarshalECPrivateKey(ecKey)
+		if err != nil {
+			return nil, err
+		}
+
+		pemBlock = &pem.Block{
+			Type:  "EC PRIVATE KEY",
+			Bytes: derBytes,
+		}
 
 	default:
-		return nil, fmt.Errorf("UNSUPPORTED KEY TYPE %q", keyType)
+		return nil, fmt.Errorf("unsupported key type %s",
+			keyType)
 	}
+
+	keyPath, err = filepath.Abs(keyPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get absolute path for key: %w",
+			err)
+	}
+
+	err = os.WriteFile(keyPath, pem.EncodeToMemory(pemBlock), os.FileMode(certPerm)) //nolint:gosec
+	if err != nil {
+		return nil, fmt.Errorf("failed to write new key: %w",
+			err)
+	}
+
+	log.Printf("%sNew %s host key generated at %s",
+		keyPrefix(), strings.ToUpper(keyType), keyPath)
+
+	return ssh.NewSignerFromKey(privateKey)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
+func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	sid := newSessionID(connections, &connectionsMutex)
 	keyLog := []string{}
 
@@ -2589,7 +2765,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 			)
 
 			if !suppressLogs {
-				log.Printf("%s%s", blueDotPrefix(), line)
+				log.Printf("%s%s",
+					blueDotPrefix(), line)
 			}
 
 			keyLog = append(keyLog, line)
@@ -2610,6 +2787,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 	}
 	config.AddHostKey(edSigner)
 	config.AddHostKey(rsaSigner)
+	config.AddHostKey(ecdsaSigner)
 
 	if tcp, ok := rawConn.(*net.TCPConn); ok {
 		_ = tcp.SetNoDelay(true)
@@ -2759,7 +2937,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner ssh.Signer) {
 		}(), addr, authMethod)
 
 	if !suppressLogs {
-		log.Printf("%s%s", blueDotPrefix(), handshakeLog)
+		log.Printf("%s%s",
+			blueDotPrefix(), handshakeLog)
 	}
 
 	keyLog = append(keyLog, handshakeLog)
@@ -2799,7 +2978,8 @@ func parseHostPort(hostPort string) (string, int, error) {
 
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
-		return "", 0, fmt.Errorf("invalid port: %s", portStr)
+		return "", 0, fmt.Errorf("invalid port: %s",
+			portStr)
 	}
 
 	return host, port, nil
@@ -3387,7 +3567,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				warnPrefix(), conn.ID, err)
 		}
 
-		log.Printf("%v", err)
+		log.Printf("%v",
+			err)
 
 		err = channel.Close()
 		if err != nil {
@@ -4594,9 +4775,12 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	now := time.Now()
 	dir := filepath.Join(
 		logDir,
-		fmt.Sprintf("%04d", now.Year()),
-		fmt.Sprintf("%02d", now.Month()),
-		fmt.Sprintf("%02d", now.Day()),
+		fmt.Sprintf("%04d",
+			now.Year()),
+		fmt.Sprintf("%02d",
+			now.Month()),
+		fmt.Sprintf("%02d",
+			now.Day()),
 	)
 
 	err := os.MkdirAll(dir, os.FileMode(logDirPerm)) //nolint:gosec
@@ -4690,7 +4874,7 @@ func newSessionID(connections map[string]*Connection, mutex *sync.Mutex) string 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex) string {
-	const chars = "abcdghkmnprsvwxyzACDFGJKMNPRSTVXY345679"
+	const chars = "abcdhkmnprsvwxyzACDFGJKMNPRSTVXY34567"
 	for {
 		b := make([]byte, 20)
 
@@ -5071,13 +5255,15 @@ func compressLogFile(logFilePath string) {
 func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 	file, err := os.Open(filePath) //nolint:gosec
 	if err != nil {
-		return nil, fmt.Errorf("%w", err)
+		return nil, fmt.Errorf("%w",
+			err)
 	}
 
 	defer func() {
 		err := file.Close()
 		if err != nil {
-			log.Printf("Error closing file: %v", err)
+			log.Printf("Error closing file: %v",
+				err)
 		}
 	}()
 
@@ -5117,7 +5303,8 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 
 	err = scanner.Err()
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", filePath, err)
+		return nil, fmt.Errorf("%s: %w",
+			filePath, err)
 	}
 
 	return networks, nil

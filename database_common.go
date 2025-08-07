@@ -195,6 +195,10 @@ func (l *stdLogger) Fatal(v ...interface{}) {
 		return
 	}
 
+	if enableGops {
+		gopsClose()
+	}
+
 	log.Fatal(errorPrefix(), fmt.Sprint(v...))
 }
 
@@ -203,6 +207,10 @@ func (l *stdLogger) Fatal(v ...interface{}) {
 func (l *stdLogger) Fatalf(format string, v ...interface{}) {
 	if !logLevelEnabled(LogFatal) {
 		return
+	}
+
+	if enableGops {
+		gopsClose()
 	}
 
 	log.Fatalf(errorPrefix()+format, v...)
@@ -236,7 +244,12 @@ func initDB() {
 	}
 
 	defer func() {
-		if r := recover(); r != nil {
+		r := recover()
+		if r != nil {
+			if enableGops {
+				gopsClose()
+			}
+
 			log.Fatalf("%sPANIC: Failure in database: %s",
 				errorPrefix(), r) // LINTED: Fatalf
 		}
@@ -255,6 +268,10 @@ func initDB() {
 
 	db, err = bbolt.Open(dbPath, os.FileMode(dbPerm), options) //nolint:gosec
 	if err != nil {
+		if enableGops {
+			gopsClose()
+		}
+
 		log.Fatalf("%sERROR: Failed to open statistics database: %v", //nolint:gocritic
 			errorPrefix(), err) // LINTED: Fatalf
 	}

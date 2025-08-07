@@ -101,7 +101,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.4 (2025-Aug-01 g7d60fb8) [linux/amd64]
+DPS8M Proxy v0.1.5 (2025-Aug-06 g8071960) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -155,6 +155,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
       --whitelist string        Enable whitelist [filename] (no default)
       --utc                     Use UTC (Coordinated Universal Time) for time
                                     display and timestamping in log files
+      --license                 Show license terms and conditions
       --version                 Show version information
       --help                    Show this help and usage information
 
@@ -174,8 +175,8 @@ are, hopefully, documented here:
     logged to **both** the console and the log file.
 
   * By default, the local time zone is used for time display and
-    writing log files.  Users can specify the `-U` (`‑‑utc`) option
-    to use UTC (Coordinated Universal Time) instead.  Additionally, on
+    writing log files.  Users can specify the `‑‑utc` option to use
+    UTC (Coordinated Universal Time) instead.  Additionally, on
     Unix-like systems, the `TZ` environment variable is respected.
 
   * If the proxy fails to create log directories or files, a warning
@@ -245,12 +246,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.4 (2025-Aug-01 g7d60fb8) [linux/amd64]
+DPS8M Proxy v0.1.5 (2025-Aug-06 g8071960) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.4                           |
+| dps8m/proxy               | v0.1.5                           |
 | arl/statsviz              | v0.7.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -263,7 +264,7 @@ DPS8M Proxy v0.1.4 (2025-Aug-01 g7d60fb8) [linux/amd64]
 | golang.org/x/term         | v0.33.0                          |
 | kernel.org/.../libcap/cap | v1.2.76                          |
 | kernel.org/.../libcap/psx | v1.2.76                          |
-| Go compiler (gc)          | v1.24.5                          |
+| Go compiler (gc)          | v1.24.6                          |
 +===========================+==================================+
 ```
 
@@ -442,9 +443,9 @@ features:
 
 ## Using OpenSSH host keys
 
-If you have existing [OpenSSH](https://www.openssh.com/) Ed25519 or
-RSA host keys that you want to use with the proxy, you’ll first need
-to convert those keys to standard PEM format.
+If you have existing [OpenSSH](https://www.openssh.com/) Ed25519, RSA,
+or ECDSA host keys that you want to use with the proxy, you’ll first
+need to convert those keys to standard PEM format.
 
 🚨 **NB**: These instructions *do not* include any specific details
 for safe handling of key file permissions—we assume you are `root`
@@ -454,17 +455,20 @@ and that you know what you’re doing!
    these copies will be *overwritten* in the conversion process:
 
    ```sh
-   cp /etc/ssh/ssh_host_rsa_key ssh_host_rsa_key.tmp
    cp /etc/ssh/ssh_host_ed25519_key ssh_host_ed25519_key.tmp
+   cp /etc/ssh/ssh_host_rsa_key ssh_host_rsa_key.tmp
+   cp /etc/ssh/ssh_host_ecdsa_key ssh_host_ecdsa_key.tmp
    ```
 
 2. Convert the keys (using `ssh‑keygen`) and rename them appropriately:
 
    ```sh
-   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
    ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ed25519_key.tmp
+   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
+   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ecdsa_key.tmp
+   mv ssh_host_ed25519_key.tmp ssh_host_ed25519_key.pem
    mv ssh_host_rsa_key.tmp ssh_host_rsa_key.pem
-   mv ssh_host_ed25519_key.tmp ssh_host_ed25519_key.pem 
+   mv ssh_host_ecdsa_key.tmp ssh_host_ecdsa_key.pem
    ```
 
 ## History
@@ -505,44 +509,44 @@ predecessor (code statistics 📈 provided by
 </tr></thead>
 <tbody><tr>
 <th>Go</th>
-<th>15</th>
-<th>6970</th>
-<th>1442</th>
-<th>341</th>
-<th>5187</th>
-<th>1203</th>
-<th>172902</th>
-<th>3155</th>
+<th>17</th>
+<th>7244</th>
+<th>1502</th>
+<th>375</th>
+<th>5367</th>
+<th>1244</th>
+<th>178081</th>
+<th>3227</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
 <th>421</th>
-<th>72</th>
-<th>79</th>
-<th>270</th>
-<th>51</th>
-<th>13018</th>
-<th>297</th>
+<th>70</th>
+<th>77</th>
+<th>274</th>
+<th>65</th>
+<th>13565</th>
+<th>294</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>535</th>
+<th>538</th>
 <th>104</th>
 <th>0</th>
-<th>431</th>
+<th>434</th>
 <th>0</th>
-<th>24584</th>
-<th>416</th>
+<th>24755</th>
+<th>419</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
-<th>126</th>
+<th>128</th>
 <th>27</th>
-<th>34</th>
+<th>36</th>
 <th>65</th>
 <th>14</th>
-<th>3464</th>
-<th>83</th>
+<th>3584</th>
+<th>84</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -556,24 +560,24 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>YAML</th>
 <th>1</th>
-<th>79</th>
+<th>85</th>
 <th>6</th>
 <th>10</th>
-<th>63</th>
+<th>69</th>
 <th>0</th>
-<th>3687</th>
-<th>70</th>
+<th>3866</th>
+<th>76</th>
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
-<th>20</th>
-<th>8340</th>
-<th>1686</th>
-<th>571</th>
-<th>6083</th>
-<th>1268</th>
-<th>225256</th>
-<th>4140</th>
+<th>22</th>
+<th>8625</th>
+<th>1744</th>
+<th>605</th>
+<th>6276</th>
+<th>1323</th>
+<th>231452</th>
+<th>4219</th>
 </tr></tfoot></table>
 
 ## Future plans

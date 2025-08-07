@@ -10,13 +10,14 @@
 # Configuration
 
 SHELL=/bin/sh
+GO?=go
 CP=cp -f
 PERL=perl
 RM=rm -f
 SED?=sed
 SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
-		 .whitesource,.golangci.yml,dependabot.yml,.txt"            \
-		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown'       \
+		 .whitesource,.golangci.yml,dependabot.yml,.txt" \
+		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown' \
 		 --include-symlinks
 .NOTPARALLEL:
 
@@ -32,7 +33,9 @@ all: proxy
 .PHONY: proxy
 proxy: tags
 	@printf '%s\n' "🧩 Building proxy..."
-	@env GOTOOLCHAIN=auto CGO_ENABLED=0 go build -trimpath -v && \
+	@env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q GOSUMDB=off && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) CGO_ENABLED=0 \
+		$(GO) build -trimpath -v && \
 	test -x proxy 2> /dev/null && { \
 		printf '%s\n\n' "✅ Build successful!"; \
 		./proxy --version; exit 0; } || { \
@@ -44,7 +47,8 @@ proxy: tags
 .PHONY: clean
 clean:
 	@printf '%s\n' "🧹 Cleaning..."
-	env GOTOOLCHAIN=auto go clean -v
+	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q GOSUMDB=off && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) clean -v
 	$(RM) -r ./cross.bin/
 
 ##############################################################################
@@ -52,14 +56,15 @@ clean:
 
 .PHONY: tidy
 tidy: go.mod
-	env GOTOOLCHAIN=auto go mod tidy -v
+	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q GOSUMDB=off && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) mod tidy -v
 
 ##############################################################################
 # Target: distclean
 
 .PHONY: distclean
 distclean: clean
-	$(RM) ssh_host_ed25519_key.pem ssh_host_rsa_key.pem
+	$(RM) ssh_host_ecdsa_key.pem ssh_host_ed25519_key.pem ssh_host_rsa_key.pem
 	$(RM) ./tags ./GPATH ./GRTAGS ./GTAGS
 	$(RM) -r ./log/
 
@@ -69,7 +74,8 @@ distclean: clean
 .PHONY: test
 test:
 	@printf '%s\n' "🧪 Running 'go test -v .'"
-	env GOTOOLCHAIN=auto go test -v .
+	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q GOSUMDB=off && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) test -v .
 
 ##############################################################################
 # Target: lint
@@ -100,7 +106,6 @@ lint check:
 		shellcheck \
 		shfmt \
 		golangci-lint \
-		glab-lint \
 		golist \
 		govulncheck
 	@test -z "$${CI_NO_CROSS:-}" && { \
@@ -116,18 +121,10 @@ lint check:
 golist:
 	@printf '\n%s\n' \
 		"ℹ️ Finding any outdated dependencies... (may take a few moments)"
-	@go list -u -f \
+	@env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q GOSUMDB=off && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) list -u -f \
 		'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} → {{.Update.Version}}{{end}}' \
 		-m all
-
-##############################################################################
-# Target: glab-lint
-
-.PHONY: glab-lint
-glab-lint:
-	@command -v glab > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ glab not found"; exit 0; } ; \
-		set -x; glab ci lint || true
 
 ##############################################################################
 # Target: reuse
@@ -150,14 +147,16 @@ gofmt:
 
 .PHONY: goverify
 goverify: go.mod
-	env GOTOOLCHAIN=auto go mod verify
+	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q GOSUMDB=off && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) mod verify
 
 ##############################################################################
 # Target: gotidydiff
 
 .PHONY: gotidydiff
 gotidydiff: go.mod
-	env GOTOOLCHAIN=auto go mod tidy -diff
+	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q GOSUMDB=off && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) mod tidy -diff
 
 ##############################################################################
 # Target: golangci-lint
@@ -266,7 +265,8 @@ tags ctags gtags GRPATH GRTAGS GTAGS:
 
 .PHONY: govet
 govet:
-	env GOTOOLCHAIN=auto go vet
+	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q GOSUMDB=off && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) vet
 
 ##############################################################################
 # Target: README.md
@@ -407,7 +407,7 @@ install:
 		{ touch "$(ETCDIR)"/"$(DEST_CONF)"; } || :
 	@printf '\n%s\n' "🔧 Installing new '$(DEST_NAME)'"
 	$(INSTALL_BIN) "proxy" "$(BINDIR)"/"$(DEST_NAME)"
-	@printf '\n%s\n' "🔧 Try to granting CAP_NET_BIND_SERVICE to $(DEST_NAME)"
+	@printf '\n%s\n' "🔧 Try granting CAP_NET_BIND_SERVICE to $(DEST_NAME)"
 	$(SETCAP) $(SETCAP_FLAGS) \
 		"$(BINDIR)"/"$(DEST_NAME)" > /dev/null 2>&1 || :
 	@printf '\n%s\n' "🔧 Installing new '$(DEST_UNIT)'"

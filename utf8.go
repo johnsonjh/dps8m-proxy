@@ -333,6 +333,16 @@ func gopsPrefix() string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+func keyPrefix() string {
+	if haveUTF8console {
+		return "🔑 " // Key
+	}
+
+	return ""
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 type emojiStripperWriter struct {
 	w io.Writer
 }
@@ -351,7 +361,7 @@ func isEmojiRune(r rune) bool {
 	switch r {
 	case
 		'🌍', '🐛', '👋', '📋', '👍', '💀', '💚', '💥', '📡', '🔔',
-		'🔧', '🚨', '🟡', '🟢', '🔴', '🔵', '🥚', '🔥', '❌':
+		'🔧', '🚨', '🟡', '🟢', '🔴', '🔵', '🥚', '🔥', '❌', '🔑':
 		return true
 
 	default:
@@ -363,7 +373,7 @@ func isEmojiRune(r rune) bool {
 
 func stripEmoji(s string) string {
 	runes := []rune(s)
-	var out []rune
+	out := make([]rune, 0, len(runes))
 
 	i := 0
 	for i < len(runes) {

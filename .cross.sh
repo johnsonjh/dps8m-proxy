@@ -97,6 +97,7 @@ set +e
 # Run script
 
 OLDIFS=${IFS:-}
+# nosemgrep: bash.lang.security.ifs-tampering.ifs-tampering
 IFS=';'
 
 for chunk in ${_S}; do
@@ -109,6 +110,7 @@ for chunk in ${_S}; do
   ) &
 done
 
+# nosemgrep: bash.lang.security.ifs-tampering.ifs-tampering
 IFS=${OLDIFS:?}
 
 wait
