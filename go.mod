@@ -23,8 +23,8 @@ require (
 	github.com/ulikunitz/xz v0.5.12
 	go.etcd.io/bbolt v1.4.2
 	go.uber.org/goleak v1.3.1-0.20241121203838-4ff5fa6529ee
-	golang.org/x/crypto v0.40.0
-	golang.org/x/term v0.33.0
+	golang.org/x/crypto v0.41.0
+	golang.org/x/term v0.34.0
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.76
 )
 
