@@ -39,6 +39,7 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 * ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
 * ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
 * ✅ Optional support for management using `systemd` on Linux (running in a sandbox)
+* ✅ Optional mDNS-SD (Multicast DNS Service Discovery) announcements for listeners
 * ✅ Link filtering
 * ✅ Live streaming connection sharing (read‑only)
   * 🤝 Allows users to share their session with one or more viewers
@@ -101,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.7 (2025-Aug-08 g42b65a2) [linux/amd64]
+DPS8M Proxy v0.1.7 (2025-Aug-12 g31229d6) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -125,6 +126,8 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     [e.g., ":6060", "[::1]:6060"]
       --gops                    Enable the "gops" diagnostic agent
                                     (see https://github.com/google/gops)
+      --mdns                    Enable mDNS (Multicast DNS Service Discovery)
+                                    (i.e., Bonjour, Avahi) announcements
       --log-dir string          Base directory for logs (default "log")
       --no-log                  Disable all session logging
                                     (for console logging see "--console-log")
@@ -246,7 +249,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.7 (2025-Aug-08 g42b65a2) [linux/amd64]
+DPS8M Proxy v0.1.7 (2025-Aug-12 g31229d6) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -255,11 +258,14 @@ DPS8M Proxy v0.1.7 (2025-Aug-08 g42b65a2) [linux/amd64]
 | arl/statsviz              | v0.7.1                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
+| hashicorp/mdns            | v1.0.6                           |
 | klauspost/compress        | v1.18.0                          |
+| miekg/dns                 | v1.1.68                          |
 | spf13/pflag               | v1.0.7                           |
 | ulikunitz/xz              | v0.5.12                          |
 | go.etcd.io/bbolt          | v1.4.2                           |
 | golang.org/x/crypto       | v0.41.0                          |
+| golang.org/x/net          | v0.43.0                          |
 | golang.org/x/sys          | v0.35.0                          |
 | golang.org/x/term         | v0.34.0                          |
 | kernel.org/.../libcap/cap | v1.2.76                          |
@@ -509,14 +515,14 @@ predecessor (code statistics 📈 provided by
 </tr></thead>
 <tbody><tr>
 <th>Go</th>
-<th>17</th>
-<th>7244</th>
-<th>1502</th>
-<th>375</th>
-<th>5367</th>
-<th>1244</th>
-<th>178081</th>
-<th>3227</th>
+<th>16</th>
+<th>7460</th>
+<th>1536</th>
+<th>359</th>
+<th>5565</th>
+<th>1319</th>
+<th>182284</th>
+<th>3330</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -530,13 +536,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>538</th>
+<th>546</th>
 <th>104</th>
 <th>0</th>
-<th>434</th>
+<th>442</th>
 <th>0</th>
-<th>24755</th>
-<th>419</th>
+<th>25870</th>
+<th>427</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
@@ -570,14 +576,14 @@ predecessor (code statistics 📈 provided by
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
-<th>22</th>
-<th>8625</th>
-<th>1744</th>
-<th>605</th>
-<th>6276</th>
-<th>1323</th>
-<th>231452</th>
-<th>4219</th>
+<th>21</th>
+<th>8849</th>
+<th>1778</th>
+<th>589</th>
+<th>6482</th>
+<th>1398</th>
+<th>236770</th>
+<th>4330</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -682,17 +688,24 @@ predecessor (code statistics 📈 provided by
   |-------------------------------------------------------------------------------:|:------------------------------------------------------------|
   |                                [arl/statsviz](https://github.com/arl/statsviz) | [MIT](https://opensource.org/license/mit)                   |
   |                              [etcd-io/bbolt](https://github.com/etcd-io/bbolt) | [MIT](https://opensource.org/license/mit)                   |
+  |                            [hashicorp/mdns](https://github.com/hashicorp/mdns) | [MIT](https://opensource.org/license/mit)                   |
   |                            [uber-go/goleak](https://github.com/uber-go/goleak) | [MIT](https://opensource.org/license/mit)                   |
   |                      [gorilla/websocket](https://github.com/gorilla/websocket) | [BSD-2-Clause](https://opensource.org/license/bsd-2-clause) |
+  |                              [google/go-cmp](https://github.com/google/go-cmp) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                  [google/gops](https://github.com/google/gops) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                    [klauspost/compress](https://github.com/klauspost/compress) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   | [libcap/cap](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/cap) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   | [libcap/psx](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/psx) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                      [miekg/dns](https://github.com/miekg/dns) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                  [spf13/pflag](https://github.com/spf13/pflag) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                [ulikunitz/xz](https://github.com/ulikunitz/xz) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
-  |                                                [x/crypto](golang.org/x/crypto) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
-  |                                                      [x/sys](golang.org/x/sys) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
-  |                                                    [x/term](golang.org/x/term) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                        [x/crypto](https://golang.org/x/crypto) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                              [x/mod](https://golang.org/x/mod) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                              [x/net](https://golang.org/x/net) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                            [x/sync](https://golang.org/x/sync) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                              [x/sys](https://golang.org/x/sys) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                            [x/term](https://golang.org/x/term) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                          [x/tools](https://golang.org/x/tools) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
 
 <!-- vim: set ft=markdown expandtab cc=72 : -->
 <!-- EOF -->

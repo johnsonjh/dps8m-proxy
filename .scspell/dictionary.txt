@@ -33,7 +33,11 @@ hhandshake
 hillegal
 hrequest
 hsessions
+iface
+ifaces
 infof
+ipaddr
+ipnet
 itoa
 klauspost
 linted
@@ -46,6 +50,7 @@ nolint
 nolintlint
 noquiet
 nosemgrep
+nosystemcrypto
 panicf
 paralleltest
 pflag
@@ -220,6 +225,7 @@ klauspost
 libcap
 magicant
 mailto
+miekg
 mvdan
 myint
 naws
@@ -311,13 +317,16 @@ gomod
 gops
 klauspost
 libcap
+miekg
 pflag
 statsviz
 ulikunitz
 
 NATURAL:
 adduser
+avahi
 bbolt
+bonjour
 brotli
 captcha
 charset
@@ -348,6 +357,7 @@ google
 goroutines
 grep
 gzip
+hashicorp
 hostname
 href
 https
@@ -370,12 +380,15 @@ logfile
 logon
 logout
 logwriter
+loopback
 makefile
+mdns
 mebibyte
 mebibytes
 microsoft
 mips
 mkdir
+multicast
 multics
 namespaces
 noexpandtab
