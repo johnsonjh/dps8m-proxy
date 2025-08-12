@@ -190,10 +190,10 @@ var (
 	noBanner                         bool
 	noCompress                       bool
 	enableGops                       bool
+	enableMDNS                       bool
 	noLog                            bool
 	showVersion                      bool
 	showLicense                      bool
-	systemCrypto                     = isSystemCrypto()
 	shutdownOnce                     sync.Once
 	shutdownSignal                   chan struct{}
 	sshAddr                          []string
@@ -453,6 +453,11 @@ func init() {
 				"    (see https://github.com/google/gops)")
 	}
 
+	pflag.BoolVar(&enableMDNS,
+		"mdns", false,
+		"Enable mDNS (Multicast DNS Service Discovery)\r\n"+
+			"    (i.e., Bonjour, Avahi) announcements")
+
 	pflag.StringVar(&logDir,
 		"log-dir", "log",
 		"Base directory for logs")
@@ -605,15 +610,19 @@ func shutdownWatchdog() {
 func main() {
 	pflag.Parse()
 
-	//revive:disable:empty-block
-	if systemCrypto { //nolint:staticcheck
-		// TBD.
-	}
-	//revive:enable:empty-block
-
 	if showLicense {
 		fmt.Println(licenseText)
 
+		if enableGops {
+			gopsClose()
+		}
+
+		os.Exit(0)
+	}
+
+	printVersion(false)
+
+	if showVersion {
 		if enableGops {
 			gopsClose()
 		}
@@ -648,16 +657,6 @@ func main() {
 		}
 
 		isConsoleLogQuiet = (cl == "quiet")
-	}
-
-	printVersion(false)
-
-	if showVersion {
-		if enableGops {
-			gopsClose()
-		}
-
-		os.Exit(0)
 	}
 
 	if dbEnabled {
@@ -908,6 +907,16 @@ func main() {
 						warnPrefix(), addr, err)
 				}
 			}()
+
+			if enableMDNS {
+				host, _, err := net.SplitHostPort(addr)
+				if err != nil {
+					log.Printf("%sError splitting host from address for mDNS: %v",
+						warnPrefix(), err)
+				} else {
+					announceMDNS(listener, host, altHosts, "_ssh._tcp", telnetHostPort)
+				}
+			}
 
 			for {
 				rawConn, err := listener.Accept()
