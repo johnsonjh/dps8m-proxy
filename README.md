@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.7 (2025-Aug-12 g31229d6) [linux/amd64]
+DPS8M Proxy v0.1.7 (2025-Aug-12 g2922269) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -188,6 +188,12 @@ are, hopefully, documented here:
     In a future version, this behavior will be configurable (*e.g.,*
     allow to either immediately or gracefully exit on logging failure).
 
+* Enabling the database (with the `‑‑db-file` option) persists to disk
+  the connection statistics (viewable with the `s` admin console
+  command) so the stats are not lost when restarting the proxy.  It
+  is customary to use a name ending with the extension `db` (*e.g.,*
+  `proxy.db`).
+
 * All incoming SSH users are connected to the default TELNET target,
   unless their supplied SSH username matches an alternate target
   enabled with the `‑‑alt‑host` flag.  The alt‑host syntax is
@@ -249,7 +255,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.7 (2025-Aug-12 g31229d6) [linux/amd64]
+DPS8M Proxy v0.1.7 (2025-Aug-12 g2922269) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -536,13 +542,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>546</th>
-<th>104</th>
+<th>552</th>
+<th>105</th>
 <th>0</th>
-<th>442</th>
+<th>447</th>
 <th>0</th>
-<th>25870</th>
-<th>427</th>
+<th>26163</th>
+<th>432</th>
 </tr><tr>
 <th>Shell</th>
 <th>1</th>
@@ -577,13 +583,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>21</th>
-<th>8849</th>
-<th>1778</th>
+<th>8855</th>
+<th>1779</th>
 <th>589</th>
-<th>6482</th>
+<th>6487</th>
 <th>1398</th>
-<th>236770</th>
-<th>4330</th>
+<th>237063</th>
+<th>4335</th>
 </tr></tfoot></table>
 
 ## Future plans

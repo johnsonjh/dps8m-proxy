@@ -128,6 +128,12 @@ are, hopefully, documented here:
     In a future version, this behavior will be configurable (*e.g.,*
     allow to either immediately or gracefully exit on logging failure).
 
+* Enabling the database (with the `‑‑db-file` option) persists to disk
+  the connection statistics (viewable with the `s` admin console
+  command) so the stats are not lost when restarting the proxy.  It
+  is customary to use a name ending with the extension `db` (*e.g.,*
+  `proxy.db`).
+
 * All incoming SSH users are connected to the default TELNET target,
   unless their supplied SSH username matches an alternate target
   enabled with the `‑‑alt‑host` flag.  The alt‑host syntax is
