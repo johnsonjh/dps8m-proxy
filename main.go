@@ -4883,7 +4883,7 @@ func newSessionID(connections map[string]*Connection, mutex *sync.Mutex) string 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex) string {
-	const chars = "abcdhkmnprsvwxyzACDFGJKMNPRSTVXY34567"
+	const chars = "bcdhkmnprswxyzCDFGJKMNPRSTXY3457"
 	for {
 		b := make([]byte, 20)
 
