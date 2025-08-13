@@ -87,6 +87,7 @@ wronly
 FILETYPE: Shell; .sh
 esac
 getconf
+gosumdb
 mkfifo
 nosemgrep
 nproc

@@ -10,7 +10,7 @@
 # Configuration
 
 SHELL=/bin/sh
-GO?=go
+GO?=$$(command -v go 2> /dev/null || printf '%s\n' "go")
 CP=cp -f
 PERL=perl
 RM=rm -f
@@ -140,7 +140,9 @@ reuse:
 
 .PHONY: gofmt
 gofmt:
-	gofmt -d -e -s .
+	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+	grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
+	'GOSUMDB=sum.golang.org' || true) gofmt -d -e -s .
 
 ##############################################################################
 # Target: goverify
@@ -165,7 +167,9 @@ gotidydiff: go.mod
 golangci-lint:
 	@command -v golangci-lint > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ golangci-lint not found!"; exit 0; } ; \
-		set -x; golangci-lint run
+		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
+		'GOSUMDB=sum.golang.org' || true) golangci-lint run
 
 ##############################################################################
 # Target: staticcheck
@@ -174,7 +178,9 @@ golangci-lint:
 staticcheck:
 	@command -v staticcheck > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ staticcheck not found!"; exit 0; } ; \
-		set -x; staticcheck .
+		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
+		'GOSUMDB=sum.golang.org' || true) staticcheck .
 
 ##############################################################################
 # Target: revive
@@ -183,7 +189,9 @@ staticcheck:
 revive:
 	@command -v revive > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ revive not found!"; exit 0; } ; \
-		set -x; revive ./...
+		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
+		'GOSUMDB=sum.golang.org' || true) revive ./...
 
 ##############################################################################
 # Target: errcheck
@@ -192,7 +200,9 @@ revive:
 errcheck:
 	@command -v errcheck > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ errcheck not found!"; exit 0; } ; \
-		set -x; errcheck
+		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
+		'GOSUMDB=sum.golang.org' || true) errcheck
 
 ##############################################################################
 # Target: govulncheck
@@ -201,7 +211,9 @@ errcheck:
 govulncheck:
 	@command -v govulncheck > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ govulncheck not found!"; exit 0; } ; \
-		set -x; govulncheck ./...
+		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
+		'GOSUMDB=sum.golang.org' || true) govulncheck ./...
 
 ##############################################################################
 # Target: gofumpt
@@ -210,7 +222,9 @@ govulncheck:
 gofumpt:
 	@command -v gofumpt > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ gofumpt not found!"; exit 0; } ; \
-		set -x; gofumpt -d -e .
+		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
+		'GOSUMDB=sum.golang.org' || true) gofumpt -d -e .
 
 ##############################################################################
 # Target: shfmt
