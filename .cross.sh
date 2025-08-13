@@ -19,23 +19,28 @@ rm -rf ./cross.bin
 mkdir -p ./cross.bin
 
 ###############################################################################
-# Disable CGO
+# Setup Go
 
+GO="$(command -v go 2> /dev/null || printf '%s\n' 'go')"
 CGO_ENABLED=0
 GOTOOLCHAIN=auto
-export CGO_ENABLED GOTOOLCHAIN
+# shellcheck disable=SC2015
+"${GO:?}" env 2>&1 | grep -q "GOSUMDB=.*off.*" \
+  && GOSUMDB='sum.golang.org' || true
+export GO CGO_ENABLED GOTOOLCHAIN GOSUMDB
 
 ###############################################################################
 # Create script
 # Exclude ios/*, android/{386,amd64,arm}
 
 # shellcheck disable=SC2016
-_S=$(go tool dist list \
+_S=$("${GO:?}" tool dist list \
   | grep -Ev '^ios/|^android/(386|amd64|arm)$' \
   | awk 'BEGIN { FS="/" } /\// { print "GOOS="$1" GOARCH="$2 }' \
   | xargs -I{} printf '%s\n' '
       export {} && printf "🧩 %s/%s\n" "${GOOS:?}" "${GOARCH:?}" &&
-      go build -trimpath -o ./cross.bin/proxy."${GOOS:?}"."${GOARCH:?}";')
+      "${GO:?}" build -trimpath \
+        -o ./cross.bin/proxy."${GOOS:?}"."${GOARCH:?}";')
 
 ###############################################################################
 # Maximum jobs
@@ -121,7 +126,8 @@ exec 3>&- 3<&-
 
 export GOOS=linux GOARCH=mips GOMIPS=softfloat \
   && printf "🧩 %s/%s\n" "${GOOS:?}" "${GOARCH:?}sf" \
-  && go build -trimpath -o ./cross.bin/proxy."${GOOS:?}"."${GOARCH:?}"sf
+  && "${GO:?}" build -trimpath \
+    -o ./cross.bin/proxy."${GOOS:?}"."${GOARCH:?}"sf
 
 ###############################################################################
 # vim: set ft=sh expandtab tabstop=2 cc=80 :
