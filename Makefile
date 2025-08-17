@@ -422,8 +422,8 @@ install:
 	@printf '\n%s\n' "🔧 Installing new '$(DEST_NAME)'"
 	$(INSTALL_BIN) "proxy" "$(BINDIR)"/"$(DEST_NAME)"
 	@printf '\n%s\n' "🔧 Try granting CAP_NET_BIND_SERVICE to $(DEST_NAME)"
-	$(SETCAP) $(SETCAP_FLAGS) \
-		"$(BINDIR)"/"$(DEST_NAME)" > /dev/null 2>&1 || :
+	test -f /.dockerenv || { $(SETCAP) $(SETCAP_FLAGS) \
+		"$(BINDIR)"/"$(DEST_NAME)" > /dev/null 2>&1 || :; } || :
 	@printf '\n%s\n' "🔧 Installing new '$(DEST_UNIT)'"
 	$(INSTALL_UNT) "systemd/dps8m-proxy.service" \
 		"$(UNTDIR)"/"$(DEST_UNIT)"
