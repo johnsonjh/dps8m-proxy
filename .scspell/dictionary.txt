@@ -132,6 +132,7 @@ bindir
 codespell
 destdir
 distclean
+dockerenv
 errcheck
 etcdir
 fnldir

@@ -455,7 +455,7 @@ func init() {
 
 	pflag.BoolVar(&enableMDNS,
 		"mdns", false,
-		"Enable mDNS (Multicast DNS Service Discovery)\r\n"+
+		"Enable mDNS (Multicast DNS) advertisements)\r\n"+
 			"    (i.e., Bonjour, Avahi) announcements")
 
 	pflag.StringVar(&logDir,
@@ -2093,6 +2093,29 @@ func listConfiguration() {
 
 	updateMaxLength(s10)
 
+	var gopsStr string
+	if enableGops {
+		gopsStr = "enabled"
+	} else {
+		gopsStr = "disabled" //nolint:goconst
+	}
+
+	s14 := fmt.Sprintf("Gops diagnostic agent: %s", gopsStr)
+
+	updateMaxLength(s14)
+
+	var MDNSStr string
+
+	if enableMDNS {
+		MDNSStr = "enabled"
+	} else {
+		MDNSStr = "disabled"
+	}
+
+	s13 := fmt.Sprintf("Multicast DNS announcements: %s", MDNSStr)
+
+	updateMaxLength(s13)
+
 	updateMaxLength("Default TELNET target: " + telnetHostPort)
 
 	s2 := fmt.Sprintf("Debug TELNET Negotiation: %t",
@@ -2109,7 +2132,7 @@ func listConfiguration() {
 		}
 	}
 
-	timeMaxStr := "disabled" //nolint:goconst
+	timeMaxStr := "disabled"
 
 	if timeMax > 0 {
 		timeMaxStr = fmt.Sprintf("%d seconds",
@@ -2378,6 +2401,9 @@ func listConfiguration() {
 	if debugAddr != "" {
 		debugHTTP = debugAddr
 	}
+
+	printRow(&b, s13) // mDNS
+	printRow(&b, s14) // gops
 
 	printRow(&b, "Debug HTTP Server: "+debugHTTP)
 	printRow(&b, "Proxy Uptime: "+uptimeString)
