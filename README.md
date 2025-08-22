@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.13 (2025-Aug-20 g82a8764) [linux/amd64]
+DPS8M Proxy v0.1.13 (2025-Aug-22 g1645fc3) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -126,7 +126,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     [e.g., ":6060", "[::1]:6060"]
       --gops                    Enable the "gops" diagnostic agent
                                     (see https://github.com/google/gops)
-      --mdns                    Enable mDNS (Multicast DNS) advertisements)
+      --mdns                    Enable mDNS (Multicast DNS) advertisements
                                     (i.e., Bonjour, Avahi announcements)
       --log-dir string          Base directory for logs (default "log")
       --no-log                  Disable all session logging
@@ -255,7 +255,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.13 (2025-Aug-20 g82a8764) [linux/amd64]
+DPS8M Proxy v0.1.13 (2025-Aug-22 g1645fc3) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -527,7 +527,7 @@ predecessor (code statistics 📈 provided by
 <th>359</th>
 <th>5583</th>
 <th>1323</th>
-<th>182695</th>
+<th>182694</th>
 <th>3343</th>
 </tr><tr>
 <th>Makefile</th>
@@ -588,7 +588,7 @@ predecessor (code statistics 📈 provided by
 <th>590</th>
 <th>6524</th>
 <th>1422</th>
-<th>238697</th>
+<th>238696</th>
 <th>4358</th>
 </tr></tfoot></table>
 
