@@ -455,8 +455,8 @@ func init() {
 
 	pflag.BoolVar(&enableMDNS,
 		"mdns", false,
-		"Enable mDNS (Multicast DNS) advertisements)\r\n"+
-			"    (i.e., Bonjour, Avahi) announcements")
+		"Enable mDNS (Multicast DNS) advertisements\r\n"+
+			"    (i.e., Bonjour, Avahi announcements)")
 
 	pflag.StringVar(&logDir,
 		"log-dir", "log",
