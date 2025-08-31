@@ -268,6 +268,7 @@ abcdghkmnprsvwxyz
 abcdhkmnprsvwxyz
 achaea
 bcdhkmnprswxyz
+cdhkmnprswxyz
 sduplicate
 sinvalid
 sspi
