@@ -34,7 +34,7 @@ all: proxy
 proxy: tags
 	@printf '%s\n' "🧩 Building proxy..."
 	@env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) CGO_ENABLED=0 \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) CGO_ENABLED=0 \
 		$(GO) build -trimpath -v && \
 	test -x proxy 2> /dev/null && { \
 		printf '%s\n\n' "✅ Build successful!"; \
@@ -48,7 +48,7 @@ proxy: tags
 clean:
 	@printf '%s\n' "🧹 Cleaning..."
 	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) clean -v
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) clean -v
 	$(RM) -r ./cross.bin/
 
 ##############################################################################
@@ -57,7 +57,7 @@ clean:
 .PHONY: tidy
 tidy: go.mod
 	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) mod tidy -v
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) mod tidy -v
 
 ##############################################################################
 # Target: distclean
@@ -75,7 +75,7 @@ distclean: clean
 test:
 	@printf '%s\n' "🧪 Running 'go test -v .'"
 	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) test -v .
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) test -v .
 
 ##############################################################################
 # Target: lint
@@ -111,7 +111,7 @@ lint check:
 		govulncheck
 	@test -z "$${CI_NO_CROSS:-}" && { \
 		printf '\n%s\n' "🧩 Running 'make cross'..."; \
-		set -x; env MAX_CPU=1 $(MAKE) cross; exit $${?}; } || true
+		set -x; env MAX_CPU=1 $(MAKE) cross; exit $${?}; } || :
 	$(MAKE) clean
 	@printf '\n%s\n\n' "🥇 Linting complete; carefully review the output."
 
@@ -123,7 +123,7 @@ golist:
 	@printf '\n%s\n' \
 		"ℹ️ Finding any outdated dependencies... (may take a few moments)"
 	@env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) list -u -f \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) list -u -f \
 		'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} → {{.Update.Version}}{{end}}' \
 		-m all
 
@@ -143,7 +143,7 @@ reuse:
 gofmt:
 	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 	grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-	'GOSUMDB=sum.golang.org' || true) gofmt -d -e -s .
+	'GOSUMDB=sum.golang.org' || :) gofmt -d -e -s .
 
 ##############################################################################
 # Target: goverify
@@ -151,7 +151,7 @@ gofmt:
 .PHONY: goverify
 goverify: go.mod
 	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) mod verify
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) mod verify
 
 ##############################################################################
 # Target: gotidydiff
@@ -159,7 +159,7 @@ goverify: go.mod
 .PHONY: gotidydiff
 gotidydiff: go.mod
 	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) mod tidy -diff
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) mod tidy -diff
 
 ##############################################################################
 # Target: golangci-lint
@@ -170,7 +170,7 @@ golangci-lint:
 		{ printf '%s\n' "⚠️ golangci-lint not found!"; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-		'GOSUMDB=sum.golang.org' || true) golangci-lint run
+		'GOSUMDB=sum.golang.org' || :) golangci-lint run
 
 ##############################################################################
 # Target: staticcheck
@@ -181,7 +181,7 @@ staticcheck:
 		{ printf '%s\n' "⚠️ staticcheck not found!"; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-		'GOSUMDB=sum.golang.org' || true) staticcheck .
+		'GOSUMDB=sum.golang.org' || :) staticcheck .
 
 ##############################################################################
 # Target: revive
@@ -192,7 +192,7 @@ revive:
 		{ printf '%s\n' "⚠️ revive not found!"; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-		'GOSUMDB=sum.golang.org' || true) revive ./...
+		'GOSUMDB=sum.golang.org' || :) revive ./...
 
 ##############################################################################
 # Target: errcheck
@@ -203,7 +203,7 @@ errcheck:
 		{ printf '%s\n' "⚠️ errcheck not found!"; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-		'GOSUMDB=sum.golang.org' || true) errcheck
+		'GOSUMDB=sum.golang.org' || :) errcheck
 
 ##############################################################################
 # Target: govulncheck
@@ -214,7 +214,7 @@ govulncheck:
 		{ printf '%s\n' "⚠️ govulncheck not found!"; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-		'GOSUMDB=sum.golang.org' || true) govulncheck ./...
+		'GOSUMDB=sum.golang.org' || :) govulncheck ./...
 
 ##############################################################################
 # Target: gofumpt
@@ -225,7 +225,7 @@ gofumpt:
 		{ printf '%s\n' "⚠️ gofumpt not found!"; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-		'GOSUMDB=sum.golang.org' || true) gofumpt -d -e .
+		'GOSUMDB=sum.golang.org' || :) gofumpt -d -e .
 
 ##############################################################################
 # Target: shfmt
@@ -281,7 +281,7 @@ tags ctags gtags GRPATH GRTAGS GTAGS:
 .PHONY: govet
 govet:
 	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || true) $(GO) vet
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) vet
 
 ##############################################################################
 # Target: README.md
@@ -399,7 +399,7 @@ INSTALL?=install
 INSTALL_BIN=$(INSTALL) -m 0755
 INSTALL_UNT=$(INSTALL) -m 0644
 
-SETCAP?=$$(command -v setcap || true)
+SETCAP?=$$(command -v setcap || :)
 SETCAP_FLAGS='cap_net_bind_service+ep'
 
 .PHONY: install
