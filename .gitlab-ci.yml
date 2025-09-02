@@ -54,7 +54,6 @@ pages:
     - pip install --upgrade pip || true
     - pip install --upgrade scspell3k codespell reuse
     - env CI_NO_CROSS=1 pdpmake lint
-    - git restore README.md || true
     - git diff --exit-code
     - env GOFLAGS="-ldflags=-s -w" pdpmake
     - env GOFLAGS="-ldflags=-s -w" pdpmake cross
