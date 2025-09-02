@@ -20,7 +20,7 @@ require (
 	github.com/google/gops v0.3.29-0.20250514124927-a2d8f7790eac
 	github.com/hashicorp/mdns v1.0.6
 	github.com/klauspost/compress v1.18.0
-	github.com/spf13/pflag v1.0.9
+	github.com/spf13/pflag v1.0.10
 	github.com/ulikunitz/xz v0.5.15
 	go.etcd.io/bbolt v1.4.3
 	go.uber.org/goleak v1.3.1-0.20241121203838-4ff5fa6529ee
