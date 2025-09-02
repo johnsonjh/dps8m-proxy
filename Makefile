@@ -86,6 +86,7 @@ lint check:
 	$(MAKE) clean
 	@printf '\n%s\n' "🧩 Running 'make doc'..."
 	$(MAKE) doc
+	git restore "README.md" > /dev/null 2>&1 || :
 	@printf '\n%s\n' "🧩 Running 'make test'..."
 	$(MAKE) test
 	@printf '\n%s\n' "🧩 Running 'make clean'..."
