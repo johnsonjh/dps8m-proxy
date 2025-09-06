@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.18* (2025-Sep-04 gf520635+) [linux/amd64]
+DPS8M Proxy v0.1.18* (2025-Sep-06 g938fbf1+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -256,7 +256,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.18* (2025-Sep-04 gf520635+) [linux/amd64]
+DPS8M Proxy v0.1.18* (2025-Sep-06 g938fbf1+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -697,7 +697,7 @@ predecessor (code statistics 📈 provided by
   |                                [arl/statsviz](https://github.com/arl/statsviz) | [MIT](https://opensource.org/license/mit)                   |
   |                              [etcd-io/bbolt](https://github.com/etcd-io/bbolt) | [MIT](https://opensource.org/license/mit)                   |
   |                            [hashicorp/mdns](https://github.com/hashicorp/mdns) | [MIT](https://opensource.org/license/mit)                   |
-  |                          [sorairolake/lzip-go](github.com/sorairolake/lzip-go) | [MIT](https://opensource.org/license/mit)                   |
+  |                  [sorairolake/lzip-go](https://github.com/sorairolake/lzip-go) | [MIT](https://opensource.org/license/mit)                   |
   |                            [uber-go/goleak](https://github.com/uber-go/goleak) | [MIT](https://opensource.org/license/mit)                   |
   |                      [gorilla/websocket](https://github.com/gorilla/websocket) | [BSD-2-Clause](https://opensource.org/license/bsd-2-clause) |
   |                                  [google/gops](https://github.com/google/gops) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
