@@ -50,6 +50,7 @@ import (
 	"github.com/arl/statsviz"
 	"github.com/klauspost/compress/gzip"
 	"github.com/klauspost/compress/zstd"
+	"github.com/sorairolake/lzip-go"
 	"github.com/spf13/pflag"
 	"github.com/ulikunitz/xz"
 	"golang.org/x/crypto/ssh"
@@ -474,13 +475,14 @@ func init() {
 
 	pflag.StringVar(&compressAlgo,
 		"compress-algo", "gzip",
-		"Compression algorithm [\"gzip\", \"xz\", \"zstd\"]\r\n"+
+		"Compression algorithm for log files\r\n"+
+			"    [\"gzip\", \"lzip\", \"xz\", \"zstd\"]\r\n"+
 			"   ")
 
 	pflag.StringVar(&compressLevel,
 		"compress-level", "normal",
-		"Compression level for gzip and zstd algorithms\r\n"+
-			"    [\"fast\", \"normal\", \"high\"]\r\n"+
+		"Compression level for gzip, lzip, and zstd\r\n"+
+			"    algorithms [\"fast\", \"normal\", \"high\"]\r\n"+
 			"   ")
 
 	pflag.BoolVar(&noCompress,
@@ -699,7 +701,7 @@ func main() {
 	}
 
 	switch compressAlgo {
-	case "gzip", "xz", "zstd": //nolint:goconst,nolintlint
+	case "gzip", "lzip", "xz", "zstd": //nolint:goconst,nolintlint
 
 	default:
 		if enableGops {
@@ -5153,6 +5155,19 @@ func compressLogFile(logFilePath string) {
 		zstdLevel = zstd.SpeedBestCompression
 	}
 
+	var lzipDictSize uint32
+
+	switch compressLevel {
+	case "fast":
+		lzipDictSize = 1 << 16 // 64 KiB
+
+	case "normal":
+		lzipDictSize = lzip.DefaultDictSize
+
+	case "high":
+		lzipDictSize = lzip.MaxDictSize
+	}
+
 	switch compressAlgo {
 	case "gzip":
 		compressedFilePath = logFilePath + ".gz"
@@ -5196,6 +5211,31 @@ func compressLogFile(logFilePath string) {
 			err := compressedFile.Close()
 			if err != nil {
 				log.Printf("%sError closing compressed file after xz writer error: %v",
+					warnPrefix(), err)
+			}
+
+			return
+		}
+
+	case "lzip":
+		compressedFilePath = logFilePath + ".lz"
+		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
+		if err != nil {
+			log.Printf("%sFailed to create compressed file %q: %v",
+				warnPrefix(), compressedFilePath, err)
+
+			return
+		}
+
+		writer, err = lzip.NewWriterOptions(
+			compressedFile, &lzip.WriterOptions{DictSize: lzipDictSize})
+		if err != nil {
+			log.Printf("%sError creating lzip writer for %q: %v",
+				warnPrefix(), compressedFilePath, err)
+
+			err := compressedFile.Close()
+			if err != nil {
+				log.Printf("%sError closing compressed file after lzip writer error: %v",
 					warnPrefix(), err)
 			}
 

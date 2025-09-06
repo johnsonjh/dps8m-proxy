@@ -253,6 +253,7 @@ sigint
 sigquit
 sigusr
 sonarcloud
+sorairolake
 sshuser
 staticcheck
 statsviz
@@ -271,6 +272,7 @@ bcdhkmnprswxyz
 cdhkmnprswxyz
 sduplicate
 sinvalid
+sorairolake
 sspi
 stacklen
 telcmd
@@ -323,6 +325,7 @@ klauspost
 libcap
 miekg
 pflag
+sorairolake
 statsviz
 ulikunitz
 
@@ -385,6 +388,7 @@ logon
 logout
 logwriter
 loopback
+lzip
 makefile
 mdns
 mebibyte

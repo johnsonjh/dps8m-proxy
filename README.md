@@ -31,7 +31,7 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 * ✅ Full IPv6 support
 * ✅ Access control whitelist/blacklist (by IP address or CIDR block)
 * ✅ Independent console and session logging (by date/time and host)
-* ✅ Automatic log‑file compression (using gzip, xz, or zstandard)
+* ✅ Automatic log‑file compression (using gzip, lzip, xz, or zstandard)
 * ✅ Banners for accepted, denied, and blocked connections (configurable per target)
 * ✅ Session connection monitoring and idle time tracking (with optional timeouts)
 * ✅ Translation of SSH `window‑change` events to TELNET NAWS messages
@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.17 (2025-Sep-04 g2a3b29f) [linux/amd64]
+DPS8M Proxy v0.1.18* (2025-Sep-06 g938fbf1+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -133,10 +133,11 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     (for console logging see "--console-log")
       --console-log string      Enable console logging ["quiet", "noquiet"]
                                     (disabled by default)
-      --compress-algo string    Compression algorithm ["gzip", "xz", "zstd"]
+      --compress-algo string    Compression algorithm for log files
+                                    ["gzip", "lzip", "xz", "zstd"]
                                     (default "gzip")
-      --compress-level string   Compression level for gzip and zstd algorithms
-                                    ["fast", "normal", "high"]
+      --compress-level string   Compression level for gzip, lzip, and zstd
+                                    algorithms ["fast", "normal", "high"]
                                     (default "normal")
       --no-compress             Disable session and/or console log compression
       --log-perm octal          Permissions (octal) for new log files
@@ -255,18 +256,19 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.17 (2025-Sep-04 g2a3b29f) [linux/amd64]
+DPS8M Proxy v0.1.18* (2025-Sep-06 g938fbf1+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.17                          |
+| dps8m/proxy               | v0.1.18*                         |
 | arl/statsviz              | v0.7.1                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
 | hashicorp/mdns            | v1.0.6                           |
 | klauspost/compress        | v1.18.0                          |
 | miekg/dns                 | v1.1.68                          |
+| sorairolake/lzip-go       | v0.3.8                           |
 | spf13/pflag               | v1.0.10                          |
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
@@ -522,13 +524,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>16</th>
-<th>7486</th>
-<th>1544</th>
+<th>7526</th>
+<th>1553</th>
 <th>359</th>
-<th>5583</th>
-<th>1323</th>
-<th>182691</th>
-<th>3343</th>
+<th>5614</th>
+<th>1330</th>
+<th>183644</th>
+<th>3355</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -547,7 +549,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>447</th>
 <th>0</th>
-<th>26158</th>
+<th>26164</th>
 <th>432</th>
 </tr><tr>
 <th>Shell</th>
@@ -557,7 +559,7 @@ predecessor (code statistics 📈 provided by
 <th>37</th>
 <th>70</th>
 <th>17</th>
-<th>3801</th>
+<th>3799</th>
 <th>90</th>
 </tr><tr>
 <th>Systemd</th>
@@ -583,13 +585,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>21</th>
-<th>8901</th>
-<th>1787</th>
+<th>8941</th>
+<th>1796</th>
 <th>590</th>
-<th>6524</th>
-<th>1423</th>
-<th>238653</th>
-<th>4358</th>
+<th>6555</th>
+<th>1430</th>
+<th>239610</th>
+<th>4370</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -695,9 +697,9 @@ predecessor (code statistics 📈 provided by
   |                                [arl/statsviz](https://github.com/arl/statsviz) | [MIT](https://opensource.org/license/mit)                   |
   |                              [etcd-io/bbolt](https://github.com/etcd-io/bbolt) | [MIT](https://opensource.org/license/mit)                   |
   |                            [hashicorp/mdns](https://github.com/hashicorp/mdns) | [MIT](https://opensource.org/license/mit)                   |
+  |                  [sorairolake/lzip-go](https://github.com/sorairolake/lzip-go) | [MIT](https://opensource.org/license/mit)                   |
   |                            [uber-go/goleak](https://github.com/uber-go/goleak) | [MIT](https://opensource.org/license/mit)                   |
   |                      [gorilla/websocket](https://github.com/gorilla/websocket) | [BSD-2-Clause](https://opensource.org/license/bsd-2-clause) |
-  |                              [google/go-cmp](https://github.com/google/go-cmp) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                  [google/gops](https://github.com/google/gops) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                    [klauspost/compress](https://github.com/klauspost/compress) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   | [libcap/cap](https://pkg.go.dev/kernel.org/pub/linux/libs/security/libcap/cap) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |

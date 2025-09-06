@@ -82,7 +82,7 @@ fi
 ###############################################################################
 # Create semaphore
 
-fifo="/tmp/${$}.fifo"
+fifo="/tmp/$$.fifo"
 trap 'rm -f "${fifo:?}"' EXIT
 mkfifo "${fifo:?}"
 exec 3<> "${fifo:?}"
