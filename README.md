@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.18* (2025-Sep-06 g938fbf1+) [linux/amd64]
+DPS8M Proxy v0.1.18 (2025-Sep-08 g5ee0883) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -256,12 +256,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.18* (2025-Sep-06 g938fbf1+) [linux/amd64]
+DPS8M Proxy v0.1.18 (2025-Sep-08 g5ee0883) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.18*                         |
+| dps8m/proxy               | v0.1.18                          |
 | arl/statsviz              | v0.7.1                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -274,7 +274,7 @@ DPS8M Proxy v0.1.18* (2025-Sep-06 g938fbf1+) [linux/amd64]
 | go.etcd.io/bbolt          | v1.4.3                           |
 | golang.org/x/crypto       | v0.41.0                          |
 | golang.org/x/net          | v0.43.0                          |
-| golang.org/x/sys          | v0.35.0                          |
+| golang.org/x/sys          | v0.36.0                          |
 | golang.org/x/term         | v0.34.0                          |
 | kernel.org/.../libcap/cap | v1.2.76                          |
 | kernel.org/.../libcap/psx | v1.2.76                          |
@@ -524,12 +524,12 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>16</th>
-<th>7526</th>
+<th>7533</th>
 <th>1553</th>
 <th>359</th>
-<th>5614</th>
-<th>1330</th>
-<th>183644</th>
+<th>5621</th>
+<th>1334</th>
+<th>183803</th>
 <th>3355</th>
 </tr><tr>
 <th>Makefile</th>
@@ -539,7 +539,7 @@ predecessor (code statistics 📈 provided by
 <th>77</th>
 <th>289</th>
 <th>83</th>
-<th>14572</th>
+<th>14591</th>
 <th>299</th>
 </tr><tr>
 <th>Markdown</th>
@@ -585,12 +585,12 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>21</th>
-<th>8941</th>
+<th>8948</th>
 <th>1796</th>
 <th>590</th>
-<th>6555</th>
-<th>1430</th>
-<th>239610</th>
+<th>6562</th>
+<th>1434</th>
+<th>239788</th>
 <th>4370</th>
 </tr></tfoot></table>
 

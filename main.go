@@ -1287,7 +1287,9 @@ func handleConsoleInput() {
 			if parts[1] == "*" {
 				killAllConnections()
 			} else {
+				connectionsMutex.Lock()
 				killConnection(parts[1])
+				connectionsMutex.Unlock()
 			}
 
 		case "r", "R":
@@ -2517,11 +2519,9 @@ func reloadLists() {
 
 func killConnection(id string) {
 	connectionsMutex.Lock()
+	defer connectionsMutex.Unlock()
 
 	conn, ok := connections[id]
-
-	connectionsMutex.Unlock()
-
 	if !ok {
 		_, _ = fmt.Fprintf(os.Stdout,
 			"%s Session ID '%s' not found.\r\n",
@@ -2539,14 +2539,17 @@ func killConnection(id string) {
 				warnPrefix(), err)
 		}
 	}
+
 	log.Printf("%sKilling connection %s...\r\n",
 		skullPrefix(), id)
 
-	_, err := conn.channel.Write(
-		[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
-	if err != nil {
-		log.Printf("%sError writing to channel for %s: %v",
-			warnPrefix(), conn.ID, err)
+	if conn.channel != nil {
+		_, err := conn.channel.Write(
+			[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+		if err != nil {
+			log.Printf("%sError writing to channel for %s: %v",
+				warnPrefix(), conn.ID, err)
+		}
 	}
 
 	connUptime := time.Since(conn.startTime)
@@ -2557,11 +2560,15 @@ func killConnection(id string) {
 
 	adminKillsTotal.Add(1)
 
-	err = conn.sshConn.Close()
-	if err != nil {
-		log.Printf("%sError closing SSH connection for %s: %v",
-			warnPrefix(), conn.ID, err)
+	if conn.sshConn != nil {
+		err := conn.sshConn.Close()
+		if err != nil {
+			log.Printf("%sError closing SSH connection for %s: %v",
+				warnPrefix(), conn.ID, err)
+		}
 	}
+
+	delete(connections, id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
