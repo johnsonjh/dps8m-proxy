@@ -402,6 +402,9 @@ INSTALL_UNT=$(INSTALL) -m 0644
 SETCAP?=$$(command -v setcap || printf '%s\n' "true")
 SETCAP_FLAGS='cap_net_bind_service+ep'
 
+SYSTEMCTL=$$(command -v systemctl || printf '%s\n' "true")
+SYSTEMCTL_FLAGS='daemon-reload'
+
 .PHONY: install
 install:
 	@printf '%s\n' "📥 Starting proxy installation..."
@@ -428,7 +431,7 @@ install:
 	@printf '\n%s\n' "🔧 Installing new '$(DEST_UNIT)'"
 	$(INSTALL_UNT) "systemd/dps8m-proxy.service" \
 		"$(UNTDIR)"/"$(DEST_UNIT)"
-	test -z "$(DESTDIR)" && { systemctl daemon-reload || :; } || :
+	test -z "$(DESTDIR)" && { $(SYSTEMCTL) $(SYSTEMCTL_FLAGS) || :; } || :
 	@printf '\n%s\n' "✅ Installation successful..."
 
 ##############################################################################
