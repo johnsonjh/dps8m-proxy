@@ -399,7 +399,7 @@ INSTALL?=install
 INSTALL_BIN=$(INSTALL) -m 0755
 INSTALL_UNT=$(INSTALL) -m 0644
 
-SETCAP?=$$(command -v setcap || :)
+SETCAP?=$$(command -v setcap || printf '%s\n' "true")
 SETCAP_FLAGS='cap_net_bind_service+ep'
 
 .PHONY: install
