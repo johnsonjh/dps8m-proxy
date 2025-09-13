@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.22 (2025-Sep-10 g9239969) [linux/amd64]
+DPS8M Proxy v0.1.22* (2025-Sep-10 gcb4fe5e+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -256,12 +256,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.22 (2025-Sep-10 g9239969) [linux/amd64]
+DPS8M Proxy v0.1.22* (2025-Sep-10 gcb4fe5e+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.22                          |
+| dps8m/proxy               | v0.1.22*                         |
 | arl/statsviz              | v0.7.1                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -273,7 +273,7 @@ DPS8M Proxy v0.1.22 (2025-Sep-10 g9239969) [linux/amd64]
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
 | golang.org/x/crypto       | v0.42.0                          |
-| golang.org/x/net          | v0.43.0                          |
+| golang.org/x/net          | v0.44.0                          |
 | golang.org/x/sys          | v0.36.0                          |
 | golang.org/x/term         | v0.35.0                          |
 | kernel.org/.../libcap/cap | v1.2.76                          |
