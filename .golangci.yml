@@ -22,6 +22,7 @@ linters:
     - gochecknoinits
     - gocognit
     - gocyclo
+    - godoclint
     - ireturn
     - maintidx
     - mnd
