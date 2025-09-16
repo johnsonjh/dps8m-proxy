@@ -3,7 +3,7 @@
 # DPS8M Proxy - .lintsetup.sh
 # Copyright (c) 2025 Jeffrey H. Johnson
 # Copyright (c) 2025 The DPS8M Development Team
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: MIT-0
 # scspell-id: 776ab862-930a-11f0-aecf-80ee73e9b8e7
 ###############################################################################
 
