@@ -135,6 +135,7 @@ FILEID: 5865f38c-6bd2-11f0-882d-80ee73e9b8e7
 basedict
 bindir
 codespell
+deps
 destdir
 distclean
 dockerenv
@@ -349,6 +350,19 @@ lintsetup
 mgechev
 mvdan
 shfmt
+
+FILEID: 3a9014e8-9335-11f0-85bd-80ee73e9b8e7
+deps
+expandtab
+goleak
+gops
+klauspost
+libcap
+miekg
+pflag
+sorairolake
+statsviz
+ulikunitz
 
 NATURAL:
 adduser

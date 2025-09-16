@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.24 (2025-Sep-16 g4537129) [linux/amd64]
+DPS8M Proxy v0.1.24* (2025-Sep-16 g67492fc+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -256,12 +256,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.24 (2025-Sep-16 g4537129) [linux/amd64]
+DPS8M Proxy v0.1.24* (2025-Sep-16 g67492fc+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.24                          |
+| dps8m/proxy               | v0.1.24*                         |
 | arl/statsviz              | v0.7.1                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -533,24 +533,24 @@ predecessor (code statistics 📈 provided by
 <th>3355</th>
 </tr><tr>
 <th>Shell</th>
-<th>2</th>
-<th>207</th>
-<th>43</th>
-<th>63</th>
-<th>101</th>
-<th>20</th>
-<th>6307</th>
-<th>127</th>
+<th>3</th>
+<th>303</th>
+<th>72</th>
+<th>82</th>
+<th>149</th>
+<th>21</th>
+<th>8800</th>
+<th>151</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>439</th>
+<th>441</th>
 <th>71</th>
 <th>77</th>
-<th>291</th>
+<th>293</th>
 <th>84</th>
-<th>14747</th>
-<th>301</th>
+<th>14821</th>
+<th>302</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
@@ -584,14 +584,14 @@ predecessor (code statistics 📈 provided by
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
-<th>22</th>
-<th>9027</th>
-<th>1813</th>
-<th>616</th>
-<th>6598</th>
-<th>1438</th>
-<th>242667</th>
-<th>4411</th>
+<th>23</th>
+<th>9125</th>
+<th>1842</th>
+<th>635</th>
+<th>6648</th>
+<th>1439</th>
+<th>245234</th>
+<th>4436</th>
 </tr></tfoot></table>
 
 ## Future plans
