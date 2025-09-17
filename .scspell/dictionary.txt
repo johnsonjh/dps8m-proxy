@@ -392,6 +392,7 @@ gibibyte
 gibibytes
 github
 gitlab
+godoclint
 gofmt
 gofumpt
 golang
