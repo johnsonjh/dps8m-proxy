@@ -231,19 +231,21 @@ gofumpt:
 # Target: shfmt
 
 .PHONY: shfmt
-shfmt: .cross.sh
+shfmt: .cross.sh .lintsetup.sh .update-deps.sh
 	@command -v shfmt > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ shfmt not found!"; exit 0; } ; \
-		set -x; shfmt -bn -sr -fn -i 2 -s -d .cross.sh
+		set -x; shfmt -bn -sr -fn -i 2 -s -d \
+			.cross.sh .lintsetup.sh .update-deps.sh
 
 ##############################################################################
 # Target: shellcheck
 
 .PHONY: shellcheck
-shellcheck: .cross.sh
+shellcheck: .cross.sh .lintsetup.sh .update-deps.sh
 	@command -v shellcheck > /dev/null 2>&1 || \
 		{ printf '%s\n' "⚠️ shellcheck not found!"; exit 0; } ; \
-		set -x; shellcheck -s sh -o any,all .cross.sh
+		set -x; shellcheck -s sh -o any,all \
+			.cross.sh .lintsetup.sh .update-deps.sh
 
 ##############################################################################
 # Target: codespell

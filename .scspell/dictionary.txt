@@ -87,7 +87,11 @@ wronly
 FILETYPE: Shell; .sh
 esac
 getconf
+goexe
+gopath
+goproxy
 gosumdb
+gotoolchain
 mkfifo
 nosemgrep
 nproc
@@ -110,6 +114,7 @@ gochecknoglobals
 gochecknoinits
 gocognit
 gocyclo
+godoclint
 goimports
 golangci
 golines
@@ -130,6 +135,7 @@ FILEID: 5865f38c-6bd2-11f0-882d-80ee73e9b8e7
 basedict
 bindir
 codespell
+deps
 destdir
 distclean
 dockerenv
@@ -155,6 +161,7 @@ grtags
 gtags
 jstemmer
 juntaki
+lintsetup
 notparallel
 pflag
 printf
@@ -225,6 +232,7 @@ icrnl
 kisielk
 klauspost
 libcap
+lintsetup
 magicant
 mailto
 miekg
@@ -329,6 +337,33 @@ sorairolake
 statsviz
 ulikunitz
 
+FILEID: 776ab862-930a-11f0-aecf-80ee73e9b8e7
+boyter
+errcheck
+expandtab
+githubusercontent
+golangci
+govulncheck
+honnef
+kisielk
+lintsetup
+mgechev
+mvdan
+shfmt
+
+FILEID: 3a9014e8-9335-11f0-85bd-80ee73e9b8e7
+deps
+expandtab
+goleak
+gops
+klauspost
+libcap
+miekg
+pflag
+sorairolake
+statsviz
+ulikunitz
+
 NATURAL:
 adduser
 avahi
@@ -417,6 +452,7 @@ shellcheck
 socat
 solaris
 spdx
+staticcheck
 subnegotiation
 sudo
 supdup

@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.23 (2025-Sep-13 g3880e7a) [linux/amd64]
+DPS8M Proxy v0.1.24 (2025-Sep-17 g28ca256) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -256,12 +256,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.23 (2025-Sep-13 g3880e7a) [linux/amd64]
+DPS8M Proxy v0.1.24 (2025-Sep-17 g28ca256) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.23                          |
+| dps8m/proxy               | v0.1.24                          |
 | arl/statsviz              | v0.7.1                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -532,35 +532,35 @@ predecessor (code statistics 📈 provided by
 <th>183803</th>
 <th>3355</th>
 </tr><tr>
+<th>Shell</th>
+<th>3</th>
+<th>304</th>
+<th>72</th>
+<th>82</th>
+<th>150</th>
+<th>21</th>
+<th>8837</th>
+<th>152</th>
+</tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>439</th>
+<th>441</th>
 <th>71</th>
 <th>77</th>
-<th>291</th>
+<th>293</th>
 <th>84</th>
-<th>14691</th>
-<th>301</th>
+<th>14821</th>
+<th>302</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>552</th>
+<th>555</th>
 <th>105</th>
 <th>0</th>
-<th>447</th>
+<th>450</th>
 <th>0</th>
-<th>26164</th>
-<th>432</th>
-</tr><tr>
-<th>Shell</th>
-<th>1</th>
-<th>134</th>
-<th>27</th>
-<th>37</th>
-<th>70</th>
-<th>17</th>
-<th>3799</th>
-<th>90</th>
+<th>26379</th>
+<th>435</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -584,14 +584,14 @@ predecessor (code statistics 📈 provided by
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
-<th>21</th>
-<th>8951</th>
-<th>1797</th>
-<th>590</th>
-<th>6564</th>
-<th>1435</th>
-<th>239888</th>
-<th>4372</th>
+<th>23</th>
+<th>9126</th>
+<th>1842</th>
+<th>635</th>
+<th>6649</th>
+<th>1439</th>
+<th>245271</th>
+<th>4437</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -658,7 +658,10 @@ predecessor (code statistics 📈 provided by
   conformance.
 * The [`Makefile`](Makefile) provides a `lint` convenience target to
   help you run all this.  You can also examine our
-  [`.gitlab-ci.yml`](.gitlab-ci.yml) file.
+  [`.gitlab-ci.yml`](.gitlab-ci.yml) file.  There is also a
+  convenience script, `.lintsetup.sh`, to help install the Go-based
+  linters, and the Python-based linters can be installed via `pip`
+  (*i.e.*, `pip install --upgrade scspell3k codespell reuse`).
 
 ### Recommended
 
