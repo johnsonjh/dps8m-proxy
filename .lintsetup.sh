@@ -16,10 +16,10 @@ set -eu
 # Latest or master?
 
 if [ "${BRANCH:-}" = "latest" ]; then
-  printf '%s\n' 'Installing "latest" linters...'
+  printf '%s' 'Installing "latest" linters'
 else
   BRANCH="master"
-  printf '%s\n' 'Installing "master" linters...'
+  printf '%s' 'Installing "master" linters'
 fi
 
 ###############################################################################
@@ -36,9 +36,10 @@ TZ=UTC
 export GO GOTOOLCHAIN GOSUMDB GOPROXY GOPATH GOEXE TZ
 
 ###############################################################################
-# Ensure GOEXE directory exists
+# Ensure GOEXE directory exists and report
 
-mkdir -p "${GOEXE:-}"
+mkdir -p "${GOEXE:?}"
+printf '%s\n' " to '${GOEXE:?}'..."
 
 ###############################################################################
 # Verbose
