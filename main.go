@@ -7,6 +7,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // DPS8M Proxy
+//
+//nolint:godoclint,nolintlint
 package main
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,6 +62,7 @@ import (
 
 // Global constants.
 const (
+	//nolint:godoclint,nolintlint
 	// TELNET Commands.
 	TelcmdSE    = 240 // Subnegotiation End
 	TelcmdNOP   = 241 // No operation
@@ -78,6 +81,7 @@ const (
 	TelcmdDONT  = 254 // DONT
 	TelcmdIAC   = 255 // Interpret As Command
 
+	//nolint:godoclint,nolintlint
 	// TELNET Command Options.
 	TeloptBinary            = 0   // Binary
 	TeloptEcho              = 1   // Echo
@@ -143,12 +147,14 @@ const (
 	TeloptGMCP              = 201 // Generic MUD Client Protocol
 	TeloptEnd               = 255 // End of Option List
 
+	//nolint:godoclint,nolintlint
 	// TELNET subnegotiation commands.
 	TelnetIs    = 0 // IS
 	TelnetSend  = 1 // SEND
 	TelnetReply = 2 // REPLY
 	TelnetName  = 3 // NAME
 
+	//nolint:godoclint,nolintlint
 	// IEC sizes.
 	KiB = 1024       // Kibibyte
 	MiB = 1024 * KiB // Mebibyte
