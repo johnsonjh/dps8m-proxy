@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.26 (2025-Sep-17 gab062ce) [linux/amd64]
+DPS8M Proxy v0.1.27 (2025-Oct-07 g6fa9c17) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -256,13 +256,13 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.26 (2025-Sep-17 gab062ce) [linux/amd64]
+DPS8M Proxy v0.1.27 (2025-Oct-07 g6fa9c17) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.26                          |
-| arl/statsviz              | v0.7.1                           |
+| dps8m/proxy               | v0.1.27                          |
+| arl/statsviz              | v0.7.2                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
 | hashicorp/mdns            | v1.0.6                           |
@@ -273,12 +273,12 @@ DPS8M Proxy v0.1.26 (2025-Sep-17 gab062ce) [linux/amd64]
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
 | golang.org/x/crypto       | v0.42.0                          |
-| golang.org/x/net          | v0.44.0                          |
+| golang.org/x/net          | v0.45.0                          |
 | golang.org/x/sys          | v0.36.0                          |
 | golang.org/x/term         | v0.35.0                          |
 | kernel.org/.../libcap/cap | v1.2.76                          |
 | kernel.org/.../libcap/psx | v1.2.76                          |
-| Go compiler (gc)          | v1.25.1                          |
+| Go compiler (gc)          | v1.25.2                          |
 +===========================+==================================+
 ```
 
@@ -544,13 +544,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>441</th>
+<th>440</th>
 <th>71</th>
 <th>77</th>
-<th>293</th>
+<th>292</th>
 <th>84</th>
-<th>14821</th>
-<th>302</th>
+<th>14807</th>
+<th>301</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
@@ -585,13 +585,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>23</th>
-<th>9162</th>
+<th>9161</th>
 <th>1842</th>
 <th>671</th>
-<th>6649</th>
+<th>6648</th>
 <th>1439</th>
-<th>245923</th>
-<th>4440</th>
+<th>245909</th>
+<th>4439</th>
 </tr></tfoot></table>
 
 ## Future plans
