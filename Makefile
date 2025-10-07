@@ -9,7 +9,6 @@
 ##############################################################################
 # Configuration
 
-SHELL=/bin/sh
 GO?=$$(command -v go 2> /dev/null || printf '%s\n' "go")
 CP=cp -f
 PERL=perl
