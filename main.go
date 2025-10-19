@@ -1034,9 +1034,9 @@ func main() {
 							conn.hostName, idleTime.Round(time.Second),
 							connUptime.Round(time.Second))
 
-						_, err := conn.channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+						_, err := conn.channel.Write(fmt.Appendf(nil,
 							"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
-							connUptime.Round(time.Second))))
+							connUptime.Round(time.Second)))
 						if err != nil {
 							log.Printf(
 								"%sError writing idle timeout message to channel for %s: %v",
@@ -1058,9 +1058,9 @@ func main() {
 							yellowDotPrefix(), id, conn.userName,
 							conn.hostName, connUptime.Round(time.Second))
 
-						_, err := conn.channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+						_, err := conn.channel.Write(fmt.Appendf(nil,
 							"\r\n\r\nCONNECTION TIMEOUT (link time %s)\r\n\r\n",
-							connUptime.Round(time.Second))))
+							connUptime.Round(time.Second)))
 						if err != nil {
 							log.Printf(
 								"%sError writing connection timeout message to channel for %s: %v",
@@ -2291,9 +2291,7 @@ func listConfiguration() {
 
 		padding := textWidth - len(text)
 
-		if padding < 0 {
-			padding = 0
-		}
+		padding = max(0, padding)
 
 		b.WriteString(strings.Repeat(" ", padding))
 		b.WriteString(" |\r\n")
@@ -2685,7 +2683,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) {
 			err)
 	}
 
-	var privateKey interface{}
+	var privateKey any
 	var pemBlock *pem.Block
 
 	switch keyType {
@@ -3319,8 +3317,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		for time.Since(startTime).Seconds() < sshDelay {
 			char := string(spinner[spinnerIndex])
 
-			_, err := channel.Write([]byte(fmt.Sprintf("\r%s", //nolint:staticcheck
-				char)))
+			_, err := channel.Write(fmt.Appendf(nil, "\r%s",
+				char))
 			if err != nil {
 				if errors.Is(err, io.EOF) {
 					delayAbandonedTotal.Add(1)
@@ -3407,9 +3405,9 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		<-conn.monitoredConnection.cancelCtx.Done()
 		dur := time.Since(conn.startTime)
 
-		_, err := channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+		_, err := channel.Write(fmt.Appendf(nil,
 			"\r\nMONITORING SESSION CLOSED (monitored for %s)\r\n\r\n",
-			dur.Round(time.Second))))
+			dur.Round(time.Second)))
 		if err != nil {
 			log.Printf("%sError writing to channel for %s: %v",
 				warnPrefix(), conn.ID, err)
@@ -3516,9 +3514,9 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 		defer func() {
 			dur := time.Since(start)
-			_, err := logwriter.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+			_, err := logwriter.Write(fmt.Appendf(nil,
 				nowStamp()+" Session end (link time %s)\r\n",
-				dur.Round(time.Second))))
+				dur.Round(time.Second)))
 			if err != nil {
 				log.Printf("%sError writing to log: %v",
 					warnPrefix(), err)
@@ -3587,16 +3585,16 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}
 
 	if !noLog {
-		_, err := logwriter.Write([]byte(fmt.Sprintf( //nolint:staticcheck
-			nowStamp()+" Target: %s:%d\r\n", targetHost, targetPort)))
+		_, err := logwriter.Write(fmt.Appendf(nil,
+			nowStamp()+" Target: %s:%d\r\n", targetHost, targetPort))
 		if err != nil {
 			log.Printf("%sError writing to log for %s: %v",
 				warnPrefix(), conn.ID, err)
 		}
 
-		_, err = logwriter.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+		_, err = logwriter.Write(fmt.Appendf(nil,
 			nowStamp()+" Connection sharing username: '%s'\r\n",
-			conn.shareableUsername)))
+			conn.shareableUsername))
 		if err != nil {
 			log.Printf("%sError writing to log for %s: %v",
 				warnPrefix(), conn.ID, err)
@@ -3887,9 +3885,9 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					yellowDotPrefix(), conn.ID, conn.userName,
 					conn.hostName, dur.Round(time.Second))
 
-				_, err := channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+				_, err := channel.Write(fmt.Appendf(nil,
 					"\r\nCONNECTION CLOSED (link time %s)\r\n\r\n",
-					dur.Round(time.Second))))
+					dur.Round(time.Second)))
 				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
@@ -3900,23 +3898,23 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				inRateNVT := uint64(float64(atomic.LoadUint64(&telnetIn)) / dur.Seconds())
 				outRateNVT := uint64(float64(atomic.LoadUint64(&telnetOut)) / dur.Seconds())
 
-				_, err = channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+				_, err = channel.Write(fmt.Appendf(nil,
 					">> SSH - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
 					formatBytes(atomic.LoadUint64(&sshIn)),
 					formatBytes(atomic.LoadUint64(&sshOut)),
 					formatBytes(inRateSSH),
-					formatBytes(outRateSSH))))
+					formatBytes(outRateSSH)))
 				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
 
-				_, err = channel.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+				_, err = channel.Write(fmt.Appendf(nil,
 					">> NVT - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
 					formatBytes(atomic.LoadUint64(&telnetIn)),
 					formatBytes(atomic.LoadUint64(&telnetOut)),
 					formatBytes(inRateNVT),
-					formatBytes(outRateNVT))))
+					formatBytes(outRateNVT)))
 				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
@@ -4177,6 +4175,10 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 						}
 
 						if seIndex != -1 {
+							if i+2 >= len(buf) || i+3 > seIndex { // Malformed packet?
+								continue // Skip this sub-negotiation.
+							}
+
 							subOpt := buf[i+2]
 							subData := buf[i+3 : seIndex]
 
@@ -4684,9 +4686,9 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 				warnPrefix(), err)
 		}
 
-		_, err = ch.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+		_, err = ch.Write(fmt.Appendf(nil,
 			">> LNK - Username '%s' can be used to share this session.\r\n",
-			conn.shareableUsername)))
+			conn.shareableUsername))
 		if err != nil {
 			log.Printf("%sError writing sharable username to channel: %v",
 				warnPrefix(), err)
@@ -4715,9 +4717,9 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 				userStr = "user"
 			}
 
-			_, err := ch.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+			_, err := ch.Write(fmt.Appendf(nil,
 				">> MON - Shared session has been viewed %d %s; %d %s currently online.\r\n",
-				conn.totalMonitors, timesStr, currentMonitors, userStr)))
+				conn.totalMonitors, timesStr, currentMonitors, userStr))
 			if err != nil {
 				log.Printf("%sError writing shared session information to channel: %v",
 					warnPrefix(), err)
@@ -4734,19 +4736,19 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		inRateNVT := uint64(float64(atomic.LoadUint64(telnetIn)) / dur.Seconds())
 		outRateNVT := uint64(float64(atomic.LoadUint64(telnetOut)) / dur.Seconds())
 
-		_, err = ch.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+		_, err = ch.Write(fmt.Appendf(nil,
 			">> SSH - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
 			formatBytes(inSSH), formatBytes(outSSH),
-			formatBytes(inRateSSH), formatBytes(outRateSSH))))
+			formatBytes(inRateSSH), formatBytes(outRateSSH)))
 		if err != nil {
 			log.Printf("%sError writing SSH statistics to channel: %v",
 				warnPrefix(), err)
 		}
 
-		_, err = ch.Write([]byte(fmt.Sprintf( //nolint:staticcheck
+		_, err = ch.Write(fmt.Appendf(nil,
 			">> NVT - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
 			formatBytes(inNVT), formatBytes(outNVT),
-			formatBytes(inRateNVT), formatBytes(outRateNVT))))
+			formatBytes(inRateNVT), formatBytes(outRateNVT)))
 		if err != nil {
 			log.Printf("%sError writing NVT statistics to channel: %v",
 				warnPrefix(), err)
