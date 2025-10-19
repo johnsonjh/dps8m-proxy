@@ -1,6 +1,7 @@
 FILETYPE: Go; .go
 addrs
 altroute
+appendf
 argv
 atcp
 atoi

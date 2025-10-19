@@ -112,7 +112,7 @@ type stdLogger struct{}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Debug(v ...interface{}) {
+func (l *stdLogger) Debug(v ...any) {
 	if !logLevelEnabled(LogDebug) {
 		return
 	}
@@ -122,7 +122,7 @@ func (l *stdLogger) Debug(v ...interface{}) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Debugf(format string, v ...interface{}) {
+func (l *stdLogger) Debugf(format string, v ...any) {
 	if !logLevelEnabled(LogDebug) {
 		return
 	}
@@ -132,7 +132,7 @@ func (l *stdLogger) Debugf(format string, v ...interface{}) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Info(v ...interface{}) {
+func (l *stdLogger) Info(v ...any) {
 	if !logLevelEnabled(LogInfo) {
 		return
 	}
@@ -142,7 +142,7 @@ func (l *stdLogger) Info(v ...interface{}) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Infof(format string, v ...interface{}) {
+func (l *stdLogger) Infof(format string, v ...any) {
 	if !logLevelEnabled(LogInfo) {
 		return
 	}
@@ -152,7 +152,7 @@ func (l *stdLogger) Infof(format string, v ...interface{}) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Warning(v ...interface{}) {
+func (l *stdLogger) Warning(v ...any) {
 	if !logLevelEnabled(LogWarning) {
 		return
 	}
@@ -162,7 +162,7 @@ func (l *stdLogger) Warning(v ...interface{}) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Warningf(format string, v ...interface{}) {
+func (l *stdLogger) Warningf(format string, v ...any) {
 	if !logLevelEnabled(LogWarning) {
 		return
 	}
@@ -172,7 +172,7 @@ func (l *stdLogger) Warningf(format string, v ...interface{}) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Error(v ...interface{}) {
+func (l *stdLogger) Error(v ...any) {
 	if !logLevelEnabled(LogError) {
 		return
 	}
@@ -182,7 +182,7 @@ func (l *stdLogger) Error(v ...interface{}) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Errorf(format string, v ...interface{}) {
+func (l *stdLogger) Errorf(format string, v ...any) {
 	if !logLevelEnabled(LogError) {
 		return
 	}
@@ -192,7 +192,7 @@ func (l *stdLogger) Errorf(format string, v ...interface{}) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Fatal(v ...interface{}) {
+func (l *stdLogger) Fatal(v ...any) {
 	if !logLevelEnabled(LogFatal) {
 		return
 	}
@@ -206,7 +206,7 @@ func (l *stdLogger) Fatal(v ...interface{}) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Fatalf(format string, v ...interface{}) {
+func (l *stdLogger) Fatalf(format string, v ...any) {
 	if !logLevelEnabled(LogFatal) {
 		return
 	}
@@ -220,7 +220,7 @@ func (l *stdLogger) Fatalf(format string, v ...interface{}) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Panic(v ...interface{}) {
+func (l *stdLogger) Panic(v ...any) {
 	if !logLevelEnabled(LogPanic) {
 		return
 	}
@@ -230,7 +230,7 @@ func (l *stdLogger) Panic(v ...interface{}) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (l *stdLogger) Panicf(format string, v ...interface{}) {
+func (l *stdLogger) Panicf(format string, v ...any) {
 	if !logLevelEnabled(LogPanic) {
 		return
 	}
