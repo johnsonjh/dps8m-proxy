@@ -29,6 +29,8 @@ var nameReplacements = []struct{ old, new string }{
 	{"gitlab.com/", ""},
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 var versionReplacements = []struct{ old, new string }{
 	{"v0.3.29-0.20250514124927-a2d8f7790eac", "v0.3.29* (2025-May-14, ga2d8f77)"},
 }
@@ -122,6 +124,7 @@ func printVersionTable() {
 	if nameLen := utf8.RuneCountInString(componentName); nameLen > maxName {
 		maxName = nameLen
 	}
+
 	if verLen := utf8.RuneCountInString(componentVersion); verLen > maxVer {
 		maxVer = verLen
 	}
