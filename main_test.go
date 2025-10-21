@@ -47,6 +47,7 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 
 	defer func() {
 		consoleLogMutex.Lock()
+
 		if consoleLogFile != nil {
 			err := consoleLogFile.Close()
 			if err != nil {
@@ -107,6 +108,7 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 
 	defer func() {
 		consoleLogMutex.Lock()
+
 		if consoleLogFile != nil {
 			err := consoleLogFile.Close()
 			if err != nil {

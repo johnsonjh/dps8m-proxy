@@ -73,6 +73,7 @@ func printVersionTable() {
 	hasDirty := strings.Contains(raw, "+dirty")
 
 	compVer := raw
+
 	if idx := strings.IndexFunc(raw, func(r rune) bool {
 		return r >= '0' && r <= '9'
 	}); idx >= 0 {
@@ -80,6 +81,7 @@ func printVersionTable() {
 	}
 
 	compVer = formatCompilerVersion(compVer)
+
 	if runtime.Compiler == "gc" {
 		if i := strings.Index(compVer, " "); i != -1 {
 			compVer = compVer[:i]
@@ -116,6 +118,7 @@ func printVersionTable() {
 		if nameLen > maxName {
 			maxName = nameLen
 		}
+
 		if verLen > maxVer {
 			maxVer = verLen
 		}

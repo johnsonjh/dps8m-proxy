@@ -76,6 +76,7 @@ var logLevelMap = map[string]LogLevel{
 
 func SetDbLogLevel(level string) error {
 	level = strings.ToLower(level)
+
 	if l, ok := logLevelMap[level]; ok {
 		currentDbLogLevel = l
 
@@ -285,6 +286,7 @@ func initDB() {
 		}
 
 		val := bucket.Get(shutdownMarkerKey)
+
 		if bytes.Equal(val, []byte("0")) {
 			log.Printf("%sUnclean database shutdown detected!",
 				warnPrefix())
@@ -456,6 +458,7 @@ func loadCountersFromDB() {
 
 		for key, val := range counters {
 			data := bucket.Get([]byte(key))
+
 			if len(data) == 8 {
 				val.Store(binary.BigEndian.Uint64(data))
 			}

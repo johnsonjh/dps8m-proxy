@@ -35,6 +35,7 @@ func handleSignal(s os.Signal) {
 			bellPrefix())
 		gracefulShutdownMode.Store(true)
 		connectionsMutex.Lock()
+
 		if len(connections) == 0 {
 			connectionsMutex.Unlock()
 			select {
