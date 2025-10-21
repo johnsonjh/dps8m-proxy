@@ -36,7 +36,7 @@
 #
 #  6. Optional: Adjust the timeouts below to suit your installation.
 #
-#  8. Install the `dps8m-proxy.service` file to your systemd system-wide
+#  7. Install the `dps8m-proxy.service` file to your systemd system-wide
 #     unit directory, which is usually `/usr/lib/systemd/system`.
 #
 #  8. Reload the systemd configuration with `systemctl daemon-reload`.
