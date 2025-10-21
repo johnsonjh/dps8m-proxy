@@ -639,6 +639,7 @@ predecessor (code statistics 📈 provided by
   `sed`), and [`reuse`](https://github.com/fsfe/reuse-tool),
   [`staticcheck`](https://staticcheck.dev/),
   [`revive`](https://revive.run/),
+  [`gopls`](https://github.com/golang/tools/tree/master/gopls),
   [`errcheck`](https://github.com/kisielk/errcheck),
   [`gofumpt`](https://github.com/mvdan/gofumpt),
   [`govulncheck`](https://go.googlesource.com/vuln),
