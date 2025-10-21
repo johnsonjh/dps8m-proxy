@@ -52,10 +52,15 @@ set -x
 ${GO:?} install -v "github.com/boyter/scc/v3@${BRANCH:-}"
 ${GO:?} install -v "github.com/kisielk/errcheck@${BRANCH:-}"
 ${GO:?} install -v "github.com/mgechev/revive@${BRANCH:-}"
+${GO:?} install -v "golang.org/x/vuln/cmd/govulncheck@${BRANCH:-}"
 ${GO:?} install -v "honnef.co/go/tools/cmd/staticcheck@${BRANCH:-}"
 ${GO:?} install -v "mvdan.cc/gofumpt@${BRANCH:-}"
 ${GO:?} install -v "mvdan.cc/sh/v3/cmd/shfmt@${BRANCH:-}"
-${GO:?} install -v "golang.org/x/vuln/cmd/govulncheck@${BRANCH:-}"
+
+###############################################################################
+# Install gopls (always @latest)
+
+${GO:?} install -v "golang.org/x/tools/gopls@latest@latest"
 
 ###############################################################################
 # Install golangci-lint

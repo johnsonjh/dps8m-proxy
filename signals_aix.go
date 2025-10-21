@@ -28,9 +28,7 @@ import (
 func lowerGOGC() {
 	currentGOGC := debug.SetGCPercent(-1)
 	newGOGC := currentGOGC / 2
-	if newGOGC <= 1 {
-		newGOGC = 1
-	}
+	newGOGC = max(newGOGC, 1)
 	debug.SetGCPercent(newGOGC)
 }
 

@@ -107,7 +107,8 @@ lint check:
 		shfmt \
 		golangci-lint \
 		golist \
-		govulncheck
+		govulncheck \
+		gopls
 	@test -z "$${CI_NO_CROSS:-}" && { \
 		printf '\n%s\n' "🧩 Running 'make cross'..."; \
 		set -x; env MAX_CPU=1 $(MAKE) cross; exit $${?}; } || :
@@ -214,6 +215,17 @@ govulncheck:
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) govulncheck ./...
+
+##############################################################################
+# Target: gopls
+
+.PHONY: gopls
+gopls:
+	@command -v gopls > /dev/null 2>&1 || \
+		{ printf '%s\n' "⚠️ gopls not found!"; exit 0; } ; \
+		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
+		'GOSUMDB=sum.golang.org' || :) gopls check -severity=hint ./*.go
 
 ##############################################################################
 # Target: gofumpt
