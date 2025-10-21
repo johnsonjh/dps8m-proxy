@@ -60,7 +60,7 @@ ${GO:?} install -v "mvdan.cc/sh/v3/cmd/shfmt@${BRANCH:-}"
 ###############################################################################
 # Install gopls (always @latest)
 
-${GO:?} install -v "golang.org/x/tools/gopls@latest@latest"
+${GO:?} install -v "golang.org/x/tools/gopls@latest"
 
 ###############################################################################
 # Install golangci-lint
