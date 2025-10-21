@@ -398,6 +398,7 @@ gofmt
 gofumpt
 golang
 google
+gopls
 goroutines
 grep
 gzip
