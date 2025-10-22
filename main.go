@@ -405,7 +405,8 @@ func init() {
 		output := re.ReplaceAllString(buf.String(), "             ")
 		reSpaces := regexp.MustCompile(`(?m)^ {6}`)
 		output = reSpaces.ReplaceAllString(output, "  ")
-		fmt.Fprint(os.Stdout, output)
+		_, _ = fmt.Fprint(os.Stdout,
+			output)
 	}
 
 	// NOTE: Ensure that all pflag --help / -h output renders in less
