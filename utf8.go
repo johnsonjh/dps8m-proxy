@@ -61,6 +61,7 @@ func canOutputUTF8() bool {
 	}
 
 	testStr := "┌─"
+
 	if !utf8.ValidString(testStr) {
 		return false
 	}

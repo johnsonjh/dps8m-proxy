@@ -1188,6 +1188,7 @@ func printVersion(short bool) {
 	if showVersion {
 		fmt.Printf("%s\r\n",
 			versionString)
+
 		if !short {
 			fmt.Printf("\r\n")
 			printVersionTable()
@@ -2104,6 +2105,7 @@ func listConfiguration() {
 	updateMaxLength(s10)
 
 	var gopsStr string
+
 	if enableGops {
 		gopsStr = "enabled"
 	} else {
@@ -2204,6 +2206,7 @@ func listConfiguration() {
 	updateMaxLength(s8)
 
 	debugHTTPStr := "disabled"
+
 	if debugAddr != "" {
 		debugHTTPStr = debugAddr
 	}
@@ -2406,6 +2409,7 @@ func listConfiguration() {
 	b.WriteString(separator)
 
 	debugHTTP := "disabled"
+
 	if debugAddr != "" {
 		debugHTTP = debugAddr
 	}
@@ -2949,6 +2953,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		}
 
 		const unknownHost = "<UNKNOWN>"
+
 		if !suppressLogs {
 			host, _, err := net.SplitHostPort(conn.hostName)
 			if err != nil {
@@ -3237,6 +3242,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}
 
 	var rejectedByRule string
+
 	for _, ipNet := range blacklistedNetworks {
 		if ipNet.Contains(clientIP) {
 			rejectedByRule = ipNet.String()
@@ -4166,6 +4172,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 
 					case TelcmdSB:
 						seIndex := -1
+
 						for j := i + 3; j < n-1; j++ {
 							if buf[j] == TelcmdIAC && buf[j+1] == TelcmdSE {
 								seIndex = j
@@ -4238,12 +4245,14 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func writeNegotiation(ch io.Writer, logw io.Writer, line string, username string) {
+func writeNegotiation(ch, logw io.Writer, line, username string) {
 	msg := line
+
 	if debugNegotiation {
 		msg = fmt.Sprintf("%s %s",
 			username, line)
 	}
+
 	msg += "\r\n"
 
 	_, err := logw.Write([]byte(msg))
@@ -4266,6 +4275,7 @@ func writeNegotiation(ch io.Writer, logw io.Writer, line string, username string
 func sendIAC(w io.Writer, cmd byte, opts ...byte) {
 	data := []byte{TelcmdIAC, cmd}
 	data = append(data, opts...)
+
 	_, err := w.Write(data)
 	if err != nil {
 		log.Printf("%sError writing TELNET IAC command to writer: %v",
@@ -4579,6 +4589,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 
 	case 'a', 'A':
 		sendIAC(remote, TelcmdAYT)
+
 		_, err := logw.Write([]byte{TelcmdIAC, TelcmdAYT})
 		if err != nil {
 			log.Printf("%sError writing AYT to log: %v",
@@ -4599,6 +4610,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 
 	case 'b', 'B':
 		sendIAC(remote, TelcmdBreak)
+
 		_, err := logw.Write([]byte{TelcmdIAC, TelcmdBreak})
 		if err != nil {
 			log.Printf("%sError writing BREAK to log: %v",
@@ -4619,6 +4631,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 
 	case 'i', 'I':
 		sendIAC(remote, TelcmdIP)
+
 		_, err := logw.Write([]byte{TelcmdIAC, TelcmdIP})
 		if err != nil {
 			log.Printf("%sError writing Interrupt to log: %v",
@@ -4639,6 +4652,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 
 	case 'k', 'K':
 		conn.emacsKeymapEnabled = !conn.emacsKeymapEnabled
+
 		if conn.emacsKeymapEnabled {
 			_, err := ch.Write([]byte("\r\n>> Emacs keymap ENABLED\r\n"))
 			if err != nil {
@@ -4661,6 +4675,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 
 	case 'n', 'N':
 		sendIAC(remote, TelcmdNOP)
+
 		_, err := logw.Write([]byte{TelcmdIAC, TelcmdNOP})
 		if err != nil {
 			log.Printf("%sError writing NOP to log: %v",
@@ -4680,6 +4695,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		}
 	case 's', 'S':
 		dur := time.Since(start)
+
 		_, err := ch.Write([]byte("\r\n"))
 		if err != nil {
 			log.Printf("%sError writing newline to channel: %v",
@@ -4755,6 +4771,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		}
 
 		keymapStatus := ""
+
 		if conn.emacsKeymapEnabled {
 			keymapStatus = " (Emacs keymap enabled)"
 		}
@@ -5028,11 +5045,13 @@ func startConsoleLogRolloverChecker() {
 		case <-ticker.C:
 			now := time.Now()
 			currentDate := now.Format("2006-01-02")
+
 			if lastLogDate != currentDate {
 				log.Printf("%sDate changed, rotating console log.",
 					bellPrefix())
 				rotateConsoleLogAt(now)
 			}
+
 		case <-shutdownSignal:
 			return
 		}
@@ -5103,6 +5122,7 @@ func rotateConsoleLogAt(t time.Time) {
 	lastLogDate = t.Format("2006-01-02")
 
 	fileWriter := &emojiStripperWriter{w: consoleLogFile}
+
 	if isConsoleLogQuiet {
 		log.SetOutput(fileWriter)
 	} else {
@@ -5119,6 +5139,7 @@ func rotateConsoleLogAt(t time.Time) {
 				"%s %sError closing previous console log file: %v\r\n",
 				nowStamp(), warnPrefix(), err)
 		}
+
 		if !noCompress {
 			compressLogFile(oldLogPath)
 		}
@@ -5424,11 +5445,13 @@ func listGoroutines() {
 		}
 
 		lines := strings.Split(g, "\n")
+
 		if len(lines) < 2 {
 			continue
 		}
 
 		header := strings.Fields(lines[0])
+
 		if len(header) < 2 {
 			continue
 		}

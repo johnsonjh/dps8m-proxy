@@ -29,6 +29,8 @@ var nameReplacements = []struct{ old, new string }{
 	{"gitlab.com/", ""},
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 var versionReplacements = []struct{ old, new string }{
 	{"v0.3.29-0.20250514124927-a2d8f7790eac", "v0.3.29* (2025-May-14, ga2d8f77)"},
 }
@@ -71,6 +73,7 @@ func printVersionTable() {
 	hasDirty := strings.Contains(raw, "+dirty")
 
 	compVer := raw
+
 	if idx := strings.IndexFunc(raw, func(r rune) bool {
 		return r >= '0' && r <= '9'
 	}); idx >= 0 {
@@ -78,6 +81,7 @@ func printVersionTable() {
 	}
 
 	compVer = formatCompilerVersion(compVer)
+
 	if runtime.Compiler == "gc" {
 		if i := strings.Index(compVer, " "); i != -1 {
 			compVer = compVer[:i]
@@ -114,6 +118,7 @@ func printVersionTable() {
 		if nameLen > maxName {
 			maxName = nameLen
 		}
+
 		if verLen > maxVer {
 			maxVer = verLen
 		}
@@ -122,6 +127,7 @@ func printVersionTable() {
 	if nameLen := utf8.RuneCountInString(componentName); nameLen > maxName {
 		maxName = nameLen
 	}
+
 	if verLen := utf8.RuneCountInString(componentVersion); verLen > maxVer {
 		maxVer = verLen
 	}
