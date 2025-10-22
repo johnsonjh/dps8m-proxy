@@ -397,7 +397,16 @@ func init() {
 		_, _ = fmt.Fprintf(os.Stdout,
 			"\r\nUsage for %s:\r\n\r\n",
 			exePath)
+		var buf bytes.Buffer
+		pflag.CommandLine.SetOutput(&buf)
 		pflag.PrintDefaults()
+		pflag.CommandLine.SetOutput(os.Stdout)
+		re := regexp.MustCompile(`\[=true\|false\]`)
+		output := re.ReplaceAllString(buf.String(), "             ")
+		reSpaces := regexp.MustCompile(`(?m)^ {6}`)
+		output = reSpaces.ReplaceAllString(output, "  ")
+		_, _ = fmt.Fprint(os.Stdout,
+			output)
 	}
 
 	// NOTE: Ensure that all pflag --help / -h output renders in less
@@ -576,8 +585,8 @@ func init() {
 		if arg == "-?" || arg == "-h" || arg == "--help" {
 			pflag.Usage()
 			_, _ = fmt.Fprintf(os.Stdout,
-				"      --help"+
-					"                    Show this help and usage information\r\n\r\n"+
+				"  --help"+
+					"                        Show this help and usage information\r\n\r\n"+
 					"proxy home page (bug reports): <https://gitlab.com/dps8m/proxy/>\r\n")
 
 			if enableGops {

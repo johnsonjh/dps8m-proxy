@@ -102,66 +102,66 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.35 (2025-Oct-22 g8130dbf) [linux/amd64]
+DPS8M Proxy v0.1.36 (2025-Oct-22 gdb0b499) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
-      --allow-root              Allow running as root (UID 0)
-      --cert-dir string         Directory containing SSH host certificates
+  --allow-root                  Allow running as root (UID 0)
+  --cert-dir string             Directory containing SSH host certificates
                                     (default: current working directory)
-      --cert-perm octal         Permissions (octal) for new certificate files
+  --cert-perm octal             Permissions (octal) for new certificate files
                                     [e.g., "600", "644"] (default 600)
-      --ssh-addr strings        SSH listener address(es)
+  --ssh-addr strings            SSH listener address(es)
                                     [e.g., ":2222", "[::1]:8000"]
                                     (multiple allowed) (default ":2222")
-      --ssh-delay float         Delay for incoming SSH connections
+  --ssh-delay float             Delay for incoming SSH connections
                                     ["0.0" to "30.0" seconds] (no default)
-      --no-banner               Disable SSH connection banner
-      --telnet-host string      Default TELNET target [host:port]
+  --no-banner                   Disable SSH connection banner
+  --telnet-host string          Default TELNET target [host:port]
                                     (default "127.0.0.1:6180")
-      --alt-host string         Alternate TELNET target(s) [sshuser@host:port]
+  --alt-host string             Alternate TELNET target(s) [sshuser@host:port]
                                     (multiple allowed)
-      --debug-telnet            Debug TELNET option negotiation
-      --debug-server string     Enable HTTP debug server listening address
+  --debug-telnet                Debug TELNET option negotiation
+  --debug-server string         Enable HTTP debug server listening address
                                     [e.g., ":6060", "[::1]:6060"]
-      --gops                    Enable the "gops" diagnostic agent
+  --gops                        Enable the "gops" diagnostic agent
                                     (see https://github.com/google/gops)
-      --mdns                    Enable mDNS (Multicast DNS) advertisements
+  --mdns                        Enable mDNS (Multicast DNS) advertisements
                                     (i.e., Bonjour, Avahi announcements)
-      --log-dir string          Base directory for logs (default "log")
-      --no-log                  Disable all session logging
+  --log-dir string              Base directory for logs (default "log")
+  --no-log                      Disable all session logging
                                     (for console logging see "--console-log")
-      --console-log string      Enable console logging ["quiet", "noquiet"]
+  --console-log string          Enable console logging ["quiet", "noquiet"]
                                     (disabled by default)
-      --compress-algo string    Compression algorithm for log files
+  --compress-algo string        Compression algorithm for log files
                                     ["gzip", "lzip", "xz", "zstd"]
                                     (default "gzip")
-      --compress-level string   Compression level for gzip, lzip, and zstd
+  --compress-level string       Compression level for gzip, lzip, and zstd
                                     algorithms ["fast", "normal", "high"]
                                     (default "normal")
-      --no-compress             Disable session and/or console log compression
-      --log-perm octal          Permissions (octal) for new log files
+  --no-compress                 Disable session and/or console log compression
+  --log-perm octal              Permissions (octal) for new log files
                                     [e.g., "600", "644"] (default 600)
-      --log-dir-perm octal      Permissions (octal) for new log directories
+  --log-dir-perm octal          Permissions (octal) for new log directories
                                     [e.g., "755", "750"] (default 750)
-      --db-file string          Path to persistent statistics storage database
+  --db-file string              Path to persistent statistics storage database
                                     (disabled by default)
-      --db-time uint            Elapsed seconds between database updates
+  --db-time uint                Elapsed seconds between database updates
                                     [0 disables periodic writes] (default 30)
-      --db-perm octal           Permissions (octal) for new database files
+  --db-perm octal               Permissions (octal) for new database files
                                     [e.g., "600", "644"] (default 600)
-      --db-loglevel string      Database engine (BBoltDB) logging output level
+  --db-loglevel string          Database engine (BBoltDB) logging output level
                                     [level: "0" - "6", or "none" - "debug"]
                                     (default "error")
-      --idle-max int            Maximum connection idle time allowed [seconds]
-      --time-max int            Maximum connection link time allowed [seconds]
-      --blacklist string        Enable blacklist [filename] (no default)
-      --whitelist string        Enable whitelist [filename] (no default)
-      --utc                     Use UTC (Coordinated Universal Time) for time
+  --idle-max int                Maximum connection idle time allowed [seconds]
+  --time-max int                Maximum connection link time allowed [seconds]
+  --blacklist string            Enable blacklist [filename] (no default)
+  --whitelist string            Enable whitelist [filename] (no default)
+  --utc                         Use UTC (Coordinated Universal Time) for time
                                     display and timestamping in log files
-      --license                 Show license terms and conditions
-      --version                 Show version information
-      --help                    Show this help and usage information
+  --license                     Show license terms and conditions
+  --version                     Show version information
+  --help                        Show this help and usage information
 
 proxy home page (bug reports): <https://gitlab.com/dps8m/proxy/>
 ```
@@ -256,12 +256,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.35 (2025-Oct-22 g8130dbf) [linux/amd64]
+DPS8M Proxy v0.1.36 (2025-Oct-22 gdb0b499) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.35                          |
+| dps8m/proxy               | v0.1.36                          |
 | arl/statsviz              | v0.7.2                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -269,7 +269,7 @@ DPS8M Proxy v0.1.35 (2025-Oct-22 g8130dbf) [linux/amd64]
 | klauspost/compress        | v1.18.1                          |
 | miekg/dns                 | v1.1.68                          |
 | sorairolake/lzip-go       | v0.3.8                           |
-| spf13/pflag               | v1.0.10                          |
+| spf13/pflag               | v1.0.11* (2025-Oct-07, g6fcfbc9) |
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
 | golang.org/x/crypto       | v0.43.0                          |
@@ -524,13 +524,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>16</th>
-<th>7598</th>
+<th>7608</th>
 <th>1589</th>
 <th>396</th>
-<th>5613</th>
+<th>5623</th>
 <th>1334</th>
-<th>184168</th>
-<th>3357</th>
+<th>184597</th>
+<th>3367</th>
 </tr><tr>
 <th>Shell</th>
 <th>3</th>
@@ -585,13 +585,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>23</th>
-<th>9207</th>
+<th>9217</th>
 <th>1882</th>
 <th>676</th>
-<th>6649</th>
+<th>6659</th>
 <th>1442</th>
-<th>246185</th>
-<th>4447</th>
+<th>246614</th>
+<th>4457</th>
 </tr></tfoot></table>
 
 ## Future plans
