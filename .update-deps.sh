@@ -46,7 +46,7 @@ ${GO:?} mod tidy
 ${GO:?} get -u github.com/sorairolake/lzip-go@latest
 ${GO:?} mod tidy
 
-${GO:?} get -u github.com/spf13/pflag@latest
+${GO:?} get -u github.com/spf13/pflag@master
 ${GO:?} mod tidy
 
 ${GO:?} get -u github.com/ulikunitz/xz@latest
