@@ -33,6 +33,7 @@ var nameReplacements = []struct{ old, new string }{
 
 var versionReplacements = []struct{ old, new string }{
 	{"v0.3.29-0.20250514124927-a2d8f7790eac", "v0.3.29* (2025-May-14, ga2d8f77)"},
+	{"v1.0.11-0.20251007101450-6fcfbc9910e1", "v1.0.11* (2025-Oct-07, g6fcfbc9)"},
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -21,7 +21,7 @@ require (
 	github.com/hashicorp/mdns v1.0.6
 	github.com/klauspost/compress v1.18.1
 	github.com/sorairolake/lzip-go v0.3.8
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.0.11-0.20251007101450-6fcfbc9910e1
 	github.com/ulikunitz/xz v0.5.15
 	go.etcd.io/bbolt v1.4.3
 	go.uber.org/goleak v1.3.1-0.20241121203838-4ff5fa6529ee
