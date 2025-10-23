@@ -125,8 +125,9 @@ are, hopefully, documented here:
   * If the proxy fails to create log directories or files, a warning
     will be displayed on the console and the session and/or console
     logging feature *may* be (but is not guaranteed to be) disabled.
-    In a future version, this behavior will be configurable (*e.g.,*
-    allow to either immediately or gracefully exit on logging failure).
+    In a future version, this behavior may be configurable (*e.g.,*
+    to allow either immediately or gracefully exiting on logging
+    failures).
 
 * Enabling the database (with the `‑‑db-file` option) persists to disk
   the connection statistics (viewable with the `s` admin console
@@ -156,7 +157,7 @@ are, hopefully, documented here:
   | `deny.txt`  | Displayed when denying target sessions (*e.g.*, during graceful shutdown) |
   | `issue.txt` | Displayed to users before their actual session with the target begins     |
 
-  * When multiple are targets defined using the `‑‑alt‑host`
+  * When multiple targets are defined using the `‑‑alt‑host`
     functionality, the system will display a file that matches `‑NAME`
     before the `.txt` extension.  For example, if you have defined a
     target as  `oldunix@10.0.5.9:3333` the proxy will look for
@@ -190,9 +191,9 @@ are, hopefully, documented here:
     have otherwise been blocked by the blacklist, it is tagged as
     `EXEMPTED` in the logs.
 
-* The `‑v` or `‑‑version` command shows detailed version information,
-  including the versions of any embedded dependencies as well as the
-  version of the Go compiler used to build the software:
+* The `‑‑version` command shows detailed version information, which
+  includes the versions of any embedded dependencies as well as the
+  name and version of the Go toolchain used to build the software:
 
 ```plaintext
 ===VERSION===
@@ -261,7 +262,7 @@ further clarification:
 
 If it is detected that you have a UTF-8 capable terminal, then some
 console output will be augmented with icons or emoji glyphs (and in
-a future version, UTF-8 box drawing symbols will be used for drawing
+a future version, UTF-8 box drawing symbols may be used for drawing
 tables).
 
 ### Signals
@@ -333,8 +334,8 @@ features:
 
 * `N` — sends an IAC `NOP` (*No Operation*) to the target TELNET host
 
-* `S` — displays the status the session, sharing information, and some
-  statistics:
+* `S` — displays the status of the session, sharing information, and
+  some statistics:
 
   ```plaintext
   >> LNK ‑ The username '_gRSyWHxPcMp2MWvtmWWF' can be used to share this session.
