@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.36 (2025-Oct-22 gdb0b499) [linux/amd64]
+DPS8M Proxy v0.1.36 (2025-Oct-23 ge82fcbe) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -256,7 +256,7 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.36 (2025-Oct-22 gdb0b499) [linux/amd64]
+DPS8M Proxy v0.1.36 (2025-Oct-23 ge82fcbe) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -554,13 +554,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>555</th>
+<th>556</th>
 <th>105</th>
 <th>0</th>
-<th>450</th>
+<th>451</th>
 <th>0</th>
-<th>26379</th>
-<th>435</th>
+<th>26415</th>
+<th>436</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -585,13 +585,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>23</th>
-<th>9217</th>
+<th>9218</th>
 <th>1882</th>
 <th>676</th>
-<th>6659</th>
+<th>6660</th>
 <th>1442</th>
-<th>246614</th>
-<th>4457</th>
+<th>246650</th>
+<th>4458</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -638,6 +638,7 @@ predecessor (code statistics 📈 provided by
   shell environment (at a minimum `sh`, `make`, `grep`, `awk`, &
   `sed`), and [`reuse`](https://github.com/fsfe/reuse-tool),
   [`staticcheck`](https://staticcheck.dev/),
+  [`gopls`](https://go.dev/gopls/),
   [`revive`](https://revive.run/),
   [`errcheck`](https://github.com/kisielk/errcheck),
   [`gofumpt`](https://github.com/mvdan/gofumpt),
