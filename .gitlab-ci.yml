@@ -31,26 +31,24 @@ pages:
     - apk update || true
     - apk add '!usr-merge-nag' 2> /dev/null || true
     - apk upgrade --prune || true
-    - apk add brotli curl gawk git go grep pdpmake perl pigz py3-pip python3 sed shellcheck tree yash zip
+    - apk add brotli coreutils curl gawk git go grep pdpmake perl pigz py3-pip python3 sed shellcheck tree yash zip
     - ln -fs "$(command -v yash)" /bin/sh
     - export SHELL=/bin/sh
-    - export PATH=$HOME/go/bin:$PATH
+    - export PATH="$HOME/go/bin:$PATH"
     - export GOPROXY=proxy.golang.org,direct
     - export GOSUMDB=sum.golang.org
     - export GOTOOLCHAIN="$(grep '^go .*$' go.mod | tr -cd 'go0-9.\n')+auto"
     - export PDPMAKE_POSIXLY_CORRECT=1
     - export TZ=UTC
-    - export MS_GOTOOLCHAIN_TELEMETRY_ENABLED=0
-    - go telemetry off || true
-    - yash ./.lintsetup.sh
-    - python3 -m venv $(pwd)/.venv
+    - stdbuf -o L -e L yash ./.lintsetup.sh
+    - stdbuf -o L -e L python3 -m venv $(pwd)/.venv
     - . $(pwd)/.venv/bin/activate
-    - pip install --upgrade pip || true
-    - pip install --upgrade scspell3k codespell reuse
-    - env CI_NO_CROSS=1 pdpmake lint
-    - git diff --exit-code
-    - env GOFLAGS="-ldflags=-s -w" pdpmake
-    - env GOFLAGS="-ldflags=-s -w" pdpmake cross
+    - stdbuf -o L -e L pip install --upgrade pip || true
+    - stdbuf -o L -e L pip install --upgrade scspell3k codespell reuse
+    - stdbuf -o L -e L env CI_NO_CROSS=1 pdpmake lint
+    - stdbuf -o L -e L git diff --exit-code
+    - stdbuf -o L -e L env GOFLAGS="-ldflags=-s -w" pdpmake
+    - stdbuf -o L -e L env GOFLAGS="-ldflags=-s -w" pdpmake cross
     - mv -f cross.bin public
     - cd public
     - for i in proxy.windows.*; do [ -f "${i:?}" ] || continue; mv -f -- "${i:?}" "${i:?}.exe"; done
@@ -64,8 +62,8 @@ pages:
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k -v -Z -- "{}" \; || true
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec pigz -9 -f -k -m -v -- "{}" \; || true
     - cd ..
-    - go mod download || true
-    - go mod vendor || true
+    - stdbuf -o L -e L go mod download || true
+    - stdbuf -o L -e L go mod vendor || true
   artifacts:
     expire_in: 1 day
     paths:
