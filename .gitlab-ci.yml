@@ -41,14 +41,7 @@ pages:
     - export TZ=UTC
     - export MS_GOTOOLCHAIN_TELEMETRY_ENABLED=0
     - go telemetry off || true
-    - go install github.com/boyter/scc/v3@master
-    - go install github.com/kisielk/errcheck@master
-    - go install github.com/mgechev/revive@master
-    - go install honnef.co/go/tools/cmd/staticcheck@master
-    - go install mvdan.cc/gofumpt@master
-    - go install mvdan.cc/sh/v3/cmd/shfmt@master
-    - go install golang.org/x/vuln/cmd/govulncheck@master
-    - curl -fsSL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | yash -s -- -b $(go env GOPATH)/bin latest
+    - yash ./.lintsetup.sh
     - python3 -m venv $(pwd)/.venv
     - . $(pwd)/.venv/bin/activate
     - pip install --upgrade pip || true
