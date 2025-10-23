@@ -129,7 +129,7 @@ ExecStart=/bin/sh -c '\
   tmux -2 -u new-session -d -s dps8m-proxy && \
   tmux send-keys -t dps8m-proxy \
     "exec /usr/local/bin/dps8m-proxy \
-       $(cat /usr/local/etc/dps8m-proxy.conf 2> /dev/null | xargs || true); \
+       $(cat /usr/local/etc/dps8m-proxy.conf 2> /dev/null | xargs || :); \
      tmux wait-for -S proxy-done" C-m && \
   tmux wait-for proxy-done'
 
@@ -161,7 +161,7 @@ ExecStop=/bin/sh -c '\
 
 ExecStopPost=/bin/sh -c '\
   tmux has-session -t dps8m-proxy 2> /dev/null && \
-  tmux kill-session -t dps8m-proxy 2> /dev/null || true'
+  tmux kill-session -t dps8m-proxy 2> /dev/null || :'
 
 ###############################################################################
 # Hardening options

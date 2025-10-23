@@ -13,7 +13,7 @@ variables:
 ###############################################################################
 
 before_script:
-  - apk update || true
+  - apk update || :
   - apk add git
   - git fetch origin
   - git checkout -B "$CI_COMMIT_REF_NAME" "origin/$CI_COMMIT_REF_NAME"
@@ -28,9 +28,10 @@ pages:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
-    - apk update || true
-    - apk -U upgrade --prune || true
-    - apk -U add brotli curl gawk git go grep pdpmake perl pigz py3-pip python3 sed shellcheck tree yash zip
+    - apk update || :
+    - apk add '!usr-merge-nag' 2> /dev/null || :
+    - apk upgrade --prune || :
+    - apk add brotli curl gawk git go grep pdpmake perl pigz py3-pip python3 sed shellcheck tree yash zip
     - ln -fs "$(command -v yash)" /bin/sh
     - export SHELL=/bin/sh
     - export PATH=$HOME/go/bin:$PATH
@@ -40,11 +41,11 @@ pages:
     - export PDPMAKE_POSIXLY_CORRECT=1
     - export TZ=UTC
     - export MS_GOTOOLCHAIN_TELEMETRY_ENABLED=0
-    - go telemetry off || true
+    - go telemetry off || :
     - yash ./.lintsetup.sh
     - python3 -m venv $(pwd)/.venv
     - . $(pwd)/.venv/bin/activate
-    - pip install --upgrade pip || true
+    - pip install --upgrade pip || :
     - pip install --upgrade scspell3k codespell reuse
     - env CI_NO_CROSS=1 pdpmake lint
     - git diff --exit-code
@@ -54,17 +55,17 @@ pages:
     - cd public
     - for i in proxy.windows.*; do [ -f "${i:?}" ] || continue; mv -f -- "${i:?}" "${i:?}.exe"; done
     - for f in proxy.windows.*.exe; do [ -f "${f:?}" ] || continue; base="${f%.exe}"; zipname="$(printf '%s\n' "${base:?}" | awk -F. '{ for (i = 1; i < NF; i++) printf "%s-", $i; print $NF ".zip" }')"; (go version -m "${f:?}" || printf '%s\n' ".") | zip -z9 "${zipname:?}" "${f:?}"; done && rm -f *.exe
-    - find . -name 'proxy.*' -print0 | xargs -0 -I{} -P $(nproc) sh -c 'pigz -C "$(go version -m {} | tr -d \" || true)" -MN9 "{}"'
+    - find . -name 'proxy.*' -print0 | xargs -0 -I{} -P $(nproc) sh -c 'pigz -C "$(go version -m {} | tr -d \" || :)" -MN9 "{}"'
     - tree -H 'https://dps8m.gitlab.io/proxy/' -L 1 --charset utf-8 -h -F -v -P 'proxy*' --metafirst -o index.html
     - sed -i 's#<a href="https://dps8m.gitlab.io/proxy/./">.</a>#<a href="https://gitlab.com/dps8m/proxy/">Home</a>#' index.html
     - sed -i "s#>Directory Tree<#>$(../proxy --version | head -1 | cut -d '[' -f 1 | sed 's/ g[[:xdigit:]][[:xdigit:]]*)/)/')<#g" index.html
     - sed -i '/<p class="VERSION">/,/<\/p>/d' index.html
     - sed -i 's#4\.0K#....#' index.html
-    - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k -v -Z -- "{}" \; || true
-    - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec pigz -9 -f -k -m -v -- "{}" \; || true
+    - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k -v -Z -- "{}" \; || :
+    - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec pigz -9 -f -k -m -v -- "{}" \; || :
     - cd ..
-    - go mod download || true
-    - go mod vendor || true
+    - go mod download || :
+    - go mod vendor || :
   artifacts:
     expire_in: 1 day
     paths:
