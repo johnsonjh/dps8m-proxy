@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.43 (2025-Oct-23 gf930aee) [linux/amd64]
+DPS8M Proxy v0.1.44 (2025-Oct-23 g25c3835) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -236,8 +236,8 @@ are, hopefully, documented here:
   If *only* the whitelist is enabled, then all connections will be
   denied by default.  Note that if *only* the blacklist is enabled, it
   will be impossible to exempt individual IP addresses within a range
-  that has been blocked.  It is recommended that you *both* lists
-  when using the access control feature.
+  that has been blocked.  It is recommended that you enable *both*
+  lists when using the access control features.
 
   * The format of the whitelist and blacklist is an IPv4 or IPv6
     address (*e.g.*, `23.215.0.138`, `2600:1406:bc00:53::b81e:94ce`),
@@ -256,12 +256,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.43 (2025-Oct-23 gf930aee) [linux/amd64]
+DPS8M Proxy v0.1.44 (2025-Oct-23 g25c3835) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.43                          |
+| dps8m/proxy               | v0.1.44                          |
 | arl/statsviz              | v0.7.2                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -559,7 +559,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>451</th>
 <th>0</th>
-<th>26415</th>
+<th>26423</th>
 <th>436</th>
 </tr><tr>
 <th>Systemd</th>
@@ -590,7 +590,7 @@ predecessor (code statistics 📈 provided by
 <th>676</th>
 <th>6652</th>
 <th>1442</th>
-<th>246148</th>
+<th>246156</th>
 <th>4450</th>
 </tr></tfoot></table>
 
