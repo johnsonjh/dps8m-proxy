@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.44 (2025-Oct-23 gf875951) [linux/amd64]
+DPS8M Proxy v0.1.45 (2025-Oct-23 g69e055e) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -186,8 +186,9 @@ are, hopefully, documented here:
   * If the proxy fails to create log directories or files, a warning
     will be displayed on the console and the session and/or console
     logging feature *may* be (but is not guaranteed to be) disabled.
-    In a future version, this behavior will be configurable (*e.g.,*
-    allow to either immediately or gracefully exit on logging failure).
+    In a future version, this behavior may be configurable (*e.g.,*
+    to allow either immediately or gracefully exiting on logging
+    failures).
 
 * Enabling the database (with the `‑‑db-file` option) persists to disk
   the connection statistics (viewable with the `s` admin console
@@ -217,7 +218,7 @@ are, hopefully, documented here:
   | `deny.txt`  | Displayed when denying target sessions (*e.g.*, during graceful shutdown) |
   | `issue.txt` | Displayed to users before their actual session with the target begins     |
 
-  * When multiple are targets defined using the `‑‑alt‑host`
+  * When multiple targets are defined using the `‑‑alt‑host`
     functionality, the system will display a file that matches `‑NAME`
     before the `.txt` extension.  For example, if you have defined a
     target as  `oldunix@10.0.5.9:3333` the proxy will look for
@@ -251,17 +252,17 @@ are, hopefully, documented here:
     have otherwise been blocked by the blacklist, it is tagged as
     `EXEMPTED` in the logs.
 
-* The `‑v` or `‑‑version` command shows detailed version information,
-  including the versions of any embedded dependencies as well as the
-  version of the Go compiler used to build the software:
+* The `‑‑version` command shows detailed version information, which
+  includes the versions of any embedded dependencies as well as the
+  name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.44 (2025-Oct-23 gf875951) [linux/amd64]
+DPS8M Proxy v0.1.45 (2025-Oct-23 g69e055e) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.44                          |
+| dps8m/proxy               | v0.1.45                          |
 | arl/statsviz              | v0.7.2                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -345,7 +346,7 @@ further clarification:
 
 If it is detected that you have a UTF-8 capable terminal, then some
 console output will be augmented with icons or emoji glyphs (and in
-a future version, UTF-8 box drawing symbols will be used for drawing
+a future version, UTF-8 box drawing symbols may be used for drawing
 tables).
 
 ### Signals
@@ -417,8 +418,8 @@ features:
 
 * `N` — sends an IAC `NOP` (*No Operation*) to the target TELNET host
 
-* `S` — displays the status the session, sharing information, and some
-  statistics:
+* `S` — displays the status of the session, sharing information, and
+  some statistics:
 
   ```plaintext
   >> LNK ‑ The username '_gRSyWHxPcMp2MWvtmWWF' can be used to share this session.
@@ -554,13 +555,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>556</th>
+<th>558</th>
 <th>105</th>
 <th>0</th>
-<th>451</th>
+<th>453</th>
 <th>0</th>
-<th>26423</th>
-<th>436</th>
+<th>26456</th>
+<th>438</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -585,13 +586,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>23</th>
-<th>9210</th>
+<th>9212</th>
 <th>1882</th>
 <th>676</th>
-<th>6652</th>
+<th>6654</th>
 <th>1442</th>
-<th>246156</th>
-<th>4450</th>
+<th>246189</th>
+<th>4452</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -660,9 +661,10 @@ predecessor (code statistics 📈 provided by
 * The [`Makefile`](Makefile) provides a `lint` convenience target to
   help you run all this.  You can also examine our
   [`.gitlab-ci.yml`](.gitlab-ci.yml) file.  There is also a
-  convenience script, `.lintsetup.sh`, to help install the Go-based
-  linters, and the Python-based linters can be installed via `pip`
-  (*i.e.*, `pip install --upgrade scspell3k codespell reuse`).
+  convenience script, [`.lintsetup.sh`](.lintsetup.sh), to help
+  install the Go-based linters, and the Python-based linters can be
+  installed via `pip` (*i.e.*,
+  `pip install --upgrade scspell3k codespell reuse`).
 
 ### Recommended
 
