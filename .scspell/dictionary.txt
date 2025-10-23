@@ -475,6 +475,7 @@ telnet
 timestamping
 tmux
 toml
+toolchain
 tunables
 uber
 uptime
