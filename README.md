@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.44 (2025-Oct-23 gf875951) [linux/amd64]
+DPS8M Proxy v0.1.45 (2025-Oct-23 g64f0852) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -256,12 +256,12 @@ are, hopefully, documented here:
   version of the Go compiler used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.44 (2025-Oct-23 gf875951) [linux/amd64]
+DPS8M Proxy v0.1.45 (2025-Oct-23 g64f0852) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.44                          |
+| dps8m/proxy               | v0.1.45                          |
 | arl/statsviz              | v0.7.2                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -554,13 +554,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>556</th>
+<th>557</th>
 <th>105</th>
 <th>0</th>
-<th>451</th>
+<th>452</th>
 <th>0</th>
-<th>26423</th>
-<th>436</th>
+<th>26442</th>
+<th>437</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -585,13 +585,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>23</th>
-<th>9210</th>
+<th>9211</th>
 <th>1882</th>
 <th>676</th>
-<th>6652</th>
+<th>6653</th>
 <th>1442</th>
-<th>246156</th>
-<th>4450</th>
+<th>246175</th>
+<th>4451</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -660,9 +660,10 @@ predecessor (code statistics 📈 provided by
 * The [`Makefile`](Makefile) provides a `lint` convenience target to
   help you run all this.  You can also examine our
   [`.gitlab-ci.yml`](.gitlab-ci.yml) file.  There is also a
-  convenience script, `.lintsetup.sh`, to help install the Go-based
-  linters, and the Python-based linters can be installed via `pip`
-  (*i.e.*, `pip install --upgrade scspell3k codespell reuse`).
+  convenience script, [`.lintsetup.sh`](.lintsetup.sh), to help
+  install the Go-based linters, and the Python-based linters can be
+  installed via `pip` (*i.e.*,
+  `pip install --upgrade scspell3k codespell reuse`).
 
 ### Recommended
 
