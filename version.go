@@ -100,6 +100,7 @@ func printVersionTable() {
 	})
 
 	var componentName string
+
 	componentRuneWidthAdj := 0
 
 	if haveUTF8console {

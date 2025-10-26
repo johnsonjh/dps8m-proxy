@@ -118,6 +118,7 @@ func announceMDNS(
 
 			for _, addr := range addrs {
 				var ip net.IP
+
 				if ipnet, ok := addr.(*net.IPNet); ok {
 					ip = ipnet.IP
 				} else if ipaddr, ok := addr.(*net.IPAddr); ok {
@@ -144,6 +145,7 @@ func announceMDNS(
 
 	for _, iface := range targetInterfaces {
 		var ifaceIPs []net.IP
+
 		addrs, err := iface.Addrs()
 		if err != nil {
 			log.Printf("%sError getting addresses for interface %s: %s",
@@ -154,6 +156,7 @@ func announceMDNS(
 
 		for _, addr := range addrs {
 			var ip net.IP
+
 			switch v := addr.(type) {
 			case *net.IPNet:
 				ip = v.IP

@@ -406,6 +406,7 @@ func writeCountersToDB() {
 
 		for key, val := range counters {
 			buf := make([]byte, 8)
+
 			binary.BigEndian.PutUint64(buf, val)
 			err := bucket.Put([]byte(key), buf)
 			if err != nil {
@@ -477,6 +478,7 @@ func loadCountersFromDB() {
 func closeDB() {
 	if db != nil {
 		writeCountersToDB()
+
 		err := db.Update(func(tx *bbolt.Tx) error {
 			bucket, err := tx.CreateBucketIfNotExists(metaBucketName)
 			if err != nil {
