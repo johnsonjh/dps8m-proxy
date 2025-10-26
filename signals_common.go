@@ -38,6 +38,7 @@ func handleSignal(s os.Signal) {
 
 		if len(connections) == 0 {
 			connectionsMutex.Unlock()
+
 			select {
 			case shutdownSignal <- struct{}{}:
 

@@ -42,6 +42,7 @@ func showCapabilityMessage(exePath string) {
 
 func checkCapability() {
 	hasBindCap := false
+
 	cv, err := cap.FromName("cap_net_bind_service")
 	if err == nil {
 		hasBindCap, _ = cap.GetProc().GetFlag(cap.Effective, cv)
