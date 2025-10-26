@@ -396,6 +396,7 @@ cocomo
 codeql
 codespell
 ctags
+darwin
 davidrg
 dependabot
 ecdsa
