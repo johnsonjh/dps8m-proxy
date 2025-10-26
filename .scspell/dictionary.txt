@@ -77,6 +77,7 @@ stdin
 stdout
 strconv
 syscall
+sysctl
 systemcrypto
 tdate
 teardown
@@ -381,6 +382,12 @@ searchapp
 searchhost
 snapprocess
 toolhelp
+
+FILEID: 9af38160-b277-11f0-8326-80ee73e9b8e7
+eproc
+getppid
+gppid
+ppid
 
 NATURAL:
 adduser
