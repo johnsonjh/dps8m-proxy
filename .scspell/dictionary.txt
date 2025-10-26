@@ -58,6 +58,7 @@ pflag
 pprof
 printf
 println
+procs
 publickey
 rcvd
 readlink
@@ -371,6 +372,15 @@ ulikunitz
 
 FILEID: 4dc282c4-6bd2-11f0-a475-80ee73e9b8e7
 fcfbc
+
+FILEID: 210c336a-b24a-11f0-ab08-80ee73e9b8e7
+getppid
+powerlauncher
+powertoys
+searchapp
+searchhost
+snapprocess
+toolhelp
 
 NATURAL:
 adduser
