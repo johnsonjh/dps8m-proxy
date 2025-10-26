@@ -56,6 +56,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/ulikunitz/xz"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/term"
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -407,6 +408,10 @@ func init() {
 		output = reSpaces.ReplaceAllString(output, "  ")
 		_, _ = fmt.Fprint(os.Stdout,
 			output)
+		_, _ = fmt.Fprintf(os.Stdout,
+			"  --help"+
+				"                        Show this help and usage information\r\n\r\n"+
+				"proxy home page (bug reports): <https://gitlab.com/dps8m/proxy/>\r\n")
 	}
 
 	// NOTE: Ensure that all pflag --help / -h output renders in less
@@ -584,10 +589,6 @@ func init() {
 	for _, arg := range os.Args[1:] {
 		if arg == "-?" || arg == "-h" || arg == "--help" {
 			pflag.Usage()
-			_, _ = fmt.Fprintf(os.Stdout,
-				"  --help"+
-					"                        Show this help and usage information\r\n\r\n"+
-					"proxy home page (bug reports): <https://gitlab.com/dps8m/proxy/>\r\n")
 
 			if enableGops {
 				gopsClose()
@@ -626,6 +627,49 @@ func shutdownWatchdog() {
 
 func main() {
 	pflag.Parse()
+
+	if pflag.NFlag() == 0 && len(pflag.Args()) == 0 && guiLaunched() {
+		fmt.Print("This is NOT a graphical (GUI) application --\r\n")
+
+		switch runtime.GOOS {
+		case "windows":
+			fmt.Print(
+				"It is intended to be invoked from a Command Prompt or Windows Terminal session!")
+		case "darwin":
+			fmt.Printf(
+				"It is intended to be invoked from the command prompt (e.g., via Terminal.app)!")
+		default:
+			fmt.Printf(
+				"It is intended to be invoked from the command prompt and not by a GUI launcher!")
+		}
+
+		fmt.Printf("\r\n\r\n")
+		pflag.Usage()
+		fmt.Print("\r\nPress Enter (or Return) to exit ... ")
+
+		oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+		if err != nil {
+			_, _ = bufio.NewReader(os.Stdin).ReadBytes('\n')
+			fmt.Print("\r\n")
+
+			if enableGops {
+				gopsClose()
+			}
+
+			os.Exit(1)
+		}
+
+		t := term.NewTerminal(os.Stdin, "")
+		_, _ = t.ReadLine()
+		_ = term.Restore(int(os.Stdin.Fd()), oldState)
+		fmt.Print("\r\n")
+
+		if enableGops {
+			gopsClose()
+		}
+
+		os.Exit(1)
+	}
 
 	if showLicense {
 		fmt.Println(licenseText)
