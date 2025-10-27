@@ -378,7 +378,7 @@ scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 		{ env printf '%s\n' "⚠️ scspell not found!" \
 			2> /dev/null || :; exit 1; }
 	@env printf '%s\n' \
-		"ℹ️ Running scspell, use scspell-fix target to run interactively" \
+		"ℹ️ Running scspell, use scspell-fix to run interactively" \
 			2> /dev/null || :
 	scspell \
 		--report-only \
@@ -397,7 +397,7 @@ scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 		{ env printf '%s\n' "⚠️ scspell not found!" \
 			2> /dev/null || :; exit 1; }
 	@env printf '%s\n' \
-		"ℹ️ Running scspell-fix, use scspell to check non-interactively" \
+		"ℹ️ Running scspell-fix, use scspell to run non-interactively" \
 			2> /dev/null || :
 	scspell \
 		--override-dictionary ./.scspell/dictionary.txt \
