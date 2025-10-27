@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.49 (2025-Oct-27 g25e1c41) [linux/amd64]
+DPS8M Proxy v0.1.50 (2025-Oct-27 g8ee6f02) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -258,12 +258,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.49 (2025-Oct-27 g25e1c41) [linux/amd64]
+DPS8M Proxy v0.1.50 (2025-Oct-27 g8ee6f02) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.49                          |
+| dps8m/proxy               | v0.1.50                          |
 | arl/statsviz              | v0.7.2                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -551,18 +551,18 @@ predecessor (code statistics 📈 provided by
 <th>79</th>
 <th>340</th>
 <th>139</th>
-<th>16530</th>
+<th>16521</th>
 <th>316</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>558</th>
+<th>562</th>
 <th>105</th>
 <th>0</th>
-<th>453</th>
+<th>457</th>
 <th>0</th>
-<th>26456</th>
-<th>438</th>
+<th>26657</th>
+<th>442</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -587,13 +587,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>26</th>
-<th>9509</th>
+<th>9513</th>
 <th>1951</th>
 <th>727</th>
-<th>6831</th>
+<th>6835</th>
 <th>1526</th>
-<th>254190</th>
-<th>4542</th>
+<th>254382</th>
+<th>4546</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -669,6 +669,10 @@ predecessor (code statistics 📈 provided by
 
 ### Recommended
 
+* Source code tags are generated using
+  [`gogtags`](https://github.com/juntaki/gogtags) and
+  [`gotags`](https://github.com/jstemmer/gotags)
+  (or [`universal-ctags`](https://ctags.io)) if installed.
 * While not absolutely required, it’s a good idea to have the latest
   [`golangci-lint`](https://golangci-lint.run/) (v2) installed.  We
   ship a [config file](.golangci.yml) file for it, and try to make
