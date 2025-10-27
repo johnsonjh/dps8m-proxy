@@ -232,6 +232,8 @@ goreportcard
 govulncheck
 hunspell
 icrnl
+jstemmer
+juntaki
 kisielk
 klauspost
 libcap
@@ -421,10 +423,12 @@ gitlab
 godoclint
 gofmt
 gofumpt
+gogtags
 golang
 google
 gopls
 goroutines
+gotags
 grep
 gzip
 hashicorp
