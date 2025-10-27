@@ -38,7 +38,7 @@ _S=$("${GO:?}" tool dist list \
   | grep -Ev '^ios/|^android/(386|amd64|arm)$' \
   | awk 'BEGIN { FS="/" } /\// { print "GOOS="$1" GOARCH="$2 }' \
   | xargs -I{} printf '%s\n' '
-      export {} && printf "🧩 %s/%s\n" "${GOOS:?}" "${GOARCH:?}" &&
+      export {} && env printf "🧩 %s/%s\n" "${GOOS:?}" "${GOARCH:?}" &&
       "${GO:?}" build -trimpath \
         -o ./cross.bin/proxy."${GOOS:?}"."${GOARCH:?}";')
 
@@ -59,7 +59,7 @@ fi
 # shellcheck disable=SC2249
 case ${max:-} in
 '' | *[!0-9]* | 0) {
-  printf '%s\n' "❗ Invalid MAX_CPU value detected, using default of 1."
+  env printf '%s\n' "❗ Invalid MAX_CPU value detected, using default of 1."
   max=1
 } ;;
 esac
@@ -68,14 +68,14 @@ esac
 # Inform of parallelism
 
 test -z "${MAX_CPU:-}" && {
-  printf '%s\n' \
+  env printf '%s\n' \
     "🧠 Set environment variable MAX_CPU to override detected parallelism."
 }
 
 if [ "${max:?}" -eq 1 ]; then
-  printf '%s\n' "💻 Build parallelism is disabled."
+  env printf '%s\n' "💻 Build parallelism is disabled."
 else
-  printf '%s\n' \
+  env printf '%s\n' \
     "💻 Forking up to ${max:?} concurrent builds for parallel compilation..."
 fi
 
@@ -89,7 +89,7 @@ exec 3<> "${fifo:?}"
 i=0
 
 while [ "${i:?}" -lt "${max:?}" ]; do
-  printf '%s\n' "" >&3
+  env printf '%s\n' "" >&3
   i=$((i + 1))
 done
 
@@ -111,7 +111,7 @@ for chunk in ${_S}; do
   read -r _ <&3
   (
     sh -c "${cmd:?}"
-    printf '%s\n' "" >&3
+    env printf '%s\n' "" >&3
   ) &
 done
 
@@ -125,7 +125,7 @@ exec 3>&- 3<&-
 # Build linux/mipssf
 
 export GOOS=linux GOARCH=mips GOMIPS=softfloat \
-  && printf "🧩 %s/%s\n" "${GOOS:?}" "${GOARCH:?}sf" \
+  && env printf "🧩 %s/%s\n" "${GOOS:?}" "${GOARCH:?}sf" \
   && "${GO:?}" build -trimpath \
     -o ./cross.bin/proxy."${GOOS:?}"."${GOARCH:?}"sf
 

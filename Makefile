@@ -31,21 +31,21 @@ all: proxy
 
 .PHONY: proxy
 proxy: tags
-	@printf '%s\n' "🧩 Building proxy..."
+	@env printf '%s\n' "🧩 Building proxy..." 2> /dev/null || :
 	@env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) CGO_ENABLED=0 \
 		$(GO) build -trimpath -v && \
 	test -x proxy 2> /dev/null && { \
-		printf '%s\n\n' "✅ Build successful!"; \
+		env printf '%s\n\n' "✅ Build successful!" 2> /dev/null || :; \
 		./proxy --version; exit 0; } || { \
-		printf '\n%s\n\n' "💔 Build failed!"; exit 1; }
+		env printf '\n%s\n\n' "💔 Build failed!" 2> /dev/null || :; exit 1; }
 
 ##############################################################################
 # Target: clean
 
 .PHONY: clean
 clean:
-	@printf '%s\n' "🧹 Cleaning..."
+	@env printf '%s\n' "🧹 Cleaning..." 2> /dev/null || :
 	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) clean -v
 	$(RM) -r ./cross.bin/
@@ -72,7 +72,7 @@ distclean: clean
 
 .PHONY: test
 test:
-	@printf '%s\n' "🧪 Running 'go test -v .'"
+	@env printf '%s\n' "🧪 Running 'go test -v .'" 2> /dev/null || :
 	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) test -v .
 
@@ -81,16 +81,16 @@ test:
 
 .PHONY: lint check
 lint check:
-	@printf '%s\n' "🧩 Running 'make clean'..."
+	@env printf '%s\n' "🧩 Running 'make clean'..." 2> /dev/null || :
 	$(MAKE) clean
-	@printf '\n%s\n' "🧩 Running 'make doc'..."
+	@env printf '\n%s\n' "🧩 Running 'make doc'..." 2> /dev/null || :
 	$(MAKE) doc
 	git restore "README.md" > /dev/null 2>&1 || :
-	@printf '\n%s\n' "🧩 Running 'make test'..."
+	@env printf '\n%s\n' "🧩 Running 'make test'..." 2> /dev/null || :
 	$(MAKE) test
-	@printf '\n%s\n' "🧩 Running 'make clean'..."
+	@env printf '\n%s\n' "🧩 Running 'make clean'..." 2> /dev/null || :
 	$(MAKE) clean
-	@printf '\n%s\n' "⚙️ Running linters..."
+	@env printf '\n%s\n' "⚙️ Running linters..." 2> /dev/null || :
 	$(MAKE) \
 		codespell \
 		scspell \
@@ -110,18 +110,20 @@ lint check:
 		govulncheck \
 		gopls
 	@test -z "$${CI_NO_CROSS:-}" && { \
-		printf '\n%s\n' "🧩 Running 'make cross'..."; \
+		env printf '\n%s\n' "🧩 Running 'make cross'..." 2> /dev/null || :; \
 		set -x; env MAX_CPU=1 $(MAKE) cross; exit $${?}; } || :
 	$(MAKE) clean
-	@printf '\n%s\n\n' "🥇 Linting complete; carefully review the output."
+	@env printf '\n%s\n\n' \
+		"🥇 Linting complete; carefully review the output." 2> /dev/null || :
 
 ##############################################################################
 # Target: golist
 
 .PHONY: golist
 golist:
-	@printf '\n%s\n' \
-		"ℹ️ Finding any outdated dependencies... (may take a few moments)"
+	@env printf '\n%s\n' \
+		"ℹ️ Finding any outdated dependencies... (may take a few moments)" \
+			 2> /dev/null || :
 	@env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) list -u -f \
 		'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} → {{.Update.Version}}{{end}}' \
@@ -133,7 +135,8 @@ golist:
 .PHONY: reuse
 reuse:
 	@command -v reuse > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ reuse not found"; exit 0; } ; \
+		{ env printf '%s\n' "⚠️ reuse not found" \
+			2> /dev/null || :; exit 0; } ; \
 		set -x; reuse lint -q || reuse lint
 
 ##############################################################################
@@ -167,7 +170,8 @@ gotidydiff: go.mod
 .PHONY: golangci-lint
 golangci-lint:
 	@command -v golangci-lint > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ golangci-lint not found!"; exit 0; } ; \
+		{ env printf '%s\n' "⚠️ golangci-lint not found!" \
+			2> /dev/null || :; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) golangci-lint run
@@ -178,7 +182,8 @@ golangci-lint:
 .PHONY: staticcheck
 staticcheck:
 	@command -v staticcheck > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ staticcheck not found!"; exit 0; } ; \
+		{ env printf '%s\n' "⚠️ staticcheck not found!" \
+			2> /dev/null || :; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) staticcheck .
@@ -189,7 +194,8 @@ staticcheck:
 .PHONY: revive
 revive:
 	@command -v revive > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ revive not found!"; exit 0; } ; \
+		{ env printf '%s\n' "⚠️ revive not found!" \
+			2> /dev/null || :; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) revive ./...
@@ -200,7 +206,8 @@ revive:
 .PHONY: errcheck
 errcheck:
 	@command -v errcheck > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ errcheck not found!"; exit 0; } ; \
+		{ env printf '%s\n' "⚠️ errcheck not found!" \
+			2> /dev/null || :; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) errcheck
@@ -211,7 +218,8 @@ errcheck:
 .PHONY: govulncheck
 govulncheck:
 	@command -v govulncheck > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ govulncheck not found!"; exit 0; } ; \
+		{ env printf '%s\n' "⚠️ govulncheck not found!" \
+			2> /dev/null || :; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) govulncheck ./...
@@ -222,7 +230,8 @@ govulncheck:
 .PHONY: gopls
 gopls:
 	@command -v gopls > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ gopls not found!"; exit 0; } ; \
+		{ env printf '%s\n' "⚠️ gopls not found!" \
+			2> /dev/null || :; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) gopls check -severity=hint ./*.go
@@ -233,7 +242,8 @@ gopls:
 .PHONY: gofumpt
 gofumpt:
 	@command -v gofumpt > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ gofumpt not found!"; exit 0; } ; \
+		{ env printf '%s\n' "⚠️ gofumpt not found!" \
+			2> /dev/null || :; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) gofumpt -d -e .
@@ -244,7 +254,8 @@ gofumpt:
 .PHONY: shfmt
 shfmt: .cross.sh .lintsetup.sh .update-deps.sh
 	@command -v shfmt > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ shfmt not found!"; exit 0; } ; \
+		{ env printf '%s\n' "⚠️ shfmt not found!" \
+			2> /dev/null || :; exit 0; } ; \
 		set -x; shfmt -bn -sr -fn -i 2 -s -d \
 			.cross.sh .lintsetup.sh .update-deps.sh
 
@@ -254,7 +265,8 @@ shfmt: .cross.sh .lintsetup.sh .update-deps.sh
 .PHONY: shellcheck
 shellcheck: .cross.sh .lintsetup.sh .update-deps.sh
 	@command -v shellcheck > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ shellcheck not found!"; exit 0; } ; \
+		{ env printf '%s\n' "⚠️ shellcheck not found!" \
+			2> /dev/null || :; exit 0; } ; \
 		set -x; shellcheck -s sh -o any,all \
 			.cross.sh .lintsetup.sh .update-deps.sh
 
@@ -264,7 +276,8 @@ shellcheck: .cross.sh .lintsetup.sh .update-deps.sh
 .PHONY: codespell
 codespell:
 	@command -v codespell > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ codespell not found!"; exit 0; } ; \
+		{ env printf '%s\n' "⚠️ codespell not found!" \
+			2> /dev/null || :; exit 0; } ; \
 		set -x; codespell .
 
 ##############################################################################
@@ -278,14 +291,17 @@ codespell:
 tags ctags gtags GRPATH GRTAGS GTAGS:
 	@$(RM) ./tags > /dev/null 2>&1
 	@command -v gotags > /dev/null 2>&1 && \
-		{ printf '%s\n' "🏷️ Building gotags database..."; \
+		{ env printf '%s\n' "🏷️ Building gotags database..." \
+			2> /dev/null || :; \
 		  gotags -f tags -R . > /dev/null 2>&1 || :; } || :
 	@test -f ./tags || { \
 		command -v ctags > /dev/null 2>&1 && \
-			{ printf '%s\n' "🏷️ Building ctags database..."; \
+			{ env printf '%s\n' "🏷️ Building ctags database..." \
+				2> /dev/null || :; \
 			  ctags -R . > /dev/null 2>&1 || :; } || :; } || :
 	@command -v gogtags > /dev/null 2>&1 && \
-		{ printf '%s\n' "🏷️ Building gogtags database..."; \
+		{ env printf '%s\n' "🏷️ Building gogtags database..." \
+			2> /dev/null || :; \
 		gogtags > /dev/null 2>&1 || :; } || :
 
 ##############################################################################
@@ -301,29 +317,35 @@ govet:
 
 .PHONY: doc docs
 README.md doc docs: README.md.tmpl proxy
-	@printf '%s\n\n' "📚 Generating README.md..."
+	@env printf '%s\n\n' "📚 Generating README.md..." 2> /dev/null || :
 	@command -v perl > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ perl not found!"; exit 1; }
+		{ env printf '%s\n' "⚠️ perl not found!" \
+			2> /dev/null || :; exit 1; }
 	@command -v scc > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ scc not found!"; exit 1; }
+		{ env printf '%s\n' "⚠️ scc not found!" \
+			2> /dev/null || :; exit 1; }
 	$(CP) README.md.tmpl README.md
-	@printf '\n%s\n' "🐪 Perl: Inserting version info..."
+	@env printf '\n%s\n' "🐪 Perl: Inserting version info..." \
+		2> /dev/null || :
 	$(PERL) -i -pe \
 	'BEGIN { ($$v=qx(./proxy --version))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===VERSION===!$$v!g' README.md
 	grep -q '===VERSION===' README.md || exit 0
-	@printf '\n%s\n' "🐪 Perl: Inserting help info..."
+	@env printf '\n%s\n' "🐪 Perl: Inserting help info..." \
+		2> /dev/null || :
 	$(PERL) -i -pe \
 	'BEGIN { ($$v=qx(./proxy --help))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===HELP===!$$v!g' README.md
 	grep -q '===HELP===' README.md || exit 0
-	@printf '\n%s\n' "🐪 Perl: Inserting scc output..."
+	@env printf '\n%s\n' "🐪 Perl: Inserting scc output..." \
+		2> /dev/null || :
 	$(PERL) -i -pe \
 	'BEGIN { ($$v=qx(scc $(SCCFLAGS) -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===SCC===!$$v!g' README.md
 	grep -q '===SCC===' README.md || exit 0
 	$(SED) -i "s/$$(printf '\t')//g" README.md
-	@printf '\n%s\n\n' "📗 README.md generation successful."
+	@env printf '\n%s\n\n' "📗 README.md generation successful." \
+		2> /dev/null || :
 
 ##############################################################################
 # Target: scc
@@ -331,7 +353,8 @@ README.md doc docs: README.md.tmpl proxy
 .PHONY: scc
 scc:
 	@command -v scc > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ scc not found!"; exit 1; } ; \
+		{ env printf '%s\n' "⚠️ scc not found!" \
+			2> /dev/null || :; exit 1; } ; \
 		set -x; scc $(SCCFLAGS)
 
 ##############################################################################
@@ -339,9 +362,12 @@ scc:
 
 .PHONY: cross
 cross: .cross.sh
-	@printf '\n%s\n\n' "🛫 Starting cross-compilation (errors are non-fatal!)"
+	@env printf '\n%s\n\n' \
+		"🛫 Starting cross-compilation (errors are non-fatal!)" \
+			2> /dev/null || :
 	@./.cross.sh
-	@printf '\n%s\n\n' "🛬 Back from cross-compilation"
+	@env printf '\n%s\n\n' \
+		"🛬 Back from cross-compilation" 2> /dev/null || :
 
 ##############################################################################
 # Target: scspell
@@ -349,9 +375,11 @@ cross: .cross.sh
 .PHONY: scspell
 scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 	@command -v scspell > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ scspell not found!"; exit 1; }
-	@printf '%s\n' \
-		"ℹ️ Running scspell, use scspell-fix target to run interactively"
+		{ env printf '%s\n' "⚠️ scspell not found!" \
+			2> /dev/null || :; exit 1; }
+	@env printf '%s\n' \
+		"ℹ️ Running scspell, use scspell-fix target to run interactively" \
+			2> /dev/null || :
 	scspell \
 		--report-only \
 		--override-dictionary ./.scspell/dictionary.txt \
@@ -366,9 +394,11 @@ scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 .PHONY: scspell-fix
 scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 	@command -v scspell > /dev/null 2>&1 || \
-		{ printf '%s\n' "⚠️ scspell not found!"; exit 1; }
-	@printf '%s\n' \
-		"ℹ️ Running scspell-fix, use scspell target to run non-interactively"
+		{ env printf '%s\n' "⚠️ scspell not found!" \
+			2> /dev/null || :; exit 1; }
+	@env printf '%s\n' \
+		"ℹ️ Running scspell-fix, use scspell to check non-interactively" \
+			2> /dev/null || :
 	scspell \
 		--override-dictionary ./.scspell/dictionary.txt \
 		--base-dict ./.scspell/basedict.txt \
@@ -381,9 +411,10 @@ scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 
 .PHONY: strip
 strip:
-	@printf '%s\n' "📥 Stripping proxy binary..."
+	@env printf '%s\n' "📥 Stripping proxy binary..." 2> /dev/null || :
 	@test -x "proxy" || \
-		{ printf '%s\n' "🚫 'proxy' not found, try running '$(MAKE)'"; \
+		{ env printf '%s\n' "🚫 'proxy' not found, try running '$(MAKE)'" \
+			2> /dev/null || :; \
 		  exit 1; }
 	env OBJECT_MODE=32_64 strip proxy
 
@@ -420,32 +451,41 @@ SYSTEMCTL_FLAGS='daemon-reload'
 
 .PHONY: install
 install:
-	@printf '%s\n' "📥 Starting proxy installation..."
+	@env printf '%s\n' "📥 Starting proxy installation..." 2> /dev/null || :
 	@test -x "proxy" || \
-		{ printf '%s\n' "🚫 'proxy' not found, try running '$(MAKE)'"; \
+		{ env printf '%s\n' "🚫 'proxy' not found, try running '$(MAKE)'" \
+			2> /dev/null || :; \
 		  exit 1; }
-	@printf '\n%s\n' "🔧 Check installation directories, create if missing..."
+	@env printf '\n%s\n' \
+		"🔧 Check installation directories, create if missing..." \
+			2> /dev/null || :
 	mkdir -p \
 		"$(BINDIR)" \
 		"$(ETCDIR)" \
 		"$(UNTDIR)"
-	@printf '\n%s\n' "🔧 Backing up '$(DEST_NAME)' if possible..."
+	@env printf '\n%s\n' \
+		"🔧 Backing up '$(DEST_NAME)' if possible..." 2> /dev/null || :
 	test -f "$(BINDIR)"/$(DEST_NAME) && { \
 		cp -fp "$(BINDIR)"/"$(DEST_NAME)" "$(BINDIR)"/"$(DEST_NAME).old"; \
 		rm -f "$(BINDIR)"/"$(DEST_NAME)"; } || :
-	@printf '\n%s\n' "🔧 Touching '$(DEST_CONF)' if missing..."
+	@env printf '\n%s\n' \
+		"🔧 Touching '$(DEST_CONF)' if missing..." 2> /dev/null || :
 	test -f "$(ETCDIR)"/"$(DEST_CONF)" || \
 		{ touch "$(ETCDIR)"/"$(DEST_CONF)"; } || :
-	@printf '\n%s\n' "🔧 Installing new '$(DEST_NAME)'"
+	@env printf '\n%s\n' "🔧 Installing new '$(DEST_NAME)'" \
+		2> /dev/null || :
 	$(INSTALL_BIN) "proxy" "$(BINDIR)"/"$(DEST_NAME)"
-	@printf '\n%s\n' "🔧 Try granting CAP_NET_BIND_SERVICE to $(DEST_NAME)"
+	@env printf '\n%s\n' \
+		"🔧 Try granting CAP_NET_BIND_SERVICE to $(DEST_NAME)" \
+			2> /dev/null || :
 	test -f /.dockerenv || { $(SETCAP) $(SETCAP_FLAGS) \
 		"$(BINDIR)"/"$(DEST_NAME)" > /dev/null 2>&1 || :; } || :
-	@printf '\n%s\n' "🔧 Installing new '$(DEST_UNIT)'"
+	@env printf '\n%s\n' \
+		"🔧 Installing new '$(DEST_UNIT)'" 2> /dev/null || :
 	$(INSTALL_UNT) "systemd/dps8m-proxy.service" \
 		"$(UNTDIR)"/"$(DEST_UNIT)"
 	test -z "$(DESTDIR)" && { $(SYSTEMCTL) $(SYSTEMCTL_FLAGS) || :; } || :
-	@printf '\n%s\n' "✅ Installation successful..."
+	@env printf '\n%s\n' "✅ Installation successful..." 2> /dev/null || :
 
 ##############################################################################
 # vim: set ft=make noexpandtab tabstop=4 cc=78 :

@@ -200,6 +200,7 @@ var (
 	enableGops                       bool
 	enableMDNS                       bool
 	noLog                            bool
+	noConsole                        bool
 	showVersion                      bool
 	showLicense                      bool
 	shutdownOnce                     sync.Once
@@ -487,6 +488,10 @@ func init() {
 		"no-log", false,
 		"Disable all session logging\r\n"+
 			"    (for console logging see \"--console-log\")")
+
+	pflag.BoolVar(&noConsole,
+		"no-console", false,
+		"Disable the interactive admin console")
 
 	pflag.StringVar(&consoleLog,
 		"console-log", "",
@@ -1011,14 +1016,16 @@ func main() {
 			relayPrefix())
 	}
 
-	if isConsoleLogQuiet {
-		_, _ = fmt.Fprintf(os.Stdout,
-			"%s %s - Type '?' for help\r\n",
-			nowStamp(), startMsg)
-	}
+	if !noConsole {
+		if isConsoleLogQuiet {
+			_, _ = fmt.Fprintf(os.Stdout,
+				"%s %s - Type '?' for help\r\n",
+				nowStamp(), startMsg)
+		}
 
-	log.Printf("%s - Type '?' for help",
-		startMsg)
+		log.Printf("%s - Type '?' for help",
+			startMsg)
+	}
 
 	for _, addr := range sshAddr {
 		log.Printf("SSH listener on %s",
@@ -1051,7 +1058,13 @@ func main() {
 
 	runSignalHandlers()
 
-	go handleConsoleInput()
+	if !noConsole {
+		go handleConsoleInput()
+	} else {
+		_, _ = fmt.Fprintf(os.Stdout,
+			"%s %sInteractive admin console is disabled; no input will be accepted!\r\n",
+			nowStamp(), alertPrefix())
+	}
 
 	go shutdownWatchdog()
 
