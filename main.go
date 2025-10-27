@@ -48,6 +48,7 @@ import (
 	"sync/atomic"
 	"time"
 	_ "time/tzdata"
+	"unicode/utf8"
 
 	"github.com/arl/statsviz"
 	"github.com/klauspost/compress/gzip"
@@ -197,6 +198,7 @@ var (
 	loggingWg                        sync.WaitGroup
 	noBanner                         bool
 	noCompress                       bool
+	noSanitize                       bool
 	enableGops                       bool
 	enableMDNS                       bool
 	noLog                            bool
@@ -306,6 +308,28 @@ type Connection struct {
 	monitoring          bool
 	nawsActive          bool
 	invalidShare        bool
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func sanitizeNonASCII(s string) string {
+	if noSanitize {
+		return s
+	}
+
+	var b strings.Builder
+
+	b.Grow(len(s))
+
+	for _, r := range s {
+		if r < utf8.RuneSelf {
+			b.WriteRune(r)
+		} else {
+			b.WriteRune('?')
+		}
+	}
+
+	return b.String()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -477,6 +501,11 @@ func init() {
 		"debug-server", "",
 		"Enable HTTP debug server listening address\r\n"+
 			"    [e.g., \":6060\", \"[::1]:6060\"]")
+
+	pflag.BoolVar(&noSanitize,
+		"no-sanitize", false,
+		"Disable ASCII sanitization of error messages\r\n"+
+			"    (allowing non-ASCII error reports via SSH)")
 
 	if gopsEnabled {
 		pflag.BoolVar(&enableGops,
@@ -3585,7 +3614,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		logfile, basePath, err = createDatedLog(conn.ID, conn.sshConn.RemoteAddr())
 		if err != nil {
 			_, err := fmt.Fprintf(channel,
-				"%v\r\n", err)
+				"%v\r\n", sanitizeNonASCII(err.Error()))
 			if err != nil {
 				log.Printf("%sError writing to channel for %s: %v",
 					warnPrefix(), conn.ID, err)
@@ -3649,12 +3678,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	if err != nil {
 		var errMsg string
 
+		sanitizedErrStr := sanitizeNonASCII(err.Error())
 		if isAltHost {
-			errMsg = fmt.Sprintf("%sError parsing alt-host for user %s: %v",
-				warnPrefix(), conn.userName, err)
+			errMsg = fmt.Sprintf("Error parsing alt-host for user %s: %v",
+				conn.userName, sanitizedErrStr)
 		} else {
 			errMsg = fmt.Sprintf("Error parsing default telnet-host: %v",
-				err)
+				sanitizedErrStr)
 		}
 
 		_, writeErr := fmt.Fprintf(channel,
@@ -3709,8 +3739,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		telnetFailuresTotal.Add(1)
 
 		_, err := fmt.Fprintf(channel,
-			"%v\r\n\r\n",
-			err)
+			"%v\r\n\r\n", sanitizeNonASCII(err.Error()))
 		if err != nil {
 			log.Printf("%sError writing to channel for %s: %v",
 				warnPrefix(), conn.ID, err)
