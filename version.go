@@ -42,7 +42,8 @@ func printVersionTable() {
 	type row struct{ Name, Version string }
 	var rows []row
 
-	if info, ok := debug.ReadBuildInfo(); ok {
+	info, ok := debug.ReadBuildInfo()
+	if ok {
 		orig := info.Main.Version
 		v := trimVersion(orig, info.Main.Sum)
 
@@ -75,16 +76,18 @@ func printVersionTable() {
 
 	compVer := raw
 
-	if idx := strings.IndexFunc(raw, func(r rune) bool {
+	idx := strings.IndexFunc(raw, func(r rune) bool {
 		return r >= '0' && r <= '9'
-	}); idx >= 0 {
+	})
+	if idx >= 0 {
 		compVer = "v" + raw[idx:]
 	}
 
 	compVer = formatCompilerVersion(compVer)
 
 	if runtime.Compiler == "gc" {
-		if i := strings.Index(compVer, " "); i != -1 {
+		i := strings.Index(compVer, " ")
+		if i != -1 {
 			compVer = compVer[:i]
 		}
 	}
@@ -126,11 +129,13 @@ func printVersionTable() {
 		}
 	}
 
-	if nameLen := utf8.RuneCountInString(componentName); nameLen > maxName {
+	nameLen := utf8.RuneCountInString(componentName)
+	if nameLen > maxName {
 		maxName = nameLen
 	}
 
-	if verLen := utf8.RuneCountInString(componentVersion); verLen > maxVer {
+	verLen := utf8.RuneCountInString(componentVersion)
+	if verLen > maxVer {
 		maxVer = verLen
 	}
 
@@ -177,7 +182,8 @@ func sanitizeVersion(version string) string {
 
 func trimVersion(version, sum string) string {
 	if sum == "" {
-		if i := strings.Index(version, "-"); i != -1 {
+		i := strings.Index(version, "-")
+		if i != -1 {
 			return version[:i]
 		}
 	}

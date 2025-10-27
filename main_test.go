@@ -65,13 +65,14 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 	rotateConsoleLogAt(now)
 
 	logPath := getConsoleLogPath(now)
-	if _, err := os.Stat(logPath); os.IsNotExist(err) { //nolint:noinlineerr
+	_, err := os.Stat(logPath)
+	if os.IsNotExist(err) {
 		t.Fatalf("Log file was not created at %s",
 			logPath)
 	}
 
 	log.Printf("Test message")
-	err := consoleLogFile.Sync()
+	err = consoleLogFile.Sync()
 	if err != nil {
 		t.Fatalf("Failed to sync log file: %v",
 			err)
@@ -125,13 +126,14 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	rotateConsoleLogAt(day1)
 
 	day1LogPath := getConsoleLogPath(day1)
-	if _, err := os.Stat(day1LogPath); os.IsNotExist(err) { //nolint:noinlineerr
+	_, err := os.Stat(day1LogPath)
+	if os.IsNotExist(err) {
 		t.Fatalf("Log file for day 1 was not created at %s",
 			day1LogPath)
 	}
 
 	log.Printf("Test message day 1")
-	err := consoleLogFile.Sync()
+	err = consoleLogFile.Sync()
 	if err != nil {
 		t.Fatalf("Failed to sync log file for day 1: %v",
 			err)
@@ -141,18 +143,21 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	rotateConsoleLogAt(day2)
 
 	day1CompressedLogPath := day1LogPath + ".gz"
-	if _, err := os.Stat(day1CompressedLogPath); os.IsNotExist(err) { //nolint:noinlineerr
+	_, err = os.Stat(day1CompressedLogPath)
+	if os.IsNotExist(err) {
 		t.Fatalf("Compressed log file for day 1 was not created at %s",
 			day1CompressedLogPath)
 	}
 
-	if _, err := os.Stat(day1LogPath); !os.IsNotExist(err) { //nolint:noinlineerr
+	_, err = os.Stat(day1LogPath)
+	if !os.IsNotExist(err) {
 		t.Fatalf("Old log file for day 1 was not removed after compression from %s",
 			day1LogPath)
 	}
 
 	day2LogPath := getConsoleLogPath(day2)
-	if _, err := os.Stat(day2LogPath); os.IsNotExist(err) { //nolint:noinlineerr
+	_, err = os.Stat(day2LogPath)
+	if os.IsNotExist(err) {
 		t.Fatalf("Log file for day 2 was not created at %s",
 			day2LogPath)
 	}

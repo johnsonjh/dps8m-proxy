@@ -338,7 +338,8 @@ func (a *altHostFlag) Set(value string) error {
 	username := parts[0]
 	hostPort := parts[1]
 
-	if _, ok := altHosts[username]; ok {
+	_, ok := altHosts[username]
+	if ok {
 		return fmt.Errorf("%sduplicate alt-host entry for sshuser: %s",
 			errorPrefix(), username)
 	}
@@ -1212,14 +1213,16 @@ func printVersion(short bool) {
 	versionString := "DPS8M Proxy"
 
 	versionString += func() string {
-		if v := getMainModuleVersion(); v != "" {
+		v := getMainModuleVersion()
+		if v != "" {
 			return " " + v
 		}
 
 		return ""
 	}()
 
-	if info, ok := debug.ReadBuildInfo(); ok {
+	info, ok := debug.ReadBuildInfo()
+	if ok {
 		var date, commit string
 		var modified bool
 
@@ -2922,7 +2925,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	config.AddHostKey(rsaSigner)
 	config.AddHostKey(ecdsaSigner)
 
-	if tcp, ok := rawConn.(*net.TCPConn); ok {
+	tcp, ok := rawConn.(*net.TCPConn)
+	if ok {
 		_ = tcp.SetNoDelay(true)
 	}
 
@@ -2997,7 +3001,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 	connections[sid] = conn
 
-	if currentLen := uint64(len(connections)); currentLen > peakUsersTotal.Load() {
+	currentLen := uint64(len(connections))
+	if currentLen > peakUsersTotal.Load() {
 		peakUsersTotal.Store(currentLen)
 		if dbEnabled {
 			if currentLen > lifetimePeakUsersTotal.Load() {
@@ -3631,7 +3636,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	var targetDest string
 	var isAltHost bool
 
-	if altHostPort, ok := altHosts[conn.userName]; ok {
+	altHostPort, ok := altHosts[conn.userName]
+	if ok {
 		targetDest = altHostPort
 		isAltHost = true
 	} else {
@@ -3722,7 +3728,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		return
 	}
 
-	if tcp2, ok := remote.(*net.TCPConn); ok {
+	tcp2, ok := remote.(*net.TCPConn)
+	if ok {
 		_ = tcp2.SetNoDelay(true)
 	}
 
@@ -3840,7 +3847,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				if len(escSequence) > 0 { //nolint:gocritic
 					escSequence = append(escSequence, b)
 					if conn.emacsKeymapEnabled {
-						if replacement, ok := emacsKeymap[string(escSequence)]; ok {
+						replacement, ok := emacsKeymap[string(escSequence)]
+						if ok {
 							m, err := remote.Write([]byte(replacement))
 							if err != nil {
 								log.Printf("%sError writing to remote for %s: %v",
@@ -5238,7 +5246,8 @@ func rotateConsoleLogAt(t time.Time) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func compressLogFile(logFilePath string) {
-	if _, err := os.Stat(logFilePath); os.IsNotExist(err) { //nolint:noinlineerr
+	_, err := os.Stat(logFilePath)
+	if os.IsNotExist(err) {
 		return
 	}
 
