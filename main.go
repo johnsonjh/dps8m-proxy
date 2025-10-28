@@ -673,23 +673,23 @@ func main() {
 	pflag.Parse()
 
 	if pflag.NFlag() == 0 && len(pflag.Args()) == 0 && guiLaunched() {
-		fmt.Print("This is NOT a graphical (GUI) application --\r\n")
+		pflag.Usage()
+
+		fmt.Print("\r\nNOTE: This is NOT a GUI application!\r\n")
 
 		switch runtime.GOOS {
 		case "windows":
 			fmt.Print(
-				"It is intended to be invoked from a Command Prompt or Windows Terminal session!")
+				"It is intended to be invoked from a Command Prompt or Windows Terminal session.")
 		case "darwin":
 			fmt.Printf(
-				"It is intended to be invoked from the command prompt (e.g., via Terminal.app)!")
+				"It is intended to be invoked from a command prompt (e.g., via Terminal.app).")
 		default:
 			fmt.Printf(
-				"It is intended to be invoked from the command prompt and not by a GUI launcher!")
+				"It is intended to be invoked from a command prompt (and not a GUI launcher).")
 		}
 
-		fmt.Printf("\r\n\r\n")
-		pflag.Usage()
-		fmt.Print("\r\nPress Enter (or Return) to exit ... ")
+		fmt.Print("\r\n\r\nPress Enter (or Return) to exit ... ")
 
 		oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
 		if err != nil {
