@@ -113,7 +113,8 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 		if consoleLogFile != nil {
 			err := consoleLogFile.Close()
 			if err != nil {
-				t.Errorf("Failed to close console log file: %v", err)
+				t.Errorf("Failed to close console log file: %v",
+					err)
 			}
 
 			consoleLogFile = nil
