@@ -1900,12 +1900,12 @@ func toggleGracefulShutdown() {
 	if gracefulShutdownMode.Load() {
 		gracefulShutdownMode.Store(false)
 
-		log.Printf("%sGraceful shutdown cancelled.\r\n",
+		log.Printf("%sGraceful shutdown canceled.\r\n",
 			bellPrefix())
 
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
-				"%s %sGraceful shutdown cancelled.\r\n",
+				"%s %sGraceful shutdown canceled.\r\n",
 				nowStamp(), bellPrefix())
 		}
 	} else {
@@ -1947,12 +1947,12 @@ func toggleDenyNewConnections() {
 	if denyNewConnectionsMode.Load() {
 		denyNewConnectionsMode.Store(false)
 
-		log.Printf("%sDeny connections cancelled.\r\n",
+		log.Printf("%sDeny connections canceled.\r\n",
 			thumbsUpPrefix())
 
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
-				"%s %sDeny connections cancelled.\r\n",
+				"%s %sDeny connections canceled.\r\n",
 				nowStamp(), thumbsUpPrefix())
 		}
 	} else {
