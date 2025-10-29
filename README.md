@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.50 (2025-Oct-27 gffa3e33) [linux/amd64]
+DPS8M Proxy v0.1.51 (2025-Oct-29 g2f6e91a) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -124,6 +124,8 @@ Usage for /home/jhj/dps8m-proxy/proxy:
   --debug-telnet                Debug TELNET option negotiation
   --debug-server string         Enable HTTP debug server listening address
                                     [e.g., ":6060", "[::1]:6060"]
+  --no-sanitize                 Disable ASCII sanitization of error messages
+                                    (allowing non-ASCII error reports via SSH)
   --gops                        Enable the "gops" diagnostic agent
                                     (see https://github.com/google/gops)
   --mdns                        Enable mDNS (Multicast DNS) advertisements
@@ -197,11 +199,17 @@ are, hopefully, documented here:
   is customary to use a name ending with the extension `db` (*e.g.,*
   `proxy.db`).
 
+* The default TELNET target for `--telnet-host` is specified as a
+  `host:port` or `path` (for connecting to a UNIX domain socket).
+  Valid examples include `hostname:23`, `1.2.3.4:2323`,
+  `[2607:f8b0:4008:805::2000]:23`, `./socket`, and `/path/socket`.
+
 * All incoming SSH users are connected to the default TELNET target,
   unless their supplied SSH username matches an alternate target
   enabled with the `‑‑alt‑host` flag.  The alt‑host syntax is
-  `sshuser@host:port`, where `sshuser` is the SSH username, and the
-  `host:port` is the TELNET target.
+  `sshuser@host:port` or `sshuser@path`, where `sshuser` is the SSH
+  username, and the `host:port` (or `path`, an absolute or relative
+  path to a UNIX domain socket) is the TELNET target.
 
 * All users connecting with SSH are shown a banner which includes
   details such as the date and time of the session, their IP address,
@@ -258,12 +266,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.50 (2025-Oct-27 gffa3e33) [linux/amd64]
+DPS8M Proxy v0.1.51 (2025-Oct-29 g2f6e91a) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.50                          |
+| dps8m/proxy               | v0.1.51                          |
 | arl/statsviz              | v0.7.2                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -526,13 +534,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>19</th>
-<th>7865</th>
-<th>1658</th>
-<th>447</th>
-<th>5760</th>
-<th>1366</th>
-<th>191226</th>
-<th>3449</th>
+<th>7943</th>
+<th>1674</th>
+<th>451</th>
+<th>5818</th>
+<th>1377</th>
+<th>192242</th>
+<th>3500</th>
 </tr><tr>
 <th>Shell</th>
 <th>3</th>
@@ -542,7 +550,7 @@ predecessor (code statistics 📈 provided by
 <th>151</th>
 <th>21</th>
 <th>9049</th>
-<th>154</th>
+<th>155</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -556,13 +564,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>562</th>
-<th>105</th>
+<th>568</th>
+<th>106</th>
 <th>0</th>
-<th>457</th>
+<th>462</th>
 <th>0</th>
-<th>26657</th>
-<th>442</th>
+<th>26999</th>
+<th>447</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -587,13 +595,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>26</th>
-<th>9513</th>
-<th>1951</th>
-<th>727</th>
-<th>6835</th>
-<th>1526</th>
-<th>254382</th>
-<th>4546</th>
+<th>9597</th>
+<th>1968</th>
+<th>731</th>
+<th>6898</th>
+<th>1537</th>
+<th>255740</th>
+<th>4603</th>
 </tr></tfoot></table>
 
 ## Future plans

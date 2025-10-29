@@ -77,7 +77,8 @@ var logLevelMap = map[string]LogLevel{
 func SetDbLogLevel(level string) error {
 	level = strings.ToLower(level)
 
-	if l, ok := logLevelMap[level]; ok {
+	l, ok := logLevelMap[level]
+	if ok {
 		currentDbLogLevel = l
 
 		return nil

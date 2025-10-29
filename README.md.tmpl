@@ -135,11 +135,17 @@ are, hopefully, documented here:
   is customary to use a name ending with the extension `db` (*e.g.,*
   `proxy.db`).
 
+* The default TELNET target for `--telnet-host` is specified as a
+  `host:port` or `path` (for connecting to a UNIX domain socket).
+  Valid examples include `hostname:23`, `1.2.3.4:2323`,
+  `[2607:f8b0:4008:805::2000]:23`, `./socket`, and `/path/socket`.
+
 * All incoming SSH users are connected to the default TELNET target,
   unless their supplied SSH username matches an alternate target
   enabled with the `‑‑alt‑host` flag.  The alt‑host syntax is
-  `sshuser@host:port`, where `sshuser` is the SSH username, and the
-  `host:port` is the TELNET target.
+  `sshuser@host:port` or `sshuser@path`, where `sshuser` is the SSH
+  username, and the `host:port` (or `path`, an absolute or relative
+  path to a UNIX domain socket) is the TELNET target.
 
 * All users connecting with SSH are shown a banner which includes
   details such as the date and time of the session, their IP address,

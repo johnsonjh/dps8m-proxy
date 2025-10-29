@@ -119,10 +119,14 @@ func announceMDNS(
 			for _, addr := range addrs {
 				var ip net.IP
 
-				if ipnet, ok := addr.(*net.IPNet); ok {
+				ipnet, ok := addr.(*net.IPNet)
+				if ok {
 					ip = ipnet.IP
-				} else if ipaddr, ok := addr.(*net.IPAddr); ok {
-					ip = ipaddr.IP
+				} else {
+					ipaddr, ok := addr.(*net.IPAddr)
+					if ok {
+						ip = ipaddr.IP
+					}
 				}
 
 				for _, adIP := range advertiseIPs {

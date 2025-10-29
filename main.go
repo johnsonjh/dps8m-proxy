@@ -48,6 +48,7 @@ import (
 	"sync/atomic"
 	"time"
 	_ "time/tzdata"
+	"unicode/utf8"
 
 	"github.com/arl/statsviz"
 	"github.com/klauspost/compress/gzip"
@@ -167,6 +168,8 @@ const (
 //go:embed LICENSE
 var licenseText string
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 // Global variables.
 var (
 	startTime                        = time.Now()
@@ -197,6 +200,7 @@ var (
 	loggingWg                        sync.WaitGroup
 	noBanner                         bool
 	noCompress                       bool
+	noSanitize                       bool
 	enableGops                       bool
 	enableMDNS                       bool
 	noLog                            bool
@@ -310,6 +314,35 @@ type Connection struct {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+func sanitizeNonASCII(s string) string {
+	if noSanitize {
+		return s
+	}
+
+	var b strings.Builder
+
+	b.Grow(len(s))
+
+	for _, r := range s {
+		if r < utf8.RuneSelf {
+			b.WriteRune(r)
+		} else {
+			b.WriteRune('?')
+		}
+	}
+
+	return b.String()
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func isUnixSocket(path string) bool {
+	return strings.HasPrefix(path, "/") || strings.HasPrefix(path, ".") ||
+		(runtime.GOOS == "windows" && strings.HasPrefix(path, "\\")) //nolint:goconst
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 type altHostFlag struct{}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -331,15 +364,18 @@ func (a *altHostFlag) Set(value string) error {
 	username := parts[0]
 	hostPort := parts[1]
 
-	if _, ok := altHosts[username]; ok {
+	_, ok := altHosts[username]
+	if ok {
 		return fmt.Errorf("%sduplicate alt-host entry for sshuser: %s",
 			errorPrefix(), username)
 	}
 
-	_, _, err := net.SplitHostPort(hostPort)
-	if err != nil {
-		return fmt.Errorf("%sinvalid host:port in alt-host '%s': %w",
-			errorPrefix(), value, err)
+	if !isUnixSocket(hostPort) {
+		_, _, err := net.SplitHostPort(hostPort)
+		if err != nil {
+			return fmt.Errorf("%sinvalid host:port in alt-host '%s': %w",
+				errorPrefix(), value, err)
+		}
 	}
 
 	altHosts[username] = hostPort
@@ -467,6 +503,11 @@ func init() {
 		"debug-server", "",
 		"Enable HTTP debug server listening address\r\n"+
 			"    [e.g., \":6060\", \"[::1]:6060\"]")
+
+	pflag.BoolVar(&noSanitize,
+		"no-sanitize", false,
+		"Disable ASCII sanitization of error messages\r\n"+
+			"    (allowing non-ASCII error reports via SSH)")
 
 	if gopsEnabled {
 		pflag.BoolVar(&enableGops,
@@ -634,23 +675,23 @@ func main() {
 	pflag.Parse()
 
 	if pflag.NFlag() == 0 && len(pflag.Args()) == 0 && guiLaunched() {
-		fmt.Print("This is NOT a graphical (GUI) application --\r\n")
+		pflag.Usage()
+
+		fmt.Print("\r\nNOTE: This is NOT a GUI application!\r\n")
 
 		switch runtime.GOOS {
 		case "windows":
 			fmt.Print(
-				"It is intended to be invoked from a Command Prompt or Windows Terminal session!")
+				"It is intended to be invoked from a Command Prompt or Windows Terminal session.")
 		case "darwin":
 			fmt.Printf(
-				"It is intended to be invoked from the command prompt (e.g., via Terminal.app)!")
+				"It is intended to be invoked from a command prompt (e.g., via Terminal.app).")
 		default:
 			fmt.Printf(
-				"It is intended to be invoked from the command prompt and not by a GUI launcher!")
+				"It is intended to be invoked from a command prompt (and not a GUI launcher).")
 		}
 
-		fmt.Printf("\r\n\r\n")
-		pflag.Usage()
-		fmt.Print("\r\nPress Enter (or Return) to exit ... ")
+		fmt.Print("\r\n\r\nPress Enter (or Return) to exit ... ")
 
 		oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
 		if err != nil {
@@ -1032,25 +1073,26 @@ func main() {
 			addr)
 	}
 
-	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
-	if err != nil {
-		if isConsoleLogQuiet {
-			_, _ = fmt.Fprintf(os.Stdout,
-				"%s %sERROR: Could not parse default TELNET target: %v\r\n",
-				nowStamp(), errorPrefix(), err)
-		}
+	if !isUnixSocket(telnetHostPort) {
+		_, _, err := net.SplitHostPort(telnetHostPort)
+		if err != nil {
+			if isConsoleLogQuiet {
+				_, _ = fmt.Fprintf(os.Stdout,
+					"%s %sERROR: Could not parse default TELNET target: %v\r\n",
+					nowStamp(), errorPrefix(), err)
+			}
 
-		if enableGops {
-			gopsClose()
-		}
+			if enableGops {
+				gopsClose()
+			}
 
-		log.Fatalf("%sERROR: Could not parse default TELNET target: %v",
-			errorPrefix(), err) // LINTED: Fatalf
+			log.Fatalf("%sERROR: Could not parse default TELNET target: %v",
+				errorPrefix(), err) // LINTED: Fatalf
+		}
 	}
 
-	log.Printf("Default TELNET target: %s:%d",
-		defaultHost, defaultPort)
-
+	log.Printf("Default TELNET target: %s",
+		telnetHostPort)
 	for user, hostPort := range altHosts {
 		log.Printf("Alt target: %s [%s]",
 			hostPort, user)
@@ -1202,14 +1244,16 @@ func printVersion(short bool) {
 	versionString := "DPS8M Proxy"
 
 	versionString += func() string {
-		if v := getMainModuleVersion(); v != "" {
+		v := getMainModuleVersion()
+		if v != "" {
 			return " " + v
 		}
 
 		return ""
 	}()
 
-	if info, ok := debug.ReadBuildInfo(); ok {
+	info, ok := debug.ReadBuildInfo()
+	if ok {
 		var date, commit string
 		var modified bool
 
@@ -1360,9 +1404,7 @@ func handleConsoleInput() {
 			if parts[1] == "*" {
 				killAllConnections()
 			} else {
-				connectionsMutex.Lock()
 				killConnection(parts[1])
-				connectionsMutex.Unlock()
 			}
 
 		case "r", "R":
@@ -1858,12 +1900,12 @@ func toggleGracefulShutdown() {
 	if gracefulShutdownMode.Load() {
 		gracefulShutdownMode.Store(false)
 
-		log.Printf("%sGraceful shutdown cancelled.\r\n",
+		log.Printf("%sGraceful shutdown canceled.\r\n",
 			bellPrefix())
 
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
-				"%s %sGraceful shutdown cancelled.\r\n",
+				"%s %sGraceful shutdown canceled.\r\n",
 				nowStamp(), bellPrefix())
 		}
 	} else {
@@ -1905,12 +1947,12 @@ func toggleDenyNewConnections() {
 	if denyNewConnectionsMode.Load() {
 		denyNewConnectionsMode.Store(false)
 
-		log.Printf("%sDeny connections cancelled.\r\n",
+		log.Printf("%sDeny connections canceled.\r\n",
 			thumbsUpPrefix())
 
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
-				"%s %sDeny connections cancelled.\r\n",
+				"%s %sDeny connections canceled.\r\n",
 				nowStamp(), thumbsUpPrefix())
 		}
 	} else {
@@ -2058,8 +2100,13 @@ func listConnections(truncate bool) {
 			targetInfo := ""
 
 			if conn.targetHost != "" {
-				targetInfo = fmt.Sprintf(" -> %s:%d",
-					conn.targetHost, conn.targetPort)
+				if conn.targetPort != 0 {
+					targetInfo = fmt.Sprintf(" -> %s:%d",
+						conn.targetHost, conn.targetPort)
+				} else {
+					targetInfo = fmt.Sprintf(" -> %s",
+						conn.targetHost)
+				}
 			}
 
 			details = fmt.Sprintf("%s@%s%s",
@@ -2907,7 +2954,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	config.AddHostKey(rsaSigner)
 	config.AddHostKey(ecdsaSigner)
 
-	if tcp, ok := rawConn.(*net.TCPConn); ok {
+	tcp, ok := rawConn.(*net.TCPConn)
+	if ok {
 		_ = tcp.SetNoDelay(true)
 	}
 
@@ -2982,7 +3030,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 	connections[sid] = conn
 
-	if currentLen := uint64(len(connections)); currentLen > peakUsersTotal.Load() {
+	currentLen := uint64(len(connections))
+	if currentLen > peakUsersTotal.Load() {
 		peakUsersTotal.Store(currentLen)
 		if dbEnabled {
 			if currentLen > lifetimePeakUsersTotal.Load() {
@@ -3090,6 +3139,10 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func parseHostPort(hostPort string) (string, int, error) {
+	if isUnixSocket(hostPort) {
+		return hostPort, 0, nil
+	}
+
 	host, portStr, err := net.SplitHostPort(hostPort)
 	if err != nil {
 		return "", 0, err
@@ -3102,6 +3155,16 @@ func parseHostPort(hostPort string) (string, int, error) {
 	}
 
 	return host, port, nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func dialDest(dest string) (net.Conn, error) {
+	if isUnixSocket(dest) {
+		return net.Dial("unix", dest)
+	}
+
+	return net.Dial("tcp", dest)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3551,7 +3614,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		logfile, basePath, err = createDatedLog(conn.ID, conn.sshConn.RemoteAddr())
 		if err != nil {
 			_, err := fmt.Fprintf(channel,
-				"%v\r\n", err)
+				"%v\r\n", sanitizeNonASCII(err.Error()))
 			if err != nil {
 				log.Printf("%sError writing to channel for %s: %v",
 					warnPrefix(), conn.ID, err)
@@ -3599,66 +3662,62 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		logwriter = io.Discard
 	}
 
-	var targetHost string
-	var targetPort int
+	var targetDest string
+	var isAltHost bool
 
-	if altHostPort, ok := altHosts[conn.userName]; ok {
-		var err error
-		targetHost, targetPort, err = parseHostPort(altHostPort)
-		if err != nil {
-			_, err := fmt.Fprintf(channel,
-				"%sError parsing alt-host for user %s: %v\r\n\r\n",
-				warnPrefix(), conn.userName, err)
-			if err != nil {
-				log.Printf("%sError writing to channel for %s: %v",
-					warnPrefix(), conn.ID, err)
-			}
-
-			log.Printf("%sError parsing alt-host for user %s: %v",
-				warnPrefix(), conn.userName, err)
-
-			err = channel.Close()
-			if err != nil {
-				log.Printf("%sError closing channel for %s: %v",
-					warnPrefix(), conn.ID, err)
-			}
-
-			return
-		}
-
-		log.Printf("%sALTROUTE [%s] %s -> %s:%d",
-			greenDotPrefix(), conn.ID, conn.userName, targetHost, targetPort)
-
-		conn.targetHost = targetHost
-		conn.targetPort = targetPort
-
-		altHostRoutesTotal.Add(1)
+	altHostPort, ok := altHosts[conn.userName]
+	if ok {
+		targetDest = altHostPort
+		isAltHost = true
 	} else {
-		var err error
-		targetHost, targetPort, err = parseHostPort(telnetHostPort)
-		if err != nil {
-			_, err := fmt.Fprintf(channel,
-				"Error parsing default telnet-host: %v\r\n\r\n", err)
-			if err != nil {
-				log.Printf("%sError writing to channel for %s: %v",
-					warnPrefix(), conn.ID, err)
-			}
-
-			log.Printf("%sError parsing default telnet-host: %v",
-				warnPrefix(), err)
-			err = channel.Close()
-			if err != nil {
-				log.Printf("%sError closing channel for %s: %v",
-					warnPrefix(), conn.ID, err)
-			}
-
-			return
-		}
+		targetDest = telnetHostPort
+		isAltHost = false
 	}
+
+	targetHost, targetPort, err := parseHostPort(targetDest)
+	if err != nil {
+		var errMsg string
+
+		sanitizedErrStr := sanitizeNonASCII(err.Error())
+		if isAltHost {
+			errMsg = fmt.Sprintf("Error parsing alt-host for user %s: %v",
+				conn.userName, sanitizedErrStr)
+		} else {
+			errMsg = fmt.Sprintf("Error parsing default telnet-host: %v",
+				sanitizedErrStr)
+		}
+
+		_, writeErr := fmt.Fprintf(channel,
+			"%s\r\n\r\n", errMsg)
+		if writeErr != nil {
+			log.Printf("%sError writing to channel for %s: %v",
+				warnPrefix(), conn.ID, writeErr)
+		}
+
+		log.Printf("%s%s", warnPrefix(), errMsg)
+
+		closeErr := channel.Close()
+		if closeErr != nil {
+			log.Printf("%sError closing channel for %s: %v",
+				warnPrefix(), conn.ID, closeErr)
+		}
+
+		return
+	}
+
+	if isAltHost {
+		altHostRoutesTotal.Add(1)
+
+		log.Printf("%sALTROUTE [%s] %s -> %s",
+			greenDotPrefix(), conn.ID, conn.userName, targetDest)
+	}
+
+	conn.targetHost = targetHost
+	conn.targetPort = targetPort
 
 	if !noLog {
 		_, err := logwriter.Write(fmt.Appendf(nil,
-			nowStamp()+" Target: %s:%d\r\n", targetHost, targetPort))
+			nowStamp()+" Target: %s\r\n", targetDest))
 		if err != nil {
 			log.Printf("%sError writing to log for %s: %v",
 				warnPrefix(), conn.ID, err)
@@ -3674,21 +3733,20 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}
 
 	telnetConnectionsTotal.Add(1)
-	addr := net.JoinHostPort(targetHost, strconv.Itoa(targetPort))
-	remote, err := net.Dial("tcp", addr)
+
+	remote, err := dialDest(targetDest)
 	if err != nil {
 		telnetFailuresTotal.Add(1)
 
-		_, err := fmt.Fprintf(channel,
-			"%v\r\n\r\n",
-			err)
-		if err != nil {
-			log.Printf("%sError writing to channel for %s: %v",
-				warnPrefix(), conn.ID, err)
-		}
+		log.Printf("%sError connecting %s -> %s: %v",
+			warnPrefix(), conn.ID, targetDest, err)
 
-		log.Printf("%v",
-			err)
+		_, err2 := fmt.Fprintf(channel,
+			"%v\r\n\r\n", sanitizeNonASCII(err.Error()))
+		if err2 != nil {
+			log.Printf("%sError writing to channel for %s: %v",
+				warnPrefix(), conn.ID, err2)
+		}
 
 		err = channel.Close()
 		if err != nil {
@@ -3699,7 +3757,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		return
 	}
 
-	if tcp2, ok := remote.(*net.TCPConn); ok {
+	tcp2, ok := remote.(*net.TCPConn)
+	if ok {
 		_ = tcp2.SetNoDelay(true)
 	}
 
@@ -3817,7 +3876,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				if len(escSequence) > 0 { //nolint:gocritic
 					escSequence = append(escSequence, b)
 					if conn.emacsKeymapEnabled {
-						if replacement, ok := emacsKeymap[string(escSequence)]; ok {
+						replacement, ok := emacsKeymap[string(escSequence)]
+						if ok {
 							m, err := remote.Write([]byte(replacement))
 							if err != nil {
 								log.Printf("%sError writing to remote for %s: %v",
@@ -5215,7 +5275,8 @@ func rotateConsoleLogAt(t time.Time) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func compressLogFile(logFilePath string) {
-	if _, err := os.Stat(logFilePath); os.IsNotExist(err) { //nolint:noinlineerr
+	_, err := os.Stat(logFilePath)
+	if os.IsNotExist(err) {
 		return
 	}
 
