@@ -3738,15 +3738,15 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	if err != nil {
 		telnetFailuresTotal.Add(1)
 
-		_, err := fmt.Fprintf(channel,
-			"%v\r\n\r\n", sanitizeNonASCII(err.Error()))
-		if err != nil {
-			log.Printf("%sError writing to channel for %s: %v",
-				warnPrefix(), conn.ID, err)
-		}
+		log.Printf("%sError connecting %s -> %s: %v",
+			warnPrefix(), conn.ID, targetDest, err)
 
-		log.Printf("%v",
-			err)
+		_, err2 := fmt.Fprintf(channel,
+			"%v\r\n\r\n", sanitizeNonASCII(err.Error()))
+		if err2 != nil {
+			log.Printf("%sError writing to channel for %s: %v",
+				warnPrefix(), conn.ID, err2)
+		}
 
 		err = channel.Close()
 		if err != nil {
