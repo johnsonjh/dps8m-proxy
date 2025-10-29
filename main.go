@@ -1404,9 +1404,7 @@ func handleConsoleInput() {
 			if parts[1] == "*" {
 				killAllConnections()
 			} else {
-				connectionsMutex.Lock()
 				killConnection(parts[1])
-				connectionsMutex.Unlock()
 			}
 
 		case "r", "R":
