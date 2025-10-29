@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.51 (2025-Oct-28 g904d41a) [linux/amd64]
+DPS8M Proxy v0.1.51 (2025-Oct-29 g2f6e91a) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -199,11 +199,17 @@ are, hopefully, documented here:
   is customary to use a name ending with the extension `db` (*e.g.,*
   `proxy.db`).
 
+* The default TELNET target for `--telnet-host` is specified as a
+  `host:port` or `path` (for connecting to a UNIX domain socket).
+  Valid examples include `hostname:23`, `1.2.3.4:2323`,
+  `[2607:f8b0:4008:805::2000]:23`, `./socket`, and `/path/socket`.
+
 * All incoming SSH users are connected to the default TELNET target,
   unless their supplied SSH username matches an alternate target
   enabled with the `‑‑alt‑host` flag.  The alt‑host syntax is
-  `sshuser@host:port`, where `sshuser` is the SSH username, and the
-  `host:port` is the TELNET target.
+  `sshuser@host:port` or `sshuser@path`, where `sshuser` is the SSH
+  username, and the `host:port` (or `path`, an absolute or relative
+  path to a UNIX domain socket) is the TELNET target.
 
 * All users connecting with SSH are shown a banner which includes
   details such as the date and time of the session, their IP address,
@@ -260,7 +266,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.51 (2025-Oct-28 g904d41a) [linux/amd64]
+DPS8M Proxy v0.1.51 (2025-Oct-29 g2f6e91a) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -528,13 +534,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>19</th>
-<th>7945</th>
+<th>7943</th>
 <th>1674</th>
 <th>451</th>
-<th>5820</th>
+<th>5818</th>
 <th>1377</th>
-<th>192233</th>
-<th>3497</th>
+<th>192242</th>
+<th>3500</th>
 </tr><tr>
 <th>Shell</th>
 <th>3</th>
@@ -558,13 +564,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>562</th>
-<th>105</th>
+<th>568</th>
+<th>106</th>
 <th>0</th>
-<th>457</th>
+<th>462</th>
 <th>0</th>
-<th>26657</th>
-<th>442</th>
+<th>26999</th>
+<th>447</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -589,13 +595,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>26</th>
-<th>9593</th>
-<th>1967</th>
+<th>9597</th>
+<th>1968</th>
 <th>731</th>
-<th>6895</th>
+<th>6898</th>
 <th>1537</th>
-<th>255389</th>
-<th>4595</th>
+<th>255740</th>
+<th>4603</th>
 </tr></tfoot></table>
 
 ## Future plans
