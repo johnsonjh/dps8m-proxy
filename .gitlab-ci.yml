@@ -31,7 +31,7 @@ pages:
     - apk update || true
     - apk add '!usr-merge-nag' 2> /dev/null || true
     - apk upgrade --prune || true
-    - apk add brotli curl gawk git go grep pdpmake perl pigz py3-pip python3 sed shellcheck tree yash zip
+    - apk add brotli curl gawk git go grep lzip pdpmake perl pigz py3-pip python3 sed shellcheck tar tree yash zip
     - ln -fs "$(command -v yash)" /bin/sh
     - export SHELL=/bin/sh
     - export PATH="$HOME/go/bin:$PATH"
@@ -49,6 +49,11 @@ pages:
     - git diff --exit-code
     - env GOFLAGS="-ldflags=-s -w" pdpmake
     - env GOFLAGS="-ldflags=-s -w" pdpmake cross
+    - ( cd $HOME && mkdir -p x-tools && cd x-tools && curl -fsSL https://github.com/johnsonjh/ndk/releases/download/r29/android-ndk-r29.tar.lz | lzip -dc | tar xf - ) || true
+    - yash ./.cross-android.sh || true
+    - mv -f proxy.android.arm cross.bin || true
+    - mv -f proxy.android.386 cross.bin || true
+    - mv -f proxy.android.amd64 cross.bin || true
     - mv -f cross.bin public
     - cd public
     - for i in proxy.windows.*; do [ -f "${i:?}" ] || continue; mv -f -- "${i:?}" "${i:?}.exe"; done

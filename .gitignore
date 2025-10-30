@@ -22,6 +22,7 @@ issue-*.txt
 log
 *.o
 proxy
+proxy.android*
 proxy.os400*
 ssh_host_ecdsa_key.pem
 ssh_host_ed25519_key.pem

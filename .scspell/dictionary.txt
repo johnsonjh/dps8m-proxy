@@ -90,12 +90,16 @@ wronly
 
 FILETYPE: Shell; .sh
 esac
+expandtab
 getconf
+goarch
 goexe
+goflags
 gopath
 goproxy
 gosumdb
 gotoolchain
+ldflags
 mkfifo
 nosemgrep
 nproc
@@ -392,6 +396,12 @@ getppid
 gppid
 ppid
 
+FILEID: de55e65e-b5e3-11f0-9604-80ee73e9b8e7
+androideabi
+armv
+ndkhome
+ndkpath
+
 NATURAL:
 adduser
 avahi
@@ -451,6 +461,7 @@ linemode
 linters
 linting
 linux
+llvm
 logfile
 logon
 logout
@@ -473,6 +484,7 @@ pdpmake
 perl
 pigz
 pkcs
+prebuilt
 proxying
 realtime
 reqs
@@ -500,6 +512,7 @@ timestamping
 tmux
 toml
 toolchain
+toolchains
 tunables
 uber
 uptime
@@ -514,6 +527,7 @@ whitesource
 workflows
 xauth
 xterm
+xxxxxx
 xyzzy
 zoneinfo
 zstandard
