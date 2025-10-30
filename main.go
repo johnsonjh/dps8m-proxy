@@ -2789,7 +2789,7 @@ func sendNaws(conn *Connection, width, height uint32) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) {
+func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint:ireturn
 	keyData, err := os.ReadFile(keyPath) //nolint:gosec
 	if err == nil {
 		return ssh.ParsePrivateKey(keyData)
