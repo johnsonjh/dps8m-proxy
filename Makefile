@@ -9,8 +9,10 @@
 ##############################################################################
 # Configuration
 
-GO?=$$(command -v go 2> /dev/null || printf '%s\n' "go")
+CGO_ENABLED=0
 CP=cp -f
+GO=$$(command -v go 2> /dev/null || printf '%s\n' "go")
+GOTOOLCHAIN=auto
 PERL=perl
 RM=rm -f
 SED?=sed
@@ -32,9 +34,10 @@ all: proxy
 .PHONY: proxy
 proxy: tags
 	@env printf '%s\n' "🧩 Building proxy..." 2> /dev/null || :
-	@env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) CGO_ENABLED=0 \
-		$(GO) build -trimpath -v && \
+	@env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) \
+		CGO_ENABLED=$(CGO_ENABLED) $(GO) build -trimpath -v && \
 	test -x proxy 2> /dev/null && { \
 		env printf '%s\n\n' "✅ Build successful!" 2> /dev/null || :; \
 		./proxy --version; exit 0; } || { \
@@ -46,7 +49,8 @@ proxy: tags
 .PHONY: clean
 clean:
 	@env printf '%s\n' "🧹 Cleaning..." 2> /dev/null || :
-	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) clean -v
 	$(RM) -r ./cross.bin/
 
@@ -55,7 +59,8 @@ clean:
 
 .PHONY: tidy
 tidy: go.mod
-	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) mod tidy -v
 
 ##############################################################################
@@ -73,7 +78,8 @@ distclean: clean
 .PHONY: test
 test:
 	@env printf '%s\n' "🧪 Running 'go test -v .'" 2> /dev/null || :
-	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) test -v .
 
 ##############################################################################
@@ -124,7 +130,8 @@ golist:
 	@env printf '\n%s\n' \
 		"ℹ️ Finding any outdated dependencies... (may take a few moments)" \
 			 2> /dev/null || :
-	@env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
+	@env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) list -u -f \
 		'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} → {{.Update.Version}}{{end}}' \
 		-m all
@@ -144,7 +151,7 @@ reuse:
 
 .PHONY: gofmt
 gofmt:
-	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 	grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 	'GOSUMDB=sum.golang.org' || :) gofmt -d -e -s .
 
@@ -153,7 +160,8 @@ gofmt:
 
 .PHONY: goverify
 goverify: go.mod
-	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) mod verify
 
 ##############################################################################
@@ -161,7 +169,8 @@ goverify: go.mod
 
 .PHONY: gotidydiff
 gotidydiff: go.mod
-	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) mod tidy -diff
 
 ##############################################################################
@@ -172,7 +181,7 @@ golangci-lint:
 	@command -v golangci-lint > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ golangci-lint not found!" \
 			2> /dev/null || :; exit 0; } ; \
-		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) golangci-lint run
 
@@ -184,7 +193,7 @@ staticcheck:
 	@command -v staticcheck > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ staticcheck not found!" \
 			2> /dev/null || :; exit 0; } ; \
-		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) staticcheck .
 
@@ -196,7 +205,7 @@ revive:
 	@command -v revive > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ revive not found!" \
 			2> /dev/null || :; exit 0; } ; \
-		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) revive ./...
 
@@ -208,7 +217,7 @@ errcheck:
 	@command -v errcheck > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ errcheck not found!" \
 			2> /dev/null || :; exit 0; } ; \
-		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) errcheck
 
@@ -220,7 +229,7 @@ govulncheck:
 	@command -v govulncheck > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ govulncheck not found!" \
 			2> /dev/null || :; exit 0; } ; \
-		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) govulncheck ./...
 
@@ -232,7 +241,7 @@ gopls:
 	@command -v gopls > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ gopls not found!" \
 			2> /dev/null || :; exit 0; } ; \
-		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) gopls check -severity=hint ./*.go
 
@@ -244,7 +253,7 @@ gofumpt:
 	@command -v gofumpt > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ gofumpt not found!" \
 			2> /dev/null || :; exit 0; } ; \
-		set -x; env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | \
+		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) gofumpt -d -e .
 
@@ -309,7 +318,8 @@ tags ctags gtags GRPATH GRTAGS GTAGS:
 
 .PHONY: govet
 govet:
-	env GOTOOLCHAIN=auto $$($(GO) env 2>&1 | grep -q "GOSUMDB=.*off.*" && \
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) vet
 
 ##############################################################################
