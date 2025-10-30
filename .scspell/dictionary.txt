@@ -39,6 +39,7 @@ ifaces
 infof
 ipaddr
 ipnet
+ireturn
 itoa
 klauspost
 linted
