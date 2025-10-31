@@ -261,23 +261,23 @@ gofumpt:
 # Target: shfmt
 
 .PHONY: shfmt
-shfmt: .cross.sh .lintsetup.sh .update-deps.sh
+shfmt: .cross.sh .cross-android.sh .lintsetup.sh .update-deps.sh
 	@command -v shfmt > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ shfmt not found!" \
 			2> /dev/null || :; exit 0; } ; \
 		set -x; shfmt -bn -sr -fn -i 2 -s -d \
-			.cross.sh .lintsetup.sh .update-deps.sh
+			.cross.sh .cross-android.sh .lintsetup.sh .update-deps.sh
 
 ##############################################################################
 # Target: shellcheck
 
 .PHONY: shellcheck
-shellcheck: .cross.sh .lintsetup.sh .update-deps.sh
+shellcheck: .cross.sh .cross-android.sh .lintsetup.sh .update-deps.sh
 	@command -v shellcheck > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ shellcheck not found!" \
 			2> /dev/null || :; exit 0; } ; \
 		set -x; shellcheck -s sh -o any,all \
-			.cross.sh .lintsetup.sh .update-deps.sh
+			.cross.sh .cross-android.sh .lintsetup.sh .update-deps.sh
 
 ##############################################################################
 # Target: codespell
