@@ -631,9 +631,10 @@ predecessor (code statistics 📈 provided by
     [C‑Kermit](https://kermitproject.org/) or
     [Kermit 95](https://davidrg.github.io/ckwin/).
   * Although directly executing programs isn’t something on the
-    roadmap, it’s not difficult to use `socat` creatively to connect
-    C‑Kermit to the proxy (*i.e.*,
-    `socat TCP‑LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
+    roadmap, it’s not difficult to creatively use
+    [`socat`](https://repo.or.cz/socat.git) to connect C‑Kermit to the
+    proxy with a UNIX domains socket (*i.e.*,
+    `socat UNIX-LISTEN:socket,fork,reuseaddr EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
   * ⚠️ Be aware that doing this *securely*—safe for public usage—is
     more involved than one might imagine.  *Safely* configuring the
     proxy for this type of operation is possible, but beyond the scope
