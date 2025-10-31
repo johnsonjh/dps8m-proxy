@@ -4919,14 +4919,14 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 
 		_, err = ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 		if err != nil {
-			log.Printf("%sError writing 'BACK TO HOST' message after link time to channel: %v",
+			log.Printf("%sError writing '[BACK TO HOST]' message after link time to channel: %v",
 				warnPrefix(), err)
 		}
 
 	case 'x', 'X':
 		_, err := ch.Write([]byte("\r\n>> DISCONNECTING...\r\n"))
 		if err != nil {
-			log.Printf("%sError writing 'DISCONNECTING' message to channel: %v",
+			log.Printf("%sError writing 'DISCONNECTING...' message to channel: %v",
 				warnPrefix(), err)
 		}
 
@@ -4964,7 +4964,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 	default:
 		_, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
 		if err != nil {
-			log.Printf("%sError writing 'BACK TO HOST' message for default case to channel: %v",
+			log.Printf("%sError writing '[BACK TO HOST]' message to channel: %v",
 				warnPrefix(), err)
 		}
 	}
