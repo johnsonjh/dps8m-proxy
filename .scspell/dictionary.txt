@@ -53,6 +53,7 @@ nolintlint
 noquiet
 nosemgrep
 nosystemcrypto
+openat
 panicf
 paralleltest
 pflag
@@ -62,6 +63,7 @@ println
 procs
 publickey
 rcvd
+rdonly
 readlink
 regexp
 replacer
@@ -84,6 +86,7 @@ tdate
 teardown
 ttype
 tzdata
+uintptr
 ulikunitz
 warningf
 wronly
@@ -402,6 +405,23 @@ androideabi
 armv
 ndkhome
 ndkpath
+
+FILEID: 7002af98-b651-11f0-9b9e-80ee73e9b8e7
+caja
+doublecmd
+dtfile
+getppid
+gppid
+nemo
+pcmanfm
+plasmashell
+ppid
+thunar
+unixtree
+vifm
+xfdesktop
+xplr
+yazi
 
 NATURAL:
 adduser

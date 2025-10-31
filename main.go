@@ -683,9 +683,15 @@ func main() {
 		case "windows":
 			fmt.Print(
 				"It is intended to be invoked from a Command Prompt or Windows Terminal session.")
+
 		case "darwin":
 			fmt.Printf(
 				"It is intended to be invoked from a command prompt (e.g., via Terminal.app).")
+
+		case "linux":
+			fmt.Printf(
+				"It is intended to be invoked from a command prompt (not a file manager or GUI).")
+
 		default:
 			fmt.Printf(
 				"It is intended to be invoked from a command prompt (and not a GUI launcher).")
@@ -3231,6 +3237,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			case "shell":
 				select {
 				case sessionStarted <- true:
+
 				default:
 				}
 
@@ -3256,6 +3263,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 				select {
 				case sessionStarted <- false:
+
 				default:
 				}
 
