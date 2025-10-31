@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.56 (2025-Oct-31 g1b604db) [linux/amd64]
+DPS8M Proxy v0.1.57 (2025-Oct-31 gdf284e3) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -266,12 +266,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.56 (2025-Oct-31 g1b604db) [linux/amd64]
+DPS8M Proxy v0.1.57 (2025-Oct-31 gdf284e3) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.56                          |
+| dps8m/proxy               | v0.1.57                          |
 | arl/statsviz              | v0.7.2                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -544,13 +544,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
-<th>384</th>
+<th>381</th>
 <th>88</th>
-<th>110</th>
-<th>186</th>
+<th>108</th>
+<th>185</th>
 <th>24</th>
-<th>11403</th>
-<th>182</th>
+<th>11448</th>
+<th>181</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -559,18 +559,18 @@ predecessor (code statistics 📈 provided by
 <th>79</th>
 <th>350</th>
 <th>139</th>
-<th>16756</th>
+<th>16828</th>
 <th>318</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>568</th>
+<th>569</th>
 <th>106</th>
 <th>0</th>
-<th>462</th>
+<th>463</th>
 <th>0</th>
-<th>26999</th>
-<th>447</th>
+<th>27057</th>
+<th>448</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -595,13 +595,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>27</th>
-<th>9689</th>
+<th>9687</th>
 <th>1982</th>
-<th>757</th>
+<th>755</th>
 <th>6950</th>
 <th>1540</th>
-<th>258784</th>
-<th>4637</th>
+<th>258959</th>
+<th>4638</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -631,9 +631,10 @@ predecessor (code statistics 📈 provided by
     [C‑Kermit](https://kermitproject.org/) or
     [Kermit 95](https://davidrg.github.io/ckwin/).
   * Although directly executing programs isn’t something on the
-    roadmap, it’s not difficult to use `socat` creatively to connect
-    C‑Kermit to the proxy (*i.e.*,
-    `socat TCP‑LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
+    roadmap, it’s not difficult to use
+    [`socat`](https://repo.or.cz/socat.git) creatively to connect
+    C‑Kermit to the proxy using a UNIX domain socket (*i.e.*,
+    `socat UNIX‑LISTEN:socket,fork,reuseaddr EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
   * ⚠️ Be aware that doing this *securely*—safe for public usage—is
     more involved than one might imagine.  *Safely* configuring the
     proxy for this type of operation is possible, but beyond the scope
