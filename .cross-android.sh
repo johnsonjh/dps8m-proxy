@@ -20,10 +20,11 @@ set -e
 GO="$(command -v go 2> /dev/null || printf '%s\n' 'go')"
 GOFLAGS="-ldflags=-s -w"
 CGO_ENABLED=1
-GOTOOLCHAIN=auto
+GOTOOLCHAIN="$(grep '^go .*$' go.mod | tr -cd 'go0-9.\n')+auto"
 # shellcheck disable=SC2015
 "${GO:?}" env 2>&1 | grep -q "GOSUMDB=.*off.*" \
   && GOSUMDB='sum.golang.org' || true
+
 export GO GOFLAGS CGO_ENABLED GOTOOLCHAIN GOSUMDB
 
 ###############################################################################
@@ -41,7 +42,7 @@ env "${MAKE:-make}" \
   GOOS="android" \
   GOARCH="arm" \
   CGO_ENABLED="${CGO_ENABLED:-1}" \
-  GOTOOLCHAIN=auto
+  GOTOOLCHAIN="${GOTOOLCHAIN:-auto}"
 mv -f "./proxy" "./proxy.android.arm"
 
 # android/386
@@ -51,7 +52,7 @@ env "${MAKE:-make}" \
   GOOS="android" \
   GOARCH="386" \
   CGO_ENABLED="${CGO_ENABLED:-1}" \
-  GOTOOLCHAIN=auto
+  GOTOOLCHAIN="${GOTOOLCHAIN:-auto}"
 mv -f "./proxy" "./proxy.android.386"
 
 # android/amd64
@@ -61,7 +62,7 @@ env "${MAKE:-make}" \
   GOOS="android" \
   GOARCH="amd64" \
   CGO_ENABLED="${CGO_ENABLED:-1}" \
-  GOTOOLCHAIN=auto
+  GOTOOLCHAIN="${GOTOOLCHAIN:-auto}"
 mv -f "./proxy" "./proxy.android.amd64"
 
 ###############################################################################
