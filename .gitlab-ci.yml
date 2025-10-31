@@ -55,6 +55,7 @@ pages:
     - mv -f proxy.android.arm public || true
     - mv -f proxy.android.386 public || true
     - mv -f proxy.android.amd64 public || true
+    - env GOFLAGS="-ldflags=-s -w" pdpmake
     - cd public
     - for i in proxy.windows.*; do [ -f "${i:?}" ] || continue; mv -f -- "${i:?}" "${i:?}.exe"; done
     - for f in proxy.windows.*.exe; do [ -f "${f:?}" ] || continue; base="${f%.exe}"; zipname="$(printf '%s\n' "${base:?}" | awk -F. '{ for (i = 1; i < NF; i++) printf "%s-", $i; print $NF ".zip" }')"; (go version -m "${f:?}" || printf '%s\n' ".") | zip -z9 "${zipname:?}" "${f:?}"; done && rm -f *.exe
