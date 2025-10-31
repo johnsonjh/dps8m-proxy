@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.57 (2025-Oct-31 gd2bb7fc) [linux/amd64]
+DPS8M Proxy v0.1.57 (2025-Oct-31 gbee1686) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -266,7 +266,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.57 (2025-Oct-31 gd2bb7fc) [linux/amd64]
+DPS8M Proxy v0.1.57 (2025-Oct-31 gbee1686) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -569,7 +569,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>463</th>
 <th>0</th>
-<th>27035</th>
+<th>27057</th>
 <th>448</th>
 </tr><tr>
 <th>Systemd</th>
@@ -600,7 +600,7 @@ predecessor (code statistics 📈 provided by
 <th>755</th>
 <th>6950</th>
 <th>1540</th>
-<th>258715</th>
+<th>258737</th>
 <th>4638</th>
 </tr></tfoot></table>
 
@@ -633,8 +633,8 @@ predecessor (code statistics 📈 provided by
   * Although directly executing programs isn’t something on the
     roadmap, it’s not difficult to use
     [`socat`](https://repo.or.cz/socat.git) creatively to connect
-    C‑Kermit to the proxy (*i.e.*,
-    `socat TCP‑LISTEN:9876,fork,reuseaddr,nodelay EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
+    C‑Kermit to the proxy using a UNIX domain socket (*i.e.*,
+    `socat UNIX‑LISTEN:socket,fork,reuseaddr EXEC:kermit,pty,setsid,echo=0,rawer,opost=1,icrnl=1,onlcr,cread`).
   * ⚠️ Be aware that doing this *securely*—safe for public usage—is
     more involved than one might imagine.  *Safely* configuring the
     proxy for this type of operation is possible, but beyond the scope
