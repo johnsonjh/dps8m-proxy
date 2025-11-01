@@ -92,10 +92,12 @@ warningf
 wronly
 
 FILETYPE: Shell; .sh
+armv
 esac
 expandtab
 getconf
 goarch
+goarm
 goexe
 goflags
 gopath
@@ -517,6 +519,7 @@ scspell
 sftp
 shellcheck
 socat
+softfloat
 solaris
 spdx
 staticcheck
