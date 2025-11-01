@@ -182,8 +182,7 @@ func announceMDNS(
 
 		defaultTxt := []string{
 			"user=default",
-			fmt.Sprintf("target=%s",
-				defaultTarget),
+			"target=" + defaultTarget,
 		}
 
 		defaultInstance := fmt.Sprintf("default-%d",
@@ -217,10 +216,8 @@ func announceMDNS(
 
 		for name, addr := range altHosts {
 			txt := []string{
-				fmt.Sprintf("user=%s",
-					name),
-				fmt.Sprintf("target=%s",
-					addr),
+				"user=" + name,
+				"target=" + addr,
 			}
 
 			altInstance := fmt.Sprintf("%s-%d",

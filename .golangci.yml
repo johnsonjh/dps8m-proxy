@@ -26,7 +26,6 @@ linters:
     - mnd
     - nestif
     - noctx
-    - perfsprint
     - varnamelen
     - wrapcheck
     - wsl

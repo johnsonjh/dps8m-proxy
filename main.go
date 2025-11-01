@@ -1056,11 +1056,9 @@ func main() {
 	var startMsg string
 
 	if pid != 0 {
-		startMsg = fmt.Sprintf("Starting proxy %s[PID %d]",
-			relayPrefix(), pid)
+		startMsg = "Starting proxy " + relayPrefix() + "[PID " + strconv.Itoa(pid) + "]"
 	} else {
-		startMsg = fmt.Sprintf("Starting proxy %s",
-			relayPrefix())
+		startMsg = "Starting proxy " + relayPrefix()
 	}
 
 	if !noConsole {
@@ -1515,26 +1513,22 @@ func showStats() {
 		rows := []row{
 			{
 				"TELNET Total Connections",
-				fmt.Sprintf("%d",
-					telnetConnectionsTotal.Load()),
+				strconv.FormatUint(telnetConnectionsTotal.Load(), 10),
 			},
 
 			{
 				"* TELNET Alt-Host Routings",
-				fmt.Sprintf("%d",
-					altHostRoutesTotal.Load()),
+				strconv.FormatUint(altHostRoutesTotal.Load(), 10),
 			},
 
 			{
 				"* TELNET Connection Failures",
-				fmt.Sprintf("%d",
-					telnetFailuresTotal.Load()),
+				strconv.FormatUint(telnetFailuresTotal.Load(), 10),
 			},
 
 			{
 				"Peak Concurrent Connections",
-				fmt.Sprintf("%d",
-					peakUsersTotal.Load()),
+				strconv.FormatUint(peakUsersTotal.Load(), 10),
 			},
 
 			{
@@ -1549,98 +1543,82 @@ func showStats() {
 
 			{
 				"SSH Total Connections",
-				fmt.Sprintf("%d",
-					sshConnectionsTotal.Load()),
+				strconv.FormatUint(sshConnectionsTotal.Load(), 10),
 			},
 
 			{
 				"* SSH User Sessions",
-				fmt.Sprintf("%d",
-					sshSessionsTotal.Load()),
+				strconv.FormatUint(sshSessionsTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Monitoring Sessions",
-				fmt.Sprintf("%d",
-					monitorSessionsTotal.Load()),
+				strconv.FormatUint(monitorSessionsTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Session Request Timeout",
-				fmt.Sprintf("%d",
-					sshRequestTimeoutTotal.Load()),
+				strconv.FormatUint(sshRequestTimeoutTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Illegal Request (SFTP)",
-				fmt.Sprintf("%d",
-					sshIllegalSubsystemTotal.Load()),
+				strconv.FormatUint(sshIllegalSubsystemTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Illegal Request (SCP/EXEC)",
-				fmt.Sprintf("%d",
-					sshExecRejectedTotal.Load()),
+				strconv.FormatUint(sshExecRejectedTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Accept Errors",
-				fmt.Sprintf("%d",
-					acceptErrorsTotal.Load()),
+				strconv.FormatUint(acceptErrorsTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Handshake Errors",
-				fmt.Sprintf("%d",
-					sshHandshakeFailedTotal.Load()),
+				strconv.FormatUint(sshHandshakeFailedTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Other Errors/Disconnects",
-				fmt.Sprintf("%d",
-					sshSessionsTotal.Load()-
-						monitorSessionsTotal.Load()-
-						sshRequestTimeoutTotal.Load()-
-						sshIllegalSubsystemTotal.Load()-
-						sshExecRejectedTotal.Load()-
-						acceptErrorsTotal.Load()-
-						sshHandshakeFailedTotal.Load()),
+				strconv.FormatUint(sshSessionsTotal.Load()-
+					monitorSessionsTotal.Load()-
+					sshRequestTimeoutTotal.Load()-
+					sshIllegalSubsystemTotal.Load()-
+					sshExecRejectedTotal.Load()-
+					acceptErrorsTotal.Load()-
+					sshHandshakeFailedTotal.Load(), 10),
 			},
-
 			{
 				"Connections Killed by Admin",
-				fmt.Sprintf("%d",
-					adminKillsTotal.Load()),
+				strconv.FormatUint(adminKillsTotal.Load(), 10),
 			},
 
 			{
 				"Connections Killed for Idle Time",
-				fmt.Sprintf("%d",
-					idleKillsTotal.Load()),
+				strconv.FormatUint(idleKillsTotal.Load(), 10),
 			},
 
 			{
 				"Connections Killed for Max Time",
-				fmt.Sprintf("%d",
-					timeKillsTotal.Load()),
+				strconv.FormatUint(timeKillsTotal.Load(), 10),
 			},
 
 			{
 				"Connections Killed via Delay",
-				fmt.Sprintf("%d",
-					delayAbandonedTotal.Load()),
+				strconv.FormatUint(delayAbandonedTotal.Load(), 10),
 			},
 
 			{
 				"Blacklist Rejected Connections",
-				fmt.Sprintf("%d",
-					rejectedTotal.Load()),
+				strconv.FormatUint(rejectedTotal.Load(), 10),
 			},
 
 			{
 				"Whitelist Exempted Connections",
-				fmt.Sprintf("%d",
-					exemptedTotal.Load()),
+				strconv.FormatUint(exemptedTotal.Load(), 10),
 			},
 		}
 
@@ -1680,180 +1658,161 @@ func showStats() {
 		rows := []row{
 			{
 				"TELNET Total Connections",
-				fmt.Sprintf("%d",
-					telnetConnectionsTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeTelnetConnectionsTotal.Load()+telnetConnectionsTotal.Load()),
+				strconv.FormatUint(telnetConnectionsTotal.Load(), 10),
+				strconv.FormatUint(lifetimeTelnetConnectionsTotal.Load()+
+					telnetConnectionsTotal.Load(), 10),
 			},
 
 			{
 				"* TELNET Alt-Host Routings",
-				fmt.Sprintf("%d",
-					altHostRoutesTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeAltHostRoutesTotal.Load()+altHostRoutesTotal.Load()),
+				strconv.FormatUint(altHostRoutesTotal.Load(), 10),
+				strconv.FormatUint(lifetimeAltHostRoutesTotal.Load()+
+					altHostRoutesTotal.Load(), 10),
 			},
 
 			{
 				"* TELNET Connection Failures",
-				fmt.Sprintf("%d",
-					telnetFailuresTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeTelnetFailuresTotal.Load()+telnetFailuresTotal.Load()),
+				strconv.FormatUint(telnetFailuresTotal.Load(), 10),
+				strconv.FormatUint(lifetimeTelnetFailuresTotal.Load()+
+					telnetFailuresTotal.Load(), 10),
 			},
 
 			{
 				"Peak Concurrent Connections",
-				fmt.Sprintf("%d",
-					peakUsersTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimePeakUsersTotal.Load()),
+				strconv.FormatUint(peakUsersTotal.Load(), 10),
+				strconv.FormatUint(lifetimePeakUsersTotal.Load(), 10),
 			},
 
 			{
 				"Total Proxy Traffic Inbound",
 				formatBytes(trafficOutTotal.Load()),
-				formatBytes(lifetimeTrafficOutTotal.Load() + trafficOutTotal.Load()),
+				formatBytes(lifetimeTrafficOutTotal.Load() +
+					trafficOutTotal.Load()),
 			},
 
 			{
 				"Total Proxy Traffic Outbound",
 				formatBytes(trafficInTotal.Load()),
-				formatBytes(lifetimeTrafficInTotal.Load() + trafficInTotal.Load()),
+				formatBytes(lifetimeTrafficInTotal.Load() +
+					trafficInTotal.Load()),
 			},
 
 			{
 				"SSH Total Connections",
-				fmt.Sprintf("%d",
-					sshConnectionsTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeSSHconnectionsTotal.Load()+sshConnectionsTotal.Load()),
+				strconv.FormatUint(sshConnectionsTotal.Load(), 10),
+				strconv.FormatUint(lifetimeSSHconnectionsTotal.Load()+
+					sshConnectionsTotal.Load(), 10),
 			},
 
 			{
 				"* SSH User Sessions",
-				fmt.Sprintf("%d",
-					sshSessionsTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeSSHsessionsTotal.Load()+sshSessionsTotal.Load()),
+				strconv.FormatUint(sshSessionsTotal.Load(), 10),
+				strconv.FormatUint(lifetimeSSHsessionsTotal.Load()+
+					sshSessionsTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Monitoring Sessions",
-				fmt.Sprintf("%d",
-					monitorSessionsTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeMonitorSessionsTotal.Load()+monitorSessionsTotal.Load()),
+				strconv.FormatUint(monitorSessionsTotal.Load(), 10),
+				strconv.FormatUint(lifetimeMonitorSessionsTotal.Load()+
+					monitorSessionsTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Session Request Timeout",
-				fmt.Sprintf("%d",
-					sshRequestTimeoutTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeSSHrequestTimeoutTotal.Load()+sshRequestTimeoutTotal.Load()),
+				strconv.FormatUint(sshRequestTimeoutTotal.Load(), 10),
+				strconv.FormatUint(lifetimeSSHrequestTimeoutTotal.Load()+
+					sshRequestTimeoutTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Illegal Request (SFTP)",
-				fmt.Sprintf("%d",
-					sshIllegalSubsystemTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeSSHillegalSubsystemTotal.Load()+sshIllegalSubsystemTotal.Load()),
+				strconv.FormatUint(sshIllegalSubsystemTotal.Load(), 10),
+				strconv.FormatUint(lifetimeSSHillegalSubsystemTotal.Load()+
+					sshIllegalSubsystemTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Illegal Request (SCP/EXEC)",
-				fmt.Sprintf("%d",
-					sshExecRejectedTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeSSHexecRejectedTotal.Load()+sshExecRejectedTotal.Load()),
+				strconv.FormatUint(sshExecRejectedTotal.Load(), 10),
+				strconv.FormatUint(lifetimeSSHexecRejectedTotal.Load()+
+					sshExecRejectedTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Accept Errors",
-				fmt.Sprintf("%d",
-					acceptErrorsTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeAcceptErrorsTotal.Load()+acceptErrorsTotal.Load()),
+				strconv.FormatUint(acceptErrorsTotal.Load(), 10),
+				strconv.FormatUint(lifetimeAcceptErrorsTotal.Load()+
+					acceptErrorsTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Handshake Errors",
-				fmt.Sprintf("%d",
-					sshHandshakeFailedTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeSSHhandshakeFailedTotal.Load()+sshHandshakeFailedTotal.Load()),
+				strconv.FormatUint(sshHandshakeFailedTotal.Load(), 10),
+				strconv.FormatUint(lifetimeSSHhandshakeFailedTotal.Load()+
+					sshHandshakeFailedTotal.Load(), 10),
 			},
 
 			{
 				"* SSH Other Errors/Disconnects",
-				fmt.Sprintf("%d",
-					sshConnectionsTotal.Load()-
-						sshSessionsTotal.Load()-
-						monitorSessionsTotal.Load()-
-						sshRequestTimeoutTotal.Load()-
-						sshIllegalSubsystemTotal.Load()-
-						sshExecRejectedTotal.Load()-
-						acceptErrorsTotal.Load()-
-						sshHandshakeFailedTotal.Load()),
-				fmt.Sprintf("%d",
-					(lifetimeSSHconnectionsTotal.Load()+sshConnectionsTotal.Load())-
-						(lifetimeSSHsessionsTotal.Load()+sshSessionsTotal.Load())-
-						(lifetimeMonitorSessionsTotal.Load()+monitorSessionsTotal.Load())-
-						(lifetimeSSHrequestTimeoutTotal.Load()+sshRequestTimeoutTotal.Load())-
-						(lifetimeSSHillegalSubsystemTotal.Load()+sshIllegalSubsystemTotal.Load())-
-						(lifetimeSSHexecRejectedTotal.Load()+sshExecRejectedTotal.Load())-
-						(lifetimeAcceptErrorsTotal.Load()+acceptErrorsTotal.Load())-
-						(lifetimeSSHhandshakeFailedTotal.Load()+sshHandshakeFailedTotal.Load())),
+				strconv.FormatUint(sshConnectionsTotal.Load()-
+					sshSessionsTotal.Load()-
+					monitorSessionsTotal.Load()-
+					sshRequestTimeoutTotal.Load()-
+					sshIllegalSubsystemTotal.Load()-
+					sshExecRejectedTotal.Load()-
+					acceptErrorsTotal.Load()-
+					sshHandshakeFailedTotal.Load(), 10),
+				strconv.FormatUint((lifetimeSSHconnectionsTotal.Load()+sshConnectionsTotal.Load())-
+					(lifetimeSSHsessionsTotal.Load()+sshSessionsTotal.Load())-
+					(lifetimeMonitorSessionsTotal.Load()+monitorSessionsTotal.Load())-
+					(lifetimeSSHrequestTimeoutTotal.Load()+sshRequestTimeoutTotal.Load())-
+					(lifetimeSSHillegalSubsystemTotal.Load()+sshIllegalSubsystemTotal.Load())-
+					(lifetimeSSHexecRejectedTotal.Load()+sshExecRejectedTotal.Load())-
+					(lifetimeAcceptErrorsTotal.Load()+acceptErrorsTotal.Load())-
+					(lifetimeSSHhandshakeFailedTotal.Load()+sshHandshakeFailedTotal.Load()), 10),
 			},
 
 			{
 				"Connections Killed by Admin",
-				fmt.Sprintf("%d",
-					adminKillsTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeAdminKillsTotal.Load()+adminKillsTotal.Load()),
+				strconv.FormatUint(adminKillsTotal.Load(), 10),
+				strconv.FormatUint(lifetimeAdminKillsTotal.Load()+
+					adminKillsTotal.Load(), 10),
 			},
 
 			{
 				"Connections Killed for Idle Time",
-				fmt.Sprintf("%d",
-					idleKillsTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeIdleKillsTotal.Load()+idleKillsTotal.Load()),
+				strconv.FormatUint(idleKillsTotal.Load(), 10),
+				strconv.FormatUint(lifetimeIdleKillsTotal.Load()+
+					idleKillsTotal.Load(), 10),
 			},
 
 			{
 				"Connections Killed for Max Time",
-				fmt.Sprintf("%d",
-					timeKillsTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeTimeKillsTotal.Load()+timeKillsTotal.Load()),
+				strconv.FormatUint(timeKillsTotal.Load(), 10),
+				strconv.FormatUint(lifetimeTimeKillsTotal.Load()+
+					timeKillsTotal.Load(), 10),
 			},
 
 			{
 				"Connections Killed via Delay",
-				fmt.Sprintf("%d",
-					delayAbandonedTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeDelayAbandonedTotal.Load()+delayAbandonedTotal.Load()),
+				strconv.FormatUint(delayAbandonedTotal.Load(), 10),
+				strconv.FormatUint(lifetimeDelayAbandonedTotal.Load()+
+					delayAbandonedTotal.Load(), 10),
 			},
 
 			{
 				"Blacklist Rejected Connections",
-				fmt.Sprintf("%d",
-					rejectedTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeRejectedTotal.Load()+rejectedTotal.Load()),
+				strconv.FormatUint(rejectedTotal.Load(), 10),
+				strconv.FormatUint(lifetimeRejectedTotal.Load()+
+					rejectedTotal.Load(), 10),
 			},
 
 			{
 				"Whitelist Exempted Connections",
-				fmt.Sprintf("%d",
-					exemptedTotal.Load()),
-				fmt.Sprintf("%d",
-					lifetimeExemptedTotal.Load()+exemptedTotal.Load()),
+				strconv.FormatUint(exemptedTotal.Load(), 10),
+				strconv.FormatUint(lifetimeExemptedTotal.Load()+
+					exemptedTotal.Load(), 10),
 			},
 		}
 
@@ -2107,11 +2066,9 @@ func listConnections(truncate bool) {
 
 			if conn.targetHost != "" {
 				if conn.targetPort != 0 {
-					targetInfo = fmt.Sprintf(" -> %s:%d",
-						conn.targetHost, conn.targetPort)
+					targetInfo = " -> " + conn.targetHost + ":" + strconv.Itoa(conn.targetPort)
 				} else {
-					targetInfo = fmt.Sprintf(" -> %s",
-						conn.targetHost)
+					targetInfo = " -> " + conn.targetHost
 				}
 			}
 
@@ -2218,8 +2175,7 @@ func listConfiguration() {
 		certDirStr = certDir
 	}
 
-	s10 := fmt.Sprintf("SSH Certificate Directory: %s",
-		certDirStr)
+	s10 := "SSH Certificate Directory: " + certDirStr
 
 	updateMaxLength(s10)
 
@@ -2231,7 +2187,7 @@ func listConfiguration() {
 		gopsStr = "disabled" //nolint:goconst
 	}
 
-	s14 := fmt.Sprintf("Gops diagnostic agent: %s", gopsStr)
+	s14 := "Gops diagnostic agent: " + gopsStr
 
 	updateMaxLength(s14)
 
@@ -2243,7 +2199,7 @@ func listConfiguration() {
 		MDNSStr = "disabled"
 	}
 
-	s13 := fmt.Sprintf("Multicast DNS announcements: %s", MDNSStr)
+	s13 := "Multicast DNS announcements: " + MDNSStr
 
 	updateMaxLength(s13)
 
@@ -2944,7 +2900,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 			return &ssh.Permissions{
 				Extensions: map[string]string{"auth-method": "publickey"},
-			}, fmt.Errorf("next key")
+			}, errors.New("next key")
 		},
 		KeyboardInteractiveCallback: func(
 			conn ssh.ConnMetadata,
