@@ -28,6 +28,7 @@ func runSignalHandlers() {
 	signal.Notify(sigChan,
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT,
 		syscall.SIGHUP, syscall.SIGUSR1, syscall.SIGUSR2)
+
 	go func() {
 		for s := range sigChan {
 			handleSignal(s)
