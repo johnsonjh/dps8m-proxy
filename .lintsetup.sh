@@ -15,12 +15,11 @@ set -eu
 ###############################################################################
 # Latest or master?
 
-if [ "${BRANCH:-}" = "latest" ]; then
-  env printf '%s' 'Installing "latest" linters'
-else
+if [ "${BRANCH:-}" != "latest" ]; then
   BRANCH="master"
-  env printf '%s' 'Installing "master" linters'
 fi
+
+env printf 'Installing "%s" linters' "${BRANCH:?}"
 
 ###############################################################################
 # Configuration
