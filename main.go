@@ -5003,6 +5003,9 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	for _, f := range files {
 		if strings.HasPrefix(f.Name(), prefix) {
 			parts := strings.SplitN(f.Name()[len(prefix):], ".", 2)
+			if parts == nil {
+				panic("internal error: SplitN returned nil (impossible)")
+			}
 
 			n, err := strconv.Atoi(parts[0])
 			if err == nil && n > maxSeq {
