@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.61 (2025-Nov-02 g5c4375b) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-02 g4b63e25) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -266,7 +266,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.61 (2025-Nov-02 g5c4375b) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-02 g4b63e25) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -654,11 +654,11 @@ predecessor (code statistics 📈 provided by
   [`errcheck`](https://github.com/kisielk/errcheck),
   [`gofumpt`](https://github.com/mvdan/gofumpt),
   [`govulncheck`](https://go.googlesource.com/vuln),
+  [NilAway](https://github.com/uber-go/nilaway),
   [`scc`](https://github.com/boyter/scc),
   [`scspell`](https://github.com/myint/scspell),
   [`codespell`](https://github.com/codespell-project/codespell),
-  [NilAway](https://github.com/uber-go/nilaway), and
-  [Perl](https://www.perl.org/).
+  and [Perl](https://www.perl.org/).
 * If you plan to make any changes to the [`Makefile`](Makefile) (or
   the [`.cross.sh`](.cross.sh) script), you’ll need to have the
   [ShellCheck](https://www.shellcheck.net/) and
