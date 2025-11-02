@@ -1179,10 +1179,14 @@ func main() {
 								warnPrefix(), id, err)
 						}
 
-						err = conn.sshConn.Close()
-						if err != nil {
-							log.Printf("%sError closing SSH connection for %s: %v",
-								warnPrefix(), id, err)
+						if conn.sshConn == nil {
+							log.Printf("%sError: sshConn is nil for connection %s",
+								warnPrefix(), id)
+						} else {
+							if err = conn.sshConn.Close(); err != nil {
+								log.Printf("%sError closing SSH connection for %s: %v",
+									warnPrefix(), id, err)
+							}
 						}
 
 						delete(connections, id)
@@ -1203,10 +1207,14 @@ func main() {
 								warnPrefix(), id, err)
 						}
 
-						err = conn.sshConn.Close()
-						if err != nil {
-							log.Printf("%sError closing SSH connection for %s: %v",
-								warnPrefix(), id, err)
+						if conn.sshConn == nil {
+							log.Printf("%sError: sshConn is nil for connection %s",
+								warnPrefix(), id)
+						} else {
+							if err = conn.sshConn.Close(); err != nil {
+								log.Printf("%sError closing SSH connection for %s: %v",
+									warnPrefix(), id, err)
+							}
 						}
 
 						delete(connections, id)
@@ -2072,6 +2080,13 @@ func listConnections(truncate bool) {
 	rows := make([]row, 0, len(connections))
 
 	for _, conn := range conns {
+		if conn.sshConn == nil {
+			log.Printf("%sError: sshConn is nil for connection %s",
+				warnPrefix(), conn.ID)
+
+			continue
+		}
+
 		user := conn.sshConn.User()
 
 		if truncate && len(user) > 21 {
@@ -2082,6 +2097,13 @@ func listConnections(truncate bool) {
 		var details, idle string
 
 		if conn.monitoring {
+			if conn.monitoredConnection == nil {
+				log.Printf("%sInternal error: monitoring enabled but monitoredConnection is nil!",
+					warnPrefix())
+
+				return
+			}
+
 			details = fmt.Sprintf("%s@%s -> %s",
 				user, conn.sshConn.RemoteAddr(), conn.monitoredConnection.ID)
 			idle = "---------"
@@ -2733,6 +2755,13 @@ func killAllConnections() {
 
 		adminKillsTotal.Add(1)
 
+		if conn.sshConn == nil {
+			log.Printf("%sError: sshConn is nil for connection %s",
+				warnPrefix(), conn.ID)
+
+			return
+		}
+
 		err := conn.sshConn.Close()
 		if err != nil {
 			log.Printf("%sError closing SSH connection for %s: %v",
@@ -2895,7 +2924,15 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
 
-	remoteAddr := rawConn.RemoteAddr().String()
+	raddr := rawConn.RemoteAddr()
+	if raddr == nil {
+		log.Printf("%sError: RemoteAddr() returned nil for rawConn",
+			warnPrefix())
+
+		return
+	}
+
+	remoteAddr := raddr.String()
 	host, _, err := net.SplitHostPort(remoteAddr)
 	if err != nil {
 		host = remoteAddr
@@ -3256,8 +3293,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 			case "exec":
 				if !suppressLogs {
-					log.Printf("%sREJECTED [%s] %s (Illegal request: exec)",
-						redDotPrefix(), conn.ID, conn.sshConn.RemoteAddr().String())
+					if conn.sshConn == nil {
+						log.Printf("%sREJECTED [%s] (Illegal request: exec)",
+							redDotPrefix(), conn.ID)
+					} else {
+						log.Printf("%sREJECTED [%s] %s (Illegal request: exec)",
+							redDotPrefix(), conn.ID, conn.sshConn.RemoteAddr().String())
+					}
 				}
 
 				sshExecRejectedTotal.Add(1)
@@ -3274,10 +3316,15 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				default:
 				}
 
-				err = conn.sshConn.Close()
-				if err != nil {
-					log.Printf("%sError closing SSH connection for %s: %v",
-						warnPrefix(), conn.ID, err)
+				if conn.sshConn == nil {
+					log.Printf("%sError: sshConn is nil for connection %s",
+						warnPrefix(), conn.ID)
+				} else {
+					err = conn.sshConn.Close()
+					if err != nil {
+						log.Printf("%sError closing SSH connection for %s: %v",
+							warnPrefix(), conn.ID, err)
+					}
 				}
 
 				return
@@ -3291,8 +3338,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 						if subsystem == "sftp" {
 							if !suppressLogs {
-								log.Printf("%sREJECTED [%s] %s (Illegal request: SFTP)",
-									redDotPrefix(), conn.ID, conn.sshConn.RemoteAddr().String())
+								if conn.sshConn == nil {
+									log.Printf("%sREJECTED [%s] (Illegal request: SFTP)",
+										redDotPrefix(), conn.ID)
+								} else {
+									log.Printf("%sREJECTED [%s] %s (Illegal request: SFTP)",
+										redDotPrefix(), conn.ID, conn.sshConn.RemoteAddr().String())
+								}
 							}
 
 							sshIllegalSubsystemTotal.Add(1)
@@ -3308,10 +3360,15 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							default:
 							}
 
-							err = conn.sshConn.Close()
-							if err != nil {
-								log.Printf("%sError closing SSH connection for %s: %v",
-									warnPrefix(), conn.ID, err)
+							if conn.sshConn == nil {
+								log.Printf("%sError: sshConn is nil for connection %s",
+									warnPrefix(), conn.ID)
+							} else {
+								err = conn.sshConn.Close()
+								if err != nil {
+									log.Printf("%sError closing SSH connection for %s: %v",
+										warnPrefix(), conn.ID, err)
+								}
 							}
 
 							return
@@ -4102,11 +4159,20 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				connectionsMutex.Lock()
 
 				for _, c := range connections {
-					if c.monitoring && c.monitoredConnection.ID == conn.ID {
-						_, err := c.channel.Write(fwd)
-						if err != nil {
-							log.Printf("%sError writing to channel for %s: %v",
-								warnPrefix(), c.ID, err)
+					if c.monitoring {
+						if c.monitoredConnection == nil {
+							log.Printf("%sError: monitoredConnection is nil for %s",
+								warnPrefix(), c.ID)
+
+							continue
+						}
+
+						if c.monitoredConnection.ID == conn.ID {
+							_, err := c.channel.Write(fwd)
+							if err != nil {
+								log.Printf("%sError writing to channel for %s: %v",
+									warnPrefix(), c.ID, err)
+							}
 						}
 					}
 				}
@@ -4857,8 +4923,17 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 			currentMonitors := 0
 
 			for _, c := range connections {
-				if c.monitoring && c.monitoredConnection.ID == conn.ID {
-					currentMonitors++
+				if c.monitoring {
+					if c.monitoredConnection == nil {
+						log.Printf("%sError: monitoredConnection is nil for %s",
+							warnPrefix(), c.ID)
+
+						continue
+					}
+
+					if c.monitoredConnection.ID == conn.ID {
+						currentMonitors++
+					}
 				}
 			}
 
