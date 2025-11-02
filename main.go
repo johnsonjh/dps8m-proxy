@@ -2754,7 +2754,12 @@ func sendNaws(conn *Connection, width, height uint32) {
 func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint:ireturn
 	keyData, err := os.ReadFile(keyPath) //nolint:gosec
 	if err == nil {
-		return ssh.ParsePrivateKey(keyData)
+		signer, err := ssh.ParsePrivateKey(keyData)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse private key: %w", err)
+		}
+
+		return signer, nil
 	}
 
 	if !os.IsNotExist(err) {
@@ -2769,7 +2774,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 	case "rsa":
 		key, err := rsa.GenerateKey(rand.Reader, 2048)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to generate rsa key: %w", err)
 		}
 
 		privateKey = key
@@ -2787,7 +2792,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 	case "ed25519":
 		_, rawPriv, err := ed25519.GenerateKey(rand.Reader)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to generate ed25519 key: %w", err)
 		}
 
 		privateKey = rawPriv
@@ -2799,7 +2804,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 
 		derBytes, err := x509.MarshalPKCS8PrivateKey(edKey)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to marshal ed25519 private key: %w", err)
 		}
 
 		pemBlock = &pem.Block{
@@ -2810,7 +2815,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 	case "ecdsa":
 		key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to generate ecdsa key: %w", err)
 		}
 
 		privateKey = key
@@ -2822,7 +2827,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 
 		derBytes, err := x509.MarshalECPrivateKey(ecKey)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to marshal ecdsa private key: %w", err)
 		}
 
 		pemBlock = &pem.Block{
@@ -2850,7 +2855,12 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 	log.Printf("%sNew %s host key generated at %s",
 		keyPrefix(), strings.ToUpper(keyType), keyPath)
 
-	return ssh.NewSignerFromKey(privateKey)
+	signer, err := ssh.NewSignerFromKey(privateKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create signer from private key: %w", err)
+	}
+
+	return signer, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3107,7 +3117,7 @@ func parseHostPort(hostPort string) (string, int, error) {
 
 	host, portStr, err := net.SplitHostPort(hostPort)
 	if err != nil {
-		return "", 0, err
+		return "", 0, fmt.Errorf("failed to split host port: %w", err)
 	}
 
 	port, err := strconv.Atoi(portStr)
@@ -3123,10 +3133,20 @@ func parseHostPort(hostPort string) (string, int, error) {
 
 func dialDest(dest string) (net.Conn, error) {
 	if isUnixSocket(dest) {
-		return net.Dial("unix", dest)
+		conn, err := net.Dial("unix", dest)
+		if err != nil {
+			return nil, fmt.Errorf("failed to dial UNIX domain socket: %w", err)
+		}
+
+		return conn, nil
 	}
 
-	return net.Dial("tcp", dest)
+	conn, err := net.Dial("tcp", dest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to dial TCP socket: %w", err)
+	}
+
+	return conn, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4944,14 +4964,14 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 
 	err := os.MkdirAll(dir, os.FileMode(logDirPerm)) //nolint:gosec
 	if err != nil {
-		return nil, "", err
+		return nil, "", fmt.Errorf("failed to create log directory: %w", err)
 	}
 
 	dir = filepath.Join(dir, ipDir)
 
 	err = os.MkdirAll(dir, os.FileMode(logDirPerm)) //nolint:gosec
 	if err != nil {
-		return nil, "", err
+		return nil, "", fmt.Errorf("failed to create log subdirectory: %w", err)
 	}
 
 	ts := now.Format("150405")
@@ -4978,8 +4998,11 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	pathBase := filepath.Join(dir, base)
 	f, err := os.OpenFile(pathBase+".log", //nolint:gosec
 		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to open log file: %w", err)
+	}
 
-	return f, pathBase, err
+	return f, pathBase, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -5085,7 +5108,12 @@ func getFileContent(baseFilename, username string) ([]byte, error) {
 		return content, nil
 	}
 
-	return os.ReadFile(baseFilename) //nolint:gosec
+	content, err = os.ReadFile(baseFilename) //nolint:gosec
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file: %w", err)
+	}
+
+	return content, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

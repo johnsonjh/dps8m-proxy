@@ -27,7 +27,6 @@ linters:
     - nestif
     - noctx
     - varnamelen
-    - wrapcheck
     - wsl
     - wsl_v5
   exclusions:

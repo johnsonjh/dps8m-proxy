@@ -14,6 +14,7 @@ package main
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -354,8 +355,12 @@ type emojiStripperWriter struct {
 
 func (e *emojiStripperWriter) Write(p []byte) (int, error) {
 	stripped := stripEmoji(string(p))
+	n, err := e.w.Write([]byte(stripped))
+	if err != nil {
+		return n, fmt.Errorf("failed to write stripped content: %w", err)
+	}
 
-	return e.w.Write([]byte(stripped))
+	return n, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
