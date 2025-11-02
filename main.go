@@ -2962,6 +2962,13 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		return
 	}
 
+	if sshConn.Permissions == nil {
+		log.Printf("%sError: sshConn.Permissions [%s] is nil",
+			warnPrefix(), sid)
+
+		return
+	}
+
 	var authMethod string
 
 	switch sshConn.Permissions.Extensions["auth-method"] {
