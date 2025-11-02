@@ -379,6 +379,7 @@ kisielk
 lintsetup
 mgechev
 mvdan
+nilaway
 shfmt
 
 FILEID: 3a9014e8-9335-11f0-85bd-80ee73e9b8e7
