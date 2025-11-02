@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.61 (2025-Nov-02 gf143b0a) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-02 g753ac27) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -266,7 +266,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.61 (2025-Nov-02 gf143b0a) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-02 g753ac27) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -488,10 +488,12 @@ and that you know what you’re doing!
 
    ```sh
    ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ed25519_key.tmp
-   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
-   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ecdsa_key.tmp
    mv ssh_host_ed25519_key.tmp ssh_host_ed25519_key.pem
+
+   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
    mv ssh_host_rsa_key.tmp ssh_host_rsa_key.pem
+
+   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ecdsa_key.tmp
    mv ssh_host_ecdsa_key.tmp ssh_host_ecdsa_key.pem
    ```
 
@@ -564,12 +566,12 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>570</th>
-<th>106</th>
+<th>572</th>
+<th>108</th>
 <th>0</th>
 <th>464</th>
 <th>0</th>
-<th>27106</th>
+<th>27108</th>
 <th>449</th>
 </tr><tr>
 <th>Systemd</th>
@@ -595,12 +597,12 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10221</th>
-<th>2197</th>
+<th>10223</th>
+<th>2199</th>
 <th>781</th>
 <th>7243</th>
 <th>1659</th>
-<th>270285</th>
+<th>270287</th>
 <th>4867</th>
 </tr></tfoot></table>
 
