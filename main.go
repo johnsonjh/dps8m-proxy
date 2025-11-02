@@ -1183,7 +1183,8 @@ func main() {
 							log.Printf("%sError: sshConn is nil for connection %s",
 								warnPrefix(), id)
 						} else {
-							if err = conn.sshConn.Close(); err != nil {
+							err = conn.sshConn.Close()
+							if err != nil {
 								log.Printf("%sError closing SSH connection for %s: %v",
 									warnPrefix(), id, err)
 							}
@@ -1211,7 +1212,8 @@ func main() {
 							log.Printf("%sError: sshConn is nil for connection %s",
 								warnPrefix(), id)
 						} else {
-							if err = conn.sshConn.Close(); err != nil {
+							err = conn.sshConn.Close()
+							if err != nil {
 								log.Printf("%sError closing SSH connection for %s: %v",
 									warnPrefix(), id, err)
 							}
@@ -3010,8 +3012,13 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	}
 
 	var authMethod string
+	var method string
 
-	switch sshConn.Permissions.Extensions["auth-method"] {
+	if sshConn != nil && sshConn.Permissions != nil && sshConn.Permissions.Extensions != nil {
+		method = sshConn.Permissions.Extensions["auth-method"]
+	}
+
+	switch method {
 	case "password":
 		authMethod = "password"
 
@@ -3025,6 +3032,27 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		authMethod = "unknown"
 	}
 
+	var userName string
+	var hostName string
+
+	if sshConn == nil {
+		log.Printf("%sError: sshConn nil while building connection for %s",
+			warnPrefix(), sid)
+		userName = ""
+		hostName = ""
+	} else {
+		userName = sshConn.User()
+
+		addr := sshConn.RemoteAddr()
+		if addr == nil {
+			log.Printf("%sError: sshConn.RemoteAddr() nil while building connection for %s",
+				warnPrefix(), sid)
+			hostName = ""
+		} else {
+			hostName = addr.String()
+		}
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	conn := &Connection{
 		ID:                sid,
@@ -3033,8 +3061,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		lastActivityTime:  time.Now(),
 		cancelCtx:         ctx,
 		cancelFunc:        cancel,
-		userName:          sshConn.User(),
-		hostName:          sshConn.RemoteAddr().String(),
+		userName:          userName,
+		hostName:          hostName,
 		shareableUsername: newShareableUsername(connections, &connectionsMutex),
 	}
 
@@ -3045,6 +3073,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 		return
 	}
+
 	conn.targetHost = defaultHost
 	conn.targetPort = defaultPort
 
@@ -3133,7 +3162,15 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		}
 	}()
 
-	addr := sshConn.RemoteAddr().String()
+	var addr string
+
+	if sshConn == nil || sshConn.RemoteAddr() == nil {
+		log.Printf("%sError: sshConn or its RemoteAddr() is nil",
+			warnPrefix())
+		addr = ""
+	} else {
+		addr = sshConn.RemoteAddr().String()
+	}
 
 	handshakeLog := fmt.Sprintf("VALIDATE [%s] %s@%s \"ssh\":%s",
 		sid, func() string {
@@ -3297,8 +3334,14 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						log.Printf("%sREJECTED [%s] (Illegal request: exec)",
 							redDotPrefix(), conn.ID)
 					} else {
-						log.Printf("%sREJECTED [%s] %s (Illegal request: exec)",
-							redDotPrefix(), conn.ID, conn.sshConn.RemoteAddr().String())
+						addr := conn.sshConn.RemoteAddr()
+						if addr == nil {
+							log.Printf("%sREJECTED [%s] (Illegal request: exec)",
+								redDotPrefix(), conn.ID)
+						} else {
+							log.Printf("%sREJECTED [%s] %s (Illegal request: exec)",
+								redDotPrefix(), conn.ID, addr.String())
+						}
 					}
 				}
 
@@ -3342,8 +3385,14 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 									log.Printf("%sREJECTED [%s] (Illegal request: SFTP)",
 										redDotPrefix(), conn.ID)
 								} else {
-									log.Printf("%sREJECTED [%s] %s (Illegal request: SFTP)",
-										redDotPrefix(), conn.ID, conn.sshConn.RemoteAddr().String())
+									addr := conn.sshConn.RemoteAddr()
+									if addr == nil {
+										log.Printf("%sREJECTED [%s] (Illegal request: SFTP)",
+											redDotPrefix(), conn.ID)
+									} else {
+										log.Printf("%sREJECTED [%s] %s (Illegal request: SFTP)",
+											redDotPrefix(), conn.ID, addr.String())
+									}
 								}
 							}
 
@@ -4200,9 +4249,23 @@ func sendBanner(sshConn *ssh.ServerConn, ch ssh.Channel, conn *Connection) {
 		return
 	}
 
-	host, _, _ := net.SplitHostPort(sshConn.RemoteAddr().String())
+	var addrStr string
+
+	if sshConn != nil {
+		if a := sshConn.RemoteAddr(); a != nil {
+			addrStr = a.String()
+		}
+	}
+
+	host, _, _ := net.SplitHostPort(addrStr)
+	if host == "" {
+		host = addrStr
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+
 	defer cancel()
+
 	names, _ := net.DefaultResolver.LookupAddr(ctx, host)
 
 	var origin string
