@@ -467,14 +467,14 @@ func init() {
 		"cert-perm",
 		"Permissions (octal) for new certificate files\r\n"+
 			"    [e.g., \"600\", \"644\"]")
-	pflag.Lookup("cert-perm").DefValue = "600"
+	pflag_mustLookup("cert-perm").DefValue = "600"
 
 	pflag.StringSliceVar(&sshAddr,
 		"ssh-addr", []string{":2222"},
 		"SSH listener address(es)\r\n"+
 			"    [e.g., \":2222\", \"[::1]:8000\"]\r\n"+
 			"    (multiple allowed)")
-	pflag.Lookup("ssh-addr").DefValue = "\":2222\""
+	pflag_mustLookup("ssh-addr").DefValue = "\":2222\""
 
 	pflag.Float64Var(&sshDelay,
 		"ssh-delay", 0,
@@ -559,13 +559,13 @@ func init() {
 		"log-perm",
 		"Permissions (octal) for new log files\r\n"+
 			"    [e.g., \"600\", \"644\"]")
-	pflag.Lookup("log-perm").DefValue = "600"
+	pflag_mustLookup("log-perm").DefValue = "600"
 
 	pflag.Var((*octalPermValue)(&logDirPerm),
 		"log-dir-perm",
 		"Permissions (octal) for new log directories\r\n"+
 			"    [e.g., \"755\", \"750\"]")
-	pflag.Lookup("log-dir-perm").DefValue = "750"
+	pflag_mustLookup("log-dir-perm").DefValue = "750"
 
 	if dbEnabled {
 		pflag.StringVar(&dbPath,
@@ -582,7 +582,7 @@ func init() {
 			"db-perm",
 			"Permissions (octal) for new database files\r\n"+
 				"    [e.g., \"600\", \"644\"]")
-		pflag.Lookup("log-perm").DefValue = "600"
+		pflag_mustLookup("log-perm").DefValue = "600"
 
 		pflag.StringVar(&dbLogLevel,
 			"db-loglevel", "error",
@@ -632,7 +632,17 @@ func init() {
 
 	haveUTF8console = haveUTF8support()
 
-	for _, arg := range os.Args[1:] {
+	args := os.Args
+	if args == nil {
+		args = []string{}
+	}
+
+	start := 1
+	if len(args) < 1 {
+		start = 0
+	}
+
+	for _, arg := range args[start:] {
 		if arg == "-?" || arg == "-h" || arg == "--help" {
 			pflag.Usage()
 
@@ -643,6 +653,17 @@ func init() {
 			os.Exit(0)
 		}
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func pflag_mustLookup(name string) *pflag.Flag {
+	f := pflag.Lookup(name)
+	if f == nil {
+		panic("internal error: flag " + name + " not defined")
+	}
+
+	return f
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
