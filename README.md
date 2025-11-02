@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.61 (2025-Nov-02 g542690d) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-02 gf143b0a) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -266,7 +266,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.61 (2025-Nov-02 g542690d) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-02 gf143b0a) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -534,12 +534,12 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>8339</th>
-<th>1766</th>
+<th>8459</th>
+<th>1886</th>
 <th>475</th>
 <th>6098</th>
 <th>1491</th>
-<th>202760</th>
+<th>202921</th>
 <th>3718</th>
 </tr><tr>
 <th>Shell</th>
@@ -595,12 +595,12 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10101</th>
-<th>2077</th>
+<th>10221</th>
+<th>2197</th>
 <th>781</th>
 <th>7243</th>
 <th>1659</th>
-<th>270124</th>
+<th>270285</th>
 <th>4867</th>
 </tr></tfoot></table>
 
