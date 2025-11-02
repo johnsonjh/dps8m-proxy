@@ -408,6 +408,7 @@ func (op *octalPermValue) Set(s string) error {
 		return fmt.Errorf("%sinvalid octal permission value: %w",
 			errorPrefix(), err)
 	}
+
 	*op = octalPermValue(v)
 
 	return nil
@@ -428,17 +429,21 @@ func init() {
 	pflag.Usage = func() {
 		origVersion := showVersion
 		showVersion = true
+
 		printVersion(true)
+
 		showVersion = origVersion
 
 		exePath := resolveExePath()
 		_, _ = fmt.Fprintf(os.Stdout,
 			"\r\nUsage for %s:\r\n\r\n",
 			exePath)
+
 		var buf bytes.Buffer
 		pflag.CommandLine.SetOutput(&buf)
 		pflag.PrintDefaults()
 		pflag.CommandLine.SetOutput(os.Stdout)
+
 		re := regexp.MustCompile(`\[=true\|false\]`)
 		output := re.ReplaceAllString(buf.String(), "             ")
 		reSpaces := regexp.MustCompile(`(?m)^ {6}`)
@@ -467,6 +472,7 @@ func init() {
 		"cert-perm",
 		"Permissions (octal) for new certificate files\r\n"+
 			"    [e.g., \"600\", \"644\"]")
+
 	pflag_mustLookup("cert-perm").DefValue = "600"
 
 	pflag.StringSliceVar(&sshAddr,
@@ -474,6 +480,7 @@ func init() {
 		"SSH listener address(es)\r\n"+
 			"    [e.g., \":2222\", \"[::1]:8000\"]\r\n"+
 			"    (multiple allowed)")
+
 	pflag_mustLookup("ssh-addr").DefValue = "\":2222\""
 
 	pflag.Float64Var(&sshDelay,
@@ -559,12 +566,14 @@ func init() {
 		"log-perm",
 		"Permissions (octal) for new log files\r\n"+
 			"    [e.g., \"600\", \"644\"]")
+
 	pflag_mustLookup("log-perm").DefValue = "600"
 
 	pflag.Var((*octalPermValue)(&logDirPerm),
 		"log-dir-perm",
 		"Permissions (octal) for new log directories\r\n"+
 			"    [e.g., \"755\", \"750\"]")
+
 	pflag_mustLookup("log-dir-perm").DefValue = "750"
 
 	if dbEnabled {
@@ -582,6 +591,7 @@ func init() {
 			"db-perm",
 			"Permissions (octal) for new database files\r\n"+
 				"    [e.g., \"600\", \"644\"]")
+
 		pflag_mustLookup("log-perm").DefValue = "600"
 
 		pflag.StringVar(&dbLogLevel,
@@ -726,6 +736,7 @@ func main() {
 		oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
 		if err != nil {
 			_, _ = bufio.NewReader(os.Stdin).ReadBytes('\n')
+
 			fmt.Print("\r\n")
 
 			if enableGops {
@@ -738,6 +749,7 @@ func main() {
 		t := term.NewTerminal(os.Stdin, "")
 		_, _ = t.ReadLine()
 		_ = term.Restore(int(os.Stdin.Fd()), oldState)
+
 		fmt.Print("\r\n")
 
 		if enableGops {
@@ -1022,6 +1034,7 @@ func main() {
 	for _, addr := range sshAddr {
 		go func(addr string) {
 			checkPrivilegedPorts(sshAddr)
+
 			listener, err := net.Listen("tcp", addr)
 			if err != nil {
 				if isConsoleLogQuiet {
@@ -1037,6 +1050,7 @@ func main() {
 				log.Fatalf("%sERROR: LISTEN on %s: %v",
 					errorPrefix(), addr, err) // LINTED: Fatalf
 			}
+
 			defer func() {
 				err := listener.Close()
 				if err != nil {
@@ -1121,6 +1135,7 @@ func main() {
 
 	log.Printf("Default TELNET target: %s",
 		telnetHostPort)
+
 	for user, hostPort := range altHosts {
 		log.Printf("Alt target: %s [%s]",
 			hostPort, user)
@@ -1261,6 +1276,7 @@ func debugInit(addr string) {
 
 	log.Printf("%sStarting debug HTTP server on %s",
 		bugPrefix(), addr)
+
 	go func() {
 		log.Fatalf("%s%v", // LINTED: Fatalf
 			// nosemgrep: go.lang.security.audit.net.use-tls.use-tls
@@ -1293,6 +1309,7 @@ func printVersion(short bool) {
 	info, ok := debug.ReadBuildInfo()
 	if ok {
 		var date, commit string
+
 		var modified bool
 
 		for _, setting := range info.Settings {
@@ -1359,6 +1376,7 @@ func handleConsoleInput() {
 		}
 
 		reader := bufio.NewReader(os.Stdin)
+
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
@@ -1370,6 +1388,7 @@ func handleConsoleInput() {
 
 				return
 			}
+
 			log.Printf("%sConsole read error: %v",
 				boomPrefix(), err)
 
@@ -1544,6 +1563,7 @@ func showHelp() {
 func showStats() {
 	if dbPath == "" {
 		type row struct{ Name, Value string }
+
 		rows := []row{
 			{
 				"TELNET Total Connections",
@@ -1671,6 +1691,7 @@ func showStats() {
 
 		border := fmt.Sprintf("\r+=%s=+=%s=+\r\n",
 			strings.Repeat("=", maxName), strings.Repeat("=", maxVal))
+
 		fmt.Print("\r\n")
 		fmt.Print(border)
 		fmt.Printf("\r| %-*s | %*s |\r\n",
@@ -1689,6 +1710,7 @@ func showStats() {
 		fmt.Print("\r\n")
 	} else {
 		type row struct{ Name, Value, Lifetime string }
+
 		rows := []row{
 			{
 				"TELNET Total Connections",
@@ -1872,6 +1894,7 @@ func showStats() {
 			strings.Repeat("=", maxName),
 			strings.Repeat("=", maxVal),
 			strings.Repeat("=", maxLifetime))
+
 		fmt.Print("\r\n")
 		fmt.Print(border)
 		fmt.Printf("\r| %-*s | %*s | %*s |\r\n",
@@ -2196,6 +2219,7 @@ func listConfiguration() {
 	pid := os.Getpid()
 
 	var b strings.Builder
+
 	maxLength := 0
 
 	updateMaxLength := func(s string) {
@@ -2210,6 +2234,7 @@ func listConfiguration() {
 	updateMaxLength(bHerald)
 
 	updateMaxLength("SSH listeners on:")
+
 	for _, addr := range sshAddr {
 		updateMaxLength("* " + addr)
 	}
@@ -2260,6 +2285,7 @@ func listConfiguration() {
 
 	if len(altHosts) > 0 {
 		updateMaxLength("Alt Targets:")
+
 		for user, hostPort := range altHosts {
 			s3 := fmt.Sprintf("* %s [%s]",
 				hostPort, user)
@@ -2299,6 +2325,7 @@ func listConfiguration() {
 		} else {
 			quietMode = "noquiet"
 		}
+
 		updateMaxLength("Console Logging: " + quietMode)
 	} else {
 		updateMaxLength("Console Logging: disabled")
@@ -2460,11 +2487,14 @@ func listConfiguration() {
 
 	if len(altHosts) > 0 {
 		printRow(&b, "Alt Targets:")
+
 		users := make([]string, 0, len(altHosts))
 		for user := range altHosts {
 			users = append(users, user)
 		}
+
 		sort.Strings(users)
+
 		for _, user := range users {
 			hostPort := altHosts[user]
 			printRow(&b, fmt.Sprintf("* %s [%s]",
@@ -2572,7 +2602,9 @@ func listConfiguration() {
 
 func reloadLists() {
 	var newBlacklistedNetworks []*net.IPNet
+
 	var newWhitelistedNetworks []*net.IPNet
+
 	var reloadErrors []string
 
 	blacklistReloaded := false
@@ -2823,6 +2855,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 	}
 
 	var privateKey any
+
 	var pemBlock *pem.Block
 
 	switch keyType {
@@ -2833,6 +2866,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 		}
 
 		privateKey = key
+
 		rsaKey, ok := privateKey.(*rsa.PrivateKey)
 		if !ok {
 			return nil, fmt.Errorf("unexpected key type %T",
@@ -2851,6 +2885,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 		}
 
 		privateKey = rawPriv
+
 		edKey, ok := privateKey.(ed25519.PrivateKey)
 		if !ok {
 			return nil, fmt.Errorf("unexpected key type %T",
@@ -2874,6 +2909,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 		}
 
 		privateKey = key
+
 		ecKey, ok := privateKey.(*ecdsa.PrivateKey)
 		if !ok {
 			return nil, fmt.Errorf("unexpected key type %T",
@@ -2935,6 +2971,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	}
 
 	remoteAddr := raddr.String()
+
 	host, _, err := net.SplitHostPort(remoteAddr)
 	if err != nil {
 		host = remoteAddr
@@ -3012,6 +3049,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	}
 
 	var authMethod string
+
 	var method string
 
 	if sshConn != nil && sshConn.Permissions != nil && sshConn.Permissions.Extensions != nil {
@@ -3033,11 +3071,13 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	}
 
 	var userName string
+
 	var hostName string
 
 	if sshConn == nil {
 		log.Printf("%sError: sshConn nil while building connection for %s",
 			warnPrefix(), sid)
+
 		userName = ""
 		hostName = ""
 	} else {
@@ -3047,6 +3087,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		if addr == nil {
 			log.Printf("%sError: sshConn.RemoteAddr() nil while building connection for %s",
 				warnPrefix(), sid)
+
 			hostName = ""
 		} else {
 			hostName = addr.String()
@@ -3102,6 +3143,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	currentLen := uint64(len(connections))
 	if currentLen > peakUsersTotal.Load() {
 		peakUsersTotal.Store(currentLen)
+
 		if dbEnabled {
 			if currentLen > lifetimePeakUsersTotal.Load() {
 				lifetimePeakUsersTotal.Store(currentLen)
@@ -3167,6 +3209,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	if sshConn == nil || sshConn.RemoteAddr() == nil {
 		log.Printf("%sError: sshConn or its RemoteAddr() is nil",
 			warnPrefix())
+
 		addr = ""
 	} else {
 		addr = sshConn.RemoteAddr().String()
@@ -3262,6 +3305,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	suppressLogs := gracefulShutdownMode.Load() || denyNewConnectionsMode.Load()
 
 	sessionStarted := make(chan bool, 1)
+
 	go func() {
 		for req := range requests {
 			switch req.Type {
@@ -3279,6 +3323,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 					if conn.telnetConn != nil {
 						nawsWill := []byte{TelcmdIAC, TelcmdWILL, TeloptNAWS}
+
 						_, err := conn.telnetConn.Write(nawsWill)
 						if err != nil {
 							log.Printf("%sError sending IAC WILL NAWS to TELNET target for %s: %v",
@@ -3403,6 +3448,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 								log.Printf("%sError replying to request: %v",
 									warnPrefix(), err)
 							}
+
 							select {
 							case sessionStarted <- false:
 
@@ -3503,6 +3549,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 	if rejectedByRule != "" {
 		var exemptedByRule string
+
 		for _, ipNet := range whitelistedNetworks {
 			if ipNet.Contains(clientIP) {
 				exemptedByRule = ipNet.String()
@@ -3532,6 +3579,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			if err == nil {
 				blockMessageContent := strings.ReplaceAll(
 					strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
+
 				_, err := channel.Write(
 					[]byte(blockMessageContent + "\r\n"))
 				if err != nil {
@@ -3600,6 +3648,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			}
 
 			spinnerIndex = (spinnerIndex + 1) % len(spinner)
+
 			time.Sleep(100 * time.Millisecond)
 		}
 
@@ -3725,10 +3774,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}
 
 	start := time.Now()
+
 	var sshIn, sshOut, telnetIn, telnetOut uint64
 
 	var logfile *os.File
+
 	var logwriter io.Writer
+
 	var basePath string
 
 	if !noLog {
@@ -3749,6 +3801,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 			return
 		}
+
 		conn.logFile = logfile
 		conn.basePath = basePath
 		logwriter = logfile
@@ -3770,6 +3823,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 		defer func() {
 			dur := time.Since(start)
+
 			_, err := logwriter.Write(fmt.Appendf(nil,
 				nowStamp()+" Session end (link time %s)\r\n",
 				dur.Round(time.Second)))
@@ -3777,6 +3831,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				log.Printf("%sError writing to log: %v",
 					warnPrefix(), err)
 			}
+
 			closeAndCompressLog(logfile, basePath+".log")
 		}()
 	} else {
@@ -3784,6 +3839,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}
 
 	var targetDest string
+
 	var isAltHost bool
 
 	altHostPort, ok := altHosts[conn.userName]
@@ -3906,8 +3962,11 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		defer wg.Done()
 
 		var menuMode bool
+
 		var escSequence []byte
+
 		var escTimer <-chan time.Time
+
 		reader := bufio.NewReader(channel)
 
 		byteChan := make(chan byte)
@@ -3926,11 +3985,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					b, err := reader.ReadByte()
 					if err != nil {
 						errorChan <- err
+
 						close(byteChan)
 						close(errorChan)
 
 						return
 					}
+
 					byteChan <- b
 				}
 			}
@@ -3963,6 +4024,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				}
 
 				atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
+
 				_, err = logwriter.Write(escSequence)
 				if err != nil {
 					log.Printf("%sError writing to log for %s: %v",
@@ -3974,12 +4036,14 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 			case b := <-byteChan:
 				conn.lastActivityTime = time.Now()
+
 				atomic.AddUint64(&sshIn, 1)
 				atomic.AddUint64(&conn.sshInTotal, 1)
 
 				if menuMode {
 					handleMenuSelection(b, conn, channel, remote, logwriter,
 						&sshIn, &sshOut, &telnetIn, &telnetOut, start)
+
 					menuMode = false
 
 					continue
@@ -3987,6 +4051,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 				if b == 0x1d { // Ctrl-]
 					showMenu(channel)
+
 					menuMode = true
 					escSequence = nil
 					escTimer = nil
@@ -4095,6 +4160,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							warnPrefix(), conn.ID, err)
 					}
 				}
+
 				if !errors.Is(err, io.EOF) {
 					log.Printf("%sSSH channel read error: %v",
 						warnPrefix(), err)
@@ -4107,6 +4173,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 	go func() {
 		defer wg.Done()
+
 		buf := make([]byte, 1024)
 
 		for {
@@ -4119,6 +4186,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 			n, err := remote.Read(buf)
 			trafficInTotal.Add(uint64(n)) //nolint:gosec
+
 			if err != nil {
 				var netErr net.Error
 
@@ -4357,6 +4425,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 	for {
 		n, err := remote.Read(buf)
 		trafficInTotal.Add(uint64(n)) //nolint:gosec
+
 		if err != nil {
 			var ne net.Error
 			if errors.As(err, &ne) && ne.Timeout() {
@@ -4385,6 +4454,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 						if supportedOptions[opt] {
 							if !state.theyWill {
 								state.theyWill = true
+
 								sendIAC(remote, TelcmdDO, opt)
 								writeNegotiation(ch, logw,
 									"[SENT "+cmdName(TelcmdDO)+" "+optName(opt)+"]",
@@ -4400,6 +4470,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 					case TelcmdWONT:
 						if state.theyWill {
 							state.theyWill = false
+
 							sendIAC(remote, TelcmdDONT, opt)
 							writeNegotiation(ch, logw,
 								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]",
@@ -4419,6 +4490,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 						} else if supportedOptions[opt] {
 							if !state.weWill {
 								state.weWill = true
+
 								sendIAC(remote, TelcmdWILL, opt)
 								writeNegotiation(ch, logw,
 									"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]",
@@ -4434,6 +4506,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 					case TelcmdDONT:
 						if state.weWill {
 							state.weWill = false
+
 							sendIAC(remote, TelcmdWONT, opt)
 							writeNegotiation(ch, logw,
 								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]",
@@ -4474,11 +4547,13 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 									data := []byte{TelcmdIAC, TelcmdSB, TeloptTTYPE, TelnetIs}
 									data = append(data, []byte(conn.termType)...)
 									data = append(data, TelcmdIAC, TelcmdSE)
+
 									_, err := remote.Write(data)
 									if err != nil {
 										log.Printf("%sError writing TELNET TTYPE response: %v",
 											warnPrefix(), err)
 									}
+
 									writeNegotiation(ch, logw,
 										"[SENT SB "+optName(TeloptTTYPE)+" IS "+
 											conn.termType+" IAC SE]", conn.userName)
@@ -4496,12 +4571,15 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 
 					default:
 					}
+
 					i += 3
 				} else if i+1 < n && buf[i+1] == TelcmdSB {
 					writeNegotiation(ch, logw, "[RCVD IAC SB (incomplete)]", conn.userName)
+
 					i += 2
 				} else {
 					writeNegotiation(ch, logw, "[RCVD IAC (incomplete)]", conn.userName)
+
 					i++
 				}
 			} else {
@@ -5168,6 +5246,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 	base := fmt.Sprintf("%s_%s_%d",
 		ts, sid, seq)
 	pathBase := filepath.Join(dir, base)
+
 	f, err := os.OpenFile(pathBase+".log", //nolint:gosec
 		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
 	if err != nil {
@@ -5181,6 +5260,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 
 func closeAndCompressLog(logfile *os.File, logFilePath string) {
 	defer loggingWg.Done()
+
 	err := logfile.Close()
 	if err != nil {
 		return
@@ -5229,6 +5309,7 @@ func newSessionID(connections map[string]*Connection, mutex *sync.Mutex) string 
 
 func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex) string {
 	const chars = "cdhkmnprswxyzCDFGJKMNPRSTXY57"
+
 	for {
 		b := make([]byte, 20)
 
@@ -5275,6 +5356,7 @@ func nowStamp() string {
 func getFileContent(baseFilename, username string) ([]byte, error) {
 	userSpecificFile := fmt.Sprintf(
 		"%s-%s.txt", strings.TrimSuffix(baseFilename, ".txt"), username)
+
 	content, err := os.ReadFile(userSpecificFile) //nolint:gosec
 	if err == nil {
 		return content, nil
@@ -5321,6 +5403,7 @@ func setupConsoleLogging() {
 	}
 
 	rotateConsoleLogAt(time.Now())
+
 	go startConsoleLogRolloverChecker()
 }
 
@@ -5370,6 +5453,7 @@ func rotateConsoleLogAt(t time.Time) {
 		}
 
 		consoleLogFile = nil
+
 		log.SetOutput(os.Stdout)
 		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sConsole logging disabled.\r\n",
@@ -5397,6 +5481,7 @@ func rotateConsoleLogAt(t time.Time) {
 		}
 
 		consoleLogFile = nil
+
 		log.SetOutput(os.Stdout)
 		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sConsole logging disabled.\r\n",
@@ -5423,6 +5508,7 @@ func rotateConsoleLogAt(t time.Time) {
 
 	if oldLogFile != nil {
 		oldLogPath := oldLogFile.Name()
+
 		err := oldLogFile.Close()
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stdout,
@@ -5453,7 +5539,9 @@ func compressLogFile(logFilePath string) {
 	}
 
 	var compressedFilePath string
+
 	var compressedFile *os.File
+
 	var writer io.WriteCloser
 
 	var gzipLevel int
@@ -5498,6 +5586,7 @@ func compressLogFile(logFilePath string) {
 	switch compressAlgo {
 	case "gzip":
 		compressedFilePath = logFilePath + ".gz"
+
 		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
 		if err != nil {
 			log.Printf("%sFailed to create compressed file %q: %v",
@@ -5522,6 +5611,7 @@ func compressLogFile(logFilePath string) {
 
 	case "xz":
 		compressedFilePath = logFilePath + ".xz"
+
 		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
 		if err != nil {
 			log.Printf("%sFailed to create compressed file %q: %v",
@@ -5546,6 +5636,7 @@ func compressLogFile(logFilePath string) {
 
 	case "lzip":
 		compressedFilePath = logFilePath + ".lz"
+
 		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
 		if err != nil {
 			log.Printf("%sFailed to create compressed file %q: %v",
@@ -5571,6 +5662,7 @@ func compressLogFile(logFilePath string) {
 
 	case "zstd":
 		compressedFilePath = logFilePath + ".zst"
+
 		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
 		if err != nil {
 			log.Printf("%sFailed to create compressed file %q: %v",
@@ -5670,6 +5762,7 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 	}()
 
 	var networks []*net.IPNet
+
 	scanner := bufio.NewScanner(file)
 	lineNumber := 0
 
@@ -5770,6 +5863,7 @@ func listGoroutines() {
 	}
 
 	type row struct{ Name, Value string }
+
 	allRows := make([]row, 0, len(goroutines)*4)
 
 	for _, g := range goroutines {
@@ -5835,6 +5929,7 @@ func checkPrivilegedPorts(addrs []string) {
 
 func resolveExePath() string {
 	var exe string
+
 	var err error
 
 	exe, err = os.Executable()
