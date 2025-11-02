@@ -283,7 +283,8 @@ func initDB() {
 	err = db.Update(func(tx *bbolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(metaBucketName)
 		if err != nil {
-			return fmt.Errorf("failed to create meta bucket: %w", err)
+			return fmt.Errorf("failed to create meta bucket: %w",
+				err)
 		}
 
 		val := bucket.Get(shutdownMarkerKey)
@@ -307,7 +308,8 @@ func initDB() {
 			err := bucket.Put(initialStartTimeKey,
 				[]byte(startTime.Format(time.RFC3339)))
 			if err != nil {
-				return fmt.Errorf("failed to write initial start time: %w", err)
+				return fmt.Errorf("failed to write initial start time: %w",
+					err)
 			}
 
 			persistedStartTime = startTime
@@ -343,7 +345,8 @@ func writeCountersToDB() {
 	err := db.Update(func(tx *bbolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(countersBucketName)
 		if err != nil {
-			return fmt.Errorf("failed to create counters bucket: %w", err)
+			return fmt.Errorf("failed to create counters bucket: %w",
+				err)
 		}
 
 		counters := map[string]uint64{
@@ -414,7 +417,8 @@ func writeCountersToDB() {
 
 			err := bucket.Put([]byte(key), buf)
 			if err != nil {
-				return fmt.Errorf("failed to write counter %s: %w", key, err)
+				return fmt.Errorf("failed to write counter %s: %w",
+					key, err)
 			}
 		}
 
@@ -487,7 +491,8 @@ func closeDB() {
 		err := db.Update(func(tx *bbolt.Tx) error {
 			bucket, err := tx.CreateBucketIfNotExists(metaBucketName)
 			if err != nil {
-				return fmt.Errorf("failed to create meta bucket: %w", err)
+				return fmt.Errorf("failed to create meta bucket: %w",
+					err)
 			}
 
 			return bucket.Put(shutdownMarkerKey, []byte(time.Now().Format(time.RFC3339)))
