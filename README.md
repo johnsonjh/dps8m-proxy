@@ -102,7 +102,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.61 (2025-Nov-02 g16b2ea7) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-02 g5c4375b) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -266,7 +266,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.61 (2025-Nov-02 g16b2ea7) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-02 g5c4375b) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -554,23 +554,23 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>502</th>
-<th>73</th>
-<th>79</th>
-<th>350</th>
-<th>139</th>
-<th>16828</th>
-<th>318</th>
+<th>517</th>
+<th>75</th>
+<th>81</th>
+<th>361</th>
+<th>143</th>
+<th>17321</th>
+<th>327</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>569</th>
+<th>570</th>
 <th>106</th>
 <th>0</th>
-<th>463</th>
+<th>464</th>
 <th>0</th>
-<th>27057</th>
-<th>448</th>
+<th>27106</th>
+<th>449</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -595,13 +595,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>9944</th>
-<th>2050</th>
-<th>777</th>
-<th>7117</th>
-<th>1595</th>
-<th>266513</th>
-<th>4783</th>
+<th>9960</th>
+<th>2052</th>
+<th>779</th>
+<th>7129</th>
+<th>1599</th>
+<th>267055</th>
+<th>4793</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -656,7 +656,8 @@ predecessor (code statistics 📈 provided by
   [`govulncheck`](https://go.googlesource.com/vuln),
   [`scc`](https://github.com/boyter/scc),
   [`scspell`](https://github.com/myint/scspell),
-  [`codespell`](https://github.com/codespell-project/codespell), and
+  [`codespell`](https://github.com/codespell-project/codespell),
+  [NilAway](https://github.com/uber-go/nilaway), and
   [Perl](https://www.perl.org/).
 * If you plan to make any changes to the [`Makefile`](Makefile) (or
   the [`.cross.sh`](.cross.sh) script), you’ll need to have the
