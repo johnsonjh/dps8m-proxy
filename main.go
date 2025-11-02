@@ -657,7 +657,8 @@ func init() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func pflag_mustLookup(name string) *pflag.Flag {
+//revive:disable:var-naming
+func pflag_mustLookup(name string) *pflag.Flag { //nolint:revive
 	f := pflag.Lookup(name)
 	if f == nil {
 		panic("internal error: flag " + name + " not defined")
@@ -665,6 +666,8 @@ func pflag_mustLookup(name string) *pflag.Flag {
 
 	return f
 }
+
+//revive:enable:var-naming
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
