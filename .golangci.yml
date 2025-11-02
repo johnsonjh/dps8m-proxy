@@ -13,7 +13,6 @@ linters:
     - containedctx
     - contextcheck
     - cyclop
-    - depguard
     - err113
     - exhaustruct
     - forbidigo
@@ -35,6 +34,31 @@ linters:
       - builtin$
       - examples$
       - third_party$
+  settings:
+    depguard:
+      rules:
+        main:
+          files:
+            - $all
+          allow:
+            - $gostd
+            - github.com/arl/statsviz
+            - github.com/google/gops/agent
+            - github.com/hashicorp/mdns
+            - github.com/klauspost/compress/gzip
+            - github.com/klauspost/compress/zstd
+            - github.com/sorairolake/lzip-go
+            - github.com/spf13/pflag
+            - github.com/ulikunitz/xz
+            - go.etcd.io/bbolt
+            - golang.org/x/crypto/ssh
+            - golang.org/x/sys/unix
+            - golang.org/x/term
+            - go.uber.org/goleak
+            - kernel.org/pub/linux/libs/security/libcap/cap
+          deny:
+            - pkg: io/ioutil
+              desc: "Deprecated: see https://pkg.go.dev/io/ioutil for details"
 formatters:
   enable:
     - gci

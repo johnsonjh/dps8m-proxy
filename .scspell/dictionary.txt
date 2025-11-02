@@ -130,14 +130,24 @@ gocyclo
 godoclint
 goimports
 golangci
+goleak
 golines
+gops
+gostd
+ioutil
 ireturn
+klauspost
+libcap
 maintidx
 nestif
 noctx
 perfsprint
+pflag
+sorairolake
+statsviz
 swaggo
 tenv
+ulikunitz
 varnamelen
 wrapcheck
 
