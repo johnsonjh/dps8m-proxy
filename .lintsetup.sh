@@ -63,11 +63,13 @@ ${GO:?} install -v "mvdan.cc/sh/v3/cmd/shfmt@${BRANCH:-}"
 ${GO:?} install -v "golang.org/x/tools/gopls@latest"
 
 ###############################################################################
-# Install golangci-lint
+# Install nilaway and golangci-lint
 
 if [ "${BRANCH:-}" = "master" ]; then
+  go install -v "go.uber.org/nilaway/cmd/nilaway@main"
   go install -v "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@main"
 else
+  go install -v "go.uber.org/nilaway/cmd/nilaway@latest"
   # shellcheck disable=SC2312
   curl -fsSL \
     "https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh" \
