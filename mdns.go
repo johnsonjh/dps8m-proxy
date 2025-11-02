@@ -30,7 +30,15 @@ func announceMDNS(
 	listener net.Listener, listenHost string, altHosts map[string]string, service string,
 	defaultTarget string,
 ) {
-	_, portStr, err := net.SplitHostPort(listener.Addr().String())
+	laddr := listener.Addr()
+	if laddr == nil {
+		log.Printf("%sError: mDNS listener.Addr() returned nil (impossible)",
+			warnPrefix())
+
+		return
+	}
+
+	_, portStr, err := net.SplitHostPort(laddr.String())
 	if err != nil {
 		log.Printf("%sError parsing host for mDNS announcements: %s",
 			warnPrefix(), err)
