@@ -422,7 +422,7 @@ func (op *octalPermValue) Type() string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func init() {
+func init() { //nolint:gochecknoinits
 	pflag.CommandLine.SetOutput(os.Stdout)
 	pflag.CommandLine.SortFlags = false
 
@@ -5584,7 +5584,7 @@ func compressLogFile(logFilePath string) {
 	}
 
 	switch compressAlgo {
-	case "gzip":
+	case "gzip": //nolint:goconst
 		compressedFilePath = logFilePath + ".gz"
 
 		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec

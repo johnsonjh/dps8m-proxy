@@ -305,6 +305,7 @@ abcdhkmnprsvwxyz
 achaea
 bcdhkmnprswxyz
 cdhkmnprswxyz
+gochecknoinits
 raddr
 sduplicate
 sinvalid

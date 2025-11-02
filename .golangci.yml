@@ -18,7 +18,6 @@ linters:
     - forbidigo
     - funlen
     - gochecknoglobals
-    - gochecknoinits
     - gocognit
     - gocyclo
     - maintidx
