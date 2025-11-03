@@ -79,10 +79,13 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   * If you don’t have a (POSIX) `make` available for some
     reason, then building with `go build` is sufficient.
 
-  * A [`.cross.sh`](.cross.sh) cross‑compilation helper script is
-    provided (which can be called with `make cross`) that attempts to
-    build `proxy` binaries for *all* supported `GOOS` and `GOARCH`
-    combinations.
+  * The [`.cross.sh`](.cross.sh) cross‑compilation helper script
+    is provided (which can be called with `make cross`) that
+    attempts to build `proxy` binaries for *all* supported `GOOS`
+    and `GOARCH` combinations (except some specific Android builds,
+    which are handled by [`.cross-android.sh`](.cross-android.sh)
+    for building the Android binaries that require the
+    [Android NDK](https://developer.android.com/ndk)).
 
 * You can also install this software using `go install` 📦:
 
@@ -102,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.61 (2025-Nov-02 g7a5b867) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-03 gf002476) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -266,7 +269,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.61 (2025-Nov-02 g7a5b867) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-03 gf002476) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -566,13 +569,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>572</th>
+<th>575</th>
 <th>108</th>
 <th>0</th>
-<th>464</th>
+<th>467</th>
 <th>0</th>
-<th>27108</th>
-<th>449</th>
+<th>27340</th>
+<th>452</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -597,13 +600,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10243</th>
+<th>10246</th>
 <th>2199</th>
 <th>781</th>
-<th>7263</th>
+<th>7266</th>
 <th>1659</th>
-<th>270362</th>
-<th>4868</th>
+<th>270594</th>
+<th>4871</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -662,11 +665,11 @@ predecessor (code statistics 📈 provided by
   [`codespell`](https://github.com/codespell-project/codespell),
   and [Perl](https://www.perl.org/).
 * If you plan to make any changes to the [`Makefile`](Makefile) (or
-  the [`.cross.sh`](.cross.sh) script), you’ll need to have the
+  [`.cross.sh`](.cross.sh) and other scripts), you’ll need to have the
   [ShellCheck](https://www.shellcheck.net/) and
   [`shfmt`](https://github.com/mvdan/sh) linters available.
 * Additionally, all modifications to the [`Makefile`](Makefile) and
-  [`.cross.sh`](.cross.sh) scripts must be tested against
+  [`.cross.sh`](.cross.sh) and other scripts must be tested against
   [`pdpmake`](https://frippery.org/make/)
   (with `PDPMAKE_POSIXLY_CORRECT` set) and
   [`yash`](https://magicant.github.io/yash/) to ensure POSIX
