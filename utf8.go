@@ -110,6 +110,7 @@ func isUTF8windows() bool {
 
 	defer func() {
 		os.Stdout = original
+
 		err := null.Close()
 		if err != nil {
 			log.Printf("%sError closing null: %v",
@@ -355,9 +356,11 @@ type emojiStripperWriter struct {
 
 func (e *emojiStripperWriter) Write(p []byte) (int, error) {
 	stripped := stripEmoji(string(p))
+
 	n, err := e.w.Write([]byte(stripped))
 	if err != nil {
-		return n, fmt.Errorf("failed to write stripped content: %w", err)
+		return n, fmt.Errorf("failed to write stripped content: %w",
+			err)
 	}
 
 	return n, nil

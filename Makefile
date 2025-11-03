@@ -112,6 +112,7 @@ lint check:
 		shellcheck \
 		shfmt \
 		golangci-lint \
+		nilaway \
 		golist \
 		govulncheck \
 		gopls
@@ -198,6 +199,20 @@ staticcheck:
 		'GOSUMDB=sum.golang.org' || :) staticcheck .
 
 ##############################################################################
+# Target: nilaway
+
+.PHONY: nilaway
+nilaway:
+	@command -v nilaway > /dev/null 2>&1 || \
+		{ env printf '%s\n' "⚠️ nilaway not found!" \
+			2> /dev/null || :; exit 0; } ; \
+		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
+		'GOSUMDB=sum.golang.org' || :) nilaway \
+			-experimental-anonymous-function \
+			-experimental-struct-init ./...
+
+##############################################################################
 # Target: revive
 
 .PHONY: revive
@@ -207,7 +222,8 @@ revive:
 			2> /dev/null || :; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-		'GOSUMDB=sum.golang.org' || :) revive ./...
+		'GOSUMDB=sum.golang.org' || :) revive \
+			-formatter stylish -set_exit_status ./...
 
 ##############################################################################
 # Target: errcheck

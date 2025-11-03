@@ -79,10 +79,13 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   * If you don’t have a (POSIX) `make` available for some
     reason, then building with `go build` is sufficient.
 
-  * A [`.cross.sh`](.cross.sh) cross‑compilation helper script is
-    provided (which can be called with `make cross`) that attempts to
-    build `proxy` binaries for *all* supported `GOOS` and `GOARCH`
-    combinations.
+  * The [`.cross.sh`](.cross.sh) cross‑compilation helper script
+    is provided (which can be called with `make cross`) that
+    attempts to build `proxy` binaries for *all* supported `GOOS`
+    and `GOARCH` combinations (except some specific Android builds,
+    which are handled by [`.cross-android.sh`](.cross-android.sh)
+    for building the Android binaries that require the
+    [Android NDK](https://developer.android.com/ndk)).
 
 * You can also install this software using `go install` 📦:
 
@@ -102,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.60 (2025-Nov-02 gcf736f7) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-03 gf002476) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -266,12 +269,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.60 (2025-Nov-02 gcf736f7) [linux/amd64]
+DPS8M Proxy v0.1.61 (2025-Nov-03 gf002476) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.60                          |
+| dps8m/proxy               | v0.1.61                          |
 | arl/statsviz              | v0.7.2                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -488,10 +491,12 @@ and that you know what you’re doing!
 
    ```sh
    ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ed25519_key.tmp
-   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
-   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ecdsa_key.tmp
    mv ssh_host_ed25519_key.tmp ssh_host_ed25519_key.pem
+
+   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_rsa_key.tmp
    mv ssh_host_rsa_key.tmp ssh_host_rsa_key.pem
+
+   ssh-keygen -p -m PEM -N '' -P '' -f ssh_host_ecdsa_key.tmp
    mv ssh_host_ecdsa_key.tmp ssh_host_ecdsa_key.pem
    ```
 
@@ -534,43 +539,43 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>8159</th>
-<th>1733</th>
-<th>472</th>
-<th>5954</th>
-<th>1421</th>
-<th>198940</th>
-<th>3625</th>
+<th>8479</th>
+<th>1886</th>
+<th>475</th>
+<th>6118</th>
+<th>1491</th>
+<th>202996</th>
+<th>3719</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
-<th>381</th>
-<th>88</th>
+<th>382</th>
+<th>89</th>
 <th>108</th>
 <th>185</th>
-<th>24</th>
-<th>11448</th>
-<th>180</th>
+<th>25</th>
+<th>11524</th>
+<th>181</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>502</th>
-<th>73</th>
-<th>79</th>
-<th>350</th>
-<th>139</th>
-<th>16828</th>
-<th>318</th>
+<th>518</th>
+<th>75</th>
+<th>81</th>
+<th>362</th>
+<th>143</th>
+<th>17362</th>
+<th>328</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>569</th>
-<th>106</th>
+<th>575</th>
+<th>108</th>
 <th>0</th>
-<th>463</th>
+<th>467</th>
 <th>0</th>
-<th>27057</th>
-<th>448</th>
+<th>27340</th>
+<th>452</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -595,13 +600,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>9903</th>
-<th>2041</th>
-<th>776</th>
-<th>7086</th>
-<th>1584</th>
-<th>265645</th>
-<th>4762</th>
+<th>10246</th>
+<th>2199</th>
+<th>781</th>
+<th>7266</th>
+<th>1659</th>
+<th>270594</th>
+<th>4871</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -654,16 +659,17 @@ predecessor (code statistics 📈 provided by
   [`errcheck`](https://github.com/kisielk/errcheck),
   [`gofumpt`](https://github.com/mvdan/gofumpt),
   [`govulncheck`](https://go.googlesource.com/vuln),
+  [NilAway](https://github.com/uber-go/nilaway),
   [`scc`](https://github.com/boyter/scc),
   [`scspell`](https://github.com/myint/scspell),
-  [`codespell`](https://github.com/codespell-project/codespell), and
-  [Perl](https://www.perl.org/).
+  [`codespell`](https://github.com/codespell-project/codespell),
+  and [Perl](https://www.perl.org/).
 * If you plan to make any changes to the [`Makefile`](Makefile) (or
-  the [`.cross.sh`](.cross.sh) script), you’ll need to have the
+  [`.cross.sh`](.cross.sh) and other scripts), you’ll need to have the
   [ShellCheck](https://www.shellcheck.net/) and
   [`shfmt`](https://github.com/mvdan/sh) linters available.
 * Additionally, all modifications to the [`Makefile`](Makefile) and
-  [`.cross.sh`](.cross.sh) scripts must be tested against
+  [`.cross.sh`](.cross.sh) and other scripts must be tested against
   [`pdpmake`](https://frippery.org/make/)
   (with `PDPMAKE_POSIXLY_CORRECT` set) and
   [`yash`](https://magicant.github.io/yash/) to ensure POSIX

@@ -18,7 +18,6 @@ linters:
     - forbidigo
     - funlen
     - gochecknoglobals
-    - gochecknoinits
     - gocognit
     - gocyclo
     - maintidx
@@ -27,7 +26,6 @@ linters:
     - noctx
     - varnamelen
     - wsl
-    - wsl_v5
   exclusions:
     generated: lax
     paths:

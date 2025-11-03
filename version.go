@@ -40,6 +40,7 @@ var versionReplacements = []struct{ old, new string }{
 
 func printVersionTable() {
 	type row struct{ Name, Version string }
+
 	var rows []row
 
 	info, ok := debug.ReadBuildInfo()
@@ -116,6 +117,7 @@ func printVersionTable() {
 	componentVersion := "Version"
 
 	maxName, maxVer := 0, 0
+
 	for _, r := range rows {
 		nameLen := utf8.RuneCountInString(r.Name)
 		verLen := utf8.RuneCountInString(r.Version)

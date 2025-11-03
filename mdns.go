@@ -30,7 +30,15 @@ func announceMDNS(
 	listener net.Listener, listenHost string, altHosts map[string]string, service string,
 	defaultTarget string,
 ) {
-	_, portStr, err := net.SplitHostPort(listener.Addr().String())
+	laddr := listener.Addr()
+	if laddr == nil {
+		log.Printf("%sError: mDNS listener.Addr() returned nil (impossible)",
+			warnPrefix())
+
+		return
+	}
+
+	_, portStr, err := net.SplitHostPort(laddr.String())
 	if err != nil {
 		log.Printf("%sError parsing host for mDNS announcements: %s",
 			warnPrefix(), err)
@@ -50,6 +58,7 @@ func announceMDNS(
 	if err != nil {
 		log.Printf("%sError getting hostname for mDNS: %v - using default of \"proxy\"",
 			toolPrefix(), err)
+
 		hostname = "proxy"
 	}
 
@@ -58,6 +67,7 @@ func announceMDNS(
 	}
 
 	var targetInterfaces []*net.Interface
+
 	var advertiseIPs []net.IP
 
 	allInterfaces, err := net.Interfaces()
@@ -86,6 +96,7 @@ func announceMDNS(
 				log.Printf(
 					"%sError resolving \"%s\" for mDNS: %v - falling back to all interfaces",
 					warnPrefix(), listenHost, err)
+
 				useAllInterfaces = true
 			} else {
 				for _, resolvedIP := range ips {
@@ -187,6 +198,7 @@ func announceMDNS(
 
 		defaultInstance := fmt.Sprintf("default-%d",
 			port)
+
 		defaultService, err := mdns.NewMDNSService(
 			defaultInstance, service, "local.", hostname, port, ifaceIPs, defaultTxt)
 		if err != nil {
@@ -211,6 +223,7 @@ func announceMDNS(
 
 		go func() {
 			<-shutdownSignal
+
 			_ = defaultServer.Shutdown()
 		}()
 
@@ -222,6 +235,7 @@ func announceMDNS(
 
 			altInstance := fmt.Sprintf("%s-%d",
 				name, port)
+
 			altHostService, err := mdns.NewMDNSService(
 				altInstance, service, "local.", hostname, port, ifaceIPs, txt)
 			if err != nil {
@@ -246,6 +260,7 @@ func announceMDNS(
 
 			go func() {
 				<-shutdownSignal
+
 				_ = altServer.Shutdown()
 			}()
 		}

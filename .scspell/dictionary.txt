@@ -185,6 +185,7 @@ gtags
 jstemmer
 juntaki
 lintsetup
+nilaway
 notparallel
 pflag
 printf
@@ -264,6 +265,7 @@ miekg
 mvdan
 myint
 naws
+nilaway
 nodelay
 noquiet
 oldunix
@@ -303,6 +305,8 @@ abcdhkmnprsvwxyz
 achaea
 bcdhkmnprswxyz
 cdhkmnprswxyz
+gochecknoinits
+raddr
 sduplicate
 sinvalid
 sorairolake
@@ -379,6 +383,7 @@ kisielk
 lintsetup
 mgechev
 mvdan
+nilaway
 shfmt
 
 FILEID: 3a9014e8-9335-11f0-85bd-80ee73e9b8e7
@@ -434,6 +439,9 @@ vifm
 xfdesktop
 xplr
 yazi
+
+FILEID: 367608fa-76ec-11f0-80c4-80ee73e9b8e7
+laddr
 
 NATURAL:
 adduser

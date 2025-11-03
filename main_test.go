@@ -42,6 +42,7 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 	logDirPerm = 0o755
 
 	originalOutput := log.Writer()
+
 	log.SetOutput(io.Discard)
 	defer log.SetOutput(originalOutput)
 
@@ -65,6 +66,7 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 	rotateConsoleLogAt(now)
 
 	logPath := getConsoleLogPath(now)
+
 	_, err := os.Stat(logPath)
 	if os.IsNotExist(err) {
 		t.Fatalf("Log file was not created at %s",
@@ -72,6 +74,7 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 	}
 
 	log.Printf("Test message")
+
 	err = consoleLogFile.Sync()
 	if err != nil {
 		t.Fatalf("Failed to sync log file: %v",
@@ -103,6 +106,7 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	logDirPerm = 0o755
 
 	originalOutput := log.Writer()
+
 	log.SetOutput(io.Discard)
 
 	defer log.SetOutput(originalOutput)
@@ -127,6 +131,7 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	rotateConsoleLogAt(day1)
 
 	day1LogPath := getConsoleLogPath(day1)
+
 	_, err := os.Stat(day1LogPath)
 	if os.IsNotExist(err) {
 		t.Fatalf("Log file for day 1 was not created at %s",
@@ -134,6 +139,7 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	}
 
 	log.Printf("Test message day 1")
+
 	err = consoleLogFile.Sync()
 	if err != nil {
 		t.Fatalf("Failed to sync log file for day 1: %v",
@@ -144,6 +150,7 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	rotateConsoleLogAt(day2)
 
 	day1CompressedLogPath := day1LogPath + ".gz"
+
 	_, err = os.Stat(day1CompressedLogPath)
 	if os.IsNotExist(err) {
 		t.Fatalf("Compressed log file for day 1 was not created at %s",
@@ -157,6 +164,7 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	}
 
 	day2LogPath := getConsoleLogPath(day2)
+
 	_, err = os.Stat(day2LogPath)
 	if os.IsNotExist(err) {
 		t.Fatalf("Log file for day 2 was not created at %s",
@@ -164,6 +172,7 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	}
 
 	log.Printf("Test message day 2")
+
 	err = consoleLogFile.Sync()
 	if err != nil {
 		t.Fatalf("Failed to sync log file for day 2: %v",

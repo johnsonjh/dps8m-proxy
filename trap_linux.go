@@ -107,6 +107,7 @@ func getProcName(pid int) (string, error) {
 	defer func() { _ = commFile.Close() }()
 
 	const maxCommLen = 32 // TASK_COMM_LEN * 2
+
 	lr := io.LimitReader(commFile, maxCommLen+1)
 
 	content, err := io.ReadAll(lr)

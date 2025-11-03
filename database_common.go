@@ -283,7 +283,8 @@ func initDB() {
 	err = db.Update(func(tx *bbolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(metaBucketName)
 		if err != nil {
-			return fmt.Errorf("failed to create meta bucket: %w", err)
+			return fmt.Errorf("failed to create meta bucket: %w",
+				err)
 		}
 
 		val := bucket.Get(shutdownMarkerKey)
@@ -307,7 +308,8 @@ func initDB() {
 			err := bucket.Put(initialStartTimeKey,
 				[]byte(startTime.Format(time.RFC3339)))
 			if err != nil {
-				return fmt.Errorf("failed to write initial start time: %w", err)
+				return fmt.Errorf("failed to write initial start time: %w",
+					err)
 			}
 
 			persistedStartTime = startTime
@@ -316,6 +318,7 @@ func initDB() {
 			if err != nil {
 				log.Printf("%sERROR: Failed to parse persisted start time: %v",
 					warnPrefix(), err)
+
 				persistedStartTime = startTime
 			} else {
 				persistedStartTime = pStartTime
@@ -338,10 +341,12 @@ func writeCountersToDB() {
 	if db == nil {
 		return
 	}
+
 	err := db.Update(func(tx *bbolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(countersBucketName)
 		if err != nil {
-			return fmt.Errorf("failed to create counters bucket: %w", err)
+			return fmt.Errorf("failed to create counters bucket: %w",
+				err)
 		}
 
 		counters := map[string]uint64{
@@ -409,9 +414,11 @@ func writeCountersToDB() {
 			buf := make([]byte, 8)
 
 			binary.BigEndian.PutUint64(buf, val)
+
 			err := bucket.Put([]byte(key), buf)
 			if err != nil {
-				return fmt.Errorf("failed to write counter %s: %w", key, err)
+				return fmt.Errorf("failed to write counter %s: %w",
+					key, err)
 			}
 		}
 
@@ -429,6 +436,7 @@ func loadCountersFromDB() {
 	if db == nil {
 		return
 	}
+
 	err := db.View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(countersBucketName)
 		if bucket == nil {
@@ -483,7 +491,8 @@ func closeDB() {
 		err := db.Update(func(tx *bbolt.Tx) error {
 			bucket, err := tx.CreateBucketIfNotExists(metaBucketName)
 			if err != nil {
-				return fmt.Errorf("failed to create meta bucket: %w", err)
+				return fmt.Errorf("failed to create meta bucket: %w",
+					err)
 			}
 
 			return bucket.Put(shutdownMarkerKey, []byte(time.Now().Format(time.RFC3339)))
