@@ -7,7 +7,7 @@
 # scspell-id: de55e65e-b5e3-11f0-9604-80ee73e9b8e7
 ###############################################################################
 
-# Cross-compile release android/arm/386/amd64 binaries using the Android NDK.
+# Cross-compile android/arm/386/amd64 binaries using the Android NDK for Cgo.
 
 ###############################################################################
 # Strict
@@ -18,14 +18,13 @@ set -e
 # Setup Go
 
 GO="$(command -v go 2> /dev/null || printf '%s\n' 'go')"
-GOFLAGS="-ldflags=-s -w"
 CGO_ENABLED=1
 GOTOOLCHAIN="$(grep '^go .*$' go.mod | tr -cd 'go0-9.\n')+auto"
 # shellcheck disable=SC2015
 "${GO:?}" env 2>&1 | grep -q "GOSUMDB=.*off.*" \
   && GOSUMDB='sum.golang.org' || true
 
-export GO GOFLAGS CGO_ENABLED GOTOOLCHAIN GOSUMDB
+export GO CGO_ENABLED GOTOOLCHAIN GOSUMDB
 
 ###############################################################################
 # Setup Android NDK

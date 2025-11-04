@@ -33,7 +33,7 @@ export GO CGO_ENABLED GOTOOLCHAIN GOSUMDB
 ###############################################################################
 # Create script
 # Exclude ios/*, android/{386,amd64,arm}
-# Use `./.cross-android.sh` to cross-compile for android/386/amd64/arm.
+# See the `./.cross-android.sh` for cross-compiling to android/386/amd64/arm.
 
 # shellcheck disable=SC2016
 _S=$("${GO:?}" tool dist list \

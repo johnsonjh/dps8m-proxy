@@ -109,6 +109,7 @@ lint check:
 		gotidydiff \
 		staticcheck \
 		errcheck \
+		deadcode \
 		shellcheck \
 		shfmt \
 		golangci-lint \
@@ -236,6 +237,18 @@ errcheck:
 		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) errcheck
+
+##############################################################################
+# Target: deadcode
+
+.PHONY: deadcode
+deadcode:
+	@command -v deadcode > /dev/null 2>&1 || \
+		{ env printf '%s\n' "⚠️ deadcode not found!" \
+			2> /dev/null || :; exit 0; } ; \
+		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
+		'GOSUMDB=sum.golang.org' || :) deadcode ./...
 
 ##############################################################################
 # Target: govulncheck

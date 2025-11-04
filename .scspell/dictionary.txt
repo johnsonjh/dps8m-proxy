@@ -99,7 +99,6 @@ getconf
 goarch
 goarm
 goexe
-goflags
 gopath
 goproxy
 gosumdb
@@ -158,6 +157,7 @@ FILEID: 5865f38c-6bd2-11f0-882d-80ee73e9b8e7
 basedict
 bindir
 codespell
+deadcode
 deps
 destdir
 distclean
@@ -326,7 +326,6 @@ errcheck
 gcompat
 githubusercontent
 glab
-goflags
 golangci
 gopath
 goproxy
@@ -373,6 +372,7 @@ ulikunitz
 
 FILEID: 776ab862-930a-11f0-aecf-80ee73e9b8e7
 boyter
+deadcode
 errcheck
 expandtab
 githubusercontent

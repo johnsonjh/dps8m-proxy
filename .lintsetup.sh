@@ -51,6 +51,7 @@ set -x
 ${GO:?} install -v "github.com/boyter/scc/v3@${BRANCH:-}"
 ${GO:?} install -v "github.com/kisielk/errcheck@${BRANCH:-}"
 ${GO:?} install -v "github.com/mgechev/revive@${BRANCH:-}"
+${GO:?} install -v "golang.org/x/tools/cmd/deadcode@${BRANCH:?}"
 ${GO:?} install -v "golang.org/x/vuln/cmd/govulncheck@${BRANCH:-}"
 ${GO:?} install -v "honnef.co/go/tools/cmd/staticcheck@${BRANCH:-}"
 ${GO:?} install -v "mvdan.cc/gofumpt@${BRANCH:-}"
