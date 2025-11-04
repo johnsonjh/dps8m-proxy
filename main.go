@@ -179,6 +179,8 @@ var (
 	logPerm                          uint = 0o600
 	logDirPerm                       uint = 0o750
 	certPerm                         uint = 0o600
+	certRSABits                           = 2048
+	certECDSABits                         = 256
 	certDir                          string
 	altHosts                         = make(map[string]string)
 	blacklistedNetworks              []*net.IPNet
@@ -422,6 +424,76 @@ func (op *octalPermValue) Type() string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+type rsaBitsValue int
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (rv *rsaBitsValue) String() string {
+	return strconv.Itoa(int(*rv))
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (rv *rsaBitsValue) Set(s string) error {
+	v, err := strconv.Atoi(s)
+	if err != nil {
+		return fmt.Errorf("%sinvalid RSA bits value: %w",
+			errorPrefix(), err)
+	}
+
+	if v < 1024 || v > 4096 {
+		return fmt.Errorf("%sRSA key size must be between 1024 and 4096",
+			errorPrefix())
+	}
+
+	*rv = rsaBitsValue(v)
+
+	return nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (rv *rsaBitsValue) Type() string {
+	return "int"
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+type ecdsaBitsValue int
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (ev *ecdsaBitsValue) String() string {
+	return strconv.Itoa(int(*ev))
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (ev *ecdsaBitsValue) Set(s string) error {
+	v, err := strconv.Atoi(s)
+	if err != nil {
+		return fmt.Errorf("%sinvalid ECDSA bits value: %w",
+			errorPrefix(), err)
+	}
+
+	if (v == 256) || (v == 384) || (v == 521) {
+		*ev = ecdsaBitsValue(v)
+	} else {
+		return fmt.Errorf("%sECDSA key size must be 256, 384, or 521",
+			errorPrefix())
+	}
+
+	return nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (ev *ecdsaBitsValue) Type() string {
+	return "int"
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func init() { //nolint:gochecknoinits
 	pflag.CommandLine.SetOutput(os.Stdout)
 	pflag.CommandLine.SortFlags = false
@@ -474,6 +546,20 @@ func init() { //nolint:gochecknoinits
 			"    [e.g., \"600\", \"644\"]")
 
 	pflag_mustLookup("cert-perm").DefValue = "600"
+
+	pflag.Var((*rsaBitsValue)(&certRSABits),
+		"cert-rsa-bits",
+		"RSA key size in bits for new certificates\r\n"+
+			"    [\"1024\" to \"4096\"]")
+
+	pflag_mustLookup("cert-rsa-bits").DefValue = "2048"
+
+	pflag.Var((*ecdsaBitsValue)(&certECDSABits),
+		"cert-ecdsa-bits",
+		"ECDSA key size in bits for new certificates\r\n"+
+			"    [\"256\", \"384\", \"521\"]")
+
+	pflag_mustLookup("cert-ecdsa-bits").DefValue = "256"
 
 	pflag.StringSliceVar(&sshAddr,
 		"ssh-addr", []string{":2222"},
@@ -2859,15 +2945,18 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 
 	var pemBlock *pem.Block
 
+	var keySize int
+
 	switch keyType {
 	case "rsa":
-		key, err := rsa.GenerateKey(rand.Reader, 2048)
+		key, err := rsa.GenerateKey(rand.Reader, certRSABits)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate rsa key: %w",
 				err)
 		}
 
 		privateKey = key
+		keySize = key.N.BitLen()
 
 		rsaKey, ok := privateKey.(*rsa.PrivateKey)
 		if !ok {
@@ -2888,6 +2977,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 		}
 
 		privateKey = rawPriv
+		keySize = 256
 
 		edKey, ok := privateKey.(ed25519.PrivateKey)
 		if !ok {
@@ -2907,13 +2997,31 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 		}
 
 	case "ecdsa":
-		key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+		var curve elliptic.Curve
+
+		switch certECDSABits {
+		case 256:
+			curve = elliptic.P256()
+
+		case 384:
+			curve = elliptic.P384()
+
+		case 521:
+			curve = elliptic.P521()
+
+		default:
+			return nil, fmt.Errorf("unsupported ECDSA curve size: %d",
+				certECDSABits)
+		}
+
+		key, err := ecdsa.GenerateKey(curve, rand.Reader)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate ecdsa key: %w",
 				err)
 		}
 
 		privateKey = key
+		keySize = key.Curve.Params().BitSize
 
 		ecKey, ok := privateKey.(*ecdsa.PrivateKey)
 		if !ok {
@@ -2949,8 +3057,8 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 			err)
 	}
 
-	log.Printf("%sNew %s host key generated at %s",
-		keyPrefix(), strings.ToUpper(keyType), keyPath)
+	log.Printf("%sNew %s host key (%d-bit) generated at %s",
+		keyPrefix(), strings.ToUpper(keyType), keySize, keyPath)
 
 	signer, err := ssh.NewSignerFromKey(privateKey)
 	if err != nil {
