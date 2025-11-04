@@ -654,6 +654,7 @@ predecessor (code statistics 📈 provided by
   shell environment (at a minimum `sh`, `make`, `grep`, `awk`, &
   `sed`), and [`reuse`](https://github.com/fsfe/reuse-tool),
   [`staticcheck`](https://staticcheck.dev/),
+  [`deadcode`](https://pkg.go.dev/golang.org/x/tools/cmd/deadcode),
   [`gopls`](https://go.dev/gopls/),
   [`revive`](https://revive.run/),
   [`errcheck`](https://github.com/kisielk/errcheck),
