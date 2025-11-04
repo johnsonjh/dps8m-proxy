@@ -99,7 +99,6 @@ getconf
 goarch
 goarm
 goexe
-goflags
 gopath
 goproxy
 gosumdb
@@ -327,7 +326,6 @@ errcheck
 gcompat
 githubusercontent
 glab
-goflags
 golangci
 gopath
 goproxy

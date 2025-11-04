@@ -47,9 +47,9 @@ pages:
     - pip install --upgrade scspell3k codespell reuse
     - env CI_NO_CROSS=1 pdpmake lint
     - git diff --exit-code
-    - env GOFLAGS="-ldflags=-s -w" pdpmake
+    - pdpmake
     - cp -f proxy /tmp
-    - env GOFLAGS="-ldflags=-s -w" pdpmake cross
+    - pdpmake cross
     - mv -f cross.bin public
     - ( cd $HOME && mkdir -p x-tools && cd x-tools && curl -fsSL https://github.com/johnsonjh/ndk/releases/download/r29/android-ndk-r29.tar.lz | lzip -dc | tar xf - ) || true
     - env MAKE=pdpmake yash ./.cross-android.sh || true
