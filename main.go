@@ -179,8 +179,8 @@ var (
 	logPerm                          uint = 0o600
 	logDirPerm                       uint = 0o750
 	certPerm                         uint = 0o600
-	certRSABits                           = 2048
-	certECDSABits                         = 256
+	certRSABits                      uint = 2048
+	certECDSABits                    uint = 256
 	certDir                          string
 	altHosts                         = make(map[string]string)
 	blacklistedNetworks              []*net.IPNet
@@ -197,7 +197,7 @@ var (
 	debugAddr                        string
 	denyNewConnectionsMode           atomic.Bool
 	gracefulShutdownMode             atomic.Bool
-	idleMax                          int
+	idleMax                          uint64
 	logDir                           string
 	loggingWg                        sync.WaitGroup
 	noBanner                         bool
@@ -213,7 +213,7 @@ var (
 	shutdownSignal                   chan struct{}
 	sshAddr                          []string
 	telnetHostPort                   string
-	timeMax                          int
+	timeMax                          uint64
 	whitelistedNetworks              []*net.IPNet
 	whitelistFile                    string
 	issueFile                        = "issue.txt"
@@ -424,18 +424,18 @@ func (op *octalPermValue) Type() string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-type rsaBitsValue int
+type rsaBitsValue uint
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (rv *rsaBitsValue) String() string {
-	return strconv.Itoa(int(*rv))
+	return strconv.FormatUint(uint64(*rv), 10)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (rv *rsaBitsValue) Set(s string) error {
-	v, err := strconv.Atoi(s)
+	v, err := strconv.ParseUint(s, 10, 32)
 	if err != nil {
 		return fmt.Errorf("%sinvalid RSA bits value: %w",
 			errorPrefix(), err)
@@ -454,23 +454,23 @@ func (rv *rsaBitsValue) Set(s string) error {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (rv *rsaBitsValue) Type() string {
-	return "int"
+	return "uint"
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-type ecdsaBitsValue int
+type ecdsaBitsValue uint
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (ev *ecdsaBitsValue) String() string {
-	return strconv.Itoa(int(*ev))
+	return strconv.FormatUint(uint64(*ev), 10)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (ev *ecdsaBitsValue) Set(s string) error {
-	v, err := strconv.Atoi(s)
+	v, err := strconv.ParseUint(s, 10, 32)
 	if err != nil {
 		return fmt.Errorf("%sinvalid ECDSA bits value: %w",
 			errorPrefix(), err)
@@ -489,7 +489,7 @@ func (ev *ecdsaBitsValue) Set(s string) error {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (ev *ecdsaBitsValue) Type() string {
-	return "int"
+	return "uint"
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -687,11 +687,11 @@ func init() { //nolint:gochecknoinits
 				"   ")
 	}
 
-	pflag.IntVar(&idleMax,
+	pflag.Uint64Var(&idleMax,
 		"idle-max", 0,
 		"Maximum connection idle time allowed [seconds]")
 
-	pflag.IntVar(&timeMax,
+	pflag.Uint64Var(&timeMax,
 		"time-max", 0,
 		"Maximum connection link time allowed [seconds]")
 
@@ -1045,6 +1045,24 @@ func main() {
 			"you specified: %s", errorPrefix(), telnetHostPort) // LINTED: Fatalf
 	}
 
+	if idleMax > 0 {
+		maxSeconds := uint64(math.MaxInt64 / int64(time.Second))
+		if idleMax > maxSeconds {
+			log.Printf("%sIllegal --idle-max value: \"%d\" exceeds safe range, using \"%d\"",
+				warnPrefix(), idleMax, maxSeconds)
+			idleMax = maxSeconds
+		}
+	}
+
+	if timeMax > 0 {
+		maxSeconds := uint64(math.MaxInt64 / int64(time.Second))
+		if timeMax > maxSeconds {
+			log.Printf("%sIllegal --time-max value: \"%d\" exceeds safe range, using \"%d\"",
+				warnPrefix(), timeMax, maxSeconds)
+			timeMax = maxSeconds
+		}
+	}
+
 	if idleMax > 0 && timeMax > 0 && idleMax >= timeMax {
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
@@ -1262,7 +1280,8 @@ func main() {
 					idleTime := time.Since(conn.lastActivityTime)
 					connUptime := time.Since(conn.startTime)
 
-					if idleMax > 0 && idleTime > time.Duration(idleMax)*time.Second {
+					if idleMax > 0 &&
+						idleTime > time.Duration(idleMax)*time.Second { //nolint:gosec
 						idleKillsTotal.Add(1)
 
 						connUptime := time.Since(conn.startTime)
@@ -1292,7 +1311,8 @@ func main() {
 						}
 
 						delete(connections, id)
-					} else if timeMax > 0 && connUptime > time.Duration(timeMax)*time.Second {
+					} else if timeMax > 0 &&
+						connUptime > time.Duration(timeMax)*time.Second { //nolint:gosec
 						timeKillsTotal.Add(1)
 
 						connUptime := time.Since(conn.startTime)
@@ -2949,7 +2969,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 
 	switch keyType {
 	case "rsa":
-		key, err := rsa.GenerateKey(rand.Reader, certRSABits)
+		key, err := rsa.GenerateKey(rand.Reader, int(certRSABits)) //nolint:gosec
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate rsa key: %w",
 				err)
