@@ -21,6 +21,7 @@ issue-*.txt
 *.log
 log
 *.o
+*.out
 proxy
 proxy.android*
 proxy.os400*
