@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v0.1.66 (2025-Nov-07 g885bd85) [linux/amd64]
+DPS8M Proxy v0.1.67 (2025-Nov-07 gd9a05d5) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -273,12 +273,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v0.1.66 (2025-Nov-07 g885bd85) [linux/amd64]
+DPS8M Proxy v0.1.67 (2025-Nov-07 gd9a05d5) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v0.1.66                          |
+| dps8m/proxy               | v0.1.67                          |
 | arl/statsviz              | v0.7.2                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -563,13 +563,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>531</th>
-<th>77</th>
-<th>83</th>
-<th>371</th>
+<th>539</th>
+<th>79</th>
+<th>85</th>
+<th>375</th>
 <th>147</th>
-<th>17793</th>
-<th>335</th>
+<th>17980</th>
+<th>340</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
@@ -578,7 +578,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>467</th>
 <th>0</th>
-<th>27340</th>
+<th>27348</th>
 <th>452</th>
 </tr><tr>
 <th>Systemd</th>
@@ -604,13 +604,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10412</th>
-<th>2239</th>
-<th>795</th>
-<th>7378</th>
+<th>10420</th>
+<th>2241</th>
+<th>797</th>
+<th>7382</th>
 <th>1682</th>
-<th>275241</th>
-<th>4948</th>
+<th>275436</th>
+<th>4953</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -655,8 +655,8 @@ predecessor (code statistics 📈 provided by
 
 * For `proxy` development, along with the most recent version of
   [Go](https://go.dev/), you’ll also need to have a standard POSIX.1
-  shell environment (at a minimum `sh`, `make`, `grep`, `awk`, &
-  `sed`), and [`reuse`](https://github.com/fsfe/reuse-tool),
+  shell environment (at a minimum `sh`, `make`, `diff`, `grep`, `awk`,
+  & `sed`), and [`reuse`](https://github.com/fsfe/reuse-tool),
   [`staticcheck`](https://staticcheck.dev/),
   [`gopls`](https://go.dev/gopls/),
   [`revive`](https://revive.run/),
