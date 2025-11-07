@@ -373,17 +373,22 @@ ulikunitz
 FILEID: 776ab862-930a-11f0-aecf-80ee73e9b8e7
 boyter
 deadcode
+dpread
+dpwrite
 errcheck
 expandtab
 githubusercontent
 golangci
 govulncheck
 honnef
+jstemmer
+juntaki
 kisielk
 lintsetup
 mgechev
 mvdan
 nilaway
+pwrite
 shfmt
 
 FILEID: 3a9014e8-9335-11f0-85bd-80ee73e9b8e7
@@ -450,6 +455,7 @@ bbolt
 bonjour
 brotli
 captcha
+cflags
 charset
 cidr
 ckwin
