@@ -60,7 +60,7 @@ pages:
     - cd public
     - for i in proxy.windows.*; do [ -f "${i:?}" ] || continue; mv -f -- "${i:?}" "${i:?}.exe"; done
     - for f in proxy.windows.*.exe; do [ -f "${f:?}" ] || continue; base="${f%.exe}"; zipname="$(printf '%s\n' "${base:?}" | awk -F. '{ for (i = 1; i < NF; i++) printf "%s-", $i; print $NF ".zip" }')"; (go version -m "${f:?}" || printf '%s\n' ".") | zip -z9 "${zipname:?}" "${f:?}"; done && rm -f *.exe
-    - find . -name 'proxy.*' -print0 | xargs -0 -I{} -P $(nproc) sh -c 'pigz -C "$(go version -m {} | tr -d \" || true)" -M -N -11 "{}"'
+    - find . -name 'proxy.*' -print0 | xargs -0 -I{} -P $(nproc) sh -c 'pigz -C "$(go version -m {} | tr -d \" || true)" -M -N -9 "{}"'
     - tree -H 'https://dps8m.gitlab.io/proxy/' -L 1 --charset utf-8 -h -F -v -P 'proxy*' --metafirst -o index.html
     - sed -i 's#<a href="https://dps8m.gitlab.io/proxy/./">.</a>#<a href="https://gitlab.com/dps8m/proxy/">Home</a>#' index.html
     - sed -i "s#>Directory Tree<#>$(../proxy --version | head -1 | cut -d '[' -f 1 | sed 's/ g[[:xdigit:]][[:xdigit:]]*)/)/')<#g" index.html

@@ -13,6 +13,15 @@
 set -eu
 
 ###############################################################################
+# Verbose?
+
+if [ -n "${VERBOSE+x}" ]; then
+  V="-v=1"
+else
+  V="-v=0"
+fi
+
+###############################################################################
 # Latest or master?
 
 if [ "${BRANCH:-}" != "latest" ]; then
@@ -46,30 +55,46 @@ env printf '%s\n' " to '${GOEXE:?}'..."
 set -x
 
 ###############################################################################
+# Install tag generators (always @master)
+
+env CGO_ENABLED=1 \
+  CGO_CFLAGS="-Dpread64=pread -Dpwrite64=pwrite -Doff64_t=off_t" \
+  "${GO:?}" install "${V:-}" "github.com/jstemmer/gotags@master" \
+  || env CGO_ENABLED=0 "${GO:?}" install "${V:-}" \
+    "github.com/jstemmer/gotags@master"
+
+env CGO_ENABLED=1 \
+  CGO_CFLAGS="-Dpread64=pread -Dpwrite64=pwrite -Doff64_t=off_t" \
+  "${GO:?}" install "${V:-}" "github.com/juntaki/gogtags@master" \
+  || env CGO_ENABLED=0 "${GO:?}" install "${V:-}" \
+    "github.com/juntaki/gogtags@master"
+
+###############################################################################
 # Install individual linters
 
-${GO:?} install -v "github.com/boyter/scc/v3@${BRANCH:-}"
-${GO:?} install -v "github.com/kisielk/errcheck@${BRANCH:-}"
-${GO:?} install -v "github.com/mgechev/revive@${BRANCH:-}"
-${GO:?} install -v "golang.org/x/tools/cmd/deadcode@${BRANCH:?}"
-${GO:?} install -v "golang.org/x/vuln/cmd/govulncheck@${BRANCH:-}"
-${GO:?} install -v "honnef.co/go/tools/cmd/staticcheck@${BRANCH:-}"
-${GO:?} install -v "mvdan.cc/gofumpt@${BRANCH:-}"
-${GO:?} install -v "mvdan.cc/sh/v3/cmd/shfmt@${BRANCH:-}"
+"${GO:?}" install "${V:-}" "github.com/boyter/scc/v3@${BRANCH:-}"
+"${GO:?}" install "${V:-}" "github.com/kisielk/errcheck@${BRANCH:-}"
+"${GO:?}" install "${V:-}" "github.com/mgechev/revive@${BRANCH:-}"
+"${GO:?}" install "${V:-}" "golang.org/x/tools/cmd/deadcode@${BRANCH:?}"
+"${GO:?}" install "${V:-}" "golang.org/x/vuln/cmd/govulncheck@${BRANCH:-}"
+"${GO:?}" install "${V:-}" "honnef.co/go/tools/cmd/staticcheck@${BRANCH:-}"
+"${GO:?}" install "${V:-}" "mvdan.cc/gofumpt@${BRANCH:-}"
+"${GO:?}" install "${V:-}" "mvdan.cc/sh/v3/cmd/shfmt@${BRANCH:-}"
 
 ###############################################################################
 # Install gopls (always @latest)
 
-${GO:?} install -v "golang.org/x/tools/gopls@latest"
+"${GO:?}" install "${V:-}" "golang.org/x/tools/gopls@latest"
 
 ###############################################################################
 # Install nilaway and golangci-lint
 
 if [ "${BRANCH:-}" = "master" ]; then
-  go install -v "go.uber.org/nilaway/cmd/nilaway@main"
-  go install -v "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@main"
+  "${GO:?}" install "${V:-}" "go.uber.org/nilaway/cmd/nilaway@main"
+  "${GO:?}" install "${V:-}" \
+    "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@main"
 else
-  go install -v "go.uber.org/nilaway/cmd/nilaway@latest"
+  "${GO:?}" install "${V:-}" "go.uber.org/nilaway/cmd/nilaway@latest"
   # shellcheck disable=SC2312
   curl -fsSL \
     "https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh" \
