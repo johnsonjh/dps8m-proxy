@@ -80,7 +80,8 @@ env CGO_ENABLED=1 \
 
 if [ "${BRANCH:-}" = "master" ]; then
   "${GO:?}" install -v "go.uber.org/nilaway/cmd/nilaway@main"
-  "${GO:?}" install -v "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@main"
+  "${GO:?}" install -v \
+    "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@main"
 else
   "${GO:?}" install -v "go.uber.org/nilaway/cmd/nilaway@latest"
   # shellcheck disable=SC2312
