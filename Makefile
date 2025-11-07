@@ -98,10 +98,11 @@ lint check:
 	$(MAKE) clean
 	@env printf '\n%s\n' "⚙️ Running linters..." 2> /dev/null || :
 	$(MAKE) \
-		codespell \
 		scspell \
-		revive \
+		codespell \
 		reuse \
+		license-diff \
+		revive \
 		gofmt \
 		gofumpt \
 		govet \
@@ -123,6 +124,13 @@ lint check:
 	$(MAKE) clean
 	@env printf '\n%s\n\n' \
 		"🥇 Linting complete; carefully review the output." 2> /dev/null || :
+
+##############################################################################
+# Target: license-diff
+
+.PHONY: license-diff
+license-diff:
+	diff LICENSE LICENSES/MIT.txt
 
 ##############################################################################
 # Target: golist
