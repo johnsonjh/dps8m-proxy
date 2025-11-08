@@ -101,7 +101,7 @@ lint check:
 		scspell \
 		codespell \
 		reuse \
-		license-diff \
+		file-diff \
 		revive \
 		gofmt \
 		gofumpt \
@@ -126,11 +126,12 @@ lint check:
 		"🥇 Linting complete; carefully review the output." 2> /dev/null || :
 
 ##############################################################################
-# Target: license-diff
+# Target: file-diff
 
-.PHONY: license-diff
-license-diff:
+.PHONY: file-diff
+file-diff:
 	diff LICENSE LICENSES/MIT.txt
+	diff .gitlab/CODEOWNERS .github/CODEOWNERS
 
 ##############################################################################
 # Target: golist
