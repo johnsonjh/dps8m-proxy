@@ -156,6 +156,7 @@ goleak
 FILEID: 5865f38c-6bd2-11f0-882d-80ee73e9b8e7
 basedict
 bindir
+codeowners
 codespell
 deadcode
 deps
@@ -447,6 +448,9 @@ yazi
 
 FILEID: 367608fa-76ec-11f0-80c4-80ee73e9b8e7
 laddr
+
+FILEID: 77970fc4-bc4b-11f0-b997-80ee73e9b8e7
+codeowners
 
 NATURAL:
 adduser
