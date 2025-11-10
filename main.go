@@ -2433,7 +2433,7 @@ func listConfiguration() {
 		if isConsoleLogQuiet {
 			quietMode = "quiet"
 		} else {
-			quietMode = "noquiet"
+			quietMode = "noquiet" //nolint:goconst,nolintlint
 		}
 
 		updateMaxLength("Console Logging: " + quietMode)
