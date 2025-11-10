@@ -38,12 +38,14 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 	consoleLog = "noquiet" //nolint:goconst,nolintlint
 	noCompress = false
 	compressAlgo = "gzip" //nolint:goconst,nolintlint
+
 	logPerm = 0o644
 	logDirPerm = 0o755
 
 	originalOutput := log.Writer()
 
 	log.SetOutput(io.Discard)
+
 	defer log.SetOutput(originalOutput)
 
 	defer func() {
@@ -94,6 +96,10 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 }
 
 func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
+	if enableGops {
+		gopsClose()
+	}
+
 	defer goleak.VerifyNone(t)
 
 	tmpDir := t.TempDir()
@@ -191,6 +197,11 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Local Variables:
+// mode: go
+// tab-width: 4
+// End:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // vim: set ft=go noexpandtab tabstop=4 cc=100 :
 ///////////////////////////////////////////////////////////////////////////////////////////////////

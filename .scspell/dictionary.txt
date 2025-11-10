@@ -421,7 +421,7 @@ FILEID: 9af38160-b277-11f0-8326-80ee73e9b8e7
 eproc
 getppid
 gppid
-maxcomlen
+maxcommlen
 ppid
 
 FILEID: de55e65e-b5e3-11f0-9604-80ee73e9b8e7
