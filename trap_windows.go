@@ -17,6 +17,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"unsafe"
 
@@ -37,14 +38,16 @@ var guiProcs = map[string]struct{}{
 func getParentProc() (*windows.ProcessEntry32, error) {
 	snap, err := windows.CreateToolhelp32Snapshot(windows.TH32CS_SNAPPROCESS, 0)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create toolhelp32 snapshot: %w",
+			err)
 	}
 
-	defer windows.CloseHandle(snap)
+	defer func() { _ = windows.CloseHandle(snap) }()
 
 	procs := make(map[uint32]windows.ProcessEntry32)
 
 	var procEnt windows.ProcessEntry32
+
 	procEnt.Size = uint32(unsafe.Sizeof(procEnt))
 
 	err = windows.Process32First(snap, &procEnt)
@@ -53,8 +56,9 @@ func getParentProc() (*windows.ProcessEntry32, error) {
 		err = windows.Process32Next(snap, &procEnt)
 	}
 
-	if err != windows.ERROR_NO_MORE_FILES {
-		return nil, err
+	if !errors.Is(err, windows.ERROR_NO_MORE_FILES) {
+		return nil, fmt.Errorf("failed to get next process: %w",
+			err)
 	}
 
 	pid := windows.GetCurrentProcessId()
