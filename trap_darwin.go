@@ -16,6 +16,7 @@ package main
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -44,7 +45,7 @@ func getParentProcInfo() (string, int32, error) {
 	}
 
 	if parentInfo == nil {
-		return "", 0, fmt.Errorf("failed to get parent process info: SysctlKinfoProc returned nil")
+		return "", 0, errors.New("failed to get parent process info: SysctlKinfoProc returned nil")
 	}
 
 	commBytes := make([]byte, 0, MAXCOMLEN)
