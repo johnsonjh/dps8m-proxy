@@ -165,8 +165,8 @@ reuse:
 .PHONY: gofmt
 gofmt:
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
-	grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-	'GOSUMDB=sum.golang.org' || :) gofmt -d -e -s .
+		grep -q "GOSUMDB=.*off.*" && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) gofmt -d -e -s .
 
 ##############################################################################
 # Target: goverify
