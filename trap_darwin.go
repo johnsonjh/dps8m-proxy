@@ -43,6 +43,10 @@ func getParentProcInfo() (string, int32, error) {
 			err)
 	}
 
+	if parentInfo == nil {
+		return "", 0, fmt.Errorf("failed to get parent process info: SysctlKinfoProc returned nil")
+	}
+
 	commBytes := make([]byte, 0, MAXCOMLEN)
 
 	for _, b := range parentInfo.Proc.P_comm {
