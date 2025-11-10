@@ -21,7 +21,6 @@ SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
 		 .whitesource,.golangci.yml,dependabot.yml,.txt" \
 		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown' \
 		 --include-symlinks
-.NOTPARALLEL:
 
 ##############################################################################
 # Target: all
@@ -541,6 +540,10 @@ install:
 		"$(UNTDIR)"/"$(DEST_UNIT)"
 	test -z "$(DESTDIR)" && { $(SYSTEMCTL) $(SYSTEMCTL_FLAGS) || :; } || :
 	@env printf '\n%s\n' "✅ Installation successful..." 2> /dev/null || :
+
+##############################################################################
+
+.NOTPARALLEL:
 
 ##############################################################################
 # vim: set ft=make noexpandtab tabstop=4 cc=78 :
