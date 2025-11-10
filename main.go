@@ -1363,22 +1363,24 @@ func debugInit(addr string) {
 
 	mux.Handle("/debug/vars", http.DefaultServeMux)
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		_, _ = fmt.Fprint(w, `
-        <html>
-        <head><title>DPS8M Proxy Debugging Dashboard</title></head>
-        <body>
-            <h1>Debug Dashboard</h1>
-            <ul>
-                <li><a href="/debug/vars">expvar</a></li>
-                <li><a href="/debug/pprof/">pprof</a></li>
-                <li><a href="/debug/statsviz/">statsviz</a></li>
-            </ul>
-        </body>
-        </html>
-    `)
-	})
+	mux.HandleFunc("/",
+		func(w http.ResponseWriter, _ *http.Request) {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			_, _ = fmt.Fprint(w, `
+                <html>
+                <head><title>DPS8M Proxy Debugging Dashboard</title></head>
+                <body>
+                    <h1>Debug Dashboard</h1>
+                    <ul>
+                        <li><a href="/debug/vars">expvar</a></li>
+                        <li><a href="/debug/pprof/">pprof</a></li>
+                        <li><a href="/debug/statsviz/">statsviz</a></li>
+                    </ul>
+                </body>
+                </html>
+            `)
+		},
+	)
 
 	log.Printf("%sStarting debug HTTP server on %s",
 		bugPrefix(), addr)
@@ -2196,9 +2198,11 @@ func listConnections(truncate bool) {
 		conns = append(conns, conn)
 	}
 
-	sort.Slice(conns, func(i, j int) bool {
-		return conns[i].startTime.Before(conns[j].startTime)
-	})
+	sort.Slice(conns,
+		func(i, j int) bool {
+			return conns[i].startTime.Before(conns[j].startTime)
+		},
+	)
 
 	type row struct {
 		ID      string
@@ -2429,7 +2433,7 @@ func listConfiguration() {
 		if isConsoleLogQuiet {
 			quietMode = "quiet"
 		} else {
-			quietMode = "noquiet"
+			quietMode = "noquiet" //nolint:goconst,nolintlint
 		}
 
 		updateMaxLength("Console Logging: " + quietMode)
@@ -3319,22 +3323,26 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 			host, _, err := net.SplitHostPort(conn.hostName)
 			if err != nil {
 				log.Printf("%sTEARDOWN [%s] %s@"+unknownHost,
-					yellowDotPrefix(), sid, func() string {
+					yellowDotPrefix(), sid,
+					func() string {
 						if conn.userName == "" {
 							return unknownHost
 						}
 
 						return conn.userName
-					}())
+					}(),
+				)
 			} else {
 				log.Printf("%sTEARDOWN [%s] %s@%s",
-					yellowDotPrefix(), sid, func() string {
+					yellowDotPrefix(), sid,
+					func() string {
 						if conn.userName == "" {
 							return unknownHost
 						}
 
 						return conn.userName
-					}(), host)
+					}(), host,
+				)
 			}
 		}
 	}()
@@ -3351,13 +3359,15 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	}
 
 	handshakeLog := fmt.Sprintf("VALIDATE [%s] %s@%s \"ssh\":%s",
-		sid, func() string {
+		sid,
+		func() string {
 			if conn.userName == "" {
 				return "<UNKNOWN>"
 			}
 
 			return conn.userName
-		}(), addr, authMethod)
+		}(), addr, authMethod,
+	)
 
 	if !suppressLogs {
 		log.Printf("%s%s",
@@ -6104,6 +6114,11 @@ func resolveExePath() string {
 	return exe
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Local Variables:
+// mode: go
+// tab-width: 4
+// End:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // vim: set ft=go noexpandtab tabstop=4 cc=100 :
 ///////////////////////////////////////////////////////////////////////////////////////////////////

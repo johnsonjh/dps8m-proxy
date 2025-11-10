@@ -16,12 +16,18 @@ package main
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
 
 	"golang.org/x/sys/unix"
 )
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+const MAXCOMMLEN = 16
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -34,17 +40,22 @@ func getParentProcInfo() (string, int32, error) {
 
 	parentInfo, err := unix.SysctlKinfoProc("kern.proc.pid", ppid)
 	if err != nil {
-		return "", 0, err
+		return "", 0, fmt.Errorf("failed to get parent process info: %w",
+			err)
 	}
 
-	var commBytes []byte
+	if parentInfo == nil {
+		return "", 0, errors.New("failed to get parent process info: SysctlKinfoProc returned nil")
+	}
+
+	commBytes := make([]byte, 0, MAXCOMMLEN)
 
 	for _, b := range parentInfo.Proc.P_comm {
 		if b == 0 {
 			break
 		}
 
-		commBytes = append(commBytes, byte(b))
+		commBytes = append(commBytes, b)
 	}
 
 	parentName := string(commBytes)
@@ -71,6 +82,11 @@ func guiLaunched() bool {
 	return false
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Local Variables:
+// mode: go
+// tab-width: 4
+// End:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // vim: set ft=go noexpandtab tabstop=4 cc=100 :
 ///////////////////////////////////////////////////////////////////////////////////////////////////

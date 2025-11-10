@@ -51,6 +51,7 @@ linters:
             - go.etcd.io/bbolt
             - golang.org/x/crypto/ssh
             - golang.org/x/sys/unix
+            - golang.org/x/sys/windows
             - golang.org/x/term
             - go.uber.org/goleak
             - kernel.org/pub/linux/libs/security/libcap/cap

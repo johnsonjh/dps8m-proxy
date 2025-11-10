@@ -25,6 +25,7 @@ log
 proxy
 proxy.android*
 proxy.os400*
+README.md.sed
 ssh_host_ecdsa_key.pem
 ssh_host_ed25519_key.pem
 ssh_host_rsa_key.pem

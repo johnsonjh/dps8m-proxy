@@ -77,9 +77,10 @@ func printVersionTable() {
 
 	compVer := raw
 
-	idx := strings.IndexFunc(raw, func(r rune) bool {
-		return r >= '0' && r <= '9'
-	})
+	idx := strings.IndexFunc(raw,
+		func(r rune) bool {
+			return r >= '0' && r <= '9'
+		})
 	if idx >= 0 {
 		compVer = "v" + raw[idx:]
 	}
@@ -231,6 +232,11 @@ func getMainModuleVersion() string {
 	return sanitizeVersion(v)
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Local Variables:
+// mode: go
+// tab-width: 4
+// End:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // vim: set ft=go noexpandtab tabstop=4 cc=100 :
 ///////////////////////////////////////////////////////////////////////////////////////////////////
