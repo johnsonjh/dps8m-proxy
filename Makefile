@@ -54,15 +54,7 @@ clean:
 		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) clean -v
 	$(RM) -r ./cross.bin/
-
-##############################################################################
-# Target: tidy
-
-.PHONY: tidy
-tidy: go.mod
-	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
-		grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) mod tidy -v
+	$(RM) ./README.md.sed
 
 ##############################################################################
 # Target: distclean
@@ -72,6 +64,15 @@ distclean: clean
 	$(RM) ssh_host_ecdsa_key.pem ssh_host_ed25519_key.pem ssh_host_rsa_key.pem
 	$(RM) ./tags ./GPATH ./GRTAGS ./GTAGS
 	$(RM) -r ./log/
+
+##############################################################################
+# Target: tidy
+
+.PHONY: tidy
+tidy: go.mod
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) mod tidy -v
 
 ##############################################################################
 # Target: test
