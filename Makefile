@@ -377,27 +377,27 @@ README.md doc docs: README.md.tmpl proxy
 	@command -v scc > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ scc not found!" \
 			2> /dev/null || :; exit 1; }
-	$(CP) README.md.tmpl README.md
+	$(CP) README.md.tmpl ./README.md
 	@env printf '\n%s\n' "🐪 Perl: Inserting version info..." \
 		2> /dev/null || :
 	$(PERL) -i -pe \
 	'BEGIN { ($$v=qx(./proxy --version))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
-	s!===VERSION===!$$v!g' README.md
-	grep -q '===VERSION===' README.md || exit 0
+	s!===VERSION===!$$v!g' ./README.md
+	grep -q '===VERSION===' ./README.md || exit 0
 	@env printf '\n%s\n' "🐪 Perl: Inserting help info..." \
 		2> /dev/null || :
 	$(PERL) -i -pe \
 	'BEGIN { ($$v=qx(./proxy --help))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
-	s!===HELP===!$$v!g' README.md
-	grep -q '===HELP===' README.md || exit 0
+	s!===HELP===!$$v!g' ./README.md
+	grep -q '===HELP===' ./README.md || exit 0
 	@env printf '\n%s\n' "🐪 Perl: Inserting scc output..." \
 		2> /dev/null || :
 	$(PERL) -i -pe \
 	'BEGIN { ($$v=qx(scc $(SCCFLAGS) -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
-	s!===SCC===!$$v!g' README.md
-	grep -q '===SCC===' README.md || exit 0
-	$(SED) "s/$$(printf '\t')//g" < README.md > README.md.sed && \
-		$(MV) README.md.sed README.md
+	s!===SCC===!$$v!g' ./README.md
+	grep -q '===SCC===' ./README.md || exit 0
+	$(SED) "s/$$(printf '\t')//g" < ./README.md > ./README.md.sed && \
+		$(MV) ./README.md.sed ./README.md
 	@env printf '\n%s\n\n' "📗 README.md generation successful." \
 		2> /dev/null || :
 
@@ -434,6 +434,7 @@ scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 	@env printf '%s\n' \
 		"ℹ️ Running scspell, use scspell-fix to run interactively" \
 			2> /dev/null || :
+	$(RM) ./tags ./GPATH ./GRTAGS ./GTAGS
 	scspell \
 		--report-only \
 		--override-dictionary ./.scspell/dictionary.txt \
