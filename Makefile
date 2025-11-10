@@ -25,13 +25,11 @@ SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
 ##############################################################################
 # Target: all
 
-.PHONY: all
 all: proxy
 
 ##############################################################################
 # Target: proxy
 
-.PHONY: proxy
 proxy: tags
 	@env printf '%s\n' "🧩 Building proxy..." 2> /dev/null || :
 	@env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
@@ -46,7 +44,6 @@ proxy: tags
 ##############################################################################
 # Target: clean
 
-.PHONY: clean
 clean:
 	@env printf '%s\n' "🧹 Cleaning..." 2> /dev/null || :
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
@@ -58,7 +55,6 @@ clean:
 ##############################################################################
 # Target: distclean
 
-.PHONY: distclean
 distclean: clean
 	$(RM) ssh_host_ecdsa_key.pem ssh_host_ed25519_key.pem ssh_host_rsa_key.pem
 	$(RM) ./tags ./GPATH ./GRTAGS ./GTAGS
@@ -67,7 +63,6 @@ distclean: clean
 ##############################################################################
 # Target: tidy
 
-.PHONY: tidy
 tidy: go.mod
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
@@ -76,7 +71,6 @@ tidy: go.mod
 ##############################################################################
 # Target: test
 
-.PHONY: test
 test:
 	@env printf '%s\n' "🧪 Running 'go test -v .'" 2> /dev/null || :
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
@@ -86,7 +80,6 @@ test:
 ##############################################################################
 # Target: lint
 
-.PHONY: lint check
 lint check:
 	@env printf '%s\n' "🧩 Running 'make clean'..." 2> /dev/null || :
 	$(MAKE) clean
@@ -129,7 +122,6 @@ lint check:
 ##############################################################################
 # Target: file-diff
 
-.PHONY: file-diff
 file-diff:
 	diff LICENSE LICENSES/MIT.txt
 	diff .gitlab/CODEOWNERS .github/CODEOWNERS
@@ -137,7 +129,6 @@ file-diff:
 ##############################################################################
 # Target: golist
 
-.PHONY: golist
 golist:
 	@env printf '\n%s\n' \
 		"ℹ️ Finding any outdated dependencies... (may take a few moments)" \
@@ -151,7 +142,6 @@ golist:
 ##############################################################################
 # Target: reuse
 
-.PHONY: reuse
 reuse:
 	@command -v reuse > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ reuse not found" \
@@ -161,7 +151,6 @@ reuse:
 ##############################################################################
 # Target: gofmt
 
-.PHONY: gofmt
 gofmt:
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
@@ -170,7 +159,6 @@ gofmt:
 ##############################################################################
 # Target: goverify
 
-.PHONY: goverify
 goverify: go.mod
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
@@ -179,7 +167,6 @@ goverify: go.mod
 ##############################################################################
 # Target: gotidydiff
 
-.PHONY: gotidydiff
 gotidydiff: go.mod
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
@@ -188,7 +175,6 @@ gotidydiff: go.mod
 ##############################################################################
 # Target: golangci-lint
 
-.PHONY: golangci-lint
 golangci-lint:
 	@command -v golangci-lint > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ golangci-lint not found!" \
@@ -200,7 +186,6 @@ golangci-lint:
 ##############################################################################
 # Target: staticcheck
 
-.PHONY: staticcheck
 staticcheck:
 	@command -v staticcheck > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ staticcheck not found!" \
@@ -212,7 +197,6 @@ staticcheck:
 ##############################################################################
 # Target: nilaway
 
-.PHONY: nilaway
 nilaway:
 	@command -v nilaway > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ nilaway not found!" \
@@ -228,7 +212,6 @@ nilaway:
 ##############################################################################
 # Target: revive
 
-.PHONY: revive
 revive:
 	@command -v revive > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ revive not found!" \
@@ -242,7 +225,6 @@ revive:
 ##############################################################################
 # Target: errcheck
 
-.PHONY: errcheck
 errcheck:
 	@command -v errcheck > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ errcheck not found!" \
@@ -254,7 +236,6 @@ errcheck:
 ##############################################################################
 # Target: deadcode
 
-.PHONY: deadcode
 deadcode:
 	@command -v deadcode > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ deadcode not found!" \
@@ -266,7 +247,6 @@ deadcode:
 ##############################################################################
 # Target: govulncheck
 
-.PHONY: govulncheck
 govulncheck:
 	@command -v govulncheck > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ govulncheck not found!" \
@@ -278,7 +258,6 @@ govulncheck:
 ##############################################################################
 # Target: gopls
 
-.PHONY: gopls
 gopls:
 	@command -v gopls > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ gopls not found!" \
@@ -290,7 +269,6 @@ gopls:
 ##############################################################################
 # Target: gofumpt
 
-.PHONY: gofumpt
 gofumpt:
 	@command -v gofumpt > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ gofumpt not found!" \
@@ -302,7 +280,6 @@ gofumpt:
 ##############################################################################
 # Target: shfmt
 
-.PHONY: shfmt
 shfmt: .cross.sh .cross-android.sh .lintsetup.sh .update-deps.sh
 	@command -v shfmt > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ shfmt not found!" \
@@ -313,7 +290,6 @@ shfmt: .cross.sh .cross-android.sh .lintsetup.sh .update-deps.sh
 ##############################################################################
 # Target: shellcheck
 
-.PHONY: shellcheck
 shellcheck: .cross.sh .cross-android.sh .lintsetup.sh .update-deps.sh
 	@command -v shellcheck > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ shellcheck not found!" \
@@ -324,7 +300,6 @@ shellcheck: .cross.sh .cross-android.sh .lintsetup.sh .update-deps.sh
 ##############################################################################
 # Target: codespell
 
-.PHONY: codespell
 codespell:
 	@command -v codespell > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ codespell not found!" \
@@ -338,7 +313,6 @@ codespell:
 # ctags: https://ctags.io/
 # gogtags: https://github.com/juntaki/gogtags
 
-.PHONY: tags ctags gtags GRPATH GRTAGS GTAGS
 tags ctags gtags GRPATH GRTAGS GTAGS:
 	@$(RM) ./tags > /dev/null 2>&1
 	@command -v gotags > /dev/null 2>&1 && \
@@ -358,7 +332,6 @@ tags ctags gtags GRPATH GRTAGS GTAGS:
 ##############################################################################
 # Target: govet
 
-.PHONY: govet
 govet:
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
@@ -367,7 +340,6 @@ govet:
 ##############################################################################
 # Target: README.md
 
-.PHONY: doc docs
 README.md doc docs: README.md.tmpl proxy
 	@env printf '%s\n\n' "📚 Generating README.md..." 2> /dev/null || :
 	@command -v perl > /dev/null 2>&1 || \
@@ -403,7 +375,6 @@ README.md doc docs: README.md.tmpl proxy
 ##############################################################################
 # Target: scc
 
-.PHONY: scc
 scc:
 	@command -v scc > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ scc not found!" \
@@ -413,7 +384,6 @@ scc:
 ##############################################################################
 # Target: cross
 
-.PHONY: cross
 cross: .cross.sh
 	@env printf '\n%s\n\n' \
 		"🛫 Starting cross-compilation (errors are non-fatal!)" \
@@ -425,7 +395,6 @@ cross: .cross.sh
 ##############################################################################
 # Target: scspell
 
-.PHONY: scspell
 scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 	@command -v scspell > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ scspell not found!" \
@@ -445,7 +414,6 @@ scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 ##############################################################################
 # Target: scspell-fix
 
-.PHONY: scspell-fix
 scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 	@command -v scspell > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ scspell not found!" \
@@ -463,7 +431,6 @@ scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 ##############################################################################
 # Target: strip
 
-.PHONY: strip
 strip:
 	@env printf '%s\n' "📥 Stripping proxy binary..." 2> /dev/null || :
 	@test -x "proxy" || \
@@ -475,7 +442,6 @@ strip:
 ##############################################################################
 # Target: install-strip
 
-.PHONY: install-strip
 install-strip:
 	$(MAKE) strip
 	$(MAKE) install
@@ -503,7 +469,6 @@ SETCAP_FLAGS='cap_net_bind_service+ep'
 SYSTEMCTL=$$(command -v systemctl || printf '%s\n' "true")
 SYSTEMCTL_FLAGS='daemon-reload'
 
-.PHONY: install
 install:
 	@env printf '%s\n' "📥 Starting proxy installation..." 2> /dev/null || :
 	@test -x "proxy" || \
@@ -544,6 +509,14 @@ install:
 ##############################################################################
 
 .NOTPARALLEL:
+
+##############################################################################
+
+.PHONY: all proxy clean distclean tidy test lint check file-diff golist \
+	reuse gofmt goverify gotidydiff golangci-lint staticcheck nilaway \
+	revive errcheck deadcode govulncheck gopls gofumpt shfmt shellcheck \
+	codespell tags ctags gtags GRPATH GRTAGS GTAGS govet doc docs scc \
+	cross scspell scspell-fix strip install-strip install
 
 ##############################################################################
 # vim: set ft=make noexpandtab tabstop=4 cc=78 :
