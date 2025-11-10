@@ -218,9 +218,11 @@ nilaway:
 			2> /dev/null || :; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-		'GOSUMDB=sum.golang.org' || :) nilaway \
+		'GOSUMDB=sum.golang.org' || :) \
+		nilaway \
 			-experimental-anonymous-function \
-			-experimental-struct-init ./...
+			-experimental-struct-init \
+			./...
 
 ##############################################################################
 # Target: revive
@@ -233,7 +235,8 @@ revive:
 		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) revive \
-			-formatter stylish -set_exit_status ./...
+			-formatter stylish \
+			-set_exit_status ./...
 
 ##############################################################################
 # Target: errcheck
