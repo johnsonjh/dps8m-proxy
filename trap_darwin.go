@@ -16,6 +16,7 @@ package main
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 import (
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
@@ -34,17 +35,18 @@ func getParentProcInfo() (string, int32, error) {
 
 	parentInfo, err := unix.SysctlKinfoProc("kern.proc.pid", ppid)
 	if err != nil {
-		return "", 0, err
+		return "", 0, fmt.Errorf("failed to get parent process info: %w",
+			err)
 	}
 
-	var commBytes []byte
+	var commBytes = make([]byte, 0, unix.MAXCOMLEN)
 
 	for _, b := range parentInfo.Proc.P_comm {
 		if b == 0 {
 			break
 		}
 
-		commBytes = append(commBytes, byte(b))
+		commBytes = append(commBytes, b)
 	}
 
 	parentName := string(commBytes)
