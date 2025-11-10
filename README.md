@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.0 (2025-Nov-10 gee5ea9f) [linux/amd64]
+DPS8M Proxy v1.0.1 (2025-Nov-10 g917caa4) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -273,12 +273,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.0 (2025-Nov-10 gee5ea9f) [linux/amd64]
+DPS8M Proxy v1.0.1 (2025-Nov-10 g917caa4) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.0                           |
+| dps8m/proxy               | v1.0.1                           |
 | arl/statsviz              | v0.7.2                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -543,13 +543,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>8607</th>
-<th>1919</th>
-<th>483</th>
-<th>6205</th>
-<th>1507</th>
-<th>206345</th>
-<th>3777</th>
+<th>8618</th>
+<th>1922</th>
+<th>484</th>
+<th>6212</th>
+<th>1509</th>
+<th>206676</th>
+<th>3780</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -563,13 +563,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>540</th>
+<th>543</th>
 <th>79</th>
 <th>85</th>
-<th>376</th>
+<th>379</th>
 <th>147</th>
-<th>18012</th>
-<th>341</th>
+<th>18026</th>
+<th>343</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
@@ -604,13 +604,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10421</th>
-<th>2241</th>
-<th>797</th>
-<th>7383</th>
-<th>1682</th>
-<th>275468</th>
-<th>4954</th>
+<th>10435</th>
+<th>2244</th>
+<th>798</th>
+<th>7393</th>
+<th>1684</th>
+<th>275813</th>
+<th>4959</th>
 </tr></tfoot></table>
 
 ## Future plans
