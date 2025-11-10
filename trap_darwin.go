@@ -43,7 +43,7 @@ func getParentProcInfo() (string, int32, error) {
 			err)
 	}
 
-	commBytes = make([]byte, 0, MAXCOMLEN)
+	commBytes := make([]byte, 0, MAXCOMLEN)
 
 	for _, b := range parentInfo.Proc.P_comm {
 		if b == 0 {
