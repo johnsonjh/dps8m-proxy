@@ -182,6 +182,7 @@ govulncheck
 gpath
 grpath
 grtags
+gsed
 gtags
 jstemmer
 juntaki

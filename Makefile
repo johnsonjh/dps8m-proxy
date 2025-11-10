@@ -11,11 +11,12 @@
 
 CGO_ENABLED=0
 CP=cp -f
-GO=$$(command -v go 2> /dev/null || printf '%s\n' "go")
+GO=$$(command -v go)
 GOTOOLCHAIN=auto
-PERL=perl
+MV=mv -f
+PERL=$$(command -v perl)
 RM=rm -f
-SED?=sed
+SED?=$$(command -v gsed 2> /dev/null || command -v sed)
 SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
 		 .whitesource,.golangci.yml,dependabot.yml,.txt" \
 		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown' \
@@ -394,7 +395,8 @@ README.md doc docs: README.md.tmpl proxy
 	'BEGIN { ($$v=qx(scc $(SCCFLAGS) -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===SCC===!$$v!g' README.md
 	grep -q '===SCC===' README.md || exit 0
-	$(SED) -i "s/$$(printf '\t')//g" README.md
+	$(SED) "s/$$(printf '\t')//g" < README.md > README.md.sed && \
+		$(MV) README.md.sed README.md
 	@env printf '\n%s\n\n' "📗 README.md generation successful." \
 		2> /dev/null || :
 
