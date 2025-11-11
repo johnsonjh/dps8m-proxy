@@ -80,7 +80,8 @@ func printVersionTable() {
 	idx := strings.IndexFunc(raw,
 		func(r rune) bool {
 			return r >= '0' && r <= '9'
-		})
+		},
+	)
 	if idx >= 0 {
 		compVer = "v" + raw[idx:]
 	}
