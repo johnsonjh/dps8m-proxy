@@ -65,20 +65,20 @@ set -x
 
 case "$(uname -s 2> /dev/null)" in
 *CYGWIN*)
-  M_CYGWIN=0
+  NOT_CYGWIN=0
   ;;
 *)
-  M_CYGWIN=1
+  NOT_CYGWIN=1
   ;;
 esac
 
-env CGO_ENABLED="${M_CYGWIN:?}" \
+env CGO_ENABLED="${NOT_CYGWIN:?}" \
   CGO_CFLAGS="-Dpread64=pread -Dpwrite64=pwrite -Doff64_t=off_t" \
   "${GO:?}" install "${V:-}" "github.com/jstemmer/gotags@master" \
   || env CGO_ENABLED=0 "${GO:?}" install "${V:-}" \
     "github.com/jstemmer/gotags@master"
 
-env CGO_ENABLED="${M_CYGWIN:?}" \
+env CGO_ENABLED="${NOT_CYGWIN:?}" \
   CGO_CFLAGS="-Dpread64=pread -Dpwrite64=pwrite -Doff64_t=off_t" \
   "${GO:?}" install "${V:-}" "github.com/juntaki/gogtags@master" \
   || env CGO_ENABLED=0 "${GO:?}" install "${V:-}" \
