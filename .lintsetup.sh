@@ -37,9 +37,15 @@ GO="$(command -v go || printf '%s\n' "go")"
 GOTOOLCHAIN="$(grep '^go .*$' go.mod | tr -cd 'go0-9.\n')+auto"
 GOSUMDB='sum.golang.org'
 GOPROXY='proxy.golang.org,direct'
-GOPATH="${HOME:-}/go"
-GOEXE="${GOPATH:?}/bin"
 TZ=UTC
+
+if [ -z "${GOPATH+x}" ]; then
+  GOPATH="${HOME:-}/go"
+fi
+
+if [ -z "${GOEXE+x}" ]; then
+  GOEXE="${GOPATH:?}/bin"
+fi
 
 export GO GOTOOLCHAIN GOSUMDB GOPROXY GOPATH GOEXE TZ
 
@@ -57,13 +63,22 @@ set -x
 ###############################################################################
 # Install tag generators (always @master)
 
-env CGO_ENABLED=1 \
+case "$(uname -s 2> /dev/null)" in
+*CYGWIN*)
+  NOT_CYGWIN=0
+  ;;
+*)
+  NOT_CYGWIN=1
+  ;;
+esac
+
+env CGO_ENABLED="${NOT_CYGWIN:?}" \
   CGO_CFLAGS="-Dpread64=pread -Dpwrite64=pwrite -Doff64_t=off_t" \
   "${GO:?}" install "${V:-}" "github.com/jstemmer/gotags@master" \
   || env CGO_ENABLED=0 "${GO:?}" install "${V:-}" \
     "github.com/jstemmer/gotags@master"
 
-env CGO_ENABLED=1 \
+env CGO_ENABLED="${NOT_CYGWIN:?}" \
   CGO_CFLAGS="-Dpread64=pread -Dpwrite64=pwrite -Doff64_t=off_t" \
   "${GO:?}" install "${V:-}" "github.com/juntaki/gogtags@master" \
   || env CGO_ENABLED=0 "${GO:?}" install "${V:-}" \
