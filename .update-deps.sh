@@ -21,7 +21,7 @@ GOSUMDB='sum.golang.org'
 GOPROXY='proxy.golang.org,direct'
 TZ=UTC
 
-export GO GOTOOLCHAIN GOSUMDB GOPROXY GOPATH GOEXE TZ
+export GO GOTOOLCHAIN GOSUMDB GOPROXY TZ
 
 ###############################################################################
 # Verbose

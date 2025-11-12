@@ -469,6 +469,7 @@ cocomo
 codeql
 codespell
 ctags
+cygwin
 darwin
 davidrg
 dependabot
