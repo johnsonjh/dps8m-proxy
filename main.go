@@ -3521,6 +3521,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						warnPrefix(), err)
 				}
 
+				return
+
 			case "exec":
 				if !suppressLogs {
 					if conn.sshConn == nil {
