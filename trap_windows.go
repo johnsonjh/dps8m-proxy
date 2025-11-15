@@ -27,10 +27,15 @@ import (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 var guiProcs = map[string]struct{}{
+	"doublecmd.exe":               {},
 	"explorer.exe":                {},
+	"far.exe":                     {},
 	"powertoys.powerlauncher.exe": {},
 	"searchapp.exe":               {},
 	"searchhost.exe":              {},
+	"tcmdx32.exe":                 {},
+	"tcmdx64.exe":                 {},
+	"totalcmd.exe":                {},
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
