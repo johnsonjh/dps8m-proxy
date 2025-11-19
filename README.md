@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.9 (2025-Nov-19 g344f92e) [linux/amd64]
+DPS8M Proxy v1.0.10 (2025-Nov-19 g24b47ed) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -118,7 +118,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     ["1024" to "4096"] (default 2048)
   --cert-ecdsa-bits uint        ECDSA key size in bits for new certificates
                                     ["256", "384", "521"] (default 256)
-  --ssh-addr strings            SSH listener address(es)
+  --ssh-addr string            SSH listener address(es)
                                     [e.g., ":2222", "[::1]:8000"]
                                     (multiple allowed) (default ":2222")
   --ssh-delay float             Delay for incoming SSH connections
@@ -273,12 +273,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.9 (2025-Nov-19 g344f92e) [linux/amd64]
+DPS8M Proxy v1.0.10 (2025-Nov-19 g24b47ed) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.9                           |
+| dps8m/proxy               | v1.0.10                          |
 | arl/statsviz              | v0.7.3                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -543,13 +543,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>8746</th>
+<th>8748</th>
 <th>1927</th>
 <th>584</th>
-<th>6235</th>
+<th>6237</th>
 <th>1509</th>
-<th>210341</th>
-<th>3796</th>
+<th>210462</th>
+<th>3798</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -604,13 +604,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10563</th>
+<th>10565</th>
 <th>2256</th>
 <th>905</th>
-<th>7402</th>
+<th>7404</th>
 <th>1687</th>
-<th>279871</th>
-<th>4960</th>
+<th>279992</th>
+<th>4962</th>
 </tr></tfoot></table>
 
 ## Future plans
