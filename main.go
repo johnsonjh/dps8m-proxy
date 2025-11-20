@@ -521,7 +521,7 @@ func init() { //nolint:gochecknoinits
 		reSpaces := regexp.MustCompile(`(?m)^ {6}`)
 		output = reSpaces.ReplaceAllString(output, "  ")
 		reString := regexp.MustCompile(`--ssh-addr strings`)
-		output = reString.ReplaceAllString(output, "--ssh-addr string")
+		output = reString.ReplaceAllString(output, "--ssh-addr string ")
 		_, _ = fmt.Fprint(os.Stdout,
 			output)
 		_, _ = fmt.Fprintf(os.Stdout,
