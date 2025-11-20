@@ -256,7 +256,7 @@ govulncheck:
 		'GOSUMDB=sum.golang.org' || :) \
 		govulncheck \
 			-show color,traces \
-			./... || :
+			./...
 
 ##############################################################################
 # Target: gopls
