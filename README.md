@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.10 (2025-Nov-20 g2464ebd) [linux/amd64]
+DPS8M Proxy v1.0.10 (2025-Nov-20 gb75f07e) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -118,7 +118,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     ["1024" to "4096"] (default 2048)
   --cert-ecdsa-bits uint        ECDSA key size in bits for new certificates
                                     ["256", "384", "521"] (default 256)
-  --ssh-addr string            SSH listener address(es)
+  --ssh-addr string             SSH listener address(es)
                                     [e.g., ":2222", "[::1]:8000"]
                                     (multiple allowed) (default ":2222")
   --ssh-delay float             Delay for incoming SSH connections
@@ -273,7 +273,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.10 (2025-Nov-20 g2464ebd) [linux/amd64]
+DPS8M Proxy v1.0.10 (2025-Nov-20 gb75f07e) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -548,7 +548,7 @@ predecessor (code statistics 📈 provided by
 <th>584</th>
 <th>6237</th>
 <th>1509</th>
-<th>210462</th>
+<th>210463</th>
 <th>3798</th>
 </tr><tr>
 <th>Shell</th>
@@ -609,7 +609,7 @@ predecessor (code statistics 📈 provided by
 <th>905</th>
 <th>7407</th>
 <th>1687</th>
-<th>280025</th>
+<th>280026</th>
 <th>4962</th>
 </tr></tfoot></table>
 
