@@ -253,7 +253,10 @@ govulncheck:
 			2> /dev/null || :; exit 0; } ; \
 		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-		'GOSUMDB=sum.golang.org' || :) govulncheck ./...
+		'GOSUMDB=sum.golang.org' || :) \
+		govulncheck \
+			-show color,traces \
+			./...
 
 ##############################################################################
 # Target: gopls
