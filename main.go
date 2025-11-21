@@ -522,6 +522,14 @@ func init() { //nolint:gochecknoinits
 		output = reSpaces.ReplaceAllString(output, "  ")
 		reString := regexp.MustCompile(`--ssh-addr strings`)
 		output = reString.ReplaceAllString(output, "--ssh-addr string ")
+		stString := regexp.MustCompile(` string   `)
+		output = stString.ReplaceAllString(output, " <string> ")
+		uiString := regexp.MustCompile(` uint   `)
+		output = uiString.ReplaceAllString(output, " <uint> ")
+		ocString := regexp.MustCompile(` octal   `)
+		output = ocString.ReplaceAllString(output, " <octal> ")
+		flString := regexp.MustCompile(` float   `)
+		output = flString.ReplaceAllString(output, " <float> ")
 		_, _ = fmt.Fprint(os.Stdout,
 			output)
 		_, _ = fmt.Fprintf(os.Stdout,
