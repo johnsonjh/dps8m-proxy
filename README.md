@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.13 (2025-Nov-24 gacaedf8) [linux/amd64]
+DPS8M Proxy v1.0.13 (2025-Nov-24 g1e1c67f) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -273,7 +273,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.13 (2025-Nov-24 gacaedf8) [linux/amd64]
+DPS8M Proxy v1.0.13 (2025-Nov-24 g1e1c67f) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -573,13 +573,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>575</th>
+<th>580</th>
 <th>108</th>
 <th>0</th>
-<th>467</th>
+<th>472</th>
 <th>0</th>
-<th>27348</th>
-<th>452</th>
+<th>27394</th>
+<th>457</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -604,13 +604,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10579</th>
+<th>10584</th>
 <th>2256</th>
 <th>905</th>
-<th>7418</th>
+<th>7423</th>
 <th>1687</th>
-<th>280467</th>
-<th>4970</th>
+<th>280513</th>
+<th>4975</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -745,5 +745,10 @@ predecessor (code statistics 📈 provided by
   |                                            [x/term](https://golang.org/x/term) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                          [x/tools](https://golang.org/x/tools) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
 
+<!--
+Local Variables:
+mode: markdown
+End:
+-->
 <!-- vim: set ft=markdown expandtab cc=72 : -->
 <!-- EOF -->
