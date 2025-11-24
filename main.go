@@ -155,12 +155,6 @@ const (
 	TelnetSend  = 1 // SEND
 	TelnetReply = 2 // REPLY
 	TelnetName  = 3 // NAME
-
-	//nolint:godoclint,nolintlint
-	// IEC sizes.
-	KiB = 1024       // Kibibyte
-	MiB = 1024 * KiB // Mebibyte
-	GiB = 1024 * MiB // Gibibyte
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
