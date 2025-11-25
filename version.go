@@ -15,9 +15,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"regexp"
 	"runtime"
 	"runtime/debug"
 	"strings"
+	"time"
 	"unicode/utf8"
 )
 
@@ -34,6 +37,87 @@ var nameReplacements = []struct{ old, new string }{
 var versionReplacements = []struct{ old, new string }{
 	{"v0.3.29-0.20250514124927-a2d8f7790eac", "v0.3.29* (2025-May-14, ga2d8f77)"},
 	{"v1.0.11-0.20251007101450-6fcfbc9910e1", "v1.0.11* (2025-Oct-07, g6fcfbc9)"},
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func isGitSHA(s string) bool {
+	match, _ := regexp.MatchString("^[0-9a-f]{40}$", s)
+
+	return match
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func printVersion(short bool) {
+	versionString := "DPS8M Proxy"
+
+	versionString += func() string {
+		v := getMainModuleVersion()
+		if v != "" {
+			return " " + v
+		}
+
+		return ""
+	}()
+
+	info, ok := debug.ReadBuildInfo()
+	if ok {
+		var date, commit string
+
+		var modified bool
+
+		for _, setting := range info.Settings {
+			switch setting.Key {
+			case "vcs.time":
+				date = setting.Value
+
+			case "vcs.revision":
+				commit = setting.Value
+
+			case "vcs.modified":
+				modified = (setting.Value == "true")
+			}
+		}
+
+		t, err := time.Parse(time.RFC3339, date)
+		if err != nil {
+			t = time.Now()
+		}
+
+		tdate := t.Format("2006-Jan-02")
+
+		if commit != "" && isGitSHA(commit) {
+			commit = commit[:7]
+		}
+
+		if date != "" && commit != "" {
+			if modified {
+				versionString += fmt.Sprintf(" (%s g%s+)",
+					tdate, commit)
+			} else {
+				versionString += fmt.Sprintf(" (%s g%s)",
+					tdate, commit)
+			}
+		}
+	}
+
+	versionString += fmt.Sprintf(" [%s/%s]",
+		runtime.GOOS, runtime.GOARCH)
+
+	if showVersion {
+		fmt.Printf("%s\r\n",
+			versionString)
+
+		if !short {
+			fmt.Printf("\r\n")
+			printVersionTable()
+			fmt.Printf("\r\n")
+		}
+	} else {
+		log.Printf("%s\r\n",
+			versionString)
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

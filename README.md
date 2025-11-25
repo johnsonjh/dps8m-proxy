@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.12 (2025-Nov-21 g398e8f8) [linux/amd64]
+DPS8M Proxy v1.0.13 (2025-Nov-24 gdda06c2) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -273,12 +273,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.12 (2025-Nov-21 g398e8f8) [linux/amd64]
+DPS8M Proxy v1.0.13 (2025-Nov-24 gdda06c2) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.12                          |
+| dps8m/proxy               | v1.0.13                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -543,13 +543,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>8756</th>
-<th>1927</th>
-<th>584</th>
+<th>8753</th>
+<th>1926</th>
+<th>582</th>
 <th>6245</th>
 <th>1509</th>
-<th>210879</th>
-<th>3806</th>
+<th>210767</th>
+<th>3802</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -573,13 +573,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>575</th>
+<th>580</th>
 <th>108</th>
 <th>0</th>
-<th>467</th>
+<th>472</th>
 <th>0</th>
-<th>27348</th>
-<th>452</th>
+<th>27394</th>
+<th>457</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -604,13 +604,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10576</th>
-<th>2256</th>
-<th>905</th>
-<th>7415</th>
+<th>10578</th>
+<th>2255</th>
+<th>903</th>
+<th>7420</th>
 <th>1687</th>
-<th>280442</th>
-<th>4970</th>
+<th>280376</th>
+<th>4971</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -745,5 +745,10 @@ predecessor (code statistics 📈 provided by
   |                                            [x/term](https://golang.org/x/term) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                          [x/tools](https://golang.org/x/tools) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
 
+<!--
+Local Variables:
+mode: markdown
+End:
+-->
 <!-- vim: set ft=markdown expandtab cc=72 : -->
 <!-- EOF -->
