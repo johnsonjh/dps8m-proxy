@@ -1038,7 +1038,8 @@ func main() {
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --telnet-host cannot contain a username (e.g., 'user@'); "+
-					"you specified: %s\r\n", nowStamp(), errorPrefix(), telnetHostPort)
+					"you specified: %s\r\n",
+				nowStamp(), errorPrefix(), telnetHostPort)
 		}
 
 		if enableGops {
@@ -1046,7 +1047,8 @@ func main() {
 		}
 
 		log.Fatalf("%sERROR: --telnet-host cannot contain a username (e.g., 'user@'); "+
-			"you specified: %s", errorPrefix(), telnetHostPort) // LINTED: Fatalf
+			"you specified: %s",
+			errorPrefix(), telnetHostPort) // LINTED: Fatalf
 	}
 
 	if idleMax > 0 {
@@ -1071,7 +1073,8 @@ func main() {
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --idle-max (%d) cannot be greater than or equal to --time-max"+
-					" (%d)\r\n", nowStamp(), errorPrefix(), idleMax, timeMax)
+					" (%d)\r\n",
+				nowStamp(), errorPrefix(), idleMax, timeMax)
 		}
 
 		if enableGops {
