@@ -192,6 +192,7 @@ var (
 	denyNewConnectionsMode           atomic.Bool
 	gracefulShutdownMode             atomic.Bool
 	idleMax                          uint64
+	keymapByDefault                  bool
 	logDir                           string
 	loggingWg                        sync.WaitGroup
 	noBanner                         bool
@@ -617,6 +618,10 @@ func init() { //nolint:gochecknoinits
 		"mdns", false,
 		"Enable mDNS (Multicast DNS) advertisements\r\n"+
 			"    (i.e., Bonjour, Avahi announcements)")
+
+	pflag.BoolVar(&keymapByDefault,
+		"keymap", false,
+		"Enable Emacs keymapping mode by default")
 
 	pflag.StringVar(&logDir,
 		"log-dir", "log",
@@ -3161,15 +3166,16 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	conn := &Connection{
-		ID:                sid,
-		sshConn:           sshConn,
-		startTime:         time.Now(),
-		lastActivityTime:  time.Now(),
-		cancelCtx:         ctx,
-		cancelFunc:        cancel,
-		userName:          userName,
-		hostName:          hostName,
-		shareableUsername: newShareableUsername(connections, &connectionsMutex),
+		ID:                 sid,
+		sshConn:            sshConn,
+		startTime:          time.Now(),
+		lastActivityTime:   time.Now(),
+		cancelCtx:          ctx,
+		cancelFunc:         cancel,
+		userName:           userName,
+		hostName:           hostName,
+		shareableUsername:  newShareableUsername(connections, &connectionsMutex),
+		emacsKeymapEnabled: keymapByDefault,
 	}
 
 	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
