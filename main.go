@@ -192,6 +192,7 @@ var (
 	denyNewConnectionsMode           atomic.Bool
 	gracefulShutdownMode             atomic.Bool
 	idleMax                          uint64
+	keymapByDefault                  bool
 	logDir                           string
 	loggingWg                        sync.WaitGroup
 	noBanner                         bool
@@ -618,6 +619,10 @@ func init() { //nolint:gochecknoinits
 		"Enable mDNS (Multicast DNS) advertisements\r\n"+
 			"    (i.e., Bonjour, Avahi announcements)")
 
+	pflag.BoolVar(&keymapByDefault,
+		"keymap", false,
+		"Enable Emacs keymapping mode by default")
+
 	pflag.StringVar(&logDir,
 		"log-dir", "log",
 		"Base directory for logs")
@@ -1038,7 +1043,8 @@ func main() {
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --telnet-host cannot contain a username (e.g., 'user@'); "+
-					"you specified: %s\r\n", nowStamp(), errorPrefix(), telnetHostPort)
+					"you specified: %s\r\n",
+				nowStamp(), errorPrefix(), telnetHostPort)
 		}
 
 		if enableGops {
@@ -1046,7 +1052,8 @@ func main() {
 		}
 
 		log.Fatalf("%sERROR: --telnet-host cannot contain a username (e.g., 'user@'); "+
-			"you specified: %s", errorPrefix(), telnetHostPort) // LINTED: Fatalf
+			"you specified: %s",
+			errorPrefix(), telnetHostPort) // LINTED: Fatalf
 	}
 
 	if idleMax > 0 {
@@ -1071,7 +1078,8 @@ func main() {
 		if isConsoleLogQuiet {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --idle-max (%d) cannot be greater than or equal to --time-max"+
-					" (%d)\r\n", nowStamp(), errorPrefix(), idleMax, timeMax)
+					" (%d)\r\n",
+				nowStamp(), errorPrefix(), idleMax, timeMax)
 		}
 
 		if enableGops {
@@ -3158,15 +3166,16 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	conn := &Connection{
-		ID:                sid,
-		sshConn:           sshConn,
-		startTime:         time.Now(),
-		lastActivityTime:  time.Now(),
-		cancelCtx:         ctx,
-		cancelFunc:        cancel,
-		userName:          userName,
-		hostName:          hostName,
-		shareableUsername: newShareableUsername(connections, &connectionsMutex),
+		ID:                 sid,
+		sshConn:            sshConn,
+		startTime:          time.Now(),
+		lastActivityTime:   time.Now(),
+		cancelCtx:          ctx,
+		cancelFunc:         cancel,
+		userName:           userName,
+		hostName:           hostName,
+		shareableUsername:  newShareableUsername(connections, &connectionsMutex),
+		emacsKeymapEnabled: keymapByDefault,
 	}
 
 	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)

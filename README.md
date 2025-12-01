@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.13 (2025-Nov-25 g5176cd7) [linux/amd64]
+DPS8M Proxy v1.0.14* (2025-Dec-01 gf93a3ad+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -137,6 +137,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     (see https://github.com/google/gops)
   --mdns                        Enable mDNS (Multicast DNS) advertisements
                                     (i.e., Bonjour, Avahi announcements)
+  --keymap                      Enable Emacs keymapping mode by default
   --log-dir <string>            Base directory for logs (default "log")
   --no-log                      Disable all session logging
                                     (for console logging see "--console-log")
@@ -273,17 +274,17 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.13 (2025-Nov-25 g5176cd7) [linux/amd64]
+DPS8M Proxy v1.0.14* (2025-Dec-01 gf93a3ad+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.13                          |
+| dps8m/proxy               | v1.0.14*                         |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
 | hashicorp/mdns            | v1.0.6                           |
-| klauspost/compress        | v1.18.1                          |
+| klauspost/compress        | v1.18.2                          |
 | miekg/dns                 | v1.1.68                          |
 | sorairolake/lzip-go       | v0.3.8                           |
 | spf13/pflag               | v1.0.11* (2025-Oct-07, g6fcfbc9) |
@@ -543,13 +544,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>8753</th>
-<th>1926</th>
+<th>8762</th>
+<th>1927</th>
 <th>582</th>
-<th>6245</th>
+<th>6253</th>
 <th>1509</th>
-<th>210767</th>
-<th>3802</th>
+<th>210963</th>
+<th>3810</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -604,13 +605,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10578</th>
-<th>2255</th>
+<th>10587</th>
+<th>2256</th>
 <th>903</th>
-<th>7420</th>
+<th>7428</th>
 <th>1687</th>
-<th>280376</th>
-<th>4971</th>
+<th>280572</th>
+<th>4979</th>
 </tr></tfoot></table>
 
 ## Future plans

@@ -512,6 +512,7 @@ kermit
 kermitproject
 keygen
 keymap
+keymapping
 kibibyte
 kibibytes
 linemode
