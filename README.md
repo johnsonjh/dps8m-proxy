@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.15 (2025-Dec-02 g75cc811) [linux/amd64]
+DPS8M Proxy v1.0.16 (2025-Dec-02 geff9381) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -274,12 +274,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.15 (2025-Dec-02 g75cc811) [linux/amd64]
+DPS8M Proxy v1.0.16 (2025-Dec-02 geff9381) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.15                          |
+| dps8m/proxy               | v1.0.16                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
