@@ -3137,7 +3137,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		authMethod = "keyboard-interactive"
 
 	default:
-		authMethod = "unknown"
+		authMethod = "unknown" //nolint:goconst
 	}
 
 	var userName string
@@ -3579,22 +3579,42 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		sshRequestTimeoutTotal.Add(1)
 
 		if !suppressLogs {
+			remoteAddr := "unknown"
+
+			if conn.sshConn != nil {
+				addr := conn.sshConn.RemoteAddr()
+				if addr != nil {
+					remoteAddr = addr.String()
+				}
+			}
+
 			log.Printf("%sTEARDOWN [%s] %s (Timeout waiting for session request)",
-				yellowDotPrefix(), conn.ID, conn.sshConn.RemoteAddr().String())
+				yellowDotPrefix(), conn.ID, remoteAddr)
 		}
 
-		err := conn.sshConn.Close()
-		if err != nil {
-			log.Printf("%sError closing SSH connection for %s: %v",
-				warnPrefix(), conn.ID, err)
+		if conn.sshConn != nil {
+			err := conn.sshConn.Close()
+			if err != nil {
+				log.Printf("%sError closing SSH connection for %s: %v",
+					warnPrefix(), conn.ID, err)
+			}
 		}
 
 		return
 	}
 
-	remoteHost, _, err := net.SplitHostPort(conn.sshConn.RemoteAddr().String())
+	var remoteAddrStr string
+
+	if conn.sshConn != nil {
+		addr := conn.sshConn.RemoteAddr()
+		if addr != nil {
+			remoteAddrStr = addr.String()
+		}
+	}
+
+	remoteHost, _, err := net.SplitHostPort(remoteAddrStr)
 	if err != nil {
-		remoteHost = conn.sshConn.RemoteAddr().String()
+		remoteHost = remoteAddrStr
 	}
 
 	clientIP := net.ParseIP(remoteHost)
@@ -3610,10 +3630,12 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				warnPrefix(), conn.ID, err)
 		}
 
-		err = conn.sshConn.Close()
-		if err != nil {
-			log.Printf("%sError closing SSH connection for %s: %v",
-				warnPrefix(), conn.ID, err)
+		if conn.sshConn != nil {
+			err = conn.sshConn.Close()
+			if err != nil {
+				log.Printf("%sError closing SSH connection for %s: %v",
+					warnPrefix(), conn.ID, err)
+			}
 		}
 
 		return
@@ -3642,17 +3664,35 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 		if exemptedByRule != "" {
 			if !suppressLogs {
+				remoteAddrStr := "unknown"
+
+				if conn.sshConn != nil {
+					addr := conn.sshConn.RemoteAddr()
+					if addr != nil {
+						remoteAddrStr = addr.String()
+					}
+				}
+
 				log.Printf("%sEXEMPTED [%s] %s (matched %s)",
 					greenHeartPrefix(), conn.ID,
-					conn.sshConn.RemoteAddr().String(), exemptedByRule)
+					remoteAddrStr, exemptedByRule)
 			}
 
 			exemptedTotal.Add(1)
 		} else {
 			if !suppressLogs {
+				remoteAddrStr := "unknown"
+
+				if conn.sshConn != nil {
+					addr := conn.sshConn.RemoteAddr()
+					if addr != nil {
+						remoteAddrStr = addr.String()
+					}
+				}
+
 				log.Printf("%sREJECTED [%s] %s (matched %s)",
 					redDotPrefix(), conn.ID,
-					conn.sshConn.RemoteAddr().String(), rejectedByRule)
+					remoteAddrStr, rejectedByRule)
 			}
 
 			rejectedTotal.Add(1)
@@ -3683,10 +3723,12 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					warnPrefix(), conn.ID, err)
 			}
 
-			err = conn.sshConn.Close()
-			if err != nil {
-				log.Printf("%sError closing SSH connection for %s: %v",
-					warnPrefix(), conn.ID, err)
+			if conn.sshConn != nil {
+				err = conn.sshConn.Close()
+				if err != nil {
+					log.Printf("%sError closing SSH connection for %s: %v",
+						warnPrefix(), conn.ID, err)
+				}
 			}
 
 			return
@@ -3712,11 +3754,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					log.Printf("%sWAITKILL [%s] %s@%s: %v",
 						yellowDotPrefix(), conn.ID, conn.userName, conn.hostName, err)
 
-					err := conn.sshConn.Close()
-					if err != nil {
-						if !strings.Contains(err.Error(), "use of closed network connection") {
-							log.Printf("%sError closing SSH connection for %s: %v",
-								warnPrefix(), conn.ID, err)
+					if conn.sshConn != nil {
+						err := conn.sshConn.Close()
+						if err != nil {
+							if !strings.Contains(err.Error(), "use of closed network connection") {
+								log.Printf("%sError closing SSH connection for %s: %v",
+									warnPrefix(), conn.ID, err)
+							}
 						}
 					}
 
@@ -3742,11 +3786,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				log.Printf("%sWAITKILL [%s] %s@%s: %v",
 					yellowDotPrefix(), conn.ID, conn.userName, conn.hostName, err)
 
-				err := conn.sshConn.Close()
-				if err != nil {
-					if !strings.Contains(err.Error(), "use of closed network connection") {
-						log.Printf("%sError closing SSH connection for %s: %v",
-							warnPrefix(), conn.ID, err)
+				if conn.sshConn != nil {
+					err := conn.sshConn.Close()
+					if err != nil {
+						if !strings.Contains(err.Error(), "use of closed network connection") {
+							log.Printf("%sError closing SSH connection for %s: %v",
+								warnPrefix(), conn.ID, err)
+						}
 					}
 				}
 
@@ -3764,8 +3810,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		monitorSessionsTotal.Add(1)
 
 		if !suppressLogs {
+			monitoredConnectionID := ""
+			if conn.monitoredConnection != nil {
+				monitoredConnectionID = conn.monitoredConnection.ID
+			}
+
 			log.Printf("%sUMONITOR [%s] %s -> %s",
-				greenDotPrefix(), conn.ID, conn.userName, conn.monitoredConnection.ID)
+				greenDotPrefix(), conn.ID, conn.userName, monitoredConnectionID)
 		}
 
 		go func() {
@@ -3789,7 +3840,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			}
 		}()
 
-		<-conn.monitoredConnection.cancelCtx.Done()
+		if conn.monitoredConnection != nil && conn.monitoredConnection.cancelCtx != nil {
+			<-conn.monitoredConnection.cancelCtx.Done()
+		}
+
 		dur := time.Since(conn.startTime)
 
 		_, err := channel.Write(fmt.Appendf(nil,
@@ -3866,7 +3920,12 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	var basePath string
 
 	if !noLog {
-		logfile, basePath, err = createDatedLog(conn.ID, conn.sshConn.RemoteAddr())
+		var remoteAddr net.Addr
+		if conn.sshConn != nil {
+			remoteAddr = conn.sshConn.RemoteAddr()
+		}
+
+		logfile, basePath, err = createDatedLog(conn.ID, remoteAddr)
 		if err != nil {
 			_, err := fmt.Fprintf(channel,
 				"%v\r\n", sanitizeNonASCII(err.Error()))
@@ -4057,7 +4116,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		go func() {
 			for {
 				select {
-				case <-ctx.Done():
+				case <-func() <-chan struct{} {
+					if ctx == nil {
+						return nil
+					}
+
+					return ctx.Done()
+				}():
 					close(byteChan)
 					close(errorChan)
 
@@ -4081,7 +4146,13 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 		for {
 			select {
-			case <-ctx.Done():
+			case <-func() <-chan struct{} {
+				if ctx == nil {
+					return nil
+				}
+
+				return ctx.Done()
+			}():
 				if len(escSequence) > 0 {
 					_, err := remote.Write(escSequence)
 					if err != nil {
@@ -4274,9 +4345,14 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 				if errors.As(err, &netErr) && netErr.Timeout() {
 					select {
-					case <-ctx.Done():
-						return
+					case <-func() <-chan struct{} {
+						if ctx == nil {
+							return nil
+						}
 
+						return ctx.Done()
+					}():
+						return
 					default:
 					}
 
@@ -4402,7 +4478,8 @@ func sendBanner(sshConn *ssh.ServerConn, ch ssh.Channel, conn *Connection) {
 	var addrStr string
 
 	if sshConn != nil {
-		if a := sshConn.RemoteAddr(); a != nil {
+		a := sshConn.RemoteAddr()
+		if a != nil {
 			addrStr = a.String()
 		}
 	}
@@ -5278,7 +5355,12 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
-	host, _, _ := net.SplitHostPort(addr.String())
+	addrStr := "unknown"
+	if addr != nil {
+		addrStr = addr.String()
+	}
+
+	host, _, _ := net.SplitHostPort(addrStr)
 	ipDir := sanitizeIP(host)
 	now := time.Now()
 	dir := filepath.Join(
