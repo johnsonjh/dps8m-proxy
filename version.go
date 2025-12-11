@@ -270,9 +270,9 @@ func sanitizeVersion(version string) string {
 
 func trimVersion(version, sum string) string {
 	if sum == "" {
-		i := strings.Index(version, "-")
-		if i != -1 {
-			return version[:i]
+		before, _, found := strings.Cut(version, "-")
+		if found {
+			return before
 		}
 	}
 
