@@ -280,6 +280,9 @@ var (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 type Connection struct {
+	totalMonitors       uint64
+	sshOutTotal         uint64
+	sshInTotal          uint64
 	startTime           time.Time
 	lastActivityTime    time.Time
 	telnetConn          net.Conn
@@ -296,10 +299,7 @@ type Connection struct {
 	targetHost          string
 	userName            string
 	basePath            string
-	totalMonitors       uint64
 	targetPort          int
-	sshOutTotal         uint64
-	sshInTotal          uint64
 	initialWindowWidth  uint32
 	initialWindowHeight uint32
 	emacsKeymapEnabled  bool
