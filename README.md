@@ -319,6 +319,9 @@ DPS8M Proxy v1.0.24 (2025-Dec-15 g9d5b1da) [linux/amd64]
   software should provide a warning message with the above
   instructions.
 
+* Note that some Android distributions restrict usage of ports
+  below 8000.
+
 ### Admin interaction
 
 * The running proxy can be controlled interactively with the following
