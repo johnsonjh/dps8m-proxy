@@ -11,6 +11,8 @@
 *.bak
 blacklist.txt
 block-*.txt
+core
+core-*
 cross.bin/
 *.db
 deny-*.txt
