@@ -18,8 +18,15 @@ set -eu
 GO="$(command -v go || printf '%s\n' "go")"
 GOTOOLCHAIN="$(grep '^go .*$' go.mod | tr -cd 'go0-9.\n')+auto"
 GOSUMDB='sum.golang.org'
-GOPROXY='proxy.golang.org,direct'
 TZ=UTC
+
+if [ -z "${GOPROXY+x}" ]; then
+  if [ -n "${DIRECT+x}" ]; then
+    GOPROXY='direct,proxy.golang.org'
+  else
+    GOPROXY='proxy.golang.org,direct'
+  fi
+fi
 
 export GO GOTOOLCHAIN GOSUMDB GOPROXY TZ
 
