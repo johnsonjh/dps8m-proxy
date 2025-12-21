@@ -435,7 +435,7 @@ scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 ##############################################################################
 # Target: strip
 
-strip:
+strip sstrip:
 	@env printf '%s\n' "📥 Stripping proxy binary..." 2> /dev/null || :
 	@test -x "proxy" || \
 		{ env printf '%s\n' "🚫 'proxy' not found, try running '$(MAKE)'" \
@@ -525,7 +525,7 @@ install:
 	reuse gofmt goverify gotidydiff golangci-lint staticcheck nilaway \
 	revive errcheck deadcode govulncheck gopls gofumpt shfmt shellcheck \
 	codespell tags ctags gtags GRPATH GRTAGS GTAGS govet doc docs scc \
-	cross scspell scspell-fix strip install-strip install
+	cross scspell scspell-fix strip sstrip install-strip install
 
 ##############################################################################
 # Local Variables:
