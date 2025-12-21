@@ -32,5 +32,6 @@ ssh_host_ecdsa_key.pem
 ssh_host_ed25519_key.pem
 ssh_host_rsa_key.pem
 tags
+vendor
 .venv
 whitelist.txt
