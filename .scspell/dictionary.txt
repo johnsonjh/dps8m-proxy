@@ -195,6 +195,7 @@ sccflags
 setcap
 shellcheck
 shfmt
+sstrip
 staticcheck
 systemctl
 tmpl

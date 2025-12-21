@@ -441,7 +441,12 @@ strip:
 		{ env printf '%s\n' "🚫 'proxy' not found, try running '$(MAKE)'" \
 			2> /dev/null || :; \
 		  exit 1; }
-	env OBJECT_MODE=32_64 strip proxy
+	@[ "$(uname -o 2> /dev/null)" = "illumos" ] || \
+		{ set -x; env OBJECT_MODE=32_64 strip proxy \
+		    2> /dev/null || :; }
+	@command -v sstrip > /dev/null 2>&1 && \
+		{ set -x; sstrip -z proxy \
+		    2> /dev/null || :; }
 
 ##############################################################################
 # Target: install-strip
