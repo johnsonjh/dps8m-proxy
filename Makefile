@@ -59,6 +59,7 @@ distclean: clean
 	$(RM) ssh_host_ecdsa_key.pem ssh_host_ed25519_key.pem ssh_host_rsa_key.pem
 	$(RM) ./tags ./GPATH ./GRTAGS ./GTAGS
 	$(RM) -r ./log/
+	test -d ./.git && $(RM) -r ./vendor/ || :
 
 ##############################################################################
 # Target: tidy
@@ -434,13 +435,18 @@ scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 ##############################################################################
 # Target: strip
 
-strip:
+strip sstrip:
 	@env printf '%s\n' "📥 Stripping proxy binary..." 2> /dev/null || :
 	@test -x "proxy" || \
 		{ env printf '%s\n' "🚫 'proxy' not found, try running '$(MAKE)'" \
 			2> /dev/null || :; \
 		  exit 1; }
-	env OBJECT_MODE=32_64 strip proxy
+	@[ "$(uname -o 2> /dev/null)" = "illumos" ] || \
+		{ set -x; env OBJECT_MODE=32_64 strip proxy \
+		    2> /dev/null || :; }
+	@command -v sstrip > /dev/null 2>&1 && \
+		{ set -x; sstrip -z proxy \
+		    2> /dev/null || :; }
 
 ##############################################################################
 # Target: install-strip
@@ -519,7 +525,7 @@ install:
 	reuse gofmt goverify gotidydiff golangci-lint staticcheck nilaway \
 	revive errcheck deadcode govulncheck gopls gofumpt shfmt shellcheck \
 	codespell tags ctags gtags GRPATH GRTAGS GTAGS govet doc docs scc \
-	cross scspell scspell-fix strip install-strip install
+	cross scspell scspell-fix strip sstrip install-strip install
 
 ##############################################################################
 # Local Variables:

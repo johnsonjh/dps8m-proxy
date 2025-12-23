@@ -46,6 +46,7 @@ pages:
     - pip install --upgrade pip || true
     - pip install --upgrade scspell3k codespell reuse
     - env CI_NO_CROSS=1 pdpmake lint
+    - deactivate
     - git diff --exit-code
     - pdpmake
     - cp -f proxy /tmp
@@ -69,13 +70,13 @@ pages:
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k -v -Z -- "{}" \; || true
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec pigz -9 -f -k -m -v -- "{}" \; || true
     - cd ..
-    - go mod download || true
-    - go mod vendor || true
+    - go mod vendor
+    - tar --exclude=.git --exclude=public --exclude=cross.bin --exclude=proxy --exclude=tags --exclude=GTAGS --exclude=GRTAGS --exclude=GPATH --exclude=.venv -cf ./public/proxy.src.tar -C . . --transform='s,^\./,./proxy/,'
+    - pigz -9 -f -m -v ./public/proxy.src.tar
   artifacts:
     expire_in: 1 day
     paths:
       - public
-      - vendor
   retry: 2
   timeout: 60 minutes
   interruptible: false
