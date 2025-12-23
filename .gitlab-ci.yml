@@ -58,6 +58,10 @@ pages:
     - mv -f proxy.android.386 public || true
     - mv -f proxy.android.amd64 public || true
     - mv -f /tmp/proxy .
+    - go mod vendor
+    - tar --exclude=.git --exclude=public --exclude=cross.bin --exclude=proxy --exclude=tags --exclude=GTAGS --exclude=GRTAGS --exclude=GPATH --exclude=.venv -cf ./public/proxy.src.tar -C . . --transform='s,^\./,./proxy/,'
+    - pigz -9 -f -m -v ./public/proxy.src.tar
+    - rm -rf ./vendor
     - cd public
     - for i in proxy.windows.*; do [ -f "${i:?}" ] || continue; mv -f -- "${i:?}" "${i:?}.exe"; done
     - for f in proxy.windows.*.exe; do [ -f "${f:?}" ] || continue; base="${f%.exe}"; zipname="$(printf '%s\n' "${base:?}" | awk -F. '{ for (i = 1; i < NF; i++) printf "%s-", $i; print $NF ".zip" }')"; (go version -m "${f:?}" || printf '%s\n' ".") | zip -z9 "${zipname:?}" "${f:?}"; done && rm -f *.exe
@@ -69,10 +73,6 @@ pages:
     - sed -i 's#4\.0K#....#' index.html
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k -v -Z -- "{}" \; || true
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec pigz -9 -f -k -m -v -- "{}" \; || true
-    - cd ..
-    - go mod vendor
-    - tar --exclude=.git --exclude=public --exclude=cross.bin --exclude=proxy --exclude=tags --exclude=GTAGS --exclude=GRTAGS --exclude=GPATH --exclude=.venv -cf ./public/proxy.src.tar -C . . --transform='s,^\./,./proxy/,'
-    - pigz -9 -f -m -v ./public/proxy.src.tar
   artifacts:
     expire_in: 1 day
     paths:
