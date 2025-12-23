@@ -335,6 +335,9 @@ goproxy
 gosumdb
 gotoolchain
 govulncheck
+gpath
+grtags
+gtags
 honnef
 kisielk
 ldflags
