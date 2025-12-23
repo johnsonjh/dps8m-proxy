@@ -69,6 +69,9 @@ pages:
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k -v -Z -- "{}" \; || true
     - find . -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec pigz -9 -f -k -m -v -- "{}" \; || true
     - cd ..
+    - go mod vendor
+    - tar --exclude=.git --exclude=public --exclude=cross.bin --exclude=proxy -cf ./public/proxy.src.tar -C . . --transform='s,^\./,./proxy/,'
+    - pigz -9 -f -m -v ./public/proxy.src.tar
   artifacts:
     expire_in: 1 day
     paths:
