@@ -1,7 +1,7 @@
 ##############################################################################
 # DPS8M Proxy - Makefile
-# Copyright (c) 2025 Jeffrey H. Johnson
-# Copyright (c) 2025 The DPS8M Development Team
+# Copyright (c) 2025-2026 Jeffrey H. Johnson
+# Copyright (c) 2025-2026 The DPS8M Development Team
 # SPDX-License-Identifier: MIT
 # scspell-id: 5865f38c-6bd2-11f0-882d-80ee73e9b8e7
 ##############################################################################
