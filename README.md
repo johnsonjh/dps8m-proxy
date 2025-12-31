@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.27 (2025-Dec-23 g5fdc6b2) [linux/amd64]
+DPS8M Proxy v1.0.28 (2025-Dec-31 g587ff01) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -274,12 +274,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.27 (2025-Dec-23 g5fdc6b2) [linux/amd64]
+DPS8M Proxy v1.0.28 (2025-Dec-31 g587ff01) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.27                          |
+| dps8m/proxy               | v1.0.28                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
 | gorilla/websocket         | v1.5.3                           |
@@ -552,7 +552,7 @@ predecessor (code statistics 📈 provided by
 <th>582</th>
 <th>6321</th>
 <th>1550</th>
-<th>212365</th>
+<th>212565</th>
 <th>3847</th>
 </tr><tr>
 <th>Shell</th>
@@ -562,7 +562,7 @@ predecessor (code statistics 📈 provided by
 <th>112</th>
 <th>225</th>
 <th>34</th>
-<th>12876</th>
+<th>12916</th>
 <th>207</th>
 </tr><tr>
 <th>Makefile</th>
@@ -572,7 +572,7 @@ predecessor (code statistics 📈 provided by
 <th>92</th>
 <th>362</th>
 <th>154</th>
-<th>18514</th>
+<th>18524</th>
 <th>324</th>
 </tr><tr>
 <th>Markdown</th>
@@ -582,7 +582,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>474</th>
 <th>0</th>
-<th>27472</th>
+<th>27482</th>
 <th>459</th>
 </tr><tr>
 <th>Systemd</th>
@@ -592,7 +592,7 @@ predecessor (code statistics 📈 provided by
 <th>107</th>
 <th>67</th>
 <th>0</th>
-<th>7595</th>
+<th>7605</th>
 <th>135</th>
 </tr><tr>
 <th>YAML</th>
@@ -602,7 +602,7 @@ predecessor (code statistics 📈 provided by
 <th>10</th>
 <th>68</th>
 <th>0</th>
-<th>3961</th>
+<th>3971</th>
 <th>75</th>
 </tr></tbody>
 <tfoot><tr>
@@ -613,7 +613,7 @@ predecessor (code statistics 📈 provided by
 <th>903</th>
 <th>7517</th>
 <th>1738</th>
-<th>282783</th>
+<th>283063</th>
 <th>5029</th>
 </tr></tfoot></table>
 
