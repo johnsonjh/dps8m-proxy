@@ -17,7 +17,7 @@ go 1.25.5
 
 require (
 	github.com/arl/statsviz v0.8.0
-	github.com/google/gops v0.3.29-0.20250514124927-a2d8f7790eac
+	github.com/google/gops v0.3.29
 	github.com/hashicorp/mdns v1.0.6
 	github.com/klauspost/compress v1.18.2
 	github.com/sorairolake/lzip-go v0.3.8
