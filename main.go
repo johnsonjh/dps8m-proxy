@@ -5202,6 +5202,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 			log.Printf("%sError writing '[BACK TO HOST]' message to channel: %v",
 				warnPrefix(), err)
 		}
+
 	case 's', 'S':
 		dur := time.Since(start)
 
