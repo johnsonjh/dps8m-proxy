@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.29 (2026-Jan-08 g8fa85d4) [linux/amd64]
+DPS8M Proxy v1.0.29 (2026-Jan-08 g30303ae) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -274,14 +274,14 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.29 (2026-Jan-08 g8fa85d4) [linux/amd64]
+DPS8M Proxy v1.0.29 (2026-Jan-08 g30303ae) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
 | dps8m/proxy               | v1.0.29                          |
 | arl/statsviz              | v0.8.0                           |
-| google/gops               | v0.3.29* (2025-May-14, ga2d8f77) |
+| google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
 | hashicorp/mdns            | v1.0.6                           |
 | klauspost/compress        | v1.18.2                          |
@@ -292,7 +292,7 @@ DPS8M Proxy v1.0.29 (2026-Jan-08 g8fa85d4) [linux/amd64]
 | go.etcd.io/bbolt          | v1.4.3                           |
 | golang.org/x/crypto       | v0.46.0                          |
 | golang.org/x/net          | v0.48.0                          |
-| golang.org/x/sys          | v0.39.0                          |
+| golang.org/x/sys          | v0.40.0                          |
 | golang.org/x/term         | v0.38.0                          |
 | kernel.org/.../libcap/cap | v1.2.77                          |
 | kernel.org/.../libcap/psx | v1.2.77                          |
@@ -547,13 +547,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>8847</th>
+<th>8846</th>
 <th>1942</th>
 <th>582</th>
-<th>6323</th>
+<th>6322</th>
 <th>1550</th>
-<th>212671</th>
-<th>3849</th>
+<th>212591</th>
+<th>3848</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -608,13 +608,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10696</th>
+<th>10695</th>
 <th>2274</th>
 <th>903</th>
-<th>7519</th>
+<th>7518</th>
 <th>1738</th>
-<th>283169</th>
-<th>5031</th>
+<th>283089</th>
+<th>5030</th>
 </tr></tfoot></table>
 
 ## Future plans
