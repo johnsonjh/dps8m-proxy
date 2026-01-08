@@ -17,7 +17,7 @@ go 1.25.5
 
 require (
 	github.com/arl/statsviz v0.8.0
-	github.com/google/gops v0.3.29-0.20250514124927-a2d8f7790eac
+	github.com/google/gops v0.3.29
 	github.com/hashicorp/mdns v1.0.6
 	github.com/klauspost/compress v1.18.2
 	github.com/sorairolake/lzip-go v0.3.8
@@ -26,7 +26,7 @@ require (
 	go.etcd.io/bbolt v1.4.3
 	go.uber.org/goleak v1.3.1-0.20251210191316-2b7fd8a0d244
 	golang.org/x/crypto v0.46.0
-	golang.org/x/sys v0.39.0
+	golang.org/x/sys v0.40.0
 	golang.org/x/term v0.38.0
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.77
 )
