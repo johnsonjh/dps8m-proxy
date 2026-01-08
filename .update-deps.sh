@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 ###############################################################################
 # DPS8M Proxy - .update-deps.sh
-# Copyright (c) 2025 Jeffrey H. Johnson
-# Copyright (c) 2025 The DPS8M Development Team
+# Copyright (c) 2025-2026 Jeffrey H. Johnson
+# Copyright (c) 2025-2026 The DPS8M Development Team
 # SPDX-License-Identifier: MIT-0
 # scspell-id: 3a9014e8-9335-11f0-85bd-80ee73e9b8e7
 ###############################################################################
@@ -38,10 +38,10 @@ set -x
 ###############################################################################
 # Update deps
 
-${GO:?} get -u github.com/arl/statsviz@latest
+${GO:?} get -u github.com/google/gops@master
 ${GO:?} mod tidy
 
-${GO:?} get -u github.com/google/gops@master
+${GO:?} get -u github.com/arl/statsviz@latest
 ${GO:?} mod tidy
 
 ${GO:?} get -u github.com/hashicorp/mdns@latest

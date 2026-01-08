@@ -1,8 +1,8 @@
 #!/bin/sh
 ###############################################################################
 # DPS8M Proxy - .cross-android.sh
-# Copyright (c) 2025 Jeffrey H. Johnson
-# Copyright (c) 2025 The DPS8M Development Team
+# Copyright (c) 2025-2026 Jeffrey H. Johnson
+# Copyright (c) 2025-2026 The DPS8M Development Team
 # SPDX-License-Identifier: MIT-0
 # scspell-id: de55e65e-b5e3-11f0-9604-80ee73e9b8e7
 ###############################################################################

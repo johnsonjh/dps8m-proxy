@@ -2,8 +2,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // DPS8M Proxy - signals_aix.go
-// Copyright (c) 2025 Jeffrey H. Johnson
-// Copyright (c) 2025 The DPS8M Development Team
+// Copyright (c) 2025-2026 Jeffrey H. Johnson
+// Copyright (c) 2025-2026 The DPS8M Development Team
 // SPDX-License-Identifier: MIT
 // scspell-id: 1ec5bca2-6bd2-11f0-8a23-80ee73e9b8e7
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,8 +1,8 @@
 #!/bin/sh
 ###############################################################################
 # DPS8M Proxy - .cross.sh
-# Copyright (c) 2025 Jeffrey H. Johnson
-# Copyright (c) 2025 The DPS8M Development Team
+# Copyright (c) 2025-2026 Jeffrey H. Johnson
+# Copyright (c) 2025-2026 The DPS8M Development Team
 # SPDX-License-Identifier: MIT-0
 # scspell-id: 3fdac6e0-6bd1-11f0-8c81-80ee73e9b8e7
 ###############################################################################

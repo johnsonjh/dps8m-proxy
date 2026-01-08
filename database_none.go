@@ -2,8 +2,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // DPS8M Proxy - database_none.go
-// Copyright (c) 2025 Jeffrey H. Johnson
-// Copyright (c) 2025 The DPS8M Development Team
+// Copyright (c) 2025-2026 Jeffrey H. Johnson
+// Copyright (c) 2025-2026 The DPS8M Development Team
 // SPDX-License-Identifier: MIT
 // scspell-id: 7eeb0750-6bd1-11f0-be56-80ee73e9b8e7
 ///////////////////////////////////////////////////////////////////////////////////////////////////

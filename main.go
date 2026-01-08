@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // DPS8M Proxy - main.go
-// Copyright (c) 2025 Jeffrey H. Johnson
-// Copyright (c) 2025 The DPS8M Development Team
+// Copyright (c) 2025-2026 Jeffrey H. Johnson
+// Copyright (c) 2025-2026 The DPS8M Development Team
 // SPDX-License-Identifier: MIT
 // scspell-id: 92e1502a-6bd1-11f0-8b9e-80ee73e9b8e7
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4703,7 +4703,8 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 							if subOpt ==
 								TeloptTTYPE && len(subData) > 0 && subData[0] == TelnetSend {
 								if conn.termType != "" {
-									data := []byte{TelcmdIAC, TelcmdSB, TeloptTTYPE, TelnetIs}
+									data := make([]byte, 0, 4+len(conn.termType)+2)
+									data = append(data, TelcmdIAC, TelcmdSB, TeloptTTYPE, TelnetIs)
 									data = append(data, []byte(conn.termType)...)
 									data = append(data, TelcmdIAC, TelcmdSE)
 
@@ -4780,7 +4781,8 @@ func writeNegotiation(ch, logw io.Writer, line, username string) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func sendIAC(w io.Writer, cmd byte, opts ...byte) {
-	data := []byte{TelcmdIAC, cmd}
+	data := make([]byte, 0, 2+len(opts))
+	data = append(data, TelcmdIAC, cmd)
 	data = append(data, opts...)
 
 	_, err := w.Write(data)
