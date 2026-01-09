@@ -27,7 +27,7 @@ require (
 	go.uber.org/goleak v1.3.1-0.20251210191316-2b7fd8a0d244
 	golang.org/x/crypto v0.46.0
 	golang.org/x/sys v0.40.0
-	golang.org/x/term v0.38.0
+	golang.org/x/term v0.39.0
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.77
 )
 
