@@ -266,6 +266,7 @@ gopls:
 	@command -v gopls > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ gopls not found!" \
 			2> /dev/null || :; exit 0; } ; \
+		$(RM) -r "${HOME:-/home}/.cache/goimports" > /dev/null 2>&1 || :; \
 		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) gopls check -severity=hint ./*.go

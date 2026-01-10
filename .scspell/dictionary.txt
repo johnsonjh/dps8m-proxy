@@ -170,6 +170,7 @@ glab
 gofmt
 gofumpt
 gogtags
+goimports
 golangci
 golist
 gosumdb
