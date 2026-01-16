@@ -19,7 +19,7 @@ require (
 	github.com/arl/statsviz v0.8.0
 	github.com/google/gops v0.3.29
 	github.com/hashicorp/mdns v1.0.6
-	github.com/klauspost/compress v1.18.2
+	github.com/klauspost/compress v1.18.3
 	github.com/sorairolake/lzip-go v0.3.8
 	github.com/spf13/pflag v1.0.11-0.20260110151513-b85eb9e15911
 	github.com/ulikunitz/xz v0.5.15
