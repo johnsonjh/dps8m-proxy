@@ -11,7 +11,7 @@ module gitlab.com/dps8m/proxy
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-go 1.25.6
+go 1.25.7
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -35,7 +35,7 @@ require (
 
 require (
 	github.com/gorilla/websocket v1.5.3 // indirect
-	github.com/miekg/dns v1.1.70 // indirect
+	github.com/miekg/dns v1.1.72 // indirect
 	golang.org/x/mod v0.32.0 // indirect
 	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect

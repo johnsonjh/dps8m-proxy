@@ -287,7 +287,7 @@ func initDB() {
 				err)
 		}
 
-		val := bucket.Get(shutdownMarkerKey)
+		val := bucket.Get(shutdownMarkerKey) //nolint:unqueryvet,nolintlint
 
 		if bytes.Equal(val, []byte("0")) {
 			log.Printf("%sUnclean database shutdown detected!",
@@ -303,7 +303,7 @@ func initDB() {
 			}
 		}
 
-		startTimeVal := bucket.Get(initialStartTimeKey)
+		startTimeVal := bucket.Get(initialStartTimeKey) //nolint:unqueryvet,nolintlint
 		if startTimeVal == nil {
 			err := bucket.Put(initialStartTimeKey,
 				[]byte(startTime.Format(time.RFC3339)))

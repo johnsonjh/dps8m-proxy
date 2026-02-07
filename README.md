@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.35 (2026-Jan-16 g21237f5) [linux/amd64]
+DPS8M Proxy v1.0.36 (2026-Feb-07 g95a991c) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -274,18 +274,18 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.35 (2026-Jan-16 g21237f5) [linux/amd64]
+DPS8M Proxy v1.0.36 (2026-Feb-07 g95a991c) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.35                          |
+| dps8m/proxy               | v1.0.36                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
 | hashicorp/mdns            | v1.0.6                           |
 | klauspost/compress        | v1.18.3                          |
-| miekg/dns                 | v1.1.70                          |
+| miekg/dns                 | v1.1.72                          |
 | sorairolake/lzip-go       | v0.3.8                           |
 | spf13/pflag               | v1.0.11* (2026-Jan-10, gb85eb9e) |
 | ulikunitz/xz              | v0.5.15                          |
@@ -296,7 +296,7 @@ DPS8M Proxy v1.0.35 (2026-Jan-16 g21237f5) [linux/amd64]
 | golang.org/x/term         | v0.39.0                          |
 | kernel.org/.../libcap/cap | v1.2.77                          |
 | kernel.org/.../libcap/psx | v1.2.77                          |
-| Go compiler (gc)          | v1.25.6                          |
+| Go compiler (gc)          | v1.25.7                          |
 +===========================+==================================+
 ```
 
@@ -552,7 +552,7 @@ predecessor (code statistics 📈 provided by
 <th>582</th>
 <th>6322</th>
 <th>1550</th>
-<th>212591</th>
+<th>212653</th>
 <th>3848</th>
 </tr><tr>
 <th>Shell</th>
@@ -613,7 +613,7 @@ predecessor (code statistics 📈 provided by
 <th>903</th>
 <th>7519</th>
 <th>1739</th>
-<th>283159</th>
+<th>283221</th>
 <th>5031</th>
 </tr></tfoot></table>
 
