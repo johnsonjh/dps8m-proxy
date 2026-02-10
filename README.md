@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.36 (2026-Feb-07 g9e564a6) [linux/amd64]
+DPS8M Proxy v1.0.37 (2026-Feb-10 gbf44f24) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -274,26 +274,26 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.36 (2026-Feb-07 g9e564a6) [linux/amd64]
+DPS8M Proxy v1.0.37 (2026-Feb-10 gbf44f24) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.36                          |
+| dps8m/proxy               | v1.0.37                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
 | hashicorp/mdns            | v1.0.6                           |
-| klauspost/compress        | v1.18.3                          |
+| klauspost/compress        | v1.18.4                          |
 | miekg/dns                 | v1.1.72                          |
 | sorairolake/lzip-go       | v0.3.8                           |
 | spf13/pflag               | v1.0.11* (2026-Jan-10, gb85eb9e) |
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
-| golang.org/x/crypto       | v0.47.0                          |
-| golang.org/x/net          | v0.49.0                          |
-| golang.org/x/sys          | v0.40.0                          |
-| golang.org/x/term         | v0.39.0                          |
+| golang.org/x/crypto       | v0.48.0                          |
+| golang.org/x/net          | v0.50.0                          |
+| golang.org/x/sys          | v0.41.0                          |
+| golang.org/x/term         | v0.40.0                          |
 | kernel.org/.../libcap/cap | v1.2.77                          |
 | kernel.org/.../libcap/psx | v1.2.77                          |
 | Go compiler (gc)          | v1.25.7                          |
