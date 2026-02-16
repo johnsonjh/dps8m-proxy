@@ -20,6 +20,7 @@ linters:
     - gochecknoglobals
     - gocognit
     - gocyclo
+    - gosec
     - maintidx
     - mnd
     - nestif
