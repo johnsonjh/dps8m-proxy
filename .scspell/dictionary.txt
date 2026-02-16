@@ -502,6 +502,7 @@ golang
 google
 gopls
 goroutines
+gosec
 gotags
 grep
 gzip
