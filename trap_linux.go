@@ -86,14 +86,14 @@ func getProcName(pid int) (string, error) {
 
 	defer func() { _ = procDir.Close() }()
 
-	commFd, err := unix.Openat(int(procDir.Fd()),
+	commFd, err := unix.Openat(int(procDir.Fd()), //nolint:gosec,nolintlint
 		"comm", unix.O_RDONLY, 0)
 	if err != nil {
 		return "", fmt.Errorf("could not openat 'comm' for pid %d: %w",
 			pid, err)
 	}
 
-	commFile := os.NewFile(uintptr(commFd),
+	commFile := os.NewFile(uintptr(commFd), //nolint:gosec,nolintlint
 		fmt.Sprintf("/proc/%d/comm",
 			pid))
 
@@ -134,14 +134,14 @@ func getPpid(pid int) (int, error) {
 
 	defer func() { _ = procDir.Close() }()
 
-	statusFd, err := unix.Openat(int(procDir.Fd()),
+	statusFd, err := unix.Openat(int(procDir.Fd()), //nolint:gosec,nolintlint
 		"status", unix.O_RDONLY, 0)
 	if err != nil {
 		return 0, fmt.Errorf("could not openat 'status' for pid %d: %w",
 			pid, err)
 	}
 
-	statusFile := os.NewFile(uintptr(statusFd),
+	statusFile := os.NewFile(uintptr(statusFd), //nolint:gosec,nolintlint
 		fmt.Sprintf("/proc/%d/status",
 			pid))
 
