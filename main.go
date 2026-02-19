@@ -714,7 +714,7 @@ func init() { //nolint:gochecknoinits
 
 	pflag.Uint64Var(&timeDefMax,
 		"time-def-max", 0,
-		"Maximum connection link time allowed for\r\n"+
+		"Maximum connection link time allowed\r\n"+
 			"    for only the default target [seconds]")
 
 	pflag.StringVar(&blacklistFile,
