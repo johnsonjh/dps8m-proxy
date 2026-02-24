@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.37 (2026-Feb-16 g8155d43) [linux/amd64]
+DPS8M Proxy v1.0.38 (2026-Feb-19 g1657a77) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -165,7 +165,11 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     [level: "0" - "6", or "none" - "debug"]
                                     (default "error")
   --idle-max <uint>             Maximum connection idle time allowed [seconds]
+  --idle-def-max <uint>         Maximum connection idle time allowed
+                                    for only the default target [seconds]
   --time-max <uint>             Maximum connection link time allowed [seconds]
+  --time-def-max <uint>         Maximum connection link time allowed
+                                    for only the default target [seconds]
   --blacklist <string>          Enable blacklist [filename] (no default)
   --whitelist <string>          Enable whitelist [filename] (no default)
   --utc                         Use UTC (Coordinated Universal Time) for time
@@ -274,12 +278,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.37 (2026-Feb-16 g8155d43) [linux/amd64]
+DPS8M Proxy v1.0.38 (2026-Feb-19 g1657a77) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.37                          |
+| dps8m/proxy               | v1.0.38                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -296,7 +300,7 @@ DPS8M Proxy v1.0.37 (2026-Feb-16 g8155d43) [linux/amd64]
 | golang.org/x/term         | v0.40.0                          |
 | kernel.org/.../libcap/cap | v1.2.77                          |
 | kernel.org/.../libcap/psx | v1.2.77                          |
-| Go compiler (gc)          | v1.26.0                          |
+| Go compiler (gc)          | v1.26.0-X:nodwarf5               |
 +===========================+==================================+
 ```
 
@@ -547,13 +551,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>8846</th>
-<th>1942</th>
+<th>8940</th>
+<th>1957</th>
 <th>582</th>
-<th>6322</th>
-<th>1550</th>
-<th>212653</th>
-<th>3848</th>
+<th>6401</th>
+<th>1576</th>
+<th>215974</th>
+<th>3898</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -608,13 +612,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10696</th>
-<th>2274</th>
+<th>10790</th>
+<th>2289</th>
 <th>903</th>
-<th>7519</th>
-<th>1739</th>
-<th>283221</th>
-<th>5031</th>
+<th>7598</th>
+<th>1765</th>
+<th>286542</th>
+<th>5081</th>
 </tr></tfoot></table>
 
 ## Future plans

@@ -192,6 +192,7 @@ var (
 	denyNewConnectionsMode           atomic.Bool
 	gracefulShutdownMode             atomic.Bool
 	idleMax                          uint64
+	idleDefMax                       uint64
 	keymapByDefault                  bool
 	logDir                           string
 	loggingWg                        sync.WaitGroup
@@ -209,6 +210,7 @@ var (
 	sshAddr                          []string
 	telnetHostPort                   string
 	timeMax                          uint64
+	timeDefMax                       uint64
 	whitelistedNetworks              []*net.IPNet
 	whitelistFile                    string
 	issueFile                        = "issue.txt"
@@ -302,6 +304,7 @@ type Connection struct {
 	targetPort          int
 	initialWindowWidth  uint32
 	initialWindowHeight uint32
+	isDefaultTarget     bool
 	emacsKeymapEnabled  bool
 	wasMonitored        bool
 	monitoring          bool
@@ -700,9 +703,19 @@ func init() { //nolint:gochecknoinits
 		"idle-max", 0,
 		"Maximum connection idle time allowed [seconds]")
 
+	pflag.Uint64Var(&idleDefMax,
+		"idle-def-max", 0,
+		"Maximum connection idle time allowed\r\n"+
+			"    for only the default target [seconds]")
+
 	pflag.Uint64Var(&timeMax,
 		"time-max", 0,
 		"Maximum connection link time allowed [seconds]")
+
+	pflag.Uint64Var(&timeDefMax,
+		"time-def-max", 0,
+		"Maximum connection link time allowed\r\n"+
+			"    for only the default target [seconds]")
 
 	pflag.StringVar(&blacklistFile,
 		"blacklist", "",
@@ -828,7 +841,7 @@ func main() {
 
 		fmt.Print("\r\n\r\nPress Enter (or Return) to exit ... ")
 
-		oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+		oldState, err := term.MakeRaw(int(os.Stdin.Fd())) //nolint:gosec,nolintlint
 		if err != nil {
 			_, _ = bufio.NewReader(os.Stdin).ReadBytes('\n')
 
@@ -843,7 +856,7 @@ func main() {
 
 		t := term.NewTerminal(os.Stdin, "")
 		_, _ = t.ReadLine()
-		_ = term.Restore(int(os.Stdin.Fd()), oldState)
+		_ = term.Restore(int(os.Stdin.Fd()), oldState) //nolint:gosec,nolintlint
 
 		fmt.Print("\r\n")
 
@@ -1065,12 +1078,30 @@ func main() {
 		}
 	}
 
+	if idleDefMax > 0 {
+		maxSeconds := uint64(math.MaxInt64 / int64(time.Second))
+		if idleDefMax > maxSeconds {
+			log.Printf("%sIllegal --idle-def-max value: \"%d\" exceeds safe range, using \"%d\"",
+				warnPrefix(), idleDefMax, maxSeconds)
+			idleDefMax = maxSeconds
+		}
+	}
+
 	if timeMax > 0 {
 		maxSeconds := uint64(math.MaxInt64 / int64(time.Second))
 		if timeMax > maxSeconds {
 			log.Printf("%sIllegal --time-max value: \"%d\" exceeds safe range, using \"%d\"",
 				warnPrefix(), timeMax, maxSeconds)
 			timeMax = maxSeconds
+		}
+	}
+
+	if timeDefMax > 0 {
+		maxSeconds := uint64(math.MaxInt64 / int64(time.Second))
+		if timeDefMax > maxSeconds {
+			log.Printf("%sIllegal --time-def-max value: \"%d\" exceeds safe range, using \"%d\"",
+				warnPrefix(), timeDefMax, maxSeconds)
+			timeDefMax = maxSeconds
 		}
 	}
 
@@ -1088,6 +1119,33 @@ func main() {
 
 		log.Fatalf("%sERROR: --idle-max (%d) cannot be greater than or equal to --time-max (%d)",
 			errorPrefix(), idleMax, timeMax) // LINTED: Fatalf
+	}
+
+	effIdleDefMax := idleMax
+	if idleDefMax > 0 {
+		effIdleDefMax = idleDefMax
+	}
+
+	effTimeDefMax := timeMax
+	if timeDefMax > 0 {
+		effTimeDefMax = timeDefMax
+	}
+
+	if effIdleDefMax > 0 && effTimeDefMax > 0 && effIdleDefMax >= effTimeDefMax {
+		if isConsoleLogQuiet {
+			_, _ = fmt.Fprintf(os.Stdout,
+				"%s %sERROR: effective default target idle-max (%d) cannot be greater than "+
+					"or equal to effective default target time-max (%d)\r\n",
+				nowStamp(), errorPrefix(), effIdleDefMax, effTimeDefMax)
+		}
+
+		if enableGops {
+			gopsClose()
+		}
+
+		log.Fatalf("%sERROR: effective default target idle-max (%d) cannot be greater than "+
+			"or equal to effective default target time-max (%d)",
+			errorPrefix(), effIdleDefMax, effTimeDefMax) // LINTED: Fatalf
 	}
 
 	edSigner, err := loadOrCreateHostKey(filepath.Join(
@@ -1270,7 +1328,7 @@ func main() {
 	go shutdownWatchdog()
 
 	go func() {
-		if idleMax == 0 {
+		if idleMax == 0 && timeMax == 0 && idleDefMax == 0 && timeDefMax == 0 {
 			return
 		}
 
@@ -1292,8 +1350,21 @@ func main() {
 					idleTime := time.Since(conn.lastActivityTime)
 					connUptime := time.Since(conn.startTime)
 
-					if idleMax > 0 &&
-						idleTime > time.Duration(idleMax)*time.Second { //nolint:gosec
+					effIdleMax := idleMax
+					effTimeMax := timeMax
+
+					if conn.isDefaultTarget {
+						if idleDefMax > 0 {
+							effIdleMax = idleDefMax
+						}
+
+						if timeDefMax > 0 {
+							effTimeMax = timeDefMax
+						}
+					}
+
+					if effIdleMax > 0 &&
+						idleTime > time.Duration(effIdleMax)*time.Second { //nolint:gosec
 						idleKillsTotal.Add(1)
 
 						connUptime := time.Since(conn.startTime)
@@ -1323,8 +1394,8 @@ func main() {
 						}
 
 						delete(connections, id)
-					} else if timeMax > 0 &&
-						connUptime > time.Duration(timeMax)*time.Second { //nolint:gosec
+					} else if effTimeMax > 0 &&
+						connUptime > time.Duration(effTimeMax)*time.Second { //nolint:gosec
 						timeKillsTotal.Add(1)
 
 						connUptime := time.Since(conn.startTime)
@@ -1537,7 +1608,7 @@ func handleConsoleInput() {
 		case "":
 
 		default:
-			_, err := fmt.Fprintf(os.Stdout,
+			_, err := fmt.Fprintf(os.Stdout, //nolint:gosec,nolintlint
 				"%s Unknown command: %s\r\n",
 				nowStamp(), cmd)
 			if err != nil {
@@ -2341,6 +2412,16 @@ func listConfiguration() {
 			timeMax)
 	}
 
+	if timeDefMax > 0 {
+		if timeMax > 0 {
+			timeMaxStr += fmt.Sprintf(" (Def. Target: %d seconds)",
+				timeDefMax)
+		} else {
+			timeMaxStr = fmt.Sprintf("disabled (Def. Target: %d seconds)",
+				timeDefMax)
+		}
+	}
+
 	updateMaxLength("Time Max: " + timeMaxStr)
 
 	idleMaxStr := "disabled"
@@ -2348,6 +2429,16 @@ func listConfiguration() {
 	if idleMax > 0 {
 		idleMaxStr = fmt.Sprintf("%d seconds",
 			idleMax)
+	}
+
+	if idleDefMax > 0 {
+		if idleMax > 0 {
+			idleMaxStr += fmt.Sprintf(" (Def. Target: %d seconds)",
+				idleDefMax)
+		} else {
+			idleMaxStr = fmt.Sprintf("disabled (Def. Target: %d seconds)",
+				idleDefMax)
+		}
 	}
 
 	updateMaxLength("Idle Max: " + idleMaxStr)
@@ -2727,7 +2818,7 @@ func killConnection(id string) {
 
 	conn, ok := connections[id]
 	if !ok {
-		_, _ = fmt.Fprintf(os.Stdout,
+		_, _ = fmt.Fprintf(os.Stdout, //nolint:gosec,nolintlint
 			"%s Session ID '%s' not found.\r\n",
 			nowStamp(), id)
 
@@ -2735,7 +2826,7 @@ func killConnection(id string) {
 	}
 
 	if isConsoleLogQuiet {
-		_, err := fmt.Fprintf(os.Stdout,
+		_, err := fmt.Fprintf(os.Stdout, //nolint:gosec,nolintlint
 			"%s %sKilling connection %s...\r\n",
 			nowStamp(), skullPrefix(), id)
 		if err != nil {
@@ -2744,7 +2835,7 @@ func killConnection(id string) {
 		}
 	}
 
-	log.Printf("%sKilling connection %s...\r\n",
+	log.Printf("%sKilling connection %s...\r\n", //nolint:gosec,nolintlint
 		skullPrefix(), id)
 
 	if conn.channel != nil {
@@ -3992,6 +4083,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		isAltHost = false
 	}
 
+	conn.isDefaultTarget = !isAltHost
+
 	targetHost, targetPort, err := parseHostPort(targetDest)
 	if err != nil {
 		var errMsg string
@@ -4418,8 +4511,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			}
 
 			if n > 0 {
-				atomic.AddUint64(&telnetIn, uint64(n))
-				atomic.AddUint64(&conn.sshInTotal, uint64(n))
+				atomic.AddUint64(&telnetIn, uint64(n))        //nolint:gosec,nolintlint
+				atomic.AddUint64(&conn.sshInTotal, uint64(n)) //nolint:gosec,nolintlint
 				fwd := bytes.ReplaceAll(buf[:n], []byte{0}, []byte{})
 
 				atomic.AddUint64(&sshOut, uint64(len(fwd)))
@@ -4598,7 +4691,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 		for i < n {
 			if buf[i] == TelcmdIAC {
 				if i+2 < n { //nolint:gocritic
-					cmd, opt := buf[i+1], buf[i+2]
+					cmd, opt := buf[i+1], buf[i+2] //nolint:gosec,nolintlint
 					writeNegotiation(ch, logw,
 						"[RCVD "+cmdName(cmd)+" "+optName(opt)+"]", conn.userName)
 
@@ -4688,7 +4781,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 								continue // Skip this sub-negotiation.
 							}
 
-							subOpt := buf[i+2]
+							subOpt := buf[i+2] //nolint:gosec,nolintlint
 							subData := buf[i+3 : seIndex]
 
 							writeNegotiation(ch, logw,
@@ -4733,7 +4826,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 					}
 
 					i += 3
-				} else if i+1 < n && buf[i+1] == TelcmdSB {
+				} else if i+1 < n && buf[i+1] == TelcmdSB { //nolint:gosec,nolintlint
 					writeNegotiation(ch, logw, "[RCVD IAC SB (incomplete)]", conn.userName)
 
 					i += 2
@@ -5696,14 +5789,14 @@ func rotateConsoleLogAt(t time.Time) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func compressLogFile(logFilePath string) {
-	_, err := os.Stat(logFilePath)
+	_, err := os.Stat(logFilePath) //nolint:gosec,nolintlint
 	if os.IsNotExist(err) {
 		return
 	}
 
 	data, err := os.ReadFile(logFilePath) //nolint:gosec
 	if err != nil {
-		log.Printf("%sFailed to read log %q for compression: %v",
+		log.Printf("%sFailed to read log %q for compression: %v", //nolint:gosec,nolintlint
 			warnPrefix(), logFilePath, err)
 
 		return
@@ -5760,7 +5853,7 @@ func compressLogFile(logFilePath string) {
 
 		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
 		if err != nil {
-			log.Printf("%sFailed to create compressed file %q: %v",
+			log.Printf("%sFailed to create compressed file %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
 
 			return
@@ -5768,7 +5861,7 @@ func compressLogFile(logFilePath string) {
 
 		writer, err = gzip.NewWriterLevel(compressedFile, gzipLevel)
 		if err != nil {
-			log.Printf("%sError creating gzip writer for %q: %v",
+			log.Printf("%sError creating gzip writer for %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
 
 			err := compressedFile.Close()
@@ -5785,7 +5878,7 @@ func compressLogFile(logFilePath string) {
 
 		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
 		if err != nil {
-			log.Printf("%sFailed to create compressed file %q: %v",
+			log.Printf("%sFailed to create compressed file %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
 
 			return
@@ -5793,7 +5886,7 @@ func compressLogFile(logFilePath string) {
 
 		writer, err = xz.NewWriter(compressedFile)
 		if err != nil {
-			log.Printf("%sError creating xz writer for %q: %v",
+			log.Printf("%sError creating xz writer for %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
 
 			err := compressedFile.Close()
@@ -5810,7 +5903,7 @@ func compressLogFile(logFilePath string) {
 
 		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
 		if err != nil {
-			log.Printf("%sFailed to create compressed file %q: %v",
+			log.Printf("%sFailed to create compressed file %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
 
 			return
@@ -5819,7 +5912,7 @@ func compressLogFile(logFilePath string) {
 		writer, err = lzip.NewWriterOptions(
 			compressedFile, &lzip.WriterOptions{DictSize: lzipDictSize})
 		if err != nil {
-			log.Printf("%sError creating lzip writer for %q: %v",
+			log.Printf("%sError creating lzip writer for %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
 
 			err := compressedFile.Close()
@@ -5836,7 +5929,7 @@ func compressLogFile(logFilePath string) {
 
 		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
 		if err != nil {
-			log.Printf("%sFailed to create compressed file %q: %v",
+			log.Printf("%sFailed to create compressed file %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
 
 			return
@@ -5845,7 +5938,7 @@ func compressLogFile(logFilePath string) {
 		writer, err = zstd.NewWriter(
 			compressedFile, zstd.WithEncoderLevel(zstdLevel))
 		if err != nil {
-			log.Printf("%sError creating zstd writer for %q: %v",
+			log.Printf("%sError creating zstd writer for %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
 
 			err := compressedFile.Close()
@@ -5858,7 +5951,7 @@ func compressLogFile(logFilePath string) {
 		}
 
 	default:
-		log.Printf("%sUnknown compression algorithm: %s",
+		log.Printf("%sUnknown compression algorithm: %s", //nolint:gosec,nolintlint
 			warnPrefix(), compressAlgo)
 
 		return
@@ -5886,7 +5979,7 @@ func compressLogFile(logFilePath string) {
 
 	_, err = writer.Write(data)
 	if err != nil {
-		log.Printf("%sError writing to compressed file %q: %v",
+		log.Printf("%sError writing to compressed file %q: %v", //nolint:gosec,nolintlint
 			warnPrefix(), compressedFilePath, err)
 
 		return
@@ -5894,7 +5987,7 @@ func compressLogFile(logFilePath string) {
 
 	err = writer.Close()
 	if err != nil {
-		log.Printf("%sError closing writer for %q: %v",
+		log.Printf("%sError closing writer for %q: %v", //nolint:gosec,nolintlint
 			warnPrefix(), compressedFilePath, err)
 
 		return
@@ -5902,15 +5995,16 @@ func compressLogFile(logFilePath string) {
 
 	err = compressedFile.Close()
 	if err != nil {
-		log.Printf("%sError closing compressed file %q: %v",
+		log.Printf("%sError closing compressed file %q: %v", //nolint:gosec,nolintlint
 			warnPrefix(), compressedFilePath, err)
 
 		return
 	}
 
-	err = os.Remove(logFilePath)
+	err = os.Remove(logFilePath) //nolint:gosec,nolintlint
 	if err != nil {
-		log.Printf("%sError removing original log %q after compression: %v",
+		log.Printf( //nolint:gosec,nolintlint
+			"%sError removing original log %q after compression: %v",
 			warnPrefix(), logFilePath, err)
 	}
 }
