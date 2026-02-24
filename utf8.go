@@ -43,7 +43,7 @@ func haveUTF8support() bool {
 			utf8Support = true // Undocumented: for debugging use.
 		} else if os.Getenv("PROXY_FORCE_NO_UTF8") == "1" {
 			utf8Support = false // Undocumented: for debugging use.
-		} else if !term.IsTerminal(int(os.Stdout.Fd())) { // #nosec G115
+		} else if !term.IsTerminal(int(os.Stdout.Fd())) { //nolint:gosec,nolintlint
 			utf8Support = false
 		} else {
 			utf8Support = isUTF8plan9() || isUTF8wasi() || isUTF8js() ||
@@ -57,7 +57,7 @@ func haveUTF8support() bool {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func canOutputUTF8() bool {
-	if !term.IsTerminal(int(os.Stdout.Fd())) { // #nosec G115
+	if !term.IsTerminal(int(os.Stdout.Fd())) { //nolint:gosec,nolintlint
 		return false
 	}
 
