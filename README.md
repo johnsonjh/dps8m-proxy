@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.38 (2026-Feb-24 g0eabe53) [linux/amd64]
+DPS8M Proxy v1.0.39 (2026-Feb-26 g801ba6b) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -278,12 +278,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.38 (2026-Feb-24 g0eabe53) [linux/amd64]
+DPS8M Proxy v1.0.39 (2026-Feb-26 g801ba6b) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.38                          |
+| dps8m/proxy               | v1.0.39                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -295,7 +295,7 @@ DPS8M Proxy v1.0.38 (2026-Feb-24 g0eabe53) [linux/amd64]
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
 | golang.org/x/crypto       | v0.48.0                          |
-| golang.org/x/net          | v0.50.0                          |
+| golang.org/x/net          | v0.51.0                          |
 | golang.org/x/sys          | v0.41.0                          |
 | golang.org/x/term         | v0.40.0                          |
 | kernel.org/.../libcap/cap | v1.2.77                          |
@@ -556,7 +556,7 @@ predecessor (code statistics 📈 provided by
 <th>582</th>
 <th>6401</th>
 <th>1576</th>
-<th>215974</th>
+<th>215996</th>
 <th>3898</th>
 </tr><tr>
 <th>Shell</th>
@@ -617,7 +617,7 @@ predecessor (code statistics 📈 provided by
 <th>903</th>
 <th>7598</th>
 <th>1765</th>
-<th>286542</th>
+<th>286564</th>
 <th>5081</th>
 </tr></tfoot></table>
 
