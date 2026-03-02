@@ -83,7 +83,7 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 			err)
 	}
 
-	content, err := os.ReadFile(logPath) //nolint:gosec
+	content, err := os.ReadFile(logPath) //nolint:gosec,nolintlint
 	if err != nil {
 		t.Fatalf("Failed to read log file: %v",
 			err)
@@ -185,7 +185,7 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 			err)
 	}
 
-	content, err := os.ReadFile(day2LogPath) //nolint:gosec
+	content, err := os.ReadFile(day2LogPath) //nolint:gosec,nolintlint
 	if err != nil {
 		t.Fatalf("Failed to read day 2 log file: %v",
 			err)
