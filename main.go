@@ -3156,7 +3156,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 				Extensions: map[string]string{"auth-method": "password"},
 			}, nil
 		},
-		PublicKeyCallback: func(
+		PublicKeyCallback: func( //nolint:gosec,nolintlint
 			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error,
 		) {
 			line := fmt.Sprintf("VALIDATE [%s] %s@%s %q:%s",
