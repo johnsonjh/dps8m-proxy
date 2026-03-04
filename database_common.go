@@ -270,7 +270,7 @@ func initDB() {
 		Logger:       &stdLogger{},
 	}
 
-	db, err = bbolt.Open(dbPath, os.FileMode(dbPerm), options) //nolint:gosec
+	db, err = bbolt.Open(dbPath, os.FileMode(dbPerm), options) //nolint:gosec,nolintlint
 	if err != nil {
 		if enableGops {
 			gopsClose()

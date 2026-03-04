@@ -35,7 +35,7 @@ import (
 	"math"
 	"net"
 	"net/http"
-	_ "net/http/pprof" //nolint:gosec
+	_ "net/http/pprof" //nolint:gosec,nolintlint
 	"os"
 	"path/filepath"
 	"regexp"
@@ -1004,7 +1004,7 @@ func main() {
 			log.Printf("%sStarting database updater with %d second interval.",
 				dbPrefix(), dbTime)
 
-			ticker := time.NewTicker(time.Duration(dbTime) * time.Second) //nolint:gosec
+			ticker := time.NewTicker(time.Duration(dbTime) * time.Second) //nolint:gosec,nolintlint
 			defer ticker.Stop()
 
 			for {
@@ -1026,7 +1026,7 @@ func main() {
 	setupConsoleLogging()
 
 	if !noLog || consoleLog != "" {
-		err := os.MkdirAll(logDir, os.FileMode(logDirPerm)) //nolint:gosec
+		err := os.MkdirAll(logDir, os.FileMode(logDirPerm)) //nolint:gosec,nolintlint
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: Failed to create session log directory: %v\r\n",
@@ -1364,7 +1364,7 @@ func main() {
 					}
 
 					if effIdleMax > 0 &&
-						idleTime > time.Duration(effIdleMax)*time.Second { //nolint:gosec
+						idleTime > time.Duration(effIdleMax)*time.Second { //nolint:gosec,nolintlint
 						idleKillsTotal.Add(1)
 
 						connUptime := time.Since(conn.startTime)
@@ -1395,7 +1395,8 @@ func main() {
 
 						delete(connections, id)
 					} else if effTimeMax > 0 &&
-						connUptime > time.Duration(effTimeMax)*time.Second { //nolint:gosec
+						connUptime > time.Duration( //nolint:gosec,nolintlint
+							effTimeMax)*time.Second {
 						timeKillsTotal.Add(1)
 
 						connUptime := time.Since(conn.startTime)
@@ -1471,7 +1472,7 @@ func debugInit(addr string) {
 	go func() {
 		log.Fatalf("%s%v", // LINTED: Fatalf
 			// nosemgrep: go.lang.security.audit.net.use-tls.use-tls
-			errorPrefix(), http.ListenAndServe(addr, mux)) //nolint:gosec
+			errorPrefix(), http.ListenAndServe(addr, mux)) //nolint:gosec,nolintlint
 	}()
 }
 
@@ -2971,7 +2972,7 @@ func sendNaws(conn *Connection, width, height uint32) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint:ireturn
-	keyData, err := os.ReadFile(keyPath) //nolint:gosec
+	keyData, err := os.ReadFile(keyPath) //nolint:gosec,nolintlint
 	if err == nil {
 		signer, err := ssh.ParsePrivateKey(keyData)
 		if err != nil {
@@ -2995,7 +2996,7 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 
 	switch keyType {
 	case "rsa":
-		key, err := rsa.GenerateKey(rand.Reader, int(certRSABits)) //nolint:gosec
+		key, err := rsa.GenerateKey(rand.Reader, int(certRSABits)) //nolint:gosec,nolintlint
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate rsa key: %w",
 				err)
@@ -3097,7 +3098,8 @@ func loadOrCreateHostKey(keyPath, keyType string) (ssh.Signer, error) { //nolint
 			err)
 	}
 
-	err = os.WriteFile(keyPath, pem.EncodeToMemory(pemBlock), os.FileMode(certPerm)) //nolint:gosec
+	err = os.WriteFile(keyPath, pem.EncodeToMemory(pemBlock),
+		os.FileMode(certPerm)) //nolint:gosec,nolintlint
 	if err != nil {
 		return nil, fmt.Errorf("failed to write new key: %w",
 			err)
@@ -3154,7 +3156,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 				Extensions: map[string]string{"auth-method": "password"},
 			}, nil
 		},
-		PublicKeyCallback: func(
+		PublicKeyCallback: func( //nolint:gosec,nolintlint
 			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error,
 		) {
 			line := fmt.Sprintf("VALIDATE [%s] %s@%s %q:%s",
@@ -3256,6 +3258,9 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+
+	defer cancel()
+
 	conn := &Connection{
 		ID:                 sid,
 		sshConn:            sshConn,
@@ -4269,7 +4274,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						warnPrefix(), conn.ID, err)
 				}
 
-				atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
+				atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
 
 				_, err = logwriter.Write(escSequence)
 				if err != nil {
@@ -4316,9 +4321,9 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 									warnPrefix(), conn.ID, err)
 							}
 
-							atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
+							atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
 
-							trafficOutTotal.Add(uint64(m)) //nolint:gosec
+							trafficOutTotal.Add(uint64(m)) //nolint:gosec,nolintlint
 
 							_, err = logwriter.Write([]byte(replacement))
 							if err != nil {
@@ -4338,9 +4343,9 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 									warnPrefix(), conn.ID, err)
 							}
 
-							atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
+							atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
 
-							trafficOutTotal.Add(uint64(m)) //nolint:gosec
+							trafficOutTotal.Add(uint64(m)) //nolint:gosec,nolintlint
 
 							_, err = logwriter.Write(escSequence)
 							if err != nil {
@@ -4358,9 +4363,9 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 								warnPrefix(), conn.ID, err)
 						}
 
-						atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
+						atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
 
-						trafficOutTotal.Add(uint64(m)) //nolint:gosec
+						trafficOutTotal.Add(uint64(m)) //nolint:gosec,nolintlint
 
 						_, err = logwriter.Write(escSequence)
 						if err != nil {
@@ -4381,9 +4386,9 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							warnPrefix(), conn.ID, err)
 					}
 
-					atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec
+					atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
 
-					trafficOutTotal.Add(uint64(m)) //nolint:gosec
+					trafficOutTotal.Add(uint64(m)) //nolint:gosec,nolintlint
 
 					_, err = logwriter.Write([]byte{b})
 					if err != nil {
@@ -4431,7 +4436,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			}
 
 			n, err := remote.Read(buf)
-			trafficInTotal.Add(uint64(n)) //nolint:gosec
+			trafficInTotal.Add(uint64(n)) //nolint:gosec,nolintlint
 
 			if err != nil {
 				var netErr net.Error
@@ -4676,7 +4681,7 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 
 	for {
 		n, err := remote.Read(buf)
-		trafficInTotal.Add(uint64(n)) //nolint:gosec
+		trafficInTotal.Add(uint64(n)) //nolint:gosec,nolintlint
 
 		if err != nil {
 			var ne net.Error
@@ -5469,7 +5474,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 			now.Day()),
 	)
 
-	err := os.MkdirAll(dir, os.FileMode(logDirPerm)) //nolint:gosec
+	err := os.MkdirAll(dir, os.FileMode(logDirPerm)) //nolint:gosec,nolintlint
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to create log directory: %w",
 			err)
@@ -5477,7 +5482,7 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 
 	dir = filepath.Join(dir, ipDir)
 
-	err = os.MkdirAll(dir, os.FileMode(logDirPerm)) //nolint:gosec
+	err = os.MkdirAll(dir, os.FileMode(logDirPerm)) //nolint:gosec,nolintlint
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to create log subdirectory: %w",
 			err)
@@ -5509,8 +5514,8 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 		ts, sid, seq)
 	pathBase := filepath.Join(dir, base)
 
-	f, err := os.OpenFile(pathBase+".log", //nolint:gosec
-		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
+	f, err := os.OpenFile(pathBase+".log", //nolint:gosec,nolintlint
+		os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec,nolintlint
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to open log file: %w",
 			err)
@@ -5620,12 +5625,12 @@ func getFileContent(baseFilename, username string) ([]byte, error) {
 	userSpecificFile := fmt.Sprintf(
 		"%s-%s.txt", strings.TrimSuffix(baseFilename, ".txt"), username)
 
-	content, err := os.ReadFile(userSpecificFile) //nolint:gosec
+	content, err := os.ReadFile(userSpecificFile) //nolint:gosec,nolintlint
 	if err == nil {
 		return content, nil
 	}
 
-	content, err = os.ReadFile(baseFilename) //nolint:gosec
+	content, err = os.ReadFile(baseFilename) //nolint:gosec,nolintlint
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w",
 			err)
@@ -5704,7 +5709,7 @@ func rotateConsoleLogAt(t time.Time) {
 	logDir := filepath.Dir(logPath)
 
 	err := os.MkdirAll(
-		logDir, os.FileMode(logDirPerm)) //nolint:gosec
+		logDir, os.FileMode(logDirPerm)) //nolint:gosec,nolintlint
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sERROR: Failed to create console log directory: %v\r\n",
@@ -5728,8 +5733,9 @@ func rotateConsoleLogAt(t time.Time) {
 		return
 	}
 
-	file, err := os.OpenFile( //nolint:gosec
-		logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(logPerm)) //nolint:gosec
+	file, err := os.OpenFile( //nolint:gosec,nolintlint
+		logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND,
+		os.FileMode(logPerm)) //nolint:gosec,nolintlint
 	if err != nil {
 		if isConsoleLogQuiet {
 			isConsoleLogQuiet = false
@@ -5794,7 +5800,7 @@ func compressLogFile(logFilePath string) {
 		return
 	}
 
-	data, err := os.ReadFile(logFilePath) //nolint:gosec
+	data, err := os.ReadFile(logFilePath) //nolint:gosec,nolintlint
 	if err != nil {
 		log.Printf("%sFailed to read log %q for compression: %v", //nolint:gosec,nolintlint
 			warnPrefix(), logFilePath, err)
@@ -5851,7 +5857,7 @@ func compressLogFile(logFilePath string) {
 	case "gzip": //nolint:goconst
 		compressedFilePath = logFilePath + ".gz"
 
-		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
+		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec,nolintlint
 		if err != nil {
 			log.Printf("%sFailed to create compressed file %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
@@ -5876,7 +5882,7 @@ func compressLogFile(logFilePath string) {
 	case "xz":
 		compressedFilePath = logFilePath + ".xz"
 
-		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
+		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec,nolintlint
 		if err != nil {
 			log.Printf("%sFailed to create compressed file %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
@@ -5901,7 +5907,7 @@ func compressLogFile(logFilePath string) {
 	case "lzip":
 		compressedFilePath = logFilePath + ".lz"
 
-		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
+		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec,nolintlint
 		if err != nil {
 			log.Printf("%sFailed to create compressed file %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
@@ -5927,7 +5933,7 @@ func compressLogFile(logFilePath string) {
 	case "zstd":
 		compressedFilePath = logFilePath + ".zst"
 
-		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec
+		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec,nolintlint
 		if err != nil {
 			log.Printf("%sFailed to create compressed file %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
@@ -6012,7 +6018,7 @@ func compressLogFile(logFilePath string) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func parseIPListFile(filePath string) ([]*net.IPNet, error) {
-	file, err := os.Open(filePath) //nolint:gosec
+	file, err := os.Open(filePath) //nolint:gosec,nolintlint
 	if err != nil {
 		return nil, fmt.Errorf("%w",
 			err)
