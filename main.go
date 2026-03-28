@@ -338,7 +338,7 @@ func sanitizeNonASCII(s string) string {
 
 func isUnixSocket(path string) bool {
 	return strings.HasPrefix(path, "/") || strings.HasPrefix(path, ".") ||
-		(runtime.GOOS == "windows" && strings.HasPrefix(path, "\\")) //nolint:goconst
+		(runtime.GOOS == "windows" && strings.HasPrefix(path, "\\")) //nolint:goconst,nolintlint
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -904,7 +904,7 @@ func main() {
 	if consoleLog != "" {
 		cl := strings.ToLower(consoleLog)
 
-		if cl != "quiet" && cl != "noquiet" { //nolint:goconst
+		if cl != "quiet" && cl != "noquiet" { //nolint:goconst,nolintlint
 			if enableGops {
 				gopsClose()
 			}
@@ -968,7 +968,7 @@ func main() {
 	}
 
 	switch compressLevel {
-	case "fast", "normal", "high": //nolint:goconst
+	case "fast", "normal", "high": //nolint:goconst,nolintlint
 
 	default:
 		if enableGops {
@@ -2370,7 +2370,7 @@ func listConfiguration() {
 	if enableGops {
 		gopsStr = "enabled"
 	} else {
-		gopsStr = "disabled" //nolint:goconst
+		gopsStr = "disabled" //nolint:goconst,nolintlint
 	}
 
 	s14 := "Gops diagnostic agent: " + gopsStr
@@ -3153,7 +3153,9 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 			conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error,
 		) {
 			return &ssh.Permissions{
-				Extensions: map[string]string{"auth-method": "password"},
+				Extensions: map[string]string{
+					"auth-method": "password", //nolint:goconst,nolintlint
+				},
 			}, nil
 		},
 		PublicKeyCallback: func( //nolint:gosec,nolintlint
@@ -3172,7 +3174,9 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 			keyLog = append(keyLog, line)
 
 			return &ssh.Permissions{
-				Extensions: map[string]string{"auth-method": "publickey"},
+				Extensions: map[string]string{
+					"auth-method": "publickey", //nolint:goconst,nolintlint
+				},
 			}, errors.New("next key")
 		},
 		KeyboardInteractiveCallback: func(
@@ -3180,7 +3184,9 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 			challenge ssh.KeyboardInteractiveChallenge) (*ssh.Permissions, error,
 		) {
 			return &ssh.Permissions{
-				Extensions: map[string]string{"auth-method": "keyboard-interactive"},
+				Extensions: map[string]string{
+					"auth-method": "keyboard-interactive", //nolint:goconst,nolintlint
+				},
 			}, nil
 		},
 		//revive:enable:unused-parameter
@@ -3230,7 +3236,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		authMethod = "keyboard-interactive"
 
 	default:
-		authMethod = "unknown" //nolint:goconst
+		authMethod = "unknown" //nolint:goconst,nolintlint
 	}
 
 	var userName string
@@ -5854,7 +5860,7 @@ func compressLogFile(logFilePath string) {
 	}
 
 	switch compressAlgo {
-	case "gzip": //nolint:goconst
+	case "gzip": //nolint:goconst,nolintlint
 		compressedFilePath = logFilePath + ".gz"
 
 		compressedFile, err = os.Create(compressedFilePath) //nolint:gosec,nolintlint

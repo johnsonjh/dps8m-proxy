@@ -97,7 +97,7 @@ func isUTF8unix() bool {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func isUTF8windows() bool {
-	if runtime.GOOS != "windows" { //nolint:goconst
+	if runtime.GOOS != "windows" { //nolint:goconst,nolintlint
 		return false
 	}
 
