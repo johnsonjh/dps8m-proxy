@@ -27,7 +27,7 @@ import (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func announceMDNS(listener net.Listener, listenHost string, altHosts map[string]string,
-	service string, defaultTarget string,
+	service, defaultTarget string,
 ) {
 	laddr := listener.Addr()
 	if laddr == nil {
