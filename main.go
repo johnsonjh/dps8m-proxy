@@ -198,6 +198,7 @@ var (
 	loggingWg                        sync.WaitGroup
 	noBanner                         bool
 	noCompress                       bool
+	noFilter                         bool
 	noSanitize                       bool
 	enableGops                       bool
 	enableMDNS                       bool
@@ -604,6 +605,10 @@ func init() { //nolint:gochecknoinits
 		"debug-server", "",
 		"Enable HTTP debug server listening address\r\n"+
 			"    [e.g., \":6060\", \"[::1]:6060\"]")
+
+	pflag.BoolVar(&noFilter,
+		"no-filter", false,
+		"Disable link filtering of NULL characters")
 
 	pflag.BoolVar(&noSanitize,
 		"no-sanitize", false,
@@ -4524,7 +4529,12 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			if n > 0 {
 				atomic.AddUint64(&telnetIn, uint64(n))        //nolint:gosec,nolintlint
 				atomic.AddUint64(&conn.sshInTotal, uint64(n)) //nolint:gosec,nolintlint
-				fwd := bytes.ReplaceAll(buf[:n], []byte{0}, []byte{})
+
+				fwd := buf[:n]
+
+				if !noFilter {
+					fwd = bytes.ReplaceAll(fwd, []byte{0}, []byte{})
+				}
 
 				atomic.AddUint64(&sshOut, uint64(len(fwd)))
 				atomic.AddUint64(&conn.sshOutTotal, uint64(len(fwd)))
