@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.47 (2026-Mar-21 g7bbd0de) [linux/amd64]
+DPS8M Proxy v1.0.48 (2026-Mar-30 ge077047) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -131,6 +131,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
   --debug-telnet                Debug TELNET option negotiation
   --debug-server <string>       Enable HTTP debug server listening address
                                     [e.g., ":6060", "[::1]:6060"]
+  --no-filter                   Disable link filtering of NULL characters
   --no-sanitize                 Disable ASCII sanitization of error messages
                                     (allowing non-ASCII error reports via SSH)
   --gops                        Enable the "gops" diagnostic agent
@@ -278,12 +279,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.47 (2026-Mar-21 g7bbd0de) [linux/amd64]
+DPS8M Proxy v1.0.48 (2026-Mar-30 ge077047) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.47                          |
+| dps8m/proxy               | v1.0.48                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -551,13 +552,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>8946</th>
-<th>1959</th>
+<th>8962</th>
+<th>1962</th>
 <th>582</th>
-<th>6405</th>
-<th>1576</th>
-<th>216470</th>
-<th>3901</th>
+<th>6418</th>
+<th>1577</th>
+<th>216837</th>
+<th>3908</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -612,13 +613,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10796</th>
-<th>2291</th>
+<th>10812</th>
+<th>2294</th>
 <th>903</th>
-<th>7602</th>
-<th>1765</th>
-<th>287038</th>
-<th>5084</th>
+<th>7615</th>
+<th>1766</th>
+<th>287405</th>
+<th>5091</th>
 </tr></tfoot></table>
 
 ## Future plans
