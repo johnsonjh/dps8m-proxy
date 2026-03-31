@@ -40,7 +40,7 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 * ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
 * ✅ Optional support for management using `systemd` on Linux (running in a sandbox)
 * ✅ Optional mDNS (Multicast DNS) DNS-SD service advertisements for listeners
-* ✅ Link filtering
+* ✅ Optional link filtering
 * ✅ Live streaming connection sharing (read‑only)
   * 🤝 Allows users to share their session with one or more viewers
 
@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.48 (2026-Mar-30 g1e758f1) [linux/amd64]
+DPS8M Proxy v1.0.49* (2026-Mar-30 g30625a4+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -279,12 +279,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.48 (2026-Mar-30 g1e758f1) [linux/amd64]
+DPS8M Proxy v1.0.49* (2026-Mar-30 g30625a4+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.48                          |
+| dps8m/proxy               | v1.0.49*                         |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -587,7 +587,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>474</th>
 <th>0</th>
-<th>27482</th>
+<th>27491</th>
 <th>459</th>
 </tr><tr>
 <th>Systemd</th>
@@ -618,7 +618,7 @@ predecessor (code statistics 📈 provided by
 <th>903</th>
 <th>7615</th>
 <th>1766</th>
-<th>287405</th>
+<th>287414</th>
 <th>5091</th>
 </tr></tfoot></table>
 
