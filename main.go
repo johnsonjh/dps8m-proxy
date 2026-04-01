@@ -203,6 +203,7 @@ var (
 	enableGops                       bool
 	enableMDNS                       bool
 	noLog                            bool
+	noMenu                           bool
 	noConsole                        bool
 	showVersion                      bool
 	showLicense                      bool
@@ -586,6 +587,10 @@ func init() { //nolint:gochecknoinits
 	pflag.BoolVar(&noBanner,
 		"no-banner", false,
 		"Disable SSH connection banner")
+
+	pflag.BoolVar(&noMenu,
+		"no-menu", false,
+		"Disable the user SSH 'Control-]' menu")
 
 	pflag.StringVar(&telnetHostPort,
 		"telnet-host", "127.0.0.1:6180",
@@ -4311,7 +4316,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					continue
 				}
 
-				if b == 0x1d { // Ctrl-]
+				if !noMenu && b == 0x1d { // Ctrl-]
 					showMenu(channel)
 
 					menuMode = true
