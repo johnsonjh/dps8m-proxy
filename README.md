@@ -105,7 +105,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.49 (2026-Mar-31 ge44471c) [linux/amd64]
+DPS8M Proxy v1.0.49 (2026-Apr-01 ga87e0f9) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -124,6 +124,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
   --ssh-delay <float>           Delay for incoming SSH connections
                                     ["0.0" to "30.0" seconds] (no default)
   --no-banner                   Disable SSH connection banner
+  --no-menu                     Disable the user SSH 'Control-]' menu
   --telnet-host <string>        Default TELNET target [host:port]
                                     (default "127.0.0.1:6180")
   --alt-host <string>           Alternate TELNET target(s) [sshuser@host:port]
@@ -279,7 +280,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.49 (2026-Mar-31 ge44471c) [linux/amd64]
+DPS8M Proxy v1.0.49 (2026-Apr-01 ga87e0f9) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -409,8 +410,7 @@ admin console).
 ### User interaction
 
 Users connected via SSH can send `^]` (*i.e.*, `Control + ]`) during
-their session to access the following following TELNET control
-features:
+their session to access the following TELNET control features:
 
 * `]` — sends a literal `Control‑]` to the target TELNET host
 
@@ -552,13 +552,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>8962</th>
-<th>1962</th>
+<th>8967</th>
+<th>1963</th>
 <th>582</th>
-<th>6418</th>
-<th>1577</th>
-<th>216837</th>
-<th>3908</th>
+<th>6422</th>
+<th>1578</th>
+<th>216975</th>
+<th>3912</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -582,13 +582,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>583</th>
+<th>582</th>
 <th>109</th>
 <th>0</th>
-<th>474</th>
+<th>473</th>
 <th>0</th>
-<th>27491</th>
-<th>459</th>
+<th>27481</th>
+<th>458</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -613,13 +613,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10812</th>
-<th>2294</th>
+<th>10816</th>
+<th>2295</th>
 <th>903</th>
-<th>7615</th>
-<th>1766</th>
-<th>287414</th>
-<th>5091</th>
+<th>7618</th>
+<th>1767</th>
+<th>287542</th>
+<th>5094</th>
 </tr></tfoot></table>
 
 ## Future plans
