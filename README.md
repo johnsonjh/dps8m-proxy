@@ -106,7 +106,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.49 (2026-Apr-02 g394852b) [linux/amd64]
+DPS8M Proxy v1.0.49 (2026-Apr-02 g1d85795) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -128,10 +128,10 @@ Usage for /home/jhj/dps8m-proxy/proxy:
   --no-menu                     Disable the user SSH 'Control-]' menu
   --telnet-host <string>        Default TELNET target [host:port]
                                     (default "127.0.0.1:6180")
-  --iconv <string>              Character map conversion of text to UTF-8
-                                    [e.g., "IBM Code Page 437"] (no default)
   --alt-host <string>           Alternate TELNET target(s) [sshuser@host:port]
                                     (multiple allowed)
+  --iconv <string>              Character map conversion of text to UTF-8
+                                    [e.g., "IBM Code Page 437"] (no default)
   --debug-telnet                Debug TELNET option negotiation
   --debug-server <string>       Enable HTTP debug server listening address
                                     [e.g., ":6060", "[::1]:6060"]
@@ -283,7 +283,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.49 (2026-Apr-02 g394852b) [linux/amd64]
+DPS8M Proxy v1.0.49 (2026-Apr-02 g1d85795) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
