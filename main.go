@@ -5339,7 +5339,7 @@ func showMenu(ch ssh.Channel) {
 		"\r +=====+=================+ \r\n"
 
 	if iconv != "" {
-		menu += "\r |  C  | Toggle Charmap   | \r\n"
+		menu += "\r |  C  | Toggle Charmap  | \r\n"
 	}
 
 	menu += "\r |  K  | Toggle Keymap   | \r\n" +
@@ -5607,7 +5607,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 
 		if conn.iconvEnabled && iconv != "" {
 			_, err = ch.Write(fmt.Appendf(nil,
-				">> CNV - Character map %s to UTF-8 conversion enabled.\r\n",
+				">> CNV - Character map \"%s\" to UTF-8 conversion enabled.\r\n",
 				iconv))
 			if err != nil {
 				log.Printf("%sError writing character map conversion status to channel: %v",
