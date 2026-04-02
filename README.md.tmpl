@@ -39,8 +39,9 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 * ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
 * ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
 * ✅ Optional support for management using `systemd` on Linux (running in a sandbox)
+* ✅ Optional conversion of legacy host character mappings to UTF-8
 * ✅ Optional mDNS (Multicast DNS) DNS-SD service advertisements for listeners
-* ✅ Link filtering
+* ✅ Optional link filtering
 * ✅ Live streaming connection sharing (read‑only)
   * 🤝 Allows users to share their session with one or more viewers
 
@@ -312,8 +313,7 @@ admin console).
 ### User interaction
 
 Users connected via SSH can send `^]` (*i.e.*, `Control + ]`) during
-their session to access the following following TELNET control
-features:
+their session to access the following TELNET control features:
 
 * `]` — sends a literal `Control‑]` to the target TELNET host
 
@@ -572,6 +572,7 @@ predecessor (code statistics 📈 provided by
   |                                            [x/sync](https://golang.org/x/sync) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                              [x/sys](https://golang.org/x/sys) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                            [x/term](https://golang.org/x/term) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                            [x/text](https://golang.org/x/text) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                          [x/tools](https://golang.org/x/tools) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
 
 <!--

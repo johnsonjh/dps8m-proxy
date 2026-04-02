@@ -39,8 +39,9 @@ more **TELNET** servers on the back‑end (*targets* 🎯).
 * ✅ User access to TELNET features (*e.g.*, line BREAK, AYT) and statistics
 * ✅ Transparent key remapping mode (translating movement keys to Emacs sequences)
 * ✅ Optional support for management using `systemd` on Linux (running in a sandbox)
+* ✅ Optional conversion of legacy host character mappings to UTF-8
 * ✅ Optional mDNS (Multicast DNS) DNS-SD service advertisements for listeners
-* ✅ Link filtering
+* ✅ Optional link filtering
 * ✅ Live streaming connection sharing (read‑only)
   * 🤝 Allows users to share their session with one or more viewers
 
@@ -105,7 +106,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.48 (2026-Mar-30 g1e758f1) [linux/amd64]
+DPS8M Proxy v1.0.49 (2026-Apr-02 gc8cb639) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -124,10 +125,13 @@ Usage for /home/jhj/dps8m-proxy/proxy:
   --ssh-delay <float>           Delay for incoming SSH connections
                                     ["0.0" to "30.0" seconds] (no default)
   --no-banner                   Disable SSH connection banner
+  --no-menu                     Disable the user SSH 'Control-]' menu
   --telnet-host <string>        Default TELNET target [host:port]
                                     (default "127.0.0.1:6180")
   --alt-host <string>           Alternate TELNET target(s) [sshuser@host:port]
                                     (multiple allowed)
+  --iconv <string>              Character map conversion of text to UTF-8
+                                    [e.g., "IBM Code Page 437"] (no default)
   --debug-telnet                Debug TELNET option negotiation
   --debug-server <string>       Enable HTTP debug server listening address
                                     [e.g., ":6060", "[::1]:6060"]
@@ -279,12 +283,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.48 (2026-Mar-30 g1e758f1) [linux/amd64]
+DPS8M Proxy v1.0.49 (2026-Apr-02 gc8cb639) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.48                          |
+| dps8m/proxy               | v1.0.49                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -299,6 +303,7 @@ DPS8M Proxy v1.0.48 (2026-Mar-30 g1e758f1) [linux/amd64]
 | golang.org/x/net          | v0.52.0                          |
 | golang.org/x/sys          | v0.42.0                          |
 | golang.org/x/term         | v0.41.0                          |
+| golang.org/x/text         | v0.35.0                          |
 | kernel.org/.../libcap/cap | v1.2.77                          |
 | kernel.org/.../libcap/psx | v1.2.77                          |
 | Go compiler (gc)          | v1.26.1-X:nodwarf5               |
@@ -409,8 +414,7 @@ admin console).
 ### User interaction
 
 Users connected via SSH can send `^]` (*i.e.*, `Control + ]`) during
-their session to access the following following TELNET control
-features:
+their session to access the following TELNET control features:
 
 * `]` — sends a literal `Control‑]` to the target TELNET host
 
@@ -552,23 +556,23 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>8962</th>
-<th>1962</th>
-<th>582</th>
-<th>6418</th>
-<th>1577</th>
-<th>216837</th>
-<th>3908</th>
+<th>9225</th>
+<th>2012</th>
+<th>587</th>
+<th>6626</th>
+<th>1659</th>
+<th>223064</th>
+<th>4035</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
-<th>436</th>
-<th>99</th>
+<th>439</th>
+<th>100</th>
 <th>112</th>
-<th>225</th>
+<th>227</th>
 <th>34</th>
-<th>12916</th>
-<th>207</th>
+<th>12974</th>
+<th>208</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -582,13 +586,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>583</th>
+<th>584</th>
 <th>109</th>
 <th>0</th>
-<th>474</th>
+<th>475</th>
 <th>0</th>
-<th>27482</th>
-<th>459</th>
+<th>27698</th>
+<th>460</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -607,19 +611,19 @@ predecessor (code statistics 📈 provided by
 <th>10</th>
 <th>68</th>
 <th>0</th>
-<th>3971</th>
+<th>3973</th>
 <th>75</th>
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>10812</th>
-<th>2294</th>
-<th>903</th>
-<th>7615</th>
-<th>1766</th>
-<th>287405</th>
-<th>5091</th>
+<th>11079</th>
+<th>2345</th>
+<th>908</th>
+<th>7826</th>
+<th>1848</th>
+<th>293908</th>
+<th>5220</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -752,6 +756,7 @@ predecessor (code statistics 📈 provided by
   |                                            [x/sync](https://golang.org/x/sync) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                              [x/sys](https://golang.org/x/sys) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                            [x/term](https://golang.org/x/term) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
+  |                                            [x/text](https://golang.org/x/text) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                          [x/tools](https://golang.org/x/tools) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
 
 <!--

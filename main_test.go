@@ -14,6 +14,7 @@ package main
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -26,7 +27,7 @@ import (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
+func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 	if enableGops {
 		gopsClose()
 	}
@@ -95,7 +96,9 @@ func TestSetupConsoleLogging(t *testing.T) { //nolint:paralleltest
 	}
 }
 
-func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 	if enableGops {
 		gopsClose()
 	}
@@ -194,6 +197,54 @@ func TestConsoleLogRollover(t *testing.T) { //nolint:paralleltest
 	if !strings.Contains(string(content), "Test message day 2") {
 		t.Errorf("Log file for day 2 does not contain the test message. Content:\r\n%s",
 			string(content))
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func TestFindCharmap(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
+	if enableGops {
+		gopsClose()
+	}
+
+	defer goleak.VerifyNone(t)
+
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"CodePage437", "CodePage437", "IBM Code Page 437"}, //nolint:goconst
+		{"ISO8859-1", "ISO8859-1", "ISO 8859-1"},
+		{"lowercase", "codepage437", "IBM Code Page 437"},         //nolint:goconst
+		{"with spaces", "IBM Code Page 437", "IBM Code Page 437"}, //nolint:goconst
+		{"invalid", "NoSuchCharmap", ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			cm := findCharmap(tt.input)
+			if tt.expected == "" {
+				if cm != nil {
+					t.Errorf("findCharmap(%q) expected nil, got %v",
+						tt.input, cm)
+				}
+			} else {
+				if cm == nil {
+					t.Errorf("findCharmap(%q) expected %q, got nil",
+						tt.input, tt.expected)
+				} else {
+					got := fmt.Sprintf("%v",
+						cm)
+					if !strings.Contains(strings.ToLower(got), strings.ToLower(tt.expected)) {
+						t.Errorf("findCharmap(%q) = %q, want it to contain %q",
+							tt.input, got, tt.expected)
+					}
+				}
+			}
+		})
 	}
 }
 
