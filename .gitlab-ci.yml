@@ -52,7 +52,7 @@ pages:
     - cp -f proxy /tmp
     - pdpmake cross
     - mv -f cross.bin public
-    - ( cd $HOME && mkdir -p x-tools && cd x-tools && curl -fsSL https://github.com/johnsonjh/ndk/releases/download/r29/android-ndk-r29.tar.lz | lzip -dc | tar xf - ) || true
+    - ( cd $HOME && mkdir -p x-tools && cd x-tools && curl -fsSL https://github.com/johnsonjh/ndk/releases/download/r29/android-ndk-r30b1.tar.lz | lzip -dc | tar xf - ) || true
     - env MAKE=pdpmake yash ./.cross-android.sh || true
     - mv -f proxy.android.arm public || true
     - mv -f proxy.android.386 public || true
