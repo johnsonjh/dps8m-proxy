@@ -71,6 +71,9 @@ ${GO:?} mod tidy
 ${GO:?} get -u golang.org/x/term@latest
 ${GO:?} mod tidy
 
+${GO:?} get -u golang.org/x/text@latest
+${GO:?} mod tidy
+
 ${GO:?} get -u kernel.org/pub/linux/libs/security/libcap/cap@latest
 ${GO:?} mod tidy
 

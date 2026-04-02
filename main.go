@@ -58,6 +58,9 @@ import (
 	"github.com/ulikunitz/xz"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/transform"
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,6 +196,7 @@ var (
 	gracefulShutdownMode             atomic.Bool
 	idleMax                          uint64
 	idleDefMax                       uint64
+	iconv                            string
 	keymapByDefault                  bool
 	logDir                           string
 	loggingWg                        sync.WaitGroup
@@ -306,6 +310,8 @@ type Connection struct {
 	targetPort          int
 	initialWindowWidth  uint32
 	initialWindowHeight uint32
+	iconvDecoder        *encoding.Decoder
+	iconvEnabled        bool
 	isDefaultTarget     bool
 	emacsKeymapEnabled  bool
 	wasMonitored        bool
@@ -334,6 +340,109 @@ func sanitizeNonASCII(s string) string {
 	}
 
 	return b.String()
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+//nolint:ireturn
+func findCharmap(name string) encoding.Encoding {
+	normalizedInput := strings.ToLower(strings.ReplaceAll(name, " ", ""))
+
+	if len(normalizedInput) < 3 {
+		return nil
+	}
+
+	for _, cm := range charmap.All {
+		cmName := fmt.Sprintf("%v", cm)
+		normalizedName := strings.ToLower(strings.ReplaceAll(cmName, " ", ""))
+
+		if normalizedInput == normalizedName ||
+			(len(normalizedInput) >= 5 && strings.HasSuffix(normalizedName, normalizedInput)) {
+			return cm
+		}
+	}
+
+	return nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func decodeTelnetData(decoder *encoding.Decoder, fwd []byte) []byte {
+	if decoder == nil {
+		return fwd
+	}
+
+	var result []byte
+
+	i := 0
+
+	for i < len(fwd) {
+		if fwd[i] == TelcmdIAC {
+			end := i + 1 // Found IAC
+			if end < len(fwd) {
+				cmd := fwd[end]
+
+				switch cmd {
+				case TelcmdWILL, TelcmdWONT, TelcmdDO, TelcmdDONT:
+					end += 2
+
+				case TelcmdSB:
+					foundSE := false
+
+					for j := end + 1; j < len(fwd)-1; j++ { // Look for IAC SE
+						if fwd[j] == TelcmdIAC && fwd[j+1] == TelcmdSE {
+							end = j + 2
+							foundSE = true
+
+							break
+						}
+					}
+
+					if !foundSE {
+						end = len(fwd)
+					}
+
+				case TelcmdIAC:
+					decoded, _, err := transform.Bytes(decoder, []byte{255}) // Escaped IAC
+					if err == nil {
+						result = append(result, decoded...)
+					} else {
+						result = append(result, 255)
+					}
+
+					i += 2
+
+					continue
+
+				default:
+					end++
+				}
+			} else {
+				end = len(fwd)
+			}
+
+			if end > len(fwd) {
+				end = len(fwd)
+			}
+
+			result = append(result, fwd[i:end]...)
+			i = end
+		} else {
+			start := i // Data segment
+			for i < len(fwd) && fwd[i] != TelcmdIAC {
+				i++
+			}
+
+			decoded, _, err := transform.Bytes(decoder, fwd[start:i])
+			if err == nil {
+				result = append(result, decoded...)
+			} else {
+				result = append(result, fwd[start:i]...)
+			}
+		}
+	}
+
+	return result
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -596,6 +705,11 @@ func init() { //nolint:gochecknoinits
 		"telnet-host", "127.0.0.1:6180",
 		"Default TELNET target [host:port]\r\n"+
 			"   ")
+
+	pflag.StringVar(&iconv,
+		"iconv", "",
+		"Character map conversion of text to UTF-8\r\n"+
+			"    [e.g., \"IBM Code Page 437\"] (no default)")
 
 	pflag.Var(&altHostFlag{},
 		"alt-host",
@@ -954,6 +1068,32 @@ func main() {
 
 		log.Fatalf("%sERROR: --ssh-delay cannot be greater than 30!",
 			errorPrefix()) // LINTED: Fatalf
+	}
+
+	if iconv != "" {
+		if findCharmap(iconv) == nil {
+			if enableGops {
+				gopsClose()
+			}
+
+			available := make([]string, 0, len(charmap.All))
+			for _, cm := range charmap.All {
+				available = append(available, fmt.Sprintf("%v", cm))
+			}
+
+			sort.Strings(available)
+
+			_, _ = fmt.Fprintf(os.Stdout, "\r\nValid --iconv character map strings:\r\n\r\n")
+
+			for _, name := range available {
+				_, _ = fmt.Fprintf(os.Stdout, "  \"%s\"\r\n", name)
+			}
+
+			_, _ = fmt.Fprintf(os.Stdout, "\r\n")
+
+			log.Fatalf("%sERROR: Illegal --iconv charmap string: \"%s\"",
+				errorPrefix(), iconv) // LINTED: Fatalf
+		}
 	}
 
 	if os.Getuid() == 0 && !allowRoot {
@@ -3290,6 +3430,14 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		emacsKeymapEnabled: keymapByDefault,
 	}
 
+	if iconv != "" {
+		cm := findCharmap(iconv)
+		if cm != nil {
+			conn.iconvDecoder = cm.NewDecoder()
+			conn.iconvEnabled = true
+		}
+	}
+
 	defaultHost, defaultPort, err := parseHostPort(telnetHostPort)
 	if err != nil {
 		log.Printf("%sError parsing default TELNET target: %v",
@@ -4541,6 +4689,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					fwd = bytes.ReplaceAll(fwd, []byte{0}, []byte{})
 				}
 
+				if conn.iconvEnabled && conn.iconvDecoder != nil {
+					fwd = decodeTelnetData(conn.iconvDecoder, fwd)
+				}
+
 				atomic.AddUint64(&sshOut, uint64(len(fwd)))
 				atomic.AddUint64(&conn.sshOutTotal, uint64(len(fwd)))
 
@@ -4573,7 +4725,12 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 				connectionsMutex.Unlock()
 
-				_, err = logwriter.Write(buf[:n])
+				if conn.iconvEnabled && conn.iconvDecoder != nil {
+					_, err = logwriter.Write(fwd)
+				} else {
+					_, err = logwriter.Write(buf[:n])
+				}
+
 				if err != nil {
 					log.Printf("%sError writing to log for %s: %v",
 						warnPrefix(), conn.ID, err)
@@ -4862,8 +5019,16 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 					i++
 				}
 			} else {
-				_, _ = ch.Write(buf[i : i+1])
-				_, _ = logw.Write(buf[i : i+1])
+				data := buf[i : i+1]
+				if conn.iconvEnabled && conn.iconvDecoder != nil {
+					decoded, _, err := transform.Bytes(conn.iconvDecoder, data)
+					if err == nil {
+						data = decoded
+					}
+				}
+
+				_, _ = ch.Write(data)
+				_, _ = logw.Write(data)
 				i++
 			}
 		}
@@ -5171,8 +5336,13 @@ func showMenu(ch ssh.Channel) {
 		"\r |  I  | Send Interrupt  | \r\n" +
 		"\r |  N  | Send NOP        | \r\n" +
 		"\r |  ]  | Send Control-]  | \r\n" +
-		"\r +=====+=================+ \r\n" +
-		"\r |  K  | Toggle Keymap   | \r\n" +
+		"\r +=====+=================+ \r\n"
+
+	if iconv != "" {
+		menu += "\r |  C  | Toggle Charmap   | \r\n"
+	}
+
+	menu += "\r |  K  | Toggle Keymap   | \r\n" +
 		"\r |  S  | Show Status     | \r\n" +
 		"\r |  X  | Disconnect      | \r\n" +
 		"\r +=====+=================+ \r\n"
@@ -5276,6 +5446,33 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		if err != nil {
 			log.Printf("%sError writing '[BACK TO HOST]' message to channel: %v",
 				warnPrefix(), err)
+		}
+
+	case 'c', 'C':
+		if iconv != "" {
+			conn.iconvEnabled = !conn.iconvEnabled
+
+			if conn.iconvEnabled {
+				_, err := ch.Write([]byte("\r\n>> Character map conversion ENABLED\r\n"))
+				if err != nil {
+					log.Printf("%s"+
+						"Error writing 'Character map conversion ENABLED' message to channel: %v",
+						warnPrefix(), err)
+				}
+			} else {
+				_, err := ch.Write([]byte("\r\n>> Character map conversion DISABLED\r\n"))
+				if err != nil {
+					log.Printf("%s"+
+						"Error writing 'Character map conversion DISABLED' message to channel: %v",
+						warnPrefix(), err)
+				}
+			}
+
+			_, err := ch.Write([]byte("\r\n[BACK TO HOST]\r\n"))
+			if err != nil {
+				log.Printf("%sError writing '[BACK TO HOST]' message to channel: %v",
+					warnPrefix(), err)
+			}
 		}
 
 	case 'k', 'K':
@@ -5406,6 +5603,16 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel, remote net.
 		if err != nil {
 			log.Printf("%sError writing NVT statistics to channel: %v",
 				warnPrefix(), err)
+		}
+
+		if conn.iconvEnabled && iconv != "" {
+			_, err = ch.Write(fmt.Appendf(nil,
+				">> CNV - Character map %s to UTF-8 conversion enabled.\r\n",
+				iconv))
+			if err != nil {
+				log.Printf("%sError writing character map conversion status to channel: %v",
+					warnPrefix(), err)
+			}
 		}
 
 		keymapStatus := ""
