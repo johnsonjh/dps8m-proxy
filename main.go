@@ -706,15 +706,15 @@ func init() { //nolint:gochecknoinits
 		"Default TELNET target [host:port]\r\n"+
 			"   ")
 
-	pflag.StringVar(&iconv,
-		"iconv", "",
-		"Character map conversion of text to UTF-8\r\n"+
-			"    [e.g., \"IBM Code Page 437\"] (no default)")
-
 	pflag.Var(&altHostFlag{},
 		"alt-host",
 		"Alternate TELNET target(s) [sshuser@host:port]\r\n"+
 			"    (multiple allowed)")
+
+	pflag.StringVar(&iconv,
+		"iconv", "",
+		"Character map conversion of text to UTF-8\r\n"+
+			"    [e.g., \"IBM Code Page 437\"] (no default)")
 
 	pflag.BoolVar(&debugNegotiation,
 		"debug-telnet", false,
