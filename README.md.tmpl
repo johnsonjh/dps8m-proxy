@@ -156,7 +156,18 @@ are, hopefully, documented here:
   and possibly a resolved host name.  This can be disabled with
   `‑‑no‑banner`.
 
-* The `‑‑no‑banner` command disables only those lines described above.
+* The `--iconv` option enables legacy character map conversion of
+  TELNET text to UTF-8, and takes the name of the legacy mapping.  To
+  see a list of valid character maps, pass `help` (or any other illegal
+  value, *i.e.*, `--iconv "help"`).  This option currently applies to
+  all targets and is most useful to operators of specific legacy
+  systems such as DOS-based bulletin board systems.
+
+* The `--no-filter` option disables link filtering of NULL characters.
+  This may be required to use the ZMODEM inline file transfer protocol
+  or other host applications that use NULL-terminated packet sequences.
+
+* The `‑‑no‑banner` option disables only those lines described above.
   It does *not* disable the file‑based banner content.  These are the
   three primary text files which can be displayed to connecting
   SSH users:
@@ -322,6 +333,9 @@ their session to access the following TELNET control features:
 * `A` — sends an IAC `AYT` (*Are You There?*) to the target TELNET host
 
 * `B` — sends an IAC `BREAK` signal to the target TELNET host
+
+* `C` — toggles the conversion of legacy host character mappings to
+  UTF-8 (if enabled via the `--iconv` option)
 
 * `I` — sends an IAC `INTERRUPT` signal to the target TELNET host
 
