@@ -106,7 +106,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.49 (2026-Apr-02 g19acda2) [linux/amd64]
+DPS8M Proxy v1.0.50 (2026-Apr-03 g25704a3) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -233,7 +233,18 @@ are, hopefully, documented here:
   and possibly a resolved host name.  This can be disabled with
   `‑‑no‑banner`.
 
-* The `‑‑no‑banner` command disables only those lines described above.
+* The `--iconv` option enables legacy character map conversion of
+  TELNET text to UTF-8, and takes the name of the legacy mapping.  To
+  see a list of valid character maps, pass `help` (or any other illegal
+  value, *i.e.*, `--iconv "help"`).  This option currently applies to
+  all targets and is most useful to operators of specific legacy
+  systems such as DOS-based bulletin board systems.
+
+* The `--no-filter` option disables link filtering of NULL characters.
+  This may be required to use the ZMODEM inline file transfer protocol
+  or other host applications that use NULL-terminated packet sequences.
+
+* The `‑‑no‑banner` option disables only those lines described above.
   It does *not* disable the file‑based banner content.  These are the
   three primary text files which can be displayed to connecting
   SSH users:
@@ -283,12 +294,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.49 (2026-Apr-02 g19acda2) [linux/amd64]
+DPS8M Proxy v1.0.50 (2026-Apr-03 g25704a3) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.49                          |
+| dps8m/proxy               | v1.0.50                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -423,6 +434,9 @@ their session to access the following TELNET control features:
 * `A` — sends an IAC `AYT` (*Are You There?*) to the target TELNET host
 
 * `B` — sends an IAC `BREAK` signal to the target TELNET host
+
+* `C` — toggles the conversion of legacy host character mappings to
+  UTF-8 (if enabled via the `--iconv` option)
 
 * `I` — sends an IAC `INTERRUPT` signal to the target TELNET host
 
@@ -586,13 +600,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>584</th>
-<th>109</th>
+<th>598</th>
+<th>112</th>
 <th>0</th>
-<th>475</th>
+<th>486</th>
 <th>0</th>
-<th>27698</th>
-<th>460</th>
+<th>28425</th>
+<th>471</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -617,13 +631,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11079</th>
-<th>2345</th>
+<th>11093</th>
+<th>2348</th>
 <th>908</th>
-<th>7826</th>
+<th>7837</th>
 <th>1848</th>
-<th>293908</th>
-<th>5220</th>
+<th>294635</th>
+<th>5231</th>
 </tr></tfoot></table>
 
 ## Future plans
