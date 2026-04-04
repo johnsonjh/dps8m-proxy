@@ -381,20 +381,23 @@ func findCharmap(name string) encoding.Encoding {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func naturalLess(s1, s2 string) bool {
-	parts1 := naturalSortRegexp.FindAllString(s1, -1)
-	parts2 := naturalSortRegexp.FindAllString(s2, -1)
+	n1 := strings.ReplaceAll(s1, " ", "-")
+	n2 := strings.ReplaceAll(s2, " ", "-")
+
+	parts1 := naturalSortRegexp.FindAllString(n1, -1)
+	parts2 := naturalSortRegexp.FindAllString(n2, -1)
 
 	for i := 0; i < len(parts1) && i < len(parts2); i++ {
 		if parts1[i] == parts2[i] {
 			continue
 		}
 
-		n1, err1 := strconv.Atoi(parts1[i])
-		n2, err2 := strconv.Atoi(parts2[i])
+		num1, err1 := strconv.Atoi(parts1[i])
+		num2, err2 := strconv.Atoi(parts2[i])
 
 		if err1 == nil && err2 == nil {
-			if n1 != n2 {
-				return n1 < n2
+			if num1 != num2 {
+				return num1 < num2
 			}
 		}
 
@@ -403,7 +406,11 @@ func naturalLess(s1, s2 string) bool {
 		}
 	}
 
-	return len(parts1) < len(parts2)
+	if len(parts1) != len(parts2) {
+		return len(parts1) < len(parts2)
+	}
+
+	return s1 < s2
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
