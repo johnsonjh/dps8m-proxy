@@ -106,7 +106,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.51 (2026-Apr-04 g56054cc) [linux/amd64]
+DPS8M Proxy v1.0.51* (2026-Apr-04 g7b2e9cc+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -238,11 +238,11 @@ are, hopefully, documented here:
   To see a list of valid character maps, pass `help` (or any other
   illegal value, *i.e.*, `--iconv "help"`).  String matching is
   *fuzzy* and most commonly-used abbreviations are supported
-  (*e.g.*, `--iconv CP437`).  This option currently applies to all
-  targets and is most useful to administrators of specific legacy
-  systems such as DOS-based bulletin board systems.  *Only data
-  received from the TELNET target is translated.*  Transmitted
-  data is passed as-is.
+  (*e.g.*, `--iconv "CP437"`).  This option currently applies to
+  all targets and is most useful to administrators of specific
+  legacy systems such as DOS-based bulletin board systems.
+  *Only data received from the TELNET target is translated.*
+  Transmitted data is passed as-is.
 
 * The `--no-filter` option disables link filtering of NULL characters.
   This may be required to use the ZMODEM inline file transfer protocol
@@ -298,12 +298,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.51 (2026-Apr-04 g56054cc) [linux/amd64]
+DPS8M Proxy v1.0.51* (2026-Apr-04 g7b2e9cc+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.51                          |
+| dps8m/proxy               | v1.0.51*                         |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
