@@ -485,6 +485,7 @@ codeql
 codespell
 ctags
 cygwin
+cyrillic
 darwin
 davidrg
 dependabot
