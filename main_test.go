@@ -260,6 +260,45 @@ func TestFindCharmap(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func TestNaturalLess(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		s1       string
+		s2       string
+		expected bool
+	}{
+		{"ISO 8859-1", "ISO 8859-2", true}, //nolint:goconst,nolintlint
+		{"ISO 8859-2", "ISO 8859-10", true},
+		{"ISO 8859-10", "ISO 8859-2", false},
+		{"CodePage437", "CodePage1047", true},
+		{"CodePage1047", "CodePage437", false},
+		{"a1", "a2", true},
+		{"a2", "a10", true},
+		{"a10", "a2", false},
+		{"1", "2", true},
+		{"2", "10", true},
+		{"10", "2", false},
+		{"abc", "abc", false}, //nolint:goconst,nolintlint
+		{"abc", "abd", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%s_%s", tt.s1, tt.s2), func(t *testing.T) {
+			t.Parallel()
+
+			got := naturalLess(tt.s1, tt.s2)
+			if got != tt.expected {
+				t.Errorf("naturalLess(%q, %q) = %v, want %v",
+					tt.s1, tt.s2, got, tt.expected)
+			}
+		})
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 // Local Variables:
 // mode: go
 // tab-width: 4

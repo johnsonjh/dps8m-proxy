@@ -222,6 +222,7 @@ var (
 	issueFile                        = "issue.txt"
 	denyFile                         = "deny.txt"
 	blockFile                        = "block.txt"
+	naturalSortRegexp                = regexp.MustCompile(`(\d+)|(\D+)`)
 	compressAlgo                     string
 	compressLevel                    string
 	dbLogLevel                       string
@@ -375,6 +376,34 @@ func findCharmap(name string) encoding.Encoding {
 	}
 
 	return nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func naturalLess(s1, s2 string) bool {
+	parts1 := naturalSortRegexp.FindAllString(s1, -1)
+	parts2 := naturalSortRegexp.FindAllString(s2, -1)
+
+	for i := 0; i < len(parts1) && i < len(parts2); i++ {
+		if parts1[i] == parts2[i] {
+			continue
+		}
+
+		n1, err1 := strconv.Atoi(parts1[i])
+		n2, err2 := strconv.Atoi(parts2[i])
+
+		if err1 == nil && err2 == nil {
+			if n1 != n2 {
+				return n1 < n2
+			}
+		}
+
+		if parts1[i] != parts2[i] {
+			return parts1[i] < parts2[i]
+		}
+	}
+
+	return len(parts1) < len(parts2)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1093,7 +1122,9 @@ func main() {
 				available = append(available, fmt.Sprintf("%v", cm))
 			}
 
-			sort.Strings(available)
+			sort.Slice(available, func(i, j int) bool {
+				return naturalLess(available[i], available[j])
+			})
 
 			_, _ = fmt.Fprintf(os.Stdout, "\r\nValid --iconv character map strings:\r\n\r\n")
 
@@ -2788,7 +2819,9 @@ func listConfiguration() {
 			users = append(users, user)
 		}
 
-		sort.Strings(users)
+		sort.Slice(users, func(i, j int) bool {
+			return naturalLess(users[i], users[j])
+		})
 
 		for _, user := range users {
 			hostPort := altHosts[user]
