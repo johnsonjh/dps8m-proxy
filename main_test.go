@@ -218,6 +218,17 @@ func TestFindCharmap(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 		{"ISO8859-1", "ISO8859-1", "ISO 8859-1"},
 		{"lowercase", "codepage437", "IBM Code Page 437"},         //nolint:goconst
 		{"with spaces", "IBM Code Page 437", "IBM Code Page 437"}, //nolint:goconst
+		{"dash and space", "ISO-8859 6E", "ISO-8859-6E"},
+		{"underscore and dash", "ISO_8859-6E", "ISO-8859-6E"},
+		{"cp space", "CP 1047", "IBM Code Page 1047"},
+		{"cp no space", "CP1047", "IBM Code Page 1047"},
+		{"codepage space", "CodePage 437", "IBM Code Page 437"},
+		{"cp 437", "CP437", "IBM Code Page 437"},
+		{"win space", "Win 1252", "Windows 1252"},
+		{"win no space", "Win1252", "Windows 1252"},
+		{"mac space", "Mac Cyrillic", "Macintosh Cyrillic"},
+		{"mac no space", "MacCyrillic", "Macintosh Cyrillic"},
+		{"mac exactly", "Mac", "Macintosh"},
 		{"invalid", "NoSuchCharmap", ""},
 	}
 

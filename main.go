@@ -346,7 +346,19 @@ func sanitizeNonASCII(s string) string {
 
 //nolint:ireturn
 func findCharmap(name string) encoding.Encoding {
-	normalizedInput := strings.ToLower(strings.ReplaceAll(name, " ", ""))
+	normalize := func(s string) string {
+		s = strings.ToLower(s)
+		s = strings.ReplaceAll(s, " ", "")
+		s = strings.ReplaceAll(s, "-", "")
+		s = strings.ReplaceAll(s, "_", "")
+		s = strings.ReplaceAll(s, "codepage", "cp")
+		s = strings.ReplaceAll(s, "windows", "win")
+		s = strings.ReplaceAll(s, "macintosh", "mac")
+
+		return s
+	}
+
+	normalizedInput := normalize(name)
 
 	if len(normalizedInput) < 3 {
 		return nil
@@ -354,7 +366,7 @@ func findCharmap(name string) encoding.Encoding {
 
 	for _, cm := range charmap.All {
 		cmName := fmt.Sprintf("%v", cm)
-		normalizedName := strings.ToLower(strings.ReplaceAll(cmName, " ", ""))
+		normalizedName := normalize(cmName)
 
 		if normalizedInput == normalizedName ||
 			(len(normalizedInput) >= 5 && strings.HasSuffix(normalizedName, normalizedInput)) {
