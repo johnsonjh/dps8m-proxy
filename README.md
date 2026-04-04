@@ -106,7 +106,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.51 (2026-Apr-04 g7f642b1) [linux/amd64]
+DPS8M Proxy v1.0.51* (2026-Apr-04 g65e2e0b+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -236,9 +236,11 @@ are, hopefully, documented here:
 * The `--iconv` option enables legacy character map conversion of
   TELNET text to UTF-8, and takes the name of the legacy mapping.  To
   see a list of valid character maps, pass `help` (or any other illegal
-  value, *i.e.*, `--iconv "help"`).  This option currently applies to
-  all targets and is most useful to operators of specific legacy
-  systems such as DOS-based bulletin board systems.
+  value, *i.e.*, `--iconv "help"`).  String matching is *fuzzy* and
+  most commonly used abbreviations works (*e.g.*, `--iconv CP437`).
+  This option currently applies to all targets and is most useful to
+  administrators of specific legacy systems such as DOS-based bulletin
+  board systems.
 
 * The `--no-filter` option disables link filtering of NULL characters.
   This may be required to use the ZMODEM inline file transfer protocol
@@ -294,12 +296,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.51 (2026-Apr-04 g7f642b1) [linux/amd64]
+DPS8M Proxy v1.0.51* (2026-Apr-04 g65e2e0b+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.51                          |
+| dps8m/proxy               | v1.0.51*                         |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -600,13 +602,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>598</th>
+<th>600</th>
 <th>112</th>
 <th>0</th>
-<th>486</th>
+<th>488</th>
 <th>0</th>
-<th>28425</th>
-<th>471</th>
+<th>28531</th>
+<th>473</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -631,13 +633,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11255</th>
+<th>11257</th>
 <th>2370</th>
 <th>910</th>
-<th>7975</th>
+<th>7977</th>
 <th>1868</th>
-<th>298700</th>
-<th>5322</th>
+<th>298806</th>
+<th>5324</th>
 </tr></tfoot></table>
 
 ## Future plans
