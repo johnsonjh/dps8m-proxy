@@ -106,7 +106,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.51 (2026-Apr-08 gc37058f) [linux/amd64]
+DPS8M Proxy v1.0.52 (2026-Apr-08 g14c9e67) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -298,12 +298,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.51 (2026-Apr-08 gc37058f) [linux/amd64]
+DPS8M Proxy v1.0.52 (2026-Apr-08 g14c9e67) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.51                          |
+| dps8m/proxy               | v1.0.52                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -316,7 +316,7 @@ DPS8M Proxy v1.0.51 (2026-Apr-08 gc37058f) [linux/amd64]
 | go.etcd.io/bbolt          | v1.4.3                           |
 | golang.org/x/crypto       | v0.49.0                          |
 | golang.org/x/net          | v0.52.0                          |
-| golang.org/x/sys          | v0.42.0                          |
+| golang.org/x/sys          | v0.43.0                          |
 | golang.org/x/term         | v0.41.0                          |
 | golang.org/x/text         | v0.35.0                          |
 | kernel.org/.../libcap/cap | v1.2.78                          |
@@ -594,12 +594,12 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>537</th>
+<th>538</th>
 <th>83</th>
 <th>92</th>
-<th>362</th>
+<th>363</th>
 <th>155</th>
-<th>18578</th>
+<th>18594</th>
 <th>325</th>
 </tr><tr>
 <th>Markdown</th>
@@ -635,12 +635,12 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11258</th>
+<th>11259</th>
 <th>2370</th>
 <th>910</th>
-<th>7978</th>
+<th>7979</th>
 <th>1868</th>
-<th>298897</th>
+<th>298913</th>
 <th>5326</th>
 </tr></tfoot></table>
 
