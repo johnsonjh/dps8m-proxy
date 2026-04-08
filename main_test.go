@@ -18,6 +18,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -214,10 +215,21 @@ func TestFindCharmap(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 		input    string
 		expected string
 	}{
-		{"CodePage437", "CodePage437", "IBM Code Page 437"}, //nolint:goconst
-		{"ISO8859-1", "ISO8859-1", "ISO 8859-1"},
-		{"lowercase", "codepage437", "IBM Code Page 437"},         //nolint:goconst
-		{"with spaces", "IBM Code Page 437", "IBM Code Page 437"}, //nolint:goconst
+		{"CodePage437", "CodePage437", "IBM Code Page 437"},       //nolint:goconst
+		{"ISO8859-1", "ISO8859-1", "ISO 8859-1"},                  //nolint:goconst,nolintlint
+		{"lowercase", "codepage437", "IBM Code Page 437"},         //nolint:goconst,nolintlint
+		{"with spaces", "IBM Code Page 437", "IBM Code Page 437"}, //nolint:goconst,nolintlint
+		{"dash and space", "ISO-8859 6E", "ISO-8859-6E"},          //nolint:goconst,nolintlint
+		{"underscore and dash", "ISO_8859-6E", "ISO-8859-6E"},     //nolint:goconst,nolintlint
+		{"cp space", "CP 1047", "IBM Code Page 1047"},
+		{"cp no space", "CP1047", "IBM Code Page 1047"},
+		{"codepage space", "CodePage 437", "IBM Code Page 437"},
+		{"cp 437", "CP437", "IBM Code Page 437"},
+		{"win space", "Win 1252", "Windows 1252"},
+		{"win no space", "Win1252", "Windows 1252"},
+		{"mac space", "Mac Cyrillic", "Macintosh Cyrillic"},
+		{"mac no space", "MacCyrillic", "Macintosh Cyrillic"},
+		{"mac exactly", "Mac", "Macintosh"},
 		{"invalid", "NoSuchCharmap", ""},
 	}
 
@@ -249,6 +261,104 @@ func TestFindCharmap(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func TestNaturalLess(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		s1       string
+		s2       string
+		expected bool
+	}{
+		{"ISO 8859-1", "ISO 8859-2", true},   //nolint:goconst,nolintlint
+		{"ISO 8859-2", "ISO 8859-10", true},  //nolint:goconst,nolintlint
+		{"ISO 8859-10", "ISO 8859-2", false}, //nolint:goconst,nolintlint
+		{"CodePage437", "CodePage1047", true},
+		{"CodePage1047", "CodePage437", false},
+		{"a1", "a2", true},
+		{"a2", "a10", true},
+		{"a10", "a2", false},
+		{"1", "2", true},
+		{"2", "10", true},
+		{"10", "2", false},
+		{"abc", "abc", false}, //nolint:goconst,nolintlint
+		{"abc", "abd", true},
+		{"ISO 8859-6", "ISO-8859-6E", true},  //nolint:goconst,nolintlint
+		{"ISO-8859-6E", "ISO 8859-7", true},  //nolint:goconst,nolintlint
+		{"ISO-8859-6E", "ISO 8859-16", true}, //nolint:goconst,nolintlint
+	}
+
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%s_%s", tt.s1, tt.s2), func(t *testing.T) {
+			t.Parallel()
+
+			got := naturalLess(tt.s1, tt.s2)
+			if got != tt.expected {
+				t.Errorf("naturalLess(%q, %q) = %v, want %v",
+					tt.s1, tt.s2, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestNaturalSort(t *testing.T) {
+	t.Parallel()
+
+	input := []string{
+		"ISO 8859-1",
+		"ISO 8859-2",
+		"ISO 8859-3",
+		"ISO 8859-4",
+		"ISO 8859-5",
+		"ISO 8859-6",
+		"ISO 8859-7",
+		"ISO 8859-8",
+		"ISO 8859-9",
+		"ISO 8859-10",
+		"ISO 8859-13",
+		"ISO 8859-14",
+		"ISO 8859-15",
+		"ISO 8859-16",
+		"ISO-8859-6E",
+		"ISO-8859-6I",
+		"ISO-8859-8E",
+		"ISO-8859-8I",
+	}
+
+	expected := []string{
+		"ISO 8859-1",
+		"ISO 8859-2",
+		"ISO 8859-3",
+		"ISO 8859-4",
+		"ISO 8859-5",
+		"ISO 8859-6",
+		"ISO-8859-6E",
+		"ISO-8859-6I",
+		"ISO 8859-7",
+		"ISO 8859-8",
+		"ISO-8859-8E",
+		"ISO-8859-8I",
+		"ISO 8859-9",
+		"ISO 8859-10",
+		"ISO 8859-13",
+		"ISO 8859-14",
+		"ISO 8859-15",
+		"ISO 8859-16",
+	}
+
+	sort.Slice(input, func(i, j int) bool {
+		return naturalLess(input[i], input[j])
+	})
+
+	for i := range input {
+		if input[i] != expected[i] {
+			t.Errorf("at index %d: got %q, want %q", i, input[i], expected[i])
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 // Local Variables:
 // mode: go
 // tab-width: 4

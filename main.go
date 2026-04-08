@@ -222,6 +222,7 @@ var (
 	issueFile                        = "issue.txt"
 	denyFile                         = "deny.txt"
 	blockFile                        = "block.txt"
+	naturalSortRegexp                = regexp.MustCompile(`(\d+)|(\D+)`)
 	compressAlgo                     string
 	compressLevel                    string
 	dbLogLevel                       string
@@ -346,7 +347,19 @@ func sanitizeNonASCII(s string) string {
 
 //nolint:ireturn
 func findCharmap(name string) encoding.Encoding {
-	normalizedInput := strings.ToLower(strings.ReplaceAll(name, " ", ""))
+	normalize := func(s string) string {
+		s = strings.ToLower(s)
+		s = strings.ReplaceAll(s, " ", "")
+		s = strings.ReplaceAll(s, "-", "")
+		s = strings.ReplaceAll(s, "_", "")
+		s = strings.ReplaceAll(s, "codepage", "cp")
+		s = strings.ReplaceAll(s, "windows", "win")
+		s = strings.ReplaceAll(s, "macintosh", "mac")
+
+		return s
+	}
+
+	normalizedInput := normalize(name)
 
 	if len(normalizedInput) < 3 {
 		return nil
@@ -354,7 +367,7 @@ func findCharmap(name string) encoding.Encoding {
 
 	for _, cm := range charmap.All {
 		cmName := fmt.Sprintf("%v", cm)
-		normalizedName := strings.ToLower(strings.ReplaceAll(cmName, " ", ""))
+		normalizedName := normalize(cmName)
 
 		if normalizedInput == normalizedName ||
 			(len(normalizedInput) >= 5 && strings.HasSuffix(normalizedName, normalizedInput)) {
@@ -363,6 +376,41 @@ func findCharmap(name string) encoding.Encoding {
 	}
 
 	return nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func naturalLess(s1, s2 string) bool {
+	n1 := strings.ReplaceAll(s1, " ", "-")
+	n2 := strings.ReplaceAll(s2, " ", "-")
+
+	parts1 := naturalSortRegexp.FindAllString(n1, -1)
+	parts2 := naturalSortRegexp.FindAllString(n2, -1)
+
+	for i := 0; i < len(parts1) && i < len(parts2); i++ {
+		if parts1[i] == parts2[i] {
+			continue
+		}
+
+		num1, err1 := strconv.Atoi(parts1[i])
+		num2, err2 := strconv.Atoi(parts2[i])
+
+		if err1 == nil && err2 == nil {
+			if num1 != num2 {
+				return num1 < num2
+			}
+		}
+
+		if parts1[i] != parts2[i] {
+			return parts1[i] < parts2[i]
+		}
+	}
+
+	if len(parts1) != len(parts2) {
+		return len(parts1) < len(parts2)
+	}
+
+	return s1 < s2
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1081,7 +1129,9 @@ func main() {
 				available = append(available, fmt.Sprintf("%v", cm))
 			}
 
-			sort.Strings(available)
+			sort.Slice(available, func(i, j int) bool {
+				return naturalLess(available[i], available[j])
+			})
 
 			_, _ = fmt.Fprintf(os.Stdout, "\r\nValid --iconv character map strings:\r\n\r\n")
 
@@ -2776,7 +2826,9 @@ func listConfiguration() {
 			users = append(users, user)
 		}
 
-		sort.Strings(users)
+		sort.Slice(users, func(i, j int) bool {
+			return naturalLess(users[i], users[j])
+		})
 
 		for _, user := range users {
 			hostPort := altHosts[user]

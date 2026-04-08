@@ -106,7 +106,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.50 (2026-Apr-03 g56a7cf4) [linux/amd64]
+DPS8M Proxy v1.0.51 (2026-Apr-08 gbdfc94f) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -234,11 +234,15 @@ are, hopefully, documented here:
   `‑‑no‑banner`.
 
 * The `--iconv` option enables legacy character map conversion of
-  TELNET text to UTF-8, and takes the name of the legacy mapping.  To
-  see a list of valid character maps, pass `help` (or any other illegal
-  value, *i.e.*, `--iconv "help"`).  This option currently applies to
-  all targets and is most useful to operators of specific legacy
-  systems such as DOS-based bulletin board systems.
+  TELNET text to UTF-8, and takes the name of the legacy mapping.
+  To see a list of valid character maps, pass `help` (or any other
+  illegal value, *i.e.*, `--iconv "help"`).  String matching is
+  *fuzzy* and most commonly-used abbreviations are supported
+  (*e.g.*, `--iconv "CP437"`).  This option currently applies to
+  all targets and is most useful to administrators of specific
+  legacy systems such as DOS-based bulletin board systems.
+  *Only data received from the TELNET target is translated.*
+  Transmitted data is passed as-is.
 
 * The `--no-filter` option disables link filtering of NULL characters.
   This may be required to use the ZMODEM inline file transfer protocol
@@ -294,12 +298,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.50 (2026-Apr-03 g56a7cf4) [linux/amd64]
+DPS8M Proxy v1.0.51 (2026-Apr-08 gbdfc94f) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.50                          |
+| dps8m/proxy               | v1.0.51                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -315,9 +319,9 @@ DPS8M Proxy v1.0.50 (2026-Apr-03 g56a7cf4) [linux/amd64]
 | golang.org/x/sys          | v0.42.0                          |
 | golang.org/x/term         | v0.41.0                          |
 | golang.org/x/text         | v0.35.0                          |
-| kernel.org/.../libcap/cap | v1.2.77                          |
-| kernel.org/.../libcap/psx | v1.2.77                          |
-| Go compiler (gc)          | v1.26.1-X:nodwarf5               |
+| kernel.org/.../libcap/cap | v1.2.78                          |
+| kernel.org/.../libcap/psx | v1.2.78                          |
+| Go compiler (gc)          | v1.26.2                          |
 +===========================+==================================+
 ```
 
@@ -570,13 +574,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>9225</th>
-<th>2012</th>
-<th>587</th>
-<th>6626</th>
-<th>1659</th>
-<th>223064</th>
-<th>4035</th>
+<th>9387</th>
+<th>2034</th>
+<th>589</th>
+<th>6764</th>
+<th>1679</th>
+<th>227129</th>
+<th>4126</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -590,23 +594,23 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>538</th>
+<th>537</th>
 <th>83</th>
 <th>92</th>
-<th>363</th>
+<th>362</th>
 <th>155</th>
-<th>18594</th>
+<th>18578</th>
 <th>325</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>598</th>
+<th>602</th>
 <th>112</th>
 <th>0</th>
-<th>486</th>
+<th>490</th>
 <th>0</th>
-<th>28425</th>
-<th>471</th>
+<th>28638</th>
+<th>475</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -631,13 +635,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11093</th>
-<th>2348</th>
-<th>908</th>
-<th>7837</th>
-<th>1848</th>
-<th>294635</th>
-<th>5231</th>
+<th>11258</th>
+<th>2370</th>
+<th>910</th>
+<th>7978</th>
+<th>1868</th>
+<th>298897</th>
+<th>5326</th>
 </tr></tfoot></table>
 
 ## Future plans
