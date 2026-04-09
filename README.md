@@ -106,7 +106,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.52 (2026-Apr-08 gaa5c37e) [linux/amd64]
+DPS8M Proxy v1.0.53 (2026-Apr-09 gbefb117) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -298,12 +298,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.52 (2026-Apr-08 gaa5c37e) [linux/amd64]
+DPS8M Proxy v1.0.53 (2026-Apr-09 gbefb117) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.52                          |
+| dps8m/proxy               | v1.0.53                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -314,11 +314,11 @@ DPS8M Proxy v1.0.52 (2026-Apr-08 gaa5c37e) [linux/amd64]
 | spf13/pflag               | v1.0.11* (2026-Mar-05, g3d32e71) |
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
-| golang.org/x/crypto       | v0.49.0                          |
-| golang.org/x/net          | v0.52.0                          |
+| golang.org/x/crypto       | v0.50.0                          |
+| golang.org/x/net          | v0.53.0                          |
 | golang.org/x/sys          | v0.43.0                          |
-| golang.org/x/term         | v0.41.0                          |
-| golang.org/x/text         | v0.35.0                          |
+| golang.org/x/term         | v0.42.0                          |
+| golang.org/x/text         | v0.36.0                          |
 | kernel.org/.../libcap/cap | v1.2.78                          |
 | kernel.org/.../libcap/psx | v1.2.78                          |
 | Go compiler (gc)          | v1.26.2                          |
