@@ -117,7 +117,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-13 gea4a39f) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-13 g9e0ef73) [linux/amd64]
 
 Usage for proxy:
 
@@ -286,6 +286,7 @@ are, hopefully, documented here:
     session with the target (via TELNET to `10.0.5.9:3333`).  If any
     of the target‑specific text files do not exist, then the standard
     files will be served.
+
   * To disable the file‑based banner for specific targets only, you
     can create empty files using the naming scheme described above.
     You can also remove *all* of these files if you don’t want to
@@ -316,7 +317,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-13 gea4a39f) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-13 g9e0ef73) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -623,11 +624,11 @@ predecessor (code statistics 📈 provided by
 <th>Markdown</th>
 <th>1</th>
 <th>620</th>
-<th>119</th>
+<th>121</th>
 <th>0</th>
-<th>501</th>
+<th>499</th>
 <th>0</th>
-<th>29270</th>
+<th>29262</th>
 <th>486</th>
 </tr><tr>
 <th>Systemd</th>
@@ -654,11 +655,11 @@ predecessor (code statistics 📈 provided by
 <th>Total</th>
 <th>28</th>
 <th>11293</th>
-<th>2377</th>
+<th>2379</th>
 <th>910</th>
-<th>8006</th>
+<th>8004</th>
 <th>1877</th>
-<th>300324</th>
+<th>300316</th>
 <th>5352</th>
 </tr></tfoot></table>
 
@@ -669,15 +670,14 @@ predecessor (code statistics 📈 provided by
   include text *CAPTCHA*s, load‑balancing, fail‑over,
   [flow control](https://www.rfc-editor.org/rfc/rfc1372), SSH
   targets, and TELNET listeners.
+
 * When users access an SSH listener, the connecting client may supply
   a password or present public keys for authentication.  These
   authentication attempts are currently logged, but are not
   otherwise used by the proxy.  A future update may allow for
   passwords and public keys to be used for pre‑authentication or to
   influence target routing.
-[]()
 
-[]()
 * While TELNET protocol support will improve in the future, there are
   no plans to support the
   [linemode](https://www.rfc-editor.org/rfc/rfc1184),
