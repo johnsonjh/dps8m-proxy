@@ -190,6 +190,7 @@ gpath
 grpath
 grtags
 gsed
+gsub
 gtags
 jstemmer
 juntaki
@@ -198,6 +199,8 @@ nilaway
 notparallel
 pflag
 printf
+rlength
+rstart
 sccflags
 setcap
 shellcheck
@@ -481,6 +484,7 @@ charset
 cidr
 ckwin
 cocomo
+codepage
 codeql
 codespell
 ctags
@@ -501,6 +505,7 @@ gibibyte
 gibibytes
 github
 gitlab
+goawk
 godoclint
 gofmt
 gofumpt
@@ -517,6 +522,7 @@ hashicorp
 hostname
 href
 https
+iconv
 illumos
 interruptible
 jeffrey

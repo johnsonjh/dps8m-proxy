@@ -10,6 +10,8 @@
 # Configuration
 
 CGO_ENABLED=0
+AWK?=$$(command -v goawk 2> /dev/null || command -v gawk 2> /dev/null || \
+		command -v mawk 2> /dev/null || command -v awk)
 CP=cp -f
 GO=$$(command -v go)
 GOTOOLCHAIN=auto
@@ -51,6 +53,7 @@ clean:
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) clean -v
 	$(RM) -r ./cross.bin/
 	$(RM) ./README.md.sed
+	$(RM) ./README.md.awk
 
 ##############################################################################
 # Target: distclean
@@ -366,12 +369,20 @@ README.md doc docs: README.md.tmpl proxy
 	'BEGIN { ($$v=qx(./proxy --help))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===HELP===!$$v!g' ./README.md
 	grep -q '===HELP===' ./README.md || exit 0
+	@env printf '\n%s\n' "⚙️ Awk: Inserting codepage list..." \
+		2> /dev/null || :
+	cp_list=$$( ./proxy --iconv help 2>&1 | $(AWK) '/^  "/ { match($$0, /"[^"]*"/); s = substr($$0, RSTART+1, RLENGTH-2); gsub(/"/,"`",s); printf "%s`\"%s\"`", sep, s; sep = ", "; } END { printf "." }' ); \
+	$(AWK) -v cp="$$cp_list" '{ gsub(/===CODEPAGE===/, cp); print; }' ./README.md > ./README.md.awk && \
+	$(MV) ./README.md.awk ./README.md
+	grep -q '===CODEPAGE===' ./README.md || exit 0
 	@env printf '\n%s\n' "🐪 Perl: Inserting scc output..." \
 		2> /dev/null || :
 	$(PERL) -i -pe \
 	'BEGIN { ($$v=qx(scc $(SCCFLAGS) -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===SCC===!$$v!g' ./README.md
 	grep -q '===SCC===' ./README.md || exit 0
+	@env printf '\n%s\n' "⚙️ Sed: Redacting paths..." \
+		2> /dev/null || :
 	$(SED) \
 	-e "s/$$(printf '\t')//g" \
 	-e 's|^Usage for .*/proxy:|Usage for proxy:|' \
