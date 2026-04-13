@@ -77,8 +77,14 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   make
   ```
 
-  * If you don’t have a (POSIX) `make` available for some
-    reason, then building with `go build` is sufficient.
+  * *Optionally*, for most UNIX-like systems, you can execute
+    `make install` (or `make install-strip`) to install the proxy for
+    system-wide usage.
+
+    * The installation targets respect both the `PREFIX`
+      environment variable (which defaults to `/usr/local`) and the
+      `DESTDIR` environment variable (used by package maintainers to
+      install the software to a staging directory).
 
   * The [`.cross.sh`](.cross.sh) cross‑compilation helper script
     is provided (which can be called with `make cross`) that
@@ -88,15 +94,20 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
     for building the Android binaries that require the
     [Android NDK](https://developer.android.com/ndk)).
 
+  * If you **don’t** have a (POSIX) `make` available for some
+    reason, then building with `go build` (or `go install`) will
+    likely be sufficient for most end-users.
+
 * You can also install this software using `go install` 📦:
 
   ```sh
-  go install gitlab.com/dps8m/proxy@latest
+  env GOTOOLCHAIN=auto go install -v gitlab.com/dps8m/proxy@latest
   ```
 
-  * Installations using `go install` download the required sources,
-    compile, and install the binary to `${GOEXE}/proxy` (which will
-    be `${HOME}/go/bin/proxy` for most users).
+  * Installations using the `go install` method will download the
+    required sources, compile them, and install the binary to
+    `${GOEXE}/proxy` (which will be `${HOME}/go/bin/proxy` for
+    most users).
 
 ## Usage
 
@@ -106,7 +117,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.56 (2026-Apr-13 g741c5c6) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-13 gdba0ae3) [linux/amd64]
 
 Usage for proxy:
 
@@ -305,12 +316,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.56 (2026-Apr-13 g741c5c6) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-13 gdba0ae3) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.56                          |
+| dps8m/proxy               | v1.0.57                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -611,13 +622,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>609</th>
-<th>117</th>
+<th>620</th>
+<th>119</th>
 <th>0</th>
-<th>492</th>
+<th>501</th>
 <th>0</th>
-<th>28747</th>
-<th>477</th>
+<th>29256</th>
+<th>486</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -642,13 +653,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11282</th>
-<th>2375</th>
+<th>11293</th>
+<th>2377</th>
 <th>910</th>
-<th>7997</th>
+<th>8006</th>
 <th>1877</th>
-<th>299801</th>
-<th>5343</th>
+<th>300310</th>
+<th>5352</th>
 </tr></tfoot></table>
 
 ## Future plans
