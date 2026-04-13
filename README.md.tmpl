@@ -159,16 +159,20 @@ are, hopefully, documented here:
 * The `--iconv` option enables legacy character map conversion of
   TELNET text to UTF-8, and takes the name of the legacy mapping.
 
-  * To see a list of valid character maps, pass `help` (or any other
-    illegal value, *i.e.*, `--iconv "help"`).
-  * String matching is *fuzzy* and most commonly-used abbreviations
-    are supported (*e.g.*, `--iconv "CP437"`).
-  * This option currently applies to all targets and is most useful to
-    administrators of specific legacy systems such as DOS-based
+  * This option currently applies to all targets and is most useful
+    to administrators of specific legacy systems such as DOS-based
     bulletin board systems.
+
   * *Only data received from the TELNET target is translated.*
     Transmitted data is passed as-is.
+
   * The following character maps are supported: ===CODEPAGE===
+
+  * String matching is *fuzzy* and most commonly-used abbreviations
+    are supported (*e.g.*, `--iconv "CP437"`).
+
+  * To print the list of supported character maps, pass `help`
+    (or any other illegal value, *i.e.*, `--iconv "help"`).
 
 * The `--no-filter` option disables link filtering of NULL characters.
   This may be required to use the ZMODEM inline file transfer protocol
