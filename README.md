@@ -106,7 +106,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.55* (2026-Apr-09 g4cb6159+) [linux/amd64]
+DPS8M Proxy v1.0.55 (2026-Apr-13 g831752e) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -124,7 +124,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     (multiple allowed) (default ":2222")
   --ssh-delay <float>           Delay for incoming SSH connections
                                     ["0.0" to "30.0" seconds] (no default)
-  --no-banner                   Disable SSH connection banner
+  --no-banner                   Disable the user SSH connection banner
   --no-menu                     Disable the user SSH 'Control-]' menu
   --telnet-host <string>        Default TELNET target [host:port]
                                     (default "127.0.0.1:6180")
@@ -298,12 +298,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.55* (2026-Apr-09 g4cb6159+) [linux/amd64]
+DPS8M Proxy v1.0.55 (2026-Apr-13 g831752e) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.55*                         |
+| dps8m/proxy               | v1.0.55                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -579,7 +579,7 @@ predecessor (code statistics 📈 provided by
 <th>589</th>
 <th>6764</th>
 <th>1679</th>
-<th>227129</th>
+<th>227138</th>
 <th>4126</th>
 </tr><tr>
 <th>Shell</th>
@@ -640,7 +640,7 @@ predecessor (code statistics 📈 provided by
 <th>910</th>
 <th>7979</th>
 <th>1868</th>
-<th>298932</th>
+<th>298941</th>
 <th>5326</th>
 </tr></tfoot></table>
 
