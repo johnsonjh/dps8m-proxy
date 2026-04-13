@@ -371,7 +371,7 @@ README.md doc docs: README.md.tmpl proxy
 	grep -q '===HELP===' ./README.md || exit 0
 	@env printf '\n%s\n' "⚙️ Awk: Inserting codepage list..." \
 		2> /dev/null || :
-	cp_list=$$( ./proxy --iconv help 2>&1 | $(AWK) '/^  "/ { match($$0, /"[^"]*"/); s = substr($$0, RSTART+1, RLENGTH-2); gsub(/"/,"`",s); printf "%s`%s`", sep, s; sep = ", "; } END { printf "." }' ); \
+	cp_list=$$( ./proxy --iconv help 2>&1 | $(AWK) '/^  "/ { match($$0, /"[^"]*"/); s = substr($$0, RSTART+1, RLENGTH-2); gsub(/"/,"`",s); printf "%s`\"%s\"`", sep, s; sep = ", "; } END { printf "." }' ); \
 	$(AWK) -v cp="$$cp_list" '{ gsub(/===CODEPAGE===/, cp); print; }' ./README.md > ./README.md.awk && \
 	$(MV) ./README.md.awk ./README.md
 	grep -q '===CODEPAGE===' ./README.md || exit 0
