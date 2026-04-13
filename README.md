@@ -98,16 +98,16 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
     reason, then building with `go build` (or `go install`) will
     likely be sufficient for most end-users.
 
-* You can also install this software using `go install` 📦:
+* To install the software using `go install` 📦:
 
   ```sh
   env GOTOOLCHAIN=auto go install -v gitlab.com/dps8m/proxy@latest
   ```
 
   * Installations using the `go install` method will download the
-    required sources, compile them, and install the binary to
-    `${GOEXE}/proxy` (which will be `${HOME}/go/bin/proxy` for
-    most users).
+    required toolchain and `proxy` sources, compile, and install the
+    `proxy` binary to `${GOEXE}/proxy` (which will be
+    `${HOME}/go/bin/proxy` for most users).
 
 ## Usage
 
@@ -117,7 +117,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-13 gdba0ae3) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-13 gea4a39f) [linux/amd64]
 
 Usage for proxy:
 
@@ -316,7 +316,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-13 gdba0ae3) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-13 gea4a39f) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -627,7 +627,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>501</th>
 <th>0</th>
-<th>29256</th>
+<th>29270</th>
 <th>486</th>
 </tr><tr>
 <th>Systemd</th>
@@ -658,7 +658,7 @@ predecessor (code statistics 📈 provided by
 <th>910</th>
 <th>8006</th>
 <th>1877</th>
-<th>300310</th>
+<th>300324</th>
 <th>5352</th>
 </tr></tfoot></table>
 
