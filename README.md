@@ -106,7 +106,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.54 (2026-Apr-09 g09297a4) [linux/amd64]
+DPS8M Proxy v1.0.55* (2026-Apr-09 g4cb6159+) [linux/amd64]
 
 Usage for /home/jhj/dps8m-proxy/proxy:
 
@@ -286,7 +286,7 @@ are, hopefully, documented here:
     or a CIDR block (*e.g.*, `123.45.0.0/17` which covers `123.45.0.0`
     to `123.45.127.255`, or `2600:1408:ec00:36::/64` covering
     `2600:1408:ec00:36:0000:0000:0000:0000` to
-    `2600:1408:ec00:36:ffff:ffff:ffff:ffff`).
+    `2600:1408:ec00:36:ffff:ffff:ffff:ffff`), one item per line.
 
   * The whitelist always takes precedence over the blacklist.
     If an address is allowed due to a whitelist match that would
@@ -298,12 +298,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.54 (2026-Apr-09 g09297a4) [linux/amd64]
+DPS8M Proxy v1.0.55* (2026-Apr-09 g4cb6159+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.54                          |
+| dps8m/proxy               | v1.0.55*                         |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -609,7 +609,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>490</th>
 <th>0</th>
-<th>28638</th>
+<th>28657</th>
 <th>475</th>
 </tr><tr>
 <th>Systemd</th>
@@ -640,7 +640,7 @@ predecessor (code statistics 📈 provided by
 <th>910</th>
 <th>7979</th>
 <th>1868</th>
-<th>298913</th>
+<th>298932</th>
 <th>5326</th>
 </tr></tfoot></table>
 
