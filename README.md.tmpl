@@ -77,8 +77,14 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   make
   ```
 
-  * If you don’t have a (POSIX) `make` available for some
-    reason, then building with `go build` is sufficient.
+  * *Optionally*, for most UNIX-like systems, you can execute
+    `make install` (or `make install-strip`) to install the proxy for
+    system-wide usage.
+
+    * The installation targets respect both the `PREFIX`
+      environment variable (which defaults to `/usr/local`) and the
+      `DESTDIR` environment variable (used by package maintainers to
+      install the software to a staging directory).
 
   * The [`.cross.sh`](.cross.sh) cross‑compilation helper script
     is provided (which can be called with `make cross`) that
@@ -88,15 +94,20 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
     for building the Android binaries that require the
     [Android NDK](https://developer.android.com/ndk)).
 
+  * If you **don’t** have a (POSIX) `make` available for some
+    reason, then building with `go build` (or `go install`) will
+    likely be sufficient for most end-users.
+
 * You can also install this software using `go install` 📦:
 
   ```sh
-  go install gitlab.com/dps8m/proxy@latest
+  env GOTOOLCHAIN=auto go install -v gitlab.com/dps8m/proxy@latest
   ```
 
-  * Installations using `go install` download the required sources,
-    compile, and install the binary to `${GOEXE}/proxy` (which will
-    be `${HOME}/go/bin/proxy` for most users).
+  * Installations using the `go install` method will download the
+    required sources, compile them, and install the binary to
+    `${GOEXE}/proxy` (which will be `${HOME}/go/bin/proxy` for
+    most users).
 
 ## Usage
 
