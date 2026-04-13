@@ -209,6 +209,7 @@ are, hopefully, documented here:
     session with the target (via TELNET to `10.0.5.9:3333`).  If any
     of the target‑specific text files do not exist, then the standard
     files will be served.
+
   * To disable the file‑based banner for specific targets only, you
     can create empty files using the naming scheme described above.
     You can also remove *all* of these files if you don’t want to
@@ -485,15 +486,14 @@ predecessor (code statistics 📈 provided by
   include text *CAPTCHA*s, load‑balancing, fail‑over,
   [flow control](https://www.rfc-editor.org/rfc/rfc1372), SSH
   targets, and TELNET listeners.
+
 * When users access an SSH listener, the connecting client may supply
   a password or present public keys for authentication.  These
   authentication attempts are currently logged, but are not
   otherwise used by the proxy.  A future update may allow for
   passwords and public keys to be used for pre‑authentication or to
   influence target routing.
-[]()
 
-[]()
 * While TELNET protocol support will improve in the future, there are
   no plans to support the
   [linemode](https://www.rfc-editor.org/rfc/rfc1184),
