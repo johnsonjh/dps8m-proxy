@@ -106,7 +106,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.56 (2026-Apr-13 g3c2dbea) [linux/amd64]
+DPS8M Proxy v1.0.56* (2026-Apr-13 g9d624ab+) [linux/amd64]
 
 Usage for proxy:
 
@@ -235,15 +235,16 @@ are, hopefully, documented here:
 
 * The `--iconv` option enables legacy character map conversion of
   TELNET text to UTF-8, and takes the name of the legacy mapping.
-  To see a list of valid character maps, pass `help` (or any other
-  illegal value, *i.e.*, `--iconv "help"`).  String matching is
-  *fuzzy* and most commonly-used abbreviations are supported
-  (*e.g.*, `--iconv "CP437"`).  This option currently applies to
-  all targets and is most useful to administrators of specific
-  legacy systems such as DOS-based bulletin board systems.
-  *Only data received from the TELNET target is translated.*
-  Transmitted data is passed as-is.
 
+  * To see a list of valid character maps, pass `help` (or any other
+    illegal value, *i.e.*, `--iconv "help"`).
+  * String matching is *fuzzy* and most commonly-used abbreviations
+    are supported (*e.g.*, `--iconv "CP437"`).
+  * This option currently applies to all targets and is most useful to
+    administrators of specific legacy systems such as DOS-based
+    bulletin board systems.
+  * *Only data received from the TELNET target is translated.*
+    Transmitted data is passed as-is.
   * The following character maps are supported: `"IBM Code Page 037"`, `"IBM Code Page 437"`, `"IBM Code Page 850"`, `"IBM Code Page 852"`, `"IBM Code Page 855"`, `"IBM Code Page 860"`, `"IBM Code Page 862"`, `"IBM Code Page 863"`, `"IBM Code Page 865"`, `"IBM Code Page 866"`, `"IBM Code Page 1047"`, `"IBM Code Page 1140"`, `"ISO 8859-1"`, `"ISO 8859-2"`, `"ISO 8859-3"`, `"ISO 8859-4"`, `"ISO 8859-5"`, `"ISO 8859-6"`, `"ISO-8859-6E"`, `"ISO-8859-6I"`, `"ISO 8859-7"`, `"ISO 8859-8"`, `"ISO-8859-8E"`, `"ISO-8859-8I"`, `"ISO 8859-9"`, `"ISO 8859-10"`, `"ISO 8859-13"`, `"ISO 8859-14"`, `"ISO 8859-15"`, `"ISO 8859-16"`, `"KOI8-R"`, `"KOI8-U"`, `"Macintosh"`, `"Macintosh Cyrillic"`, `"Windows 874"`, `"Windows 1250"`, `"Windows 1251"`, `"Windows 1252"`, `"Windows 1253"`, `"Windows 1254"`, `"Windows 1255"`, `"Windows 1256"`, `"Windows 1257"`, `"Windows 1258"`, `"Windows Code Page 858"`, `"X-User-Defined"`.
 
 * The `--no-filter` option disables link filtering of NULL characters.
@@ -300,12 +301,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.56 (2026-Apr-13 g3c2dbea) [linux/amd64]
+DPS8M Proxy v1.0.56* (2026-Apr-13 g9d624ab+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.56                          |
+| dps8m/proxy               | v1.0.56*                         |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -606,13 +607,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>604</th>
+<th>605</th>
 <th>113</th>
 <th>0</th>
-<th>491</th>
+<th>492</th>
 <th>0</th>
-<th>28721</th>
-<th>476</th>
+<th>28739</th>
+<th>477</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -637,13 +638,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11277</th>
+<th>11278</th>
 <th>2371</th>
 <th>910</th>
-<th>7996</th>
+<th>7997</th>
 <th>1877</th>
-<th>299775</th>
-<th>5342</th>
+<th>299793</th>
+<th>5343</th>
 </tr></tfoot></table>
 
 ## Future plans
