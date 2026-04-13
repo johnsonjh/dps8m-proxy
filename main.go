@@ -743,7 +743,7 @@ func init() { //nolint:gochecknoinits
 
 	pflag.BoolVar(&noBanner,
 		"no-banner", false,
-		"Disable SSH connection banner")
+		"Disable the user SSH connection banner")
 
 	pflag.BoolVar(&noMenu,
 		"no-menu", false,

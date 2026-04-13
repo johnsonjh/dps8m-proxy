@@ -106,9 +106,9 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.54 (2026-Apr-09 g09297a4) [linux/amd64]
+DPS8M Proxy v1.0.55 (2026-Apr-13 ga64160f) [linux/amd64]
 
-Usage for /home/jhj/dps8m-proxy/proxy:
+Usage for proxy:
 
   --allow-root                  Allow running as root (UID 0)
   --cert-dir <string>           Directory containing SSH host certificates
@@ -124,7 +124,7 @@ Usage for /home/jhj/dps8m-proxy/proxy:
                                     (multiple allowed) (default ":2222")
   --ssh-delay <float>           Delay for incoming SSH connections
                                     ["0.0" to "30.0" seconds] (no default)
-  --no-banner                   Disable SSH connection banner
+  --no-banner                   Disable the user SSH connection banner
   --no-menu                     Disable the user SSH 'Control-]' menu
   --telnet-host <string>        Default TELNET target [host:port]
                                     (default "127.0.0.1:6180")
@@ -286,7 +286,7 @@ are, hopefully, documented here:
     or a CIDR block (*e.g.*, `123.45.0.0/17` which covers `123.45.0.0`
     to `123.45.127.255`, or `2600:1408:ec00:36::/64` covering
     `2600:1408:ec00:36:0000:0000:0000:0000` to
-    `2600:1408:ec00:36:ffff:ffff:ffff:ffff`).
+    `2600:1408:ec00:36:ffff:ffff:ffff:ffff`), one item per line.
 
   * The whitelist always takes precedence over the blacklist.
     If an address is allowed due to a whitelist match that would
@@ -298,12 +298,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.54 (2026-Apr-09 g09297a4) [linux/amd64]
+DPS8M Proxy v1.0.55 (2026-Apr-13 ga64160f) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.54                          |
+| dps8m/proxy               | v1.0.55                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -574,13 +574,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>9387</th>
+<th>9389</th>
 <th>2034</th>
 <th>589</th>
-<th>6764</th>
+<th>6766</th>
 <th>1679</th>
-<th>227129</th>
-<th>4126</th>
+<th>227151</th>
+<th>4129</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -594,13 +594,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>538</th>
+<th>541</th>
 <th>83</th>
 <th>92</th>
-<th>363</th>
-<th>155</th>
-<th>18594</th>
-<th>325</th>
+<th>366</th>
+<th>157</th>
+<th>18652</th>
+<th>328</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
@@ -609,7 +609,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>490</th>
 <th>0</th>
-<th>28638</th>
+<th>28657</th>
 <th>475</th>
 </tr><tr>
 <th>Systemd</th>
@@ -635,13 +635,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11259</th>
+<th>11264</th>
 <th>2370</th>
 <th>910</th>
-<th>7979</th>
-<th>1868</th>
-<th>298913</th>
-<th>5326</th>
+<th>7984</th>
+<th>1870</th>
+<th>299012</th>
+<th>5332</th>
 </tr></tfoot></table>
 
 ## Future plans

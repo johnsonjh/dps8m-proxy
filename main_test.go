@@ -289,15 +289,17 @@ func TestNaturalLess(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(fmt.Sprintf("%s_%s", tt.s1, tt.s2), func(t *testing.T) {
-			t.Parallel()
+		t.Run(fmt.Sprintf("%s_%s",
+			tt.s1, tt.s2),
+			func(t *testing.T) {
+				t.Parallel()
 
-			got := naturalLess(tt.s1, tt.s2)
-			if got != tt.expected {
-				t.Errorf("naturalLess(%q, %q) = %v, want %v",
-					tt.s1, tt.s2, got, tt.expected)
-			}
-		})
+				got := naturalLess(tt.s1, tt.s2)
+				if got != tt.expected {
+					t.Errorf("naturalLess(%q, %q) = %v, want %v",
+						tt.s1, tt.s2, got, tt.expected)
+				}
+			})
 	}
 }
 
