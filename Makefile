@@ -372,7 +372,10 @@ README.md doc docs: README.md.tmpl proxy
 	'BEGIN { ($$v=qx(scc $(SCCFLAGS) -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
 	s!===SCC===!$$v!g' ./README.md
 	grep -q '===SCC===' ./README.md || exit 0
-	$(SED) "s/$$(printf '\t')//g" < ./README.md > ./README.md.sed && \
+	$(SED) \
+	-e "s/$$(printf '\t')//g" \
+	-e 's|^Usage for .*/proxy:|Usage for proxy:|' \
+	< ./README.md > ./README.md.sed && \
 		$(MV) ./README.md.sed ./README.md
 	@env printf '\n%s\n\n' "📗 README.md generation successful." \
 		2> /dev/null || :
