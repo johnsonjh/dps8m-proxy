@@ -359,9 +359,14 @@ README.md doc docs: README.md.tmpl proxy
 	$(CP) README.md.tmpl ./README.md
 	@env printf '\n%s\n' "⚙️ Awk: Inserting version info..."  \
 		2> /dev/null || :
-	v="$$( ./proxy --version 2>&1 $(AWK) '{ gsub(/\r/,""); sub(/^[[:space:]]+/,""); sub(/[[:space:]]+$$/,""); print }' )" ; \
+	v="$$( ./proxy --version 2>&1 | $(AWK) \
+	  'BEGIN { s = "" } \
+	   { gsub(/\r/, ""); \
+	     if (NR > 1) s = s ORS $$0; else s = $$0 } \
+	   END { sub(/^[[:space:]]+/, "", s); sub(/[[:space:]]+$$/, "", s); \
+	         print s }' )" ; \
 	$(AWK) -v v="$$v" '{ gsub(/===VERSION===/, v); print }' README.md > README.md.awk && \
-		mv README.md.awk README.md
+		$(MV) README.md.awk README.md
 	grep -q '===VERSION===' ./README.md || exit 0
 	@env printf '\n%s\n' "⚙️ Sed: Inserting help info..." \
 		2> /dev/null || :
