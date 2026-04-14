@@ -48,7 +48,7 @@ clean:
 		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) \
 		$(GO) clean -v || { \
-	env printf '\n%s\n\n' "🧩 Will retry clean (ignoring vendoring)..."; \
+	env printf '\n%s\n\n' "🧩 Retrying clean (ignoring vendoring)..."; \
 		2> /dev/null || :; \
 	env printf '%s\n' "$(GO) clean -v -mod=readonly"; \
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
