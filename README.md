@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.58 (2026-Apr-14 ge49ee50) [linux/amd64]
+DPS8M Proxy v1.0.58 (2026-Apr-14 gba62f8e) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,7 +326,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.58 (2026-Apr-14 ge49ee50) [linux/amd64]
+DPS8M Proxy v1.0.58 (2026-Apr-14 gba62f8e) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -637,7 +637,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>509</th>
 <th>0</th>
-<th>29714</th>
+<th>29721</th>
 <th>496</th>
 </tr><tr>
 <th>Systemd</th>
@@ -668,7 +668,7 @@ predecessor (code statistics 📈 provided by
 <th>910</th>
 <th>8031</th>
 <th>1884</th>
-<th>301394</th>
+<th>301401</th>
 <th>5370</th>
 </tr></tfoot></table>
 
@@ -784,8 +784,8 @@ predecessor (code statistics 📈 provided by
 * Some bundled example and miscellaneous files distributed under the
   terms of the
   [MIT No Attribution License](https://opensource.org/license/mit-0).
-* All direct and indirect dependencies are licensed under permissive
-  open-source licenses:
+* All direct, indirect, and test dependencies are licensed under
+  permissive open-source licenses:
   |                                                                     Dependency | License                                                     |
   |-------------------------------------------------------------------------------:|:------------------------------------------------------------|
   |                                [arl/statsviz](https://github.com/arl/statsviz) | [MIT](https://opensource.org/license/mit)                   |
