@@ -357,11 +357,11 @@ README.md doc docs: README.md.tmpl proxy
 		{ env printf '%s\n' "⚠️ scc not found!" \
 			2> /dev/null || :; exit 1; }
 	$(CP) README.md.tmpl ./README.md
-	@env printf '\n%s\n' "🐪 Perl: Inserting version info..." \
+	@env printf '\n%s\n' "⚙️ Awk: Inserting version info..."  \
 		2> /dev/null || :
-	$(PERL) -i -pe \
-	'BEGIN { ($$v=qx(./proxy --version))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
-	s!===VERSION===!$$v!g' ./README.md
+	v="$$( ./proxy --version 2>&1 $(AWK) '{ gsub(/\r/,""); sub(/^[[:space:]]+/,""); sub(/[[:space:]]+$$/,""); print }' )" ; \
+	$(AWK) -v v="$$v" '{ gsub(/===VERSION===/, v); print }' README.md > README.md.awk && \
+		mv README.md.awk README.md
 	grep -q '===VERSION===' ./README.md || exit 0
 	@env printf '\n%s\n' "🐪 Perl: Inserting help info..." \
 		2> /dev/null || :
