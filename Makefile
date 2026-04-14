@@ -18,10 +18,6 @@ GOTOOLCHAIN=auto
 MV=mv -f
 RM=rm -f
 SED?=$$(command -v gsed 2> /dev/null || command -v sed)
-SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
-		 .whitesource,.golangci.yml,dependabot.yml,.txt" \
-		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown' \
-		 --include-symlinks
 
 ##############################################################################
 # Target: all
@@ -47,9 +43,18 @@ proxy: tags
 
 clean:
 	@env printf '%s\n' "🧹 Cleaning..." 2> /dev/null || :
+	@env printf '%s\n' "$(GO) clean -v"; \
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) clean -v
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) \
+		$(GO) clean -v || { \
+	env printf '\n%s\n\n' "🧩 Retrying clean (ignoring vendoring)..."; \
+		2> /dev/null || :; \
+	env printf '%s\n' "$(GO) clean -v -mod=readonly"; \
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) \
+		$(GO) clean -v -mod=readonly; }
 	$(RM) -r ./cross.bin/
 	$(RM) ./README.md.sed
 	$(RM) ./README.md.awk
@@ -132,6 +137,9 @@ file-diff:
 ##############################################################################
 # Target: golist
 
+GOLIST_TMPL='{{if (and (not (or .Main .Indirect)) .Update)}}\
+			{{.Path}}: {{.Version}} → {{.Update.Version}}{{end}}'
+
 golist:
 	@env printf '\n%s\n' \
 		"ℹ️ Finding any outdated dependencies... (may take a few moments)" \
@@ -139,8 +147,7 @@ golist:
 	@env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) list -u -f \
-		'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} → {{.Update.Version}}{{end}}' \
-		-m all
+		$(GOLIST_TMPL) -m all
 
 ##############################################################################
 # Target: reuse
@@ -409,6 +416,11 @@ README.md doc docs: README.md.tmpl proxy
 
 ##############################################################################
 # Target: scc
+
+SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
+		 .whitesource,.golangci.yml,dependabot.yml,.txt" \
+		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown' \
+		 --include-symlinks
 
 scc:
 	@command -v scc > /dev/null 2>&1 || \

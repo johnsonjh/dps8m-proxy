@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-14 gf896e54) [linux/amd64]
+DPS8M Proxy v1.0.58 (2026-Apr-14 gb5a23dd) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,12 +326,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-14 gf896e54) [linux/amd64]
+DPS8M Proxy v1.0.58 (2026-Apr-14 gb5a23dd) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.57                          |
+| dps8m/proxy               | v1.0.58                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -622,23 +622,23 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>568</th>
-<th>83</th>
+<th>580</th>
+<th>85</th>
 <th>92</th>
-<th>393</th>
-<th>171</th>
-<th>19952</th>
-<th>344</th>
+<th>403</th>
+<th>175</th>
+<th>20351</th>
+<th>350</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>628</th>
-<th>123</th>
+<th>635</th>
+<th>126</th>
 <th>0</th>
-<th>505</th>
+<th>509</th>
 <th>0</th>
-<th>29531</th>
-<th>492</th>
+<th>29762</th>
+<th>496</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -657,20 +657,27 @@ predecessor (code statistics 📈 provided by
 <th>10</th>
 <th>68</th>
 <th>0</th>
-<th>3973</th>
+<th>3968</th>
 <th>75</th>
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11317</th>
-<th>2381</th>
+<th>11336</th>
+<th>2386</th>
 <th>910</th>
-<th>8026</th>
-<th>1884</th>
-<th>301186</th>
-<th>5365</th>
+<th>8040</th>
+<th>1888</th>
+<th>301811</th>
+<th>5375</th>
 </tr></tfoot></table>
+
+
+## Changes
+
+* If you are looking for a ChangeLog, you can use the GitLab
+  [Repository graph](https://gitlab.com/dps8m/proxy/-/network/master)
+  to see the changes in each release.
 
 ## Future plans
 
@@ -752,8 +759,8 @@ predecessor (code statistics 📈 provided by
 * While not absolutely required, it’s a good idea to have the latest
   [`golangci-lint`](https://golangci-lint.run/) (v2) installed.  We
   ship a [config file](.golangci.yml) file for it, and try to make
-  sure that all the tests pass when using the most recently released
-  version.
+  sure that all the tests pass when using both the latest `git`
+  version as well as the most recently released version.
 * It’s also recommended to (*manually*) use
   [`hunspell`](https://hunspell.github.io/) for spell
   checking—in addition to using `codespell` and `scspell`.
@@ -777,8 +784,8 @@ predecessor (code statistics 📈 provided by
 * Some bundled example and miscellaneous files distributed under the
   terms of the
   [MIT No Attribution License](https://opensource.org/license/mit-0).
-* All direct and indirect dependencies are licensed under permissive
-  open-source licenses:
+* All direct, indirect, and test dependencies are licensed under
+  permissive open-source licenses:
   |                                                                     Dependency | License                                                     |
   |-------------------------------------------------------------------------------:|:------------------------------------------------------------|
   |                                [arl/statsviz](https://github.com/arl/statsviz) | [MIT](https://opensource.org/license/mit)                   |
