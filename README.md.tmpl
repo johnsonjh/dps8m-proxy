@@ -176,24 +176,6 @@ are, hopefully, documented here:
   and possibly a resolved host name.  This can be disabled with
   `‑‑no‑banner`.
 
-* The `--iconv` option enables legacy character map conversion of
-  TELNET text to UTF-8, and takes the name of the legacy mapping.
-
-  * This option currently applies to all targets and is most useful
-    to administrators of specific legacy systems such as DOS-based
-    bulletin board systems.
-
-  * *Only data received from the TELNET target is translated.*
-    Transmitted data is passed as-is.
-
-  * The following character maps are supported: ===CODEPAGE===
-
-  * String matching is *fuzzy* and most commonly-used abbreviations
-    are supported (*e.g.*, `--iconv "CP437"`).
-
-  * To print the list of supported character maps, pass `help`
-    (or any other illegal value, *e.g.*, `--iconv "help"`).
-
 * The `--no-filter` option disables link filtering of NULL characters.
   This is required to use the ZMODEM inline file transfer protocol
   or other host applications that use NULL-terminated packet sequences.
@@ -223,6 +205,24 @@ are, hopefully, documented here:
     can create empty files using the naming scheme described above.
     You can also remove *all* of these files if you don’t want to
     use this functionality.
+
+* The `--iconv` option enables legacy character map conversion of
+  TELNET text to UTF-8, and takes the name of the legacy mapping.
+
+  * This option currently applies to all targets and is most useful
+    to administrators of specific legacy systems such as DOS-based
+    bulletin board systems.
+
+  * *Only data received from the TELNET target is translated.*
+    Transmitted data is passed as-is.
+
+  * The following character maps are supported: ===CODEPAGE===
+
+  * String matching is *fuzzy* and most commonly-used abbreviations
+    are supported (*e.g.*, `--iconv "CP437"`).
+
+  * To print the list of supported character maps, pass `help`
+    (or any other illegal value, *e.g.*, `--iconv "help"`).
 
 * You need to start `proxy` using the `‑‑whitelist` and/or
   `‑‑blacklist` argument to enable the access control functionality.
