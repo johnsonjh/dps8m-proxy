@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.59 (2026-Apr-14 g1ca3322) [linux/amd64]
+DPS8M Proxy v1.0.60 (2026-Apr-14 geef6fa0) [linux/amd64]
 
 Usage for proxy:
 
@@ -173,13 +173,13 @@ Usage for proxy:
                                     ["gzip", "lzip", "xz", "zstd"]
                                     (default "gzip")
   --compress-level <string>     Compression level for gzip, lzip, and zstd
-                                    algorithms ["fast", "normal", "high"]
+                                    ["fast", "normal", "high"]
                                     (default "normal")
   --no-compress                 Disable session and/or console log compression
   --log-perm <octal>            Permissions (octal) for new log files
                                     [e.g., "600", "644"] (default 600)
   --log-dir-perm <octal>        Permissions (octal) for new log directories
-                                    [e.g., "755", "750"] (default 750)
+                                    [e.g., "750", "755"] (default 750)
   --db-file <string>            Path to persistent statistics storage database
                                     (disabled by default)
   --db-time <uint>              Elapsed seconds between database updates
@@ -326,12 +326,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.59 (2026-Apr-14 g1ca3322) [linux/amd64]
+DPS8M Proxy v1.0.60 (2026-Apr-14 geef6fa0) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.59                          |
+| dps8m/proxy               | v1.0.60                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -607,7 +607,7 @@ predecessor (code statistics 📈 provided by
 <th>589</th>
 <th>6766</th>
 <th>1679</th>
-<th>227151</th>
+<th>227140</th>
 <th>4129</th>
 </tr><tr>
 <th>Shell</th>
@@ -668,7 +668,7 @@ predecessor (code statistics 📈 provided by
 <th>910</th>
 <th>8040</th>
 <th>1890</th>
-<th>301839</th>
+<th>301828</th>
 <th>5375</th>
 </tr></tfoot></table>
 
