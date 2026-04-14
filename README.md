@@ -81,6 +81,10 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
     `make install` (or `make install-strip`) to install the proxy for
     system-wide usage.
 
+    ```sh
+    make install
+    ```
+
     * The installation targets respect both the `PREFIX`
       environment variable (which defaults to `/usr/local`) and the
       `DESTDIR` environment variable (used by package maintainers to
@@ -117,7 +121,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-13 g9e0ef73) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-14 g90313c8) [linux/amd64]
 
 Usage for proxy:
 
@@ -317,7 +321,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-13 g9e0ef73) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-14 g90313c8) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -623,13 +627,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>620</th>
-<th>121</th>
+<th>624</th>
+<th>122</th>
 <th>0</th>
-<th>499</th>
+<th>502</th>
 <th>0</th>
-<th>29262</th>
-<th>486</th>
+<th>29298</th>
+<th>489</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -654,13 +658,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11293</th>
-<th>2379</th>
+<th>11297</th>
+<th>2380</th>
 <th>910</th>
-<th>8004</th>
+<th>8007</th>
 <th>1877</th>
-<th>300316</th>
-<th>5352</th>
+<th>300352</th>
+<th>5355</th>
 </tr></tfoot></table>
 
 ## Future plans
