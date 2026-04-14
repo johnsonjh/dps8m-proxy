@@ -387,9 +387,14 @@ README.md doc docs: README.md.tmpl proxy
 	grep -q '===CODEPAGE===' ./README.md || exit 0
 	@env printf '\n%s\n' "🐪 Perl: Inserting scc output..." \
 		2> /dev/null || :
-	$(PERL) -i -pe \
-	'BEGIN { ($$v=qx(scc $(SCCFLAGS) -f html-table))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
-	s!===SCC===!$$v!g' ./README.md
+	s="$$( scc $(SCCFLAGS) -f html-table 2>&1 | $(AWK) \
+	  'BEGIN { s = "" } \
+	   { gsub(/\r/, ""); \
+	     if (NR > 1) s = s ORS $$0; else s = $$0 } \
+	   END { sub(/^[[:space:]]+/, "", s); sub(/[[:space:]]+$$/, "", s); \
+	         print s }' )" ; \
+	$(AWK) -v s="$$s" '{ gsub(/===SCC===/, s); print }' README.md > README.md.awk && \
+		$(MV) README.md.awk README.md
 	grep -q '===SCC===' ./README.md || exit 0
 	@env printf '\n%s\n' "⚙️ Sed: Redacting paths..." \
 		2> /dev/null || :
