@@ -31,7 +31,7 @@ pages:
     - apk update || true
     - apk add '!usr-merge-nag' 2> /dev/null || true
     - apk upgrade --prune || true
-    - apk add bash brotli curl gawk gcompat git go grep lzip pdpmake perl pigz py3-pip python3 sed shellcheck tar tree yash zip
+    - apk add bash brotli curl gawk gcompat git go grep lzip pdpmake pigz py3-pip python3 sed shellcheck tar tree yash zip
     - ln -fs "$(command -v yash)" /bin/sh
     - export SHELL=/bin/sh
     - export PATH="$HOME/go/bin:$PATH"
