@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.57* (2026-Apr-14 gca8ecad+) [linux/amd64]
+DPS8M Proxy v1.0.57* (2026-Apr-14 g1b1bf66+) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,7 +326,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.57* (2026-Apr-14 gca8ecad+) [linux/amd64]
+DPS8M Proxy v1.0.57* (2026-Apr-14 g1b1bf66+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -622,23 +622,23 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>567</th>
+<th>571</th>
 <th>83</th>
 <th>92</th>
-<th>392</th>
+<th>396</th>
 <th>173</th>
-<th>20044</th>
-<th>342</th>
+<th>20073</th>
+<th>346</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>629</th>
+<th>628</th>
 <th>123</th>
 <th>0</th>
-<th>506</th>
+<th>505</th>
 <th>0</th>
-<th>29564</th>
-<th>493</th>
+<th>29531</th>
+<th>492</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -663,13 +663,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11317</th>
+<th>11320</th>
 <th>2381</th>
 <th>910</th>
-<th>8026</th>
+<th>8029</th>
 <th>1886</th>
-<th>301311</th>
-<th>5364</th>
+<th>301307</th>
+<th>5367</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -724,8 +724,7 @@ predecessor (code statistics 📈 provided by
   [NilAway](https://github.com/uber-go/nilaway),
   [`scc`](https://github.com/boyter/scc),
   [`scspell`](https://github.com/myint/scspell),
-  [`codespell`](https://github.com/codespell-project/codespell),
-  and [Perl](https://www.perl.org/).
+  and [`codespell`](https://github.com/codespell-project/codespell).
 * If you plan to make any changes to the [`Makefile`](Makefile) (or
   [`.cross.sh`](.cross.sh) and other scripts), you’ll need to have the
   [ShellCheck](https://www.shellcheck.net/) and

@@ -16,7 +16,6 @@ CP=cp -f
 GO=$$(command -v go)
 GOTOOLCHAIN=auto
 MV=mv -f
-PERL=$$(command -v perl)
 RM=rm -f
 SED?=$$(command -v gsed 2> /dev/null || command -v sed)
 SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
@@ -360,48 +359,53 @@ README.md doc docs: README.md.tmpl proxy
 	@env printf '\n%s\n' "⚙️ Awk: Inserting version info..."  \
 		2> /dev/null || :
 	v="$$( ./proxy --version 2>&1 | $(AWK) \
-	  'BEGIN { s = "" } \
-	   { gsub(/\r/, ""); \
-	     if (NR > 1) s = s ORS $$0; else s = $$0 } \
+	  'BEGIN { s = "" } { gsub(/\r/, ""); \
+	   if (NR > 1) s = s ORS $$0; else s = $$0 } \
 	   END { sub(/^[[:space:]]+/, "", s); sub(/[[:space:]]+$$/, "", s); \
 	         print s }' )" ; \
-	$(AWK) -v v="$$v" '{ gsub(/===VERSION===/, v); print }' README.md > README.md.awk && \
+	$(AWK) -v v="$$v" '{ gsub(/===VERSION===/, v); print }' \
+	  README.md > README.md.awk && \
 		$(MV) README.md.awk README.md
 	grep -q '===VERSION===' ./README.md || exit 0
-	@env printf '\n%s\n' "⚙️ Sed: Inserting help info..." \
+	@env printf '\n%s\n' "⚙️ Awk: Inserting help info..." \
 		2> /dev/null || :
 	h="$$( ./proxy --help 2>&1 | $(AWK) \
-	  'BEGIN { s = "" } \
-	   { gsub(/\r/, ""); \
-	     if (NR > 1) s = s ORS $$0; else s = $$0 } \
+	  'BEGIN { s = "" } { gsub(/\r/, ""); \
+	   if (NR > 1) s = s ORS $$0; else s = $$0 } \
 	   END { sub(/^[[:space:]]+/, "", s); sub(/[[:space:]]+$$/, "", s); \
 	         print s }' )" ; \
-	$(AWK) -v h="$$h" '{ gsub(/===HELP===/, h); print }' README.md > README.md.awk && \
+	$(AWK) -v h="$$h" '{ gsub(/===HELP===/, h); print }' \
+	  README.md > README.md.awk && \
 		$(MV) README.md.awk README.md
 	grep -q '===HELP===' ./README.md || exit 0
 	@env printf '\n%s\n' "⚙️ Awk: Inserting codepage list..." \
 		2> /dev/null || :
-	cp_list=$$( ./proxy --iconv help 2>&1 | $(AWK) '/^  "/ { match($$0, /"[^"]*"/); s = substr($$0, RSTART+1, RLENGTH-2); gsub(/"/,"`",s); printf "%s`\"%s\"`", sep, s; sep = ", "; } END { printf "." }' ); \
-	$(AWK) -v cp="$$cp_list" '{ gsub(/===CODEPAGE===/, cp); print; }' ./README.md > ./README.md.awk && \
-	$(MV) ./README.md.awk ./README.md
+	cp_list=$$( ./proxy --iconv help 2>&1 | $(AWK) \
+	  '/^  "/ { match($$0, /"[^"]*"/); \
+	            s = substr($$0, RSTART+1, RLENGTH-2); gsub(/"/,"`",s); \
+	            printf "%s`\"%s\"`", sep, s; sep = ", "; } \
+	            END { printf "." }' ); \
+	$(AWK) -v cp="$$cp_list" '{ gsub(/===CODEPAGE===/, cp); print; }' \
+	  ./README.md > ./README.md.awk && \
+		$(MV) ./README.md.awk ./README.md
 	grep -q '===CODEPAGE===' ./README.md || exit 0
-	@env printf '\n%s\n' "🐪 Perl: Inserting scc output..." \
+	@env printf '\n%s\n' "⚙️ Awk: Inserting scc output..." \
 		2> /dev/null || :
 	s="$$( scc $(SCCFLAGS) -f html-table 2>&1 | $(AWK) \
-	  'BEGIN { s = "" } \
-	   { gsub(/\r/, ""); \
-	     if (NR > 1) s = s ORS $$0; else s = $$0 } \
+	  'BEGIN { s = "" } { gsub(/\r/, ""); \
+	   if (NR > 1) s = s ORS $$0; else s = $$0 } \
 	   END { sub(/^[[:space:]]+/, "", s); sub(/[[:space:]]+$$/, "", s); \
 	         print s }' )" ; \
-	$(AWK) -v s="$$s" '{ gsub(/===SCC===/, s); print }' README.md > README.md.awk && \
+	$(AWK) -v s="$$s" '{ gsub(/===SCC===/, s); print }' \
+	  README.md > README.md.awk && \
 		$(MV) README.md.awk README.md
 	grep -q '===SCC===' ./README.md || exit 0
 	@env printf '\n%s\n' "⚙️ Sed: Redacting paths..." \
 		2> /dev/null || :
 	$(SED) \
-	-e "s/$$(printf '\t')//g" \
-	-e 's|^Usage for .*/proxy:|Usage for proxy:|' \
-	< ./README.md > ./README.md.sed && \
+	  -e "s/$$(printf '\t')//g" \
+	  -e 's|^Usage for .*/proxy:|Usage for proxy:|' < \
+	  ./README.md > ./README.md.sed && \
 		$(MV) ./README.md.sed ./README.md
 	@env printf '\n%s\n\n' "📗 README.md generation successful." \
 		2> /dev/null || :
