@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.60 (2026-Apr-14 geef6fa0) [linux/amd64]
+DPS8M Proxy v1.0.60 (2026-Apr-14 g03d8940) [linux/amd64]
 
 Usage for proxy:
 
@@ -269,7 +269,7 @@ are, hopefully, documented here:
     are supported (*e.g.*, `--iconv "CP437"`).
 
   * To print the list of supported character maps, pass `help`
-    (or any other illegal value, *i.e.*, `--iconv "help"`).
+    (or any other illegal value, *e.g.*, `--iconv "help"`).
 
 * The `--no-filter` option disables link filtering of NULL characters.
   This is required to use the ZMODEM inline file transfer protocol
@@ -326,7 +326,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.60 (2026-Apr-14 geef6fa0) [linux/amd64]
+DPS8M Proxy v1.0.60 (2026-Apr-14 g03d8940) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
