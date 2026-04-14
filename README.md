@@ -77,8 +77,18 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   make
   ```
 
-  * If you don’t have a (POSIX) `make` available for some
-    reason, then building with `go build` is sufficient.
+  * *Optionally*, for most UNIX-like systems, you can execute
+    `make install` (or `make install-strip`) to install the proxy for
+    system-wide usage:
+
+    ```sh
+    make install
+    ```
+
+    * The installation targets respect both the `PREFIX`
+      environment variable (which defaults to `/usr/local`) and the
+      `DESTDIR` environment variable (used by package maintainers to
+      install the software to a staging directory).
 
   * The [`.cross.sh`](.cross.sh) cross‑compilation helper script
     is provided (which can be called with `make cross`) that
@@ -88,15 +98,25 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
     for building the Android binaries that require the
     [Android NDK](https://developer.android.com/ndk)).
 
-* You can also install this software using `go install` 📦:
+  * If you **don’t** have a (POSIX) `make` available for some
+    reason, then building with `go build` (or `go install`) will
+    likely be sufficient for most end-users.
+
+* To install the software using `go install` 📦:
 
   ```sh
-  go install gitlab.com/dps8m/proxy@latest
+  env GOTOOLCHAIN=auto go install -v gitlab.com/dps8m/proxy@latest
   ```
 
-  * Installations using `go install` download the required sources,
-    compile, and install the binary to `${GOEXE}/proxy` (which will
-    be `${HOME}/go/bin/proxy` for most users).
+  * Installations using the `go install` method will install the
+    appropriate Go toolchain (if needed), download the `proxy` sources,
+    compile them, and install the `proxy` binary to `${GOEXE}/proxy`
+    (which will be `${HOME}/go/bin/proxy` for most users).
+
+  * For users requiring completely offline builds, we provide a
+    [source archive](https://dps8m.gitlab.io/proxy/proxy.src.tar.gz)
+    for the current release which
+    [vendors](https://go.dev/ref/mod#vendoring) all dependencies.
 
 ## Usage
 
@@ -106,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.56 (2026-Apr-13 g741c5c6) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-14 ge44a811) [linux/amd64]
 
 Usage for proxy:
 
@@ -275,6 +295,7 @@ are, hopefully, documented here:
     session with the target (via TELNET to `10.0.5.9:3333`).  If any
     of the target‑specific text files do not exist, then the standard
     files will be served.
+
   * To disable the file‑based banner for specific targets only, you
     can create empty files using the naming scheme described above.
     You can also remove *all* of these files if you don’t want to
@@ -305,12 +326,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.56 (2026-Apr-13 g741c5c6) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-14 ge44a811) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.56                          |
+| dps8m/proxy               | v1.0.57                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -601,23 +622,23 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>552</th>
+<th>568</th>
 <th>83</th>
 <th>92</th>
-<th>377</th>
-<th>164</th>
-<th>19351</th>
-<th>337</th>
+<th>393</th>
+<th>171</th>
+<th>19952</th>
+<th>344</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>609</th>
-<th>117</th>
+<th>628</th>
+<th>123</th>
 <th>0</th>
+<th>505</th>
+<th>0</th>
+<th>29531</th>
 <th>492</th>
-<th>0</th>
-<th>28747</th>
-<th>477</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -642,13 +663,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11282</th>
-<th>2375</th>
+<th>11317</th>
+<th>2381</th>
 <th>910</th>
-<th>7997</th>
-<th>1877</th>
-<th>299801</th>
-<th>5343</th>
+<th>8026</th>
+<th>1884</th>
+<th>301186</th>
+<th>5365</th>
 </tr></tfoot></table>
 
 ## Future plans
@@ -658,15 +679,14 @@ predecessor (code statistics 📈 provided by
   include text *CAPTCHA*s, load‑balancing, fail‑over,
   [flow control](https://www.rfc-editor.org/rfc/rfc1372), SSH
   targets, and TELNET listeners.
+
 * When users access an SSH listener, the connecting client may supply
   a password or present public keys for authentication.  These
   authentication attempts are currently logged, but are not
   otherwise used by the proxy.  A future update may allow for
   passwords and public keys to be used for pre‑authentication or to
   influence target routing.
-[]()
 
-[]()
 * While TELNET protocol support will improve in the future, there are
   no plans to support the
   [linemode](https://www.rfc-editor.org/rfc/rfc1184),
@@ -704,8 +724,7 @@ predecessor (code statistics 📈 provided by
   [NilAway](https://github.com/uber-go/nilaway),
   [`scc`](https://github.com/boyter/scc),
   [`scspell`](https://github.com/myint/scspell),
-  [`codespell`](https://github.com/codespell-project/codespell),
-  and [Perl](https://www.perl.org/).
+  and [`codespell`](https://github.com/codespell-project/codespell).
 * If you plan to make any changes to the [`Makefile`](Makefile) (or
   [`.cross.sh`](.cross.sh) and other scripts), you’ll need to have the
   [ShellCheck](https://www.shellcheck.net/) and

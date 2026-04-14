@@ -263,6 +263,7 @@ goleak
 googlesource
 gops
 goreportcard
+gotoolchain
 govulncheck
 hunspell
 iconv
@@ -493,6 +494,7 @@ cyrillic
 darwin
 davidrg
 dependabot
+destdir
 ecdsa
 emacs
 emoji
@@ -596,6 +598,7 @@ tunables
 uber
 uptime
 username
+vendoring
 venv
 wasip
 wasm
