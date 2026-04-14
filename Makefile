@@ -43,14 +43,18 @@ proxy: tags
 
 clean:
 	@env printf '%s\n' "🧹 Cleaning..." 2> /dev/null || :
+	@env printf '%s\n' "$(GO) clean -v"; \
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) \
-		$(GO) clean -v || \
+		$(GO) clean -v || { \
+	env printf '\n%s\n\n' "🧩 Will retry clean (ignoring vendoring)..."; \
+		2> /dev/null || :; \
+	env printf '%s\n' "$(GO) clean -v -mod=readonly"; \
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
 		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) \
-		$(GO) clean -v -mod=readonly
+		$(GO) clean -v -mod=readonly; }
 	$(RM) -r ./cross.bin/
 	$(RM) ./README.md.sed
 	$(RM) ./README.md.awk
