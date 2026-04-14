@@ -825,7 +825,7 @@ func init() { //nolint:gochecknoinits
 	pflag.StringVar(&compressLevel,
 		"compress-level", "normal",
 		"Compression level for gzip, lzip, and zstd\r\n"+
-			"    algorithms [\"fast\", \"normal\", \"high\"]\r\n"+
+			"    [\"fast\", \"normal\", \"high\"]\r\n"+
 			"   ")
 
 	pflag.BoolVar(&noCompress,
