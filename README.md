@@ -79,7 +79,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
 
   * *Optionally*, for most UNIX-like systems, you can execute
     `make install` (or `make install-strip`) to install the proxy for
-    system-wide usage.
+    system-wide usage:
 
     ```sh
     make install
@@ -121,7 +121,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-14 g90313c8) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-14 g90cbe65) [linux/amd64]
 
 Usage for proxy:
 
@@ -321,7 +321,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-14 g90313c8) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-14 g90cbe65) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
