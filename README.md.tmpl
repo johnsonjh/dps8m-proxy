@@ -108,10 +108,15 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   env GOTOOLCHAIN=auto go install -v gitlab.com/dps8m/proxy@latest
   ```
 
-  * Installations using the `go install` method will download the
-    required toolchain and `proxy` sources, compile, and install the
-    `proxy` binary to `${GOEXE}/proxy` (which will be
-    `${HOME}/go/bin/proxy` for most users).
+  * Installations using the `go install` method will install the
+    appropriate Go toolchain (if needed), download the `proxy` sources,
+    compile them, and install the `proxy` binary to `${GOEXE}/proxy`
+    (which will be `${HOME}/go/bin/proxy` for most users).
+
+    * For users requiring completely offline builds, we provide a
+      [source archive](https://dps8m.gitlab.io/proxy/proxy.src.tar.gz)
+      for the current release which
+      [vendors](https://go.dev/ref/mod#vendoring) all dependencies.
 
 ## Usage
 

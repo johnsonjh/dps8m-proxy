@@ -598,6 +598,7 @@ tunables
 uber
 uptime
 username
+vendoring
 venv
 wasip
 wasm
