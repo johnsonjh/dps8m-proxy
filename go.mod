@@ -15,6 +15,7 @@ go 1.26.2
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Direct dependencies
 require (
 	github.com/arl/statsviz v0.8.0
 	github.com/google/gops v0.3.29
@@ -24,7 +25,6 @@ require (
 	github.com/spf13/pflag v1.0.11-0.20260305102058-3d32e71abc0b
 	github.com/ulikunitz/xz v0.5.15
 	go.etcd.io/bbolt v1.4.3
-	go.uber.org/goleak v1.3.1-0.20251210191316-2b7fd8a0d244
 	golang.org/x/crypto v0.50.0
 	golang.org/x/sys v0.43.0
 	golang.org/x/term v0.42.0
@@ -34,6 +34,12 @@ require (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Test dependencies
+require go.uber.org/goleak v1.3.1-0.20251210191316-2b7fd8a0d244 // test
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Indirect dependencies
 require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/miekg/dns v1.1.72 // indirect
