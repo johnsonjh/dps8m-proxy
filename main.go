@@ -842,7 +842,7 @@ func init() { //nolint:gochecknoinits
 	pflag.Var((*octalPermValue)(&logDirPerm),
 		"log-dir-perm",
 		"Permissions (octal) for new log directories\r\n"+
-			"    [e.g., \"755\", \"750\"]")
+			"    [e.g., \"750\", \"755\"]")
 
 	pflag_mustLookup("log-dir-perm").DefValue = "750"
 
