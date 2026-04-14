@@ -363,11 +363,16 @@ README.md doc docs: README.md.tmpl proxy
 	$(AWK) -v v="$$v" '{ gsub(/===VERSION===/, v); print }' README.md > README.md.awk && \
 		mv README.md.awk README.md
 	grep -q '===VERSION===' ./README.md || exit 0
-	@env printf '\n%s\n' "🐪 Perl: Inserting help info..." \
+	@env printf '\n%s\n' "⚙️ Sed: Inserting help info..." \
 		2> /dev/null || :
-	$(PERL) -i -pe \
-	'BEGIN { ($$v=qx(./proxy --help))=~s/^\s+|\s+$$//g; $$v=~s/\r//g; } \
-	s!===HELP===!$$v!g' ./README.md
+	h="$$( ./proxy --help 2>&1 | $(AWK) \
+	  'BEGIN { s = "" } \
+	   { gsub(/\r/, ""); \
+	     if (NR > 1) s = s ORS $$0; else s = $$0 } \
+	   END { sub(/^[[:space:]]+/, "", s); sub(/[[:space:]]+$$/, "", s); \
+	         print s }' )" ; \
+	$(AWK) -v h="$$h" '{ gsub(/===HELP===/, h); print }' README.md > README.md.awk && \
+		$(MV) README.md.awk README.md
 	grep -q '===HELP===' ./README.md || exit 0
 	@env printf '\n%s\n' "⚙️ Awk: Inserting codepage list..." \
 		2> /dev/null || :
