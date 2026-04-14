@@ -1081,7 +1081,7 @@ func main() {
 				gopsClose()
 			}
 
-			log.Fatalf("%sERROR: Invalid --console-log value: %s.  Must be 'quiet' or 'noquiet'",
+			log.Fatalf("%sERROR: Illegal --console-log value: %s.  Must be 'quiet' or 'noquiet'",
 				errorPrefix(), consoleLog) // LINTED: Fatalf
 		}
 
@@ -1163,7 +1163,7 @@ func main() {
 			gopsClose()
 		}
 
-		log.Fatalf("%sERROR: Invalid --compress-algo: %s",
+		log.Fatalf("%sERROR: Illegal --compress-algo: %s",
 			errorPrefix(), compressAlgo) // LINTED: Fatalf
 	}
 
@@ -1175,7 +1175,7 @@ func main() {
 			gopsClose()
 		}
 
-		log.Fatalf("%sERROR: Invalid --compress-level: %s",
+		log.Fatalf("%sERROR: Illegal --compress-level: %s",
 			errorPrefix(), compressLevel) // LINTED: Fatalf
 	}
 
