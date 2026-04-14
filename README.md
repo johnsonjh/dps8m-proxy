@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.60 (2026-Apr-14 gc9e11e8) [linux/amd64]
+DPS8M Proxy v1.0.60 (2026-Apr-14 gdf40fe4) [linux/amd64]
 
 Usage for proxy:
 
@@ -253,10 +253,6 @@ are, hopefully, documented here:
   and possibly a resolved host name.  This can be disabled with
   `‑‑no‑banner`.
 
-* The `--no-filter` option disables link filtering of NULL characters.
-  This is required to use the ZMODEM inline file transfer protocol
-  or other host applications that use NULL-terminated packet sequences.
-
 * The `‑‑no‑banner` option disables only those lines described above.
   It does *not* disable the file‑based banner content.  These are the
   three primary text files which can be displayed to connecting
@@ -282,6 +278,10 @@ are, hopefully, documented here:
     can create empty files using the naming scheme described above.
     You can also remove *all* of these files if you don’t want to
     use this functionality.
+
+* The `--no-filter` option disables link filtering of NULL characters.
+  This is required to use the ZMODEM inline file transfer protocol
+  or other host applications that use NULL-terminated packet sequences.
 
 * The `--iconv` option enables legacy character map conversion of
   TELNET text to UTF-8, and takes the name of the legacy mapping.
@@ -326,7 +326,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.60 (2026-Apr-14 gc9e11e8) [linux/amd64]
+DPS8M Proxy v1.0.60 (2026-Apr-14 gdf40fe4) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
