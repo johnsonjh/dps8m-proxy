@@ -349,9 +349,6 @@ govet:
 
 README.md doc docs: README.md.tmpl proxy
 	@env printf '%s\n\n' "📚 Generating README.md..." 2> /dev/null || :
-	@command -v perl > /dev/null 2>&1 || \
-		{ env printf '%s\n' "⚠️ perl not found!" \
-			2> /dev/null || :; exit 1; }
 	@command -v scc > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ scc not found!" \
 			2> /dev/null || :; exit 1; }
