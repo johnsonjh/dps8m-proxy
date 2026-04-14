@@ -113,10 +113,10 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
     compile them, and install the `proxy` binary to `${GOEXE}/proxy`
     (which will be `${HOME}/go/bin/proxy` for most users).
 
-    * For users requiring completely offline builds, we provide a
-      [source archive](https://dps8m.gitlab.io/proxy/proxy.src.tar.gz)
-      for the current release which
-      [vendors](https://go.dev/ref/mod#vendoring) all dependencies.
+  * For users requiring completely offline builds, we provide a
+    [source archive](https://dps8m.gitlab.io/proxy/proxy.src.tar.gz)
+    for the current release which
+    [vendors](https://go.dev/ref/mod#vendoring) all dependencies.
 
 ## Usage
 
@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-14 g7a36629) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-14 gb94e592) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,7 +326,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.57 (2026-Apr-14 g7a36629) [linux/amd64]
+DPS8M Proxy v1.0.57 (2026-Apr-14 gb94e592) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -637,7 +637,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>506</th>
 <th>0</th>
-<th>29572</th>
+<th>29564</th>
 <th>493</th>
 </tr><tr>
 <th>Systemd</th>
@@ -668,7 +668,7 @@ predecessor (code statistics 📈 provided by
 <th>910</th>
 <th>8011</th>
 <th>1877</th>
-<th>300626</th>
+<th>300618</th>
 <th>5359</th>
 </tr></tfoot></table>
 
