@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.58 (2026-Apr-14 gba62f8e) [linux/amd64]
+DPS8M Proxy v1.0.58 (2026-Apr-14 ga0f7b36) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,7 +326,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.58 (2026-Apr-14 gba62f8e) [linux/amd64]
+DPS8M Proxy v1.0.58 (2026-Apr-14 ga0f7b36) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -637,7 +637,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>509</th>
 <th>0</th>
-<th>29721</th>
+<th>29762</th>
 <th>496</th>
 </tr><tr>
 <th>Systemd</th>
@@ -668,7 +668,7 @@ predecessor (code statistics 📈 provided by
 <th>910</th>
 <th>8031</th>
 <th>1884</th>
-<th>301401</th>
+<th>301442</th>
 <th>5370</th>
 </tr></tfoot></table>
 
@@ -759,8 +759,8 @@ predecessor (code statistics 📈 provided by
 * While not absolutely required, it’s a good idea to have the latest
   [`golangci-lint`](https://golangci-lint.run/) (v2) installed.  We
   ship a [config file](.golangci.yml) file for it, and try to make
-  sure that all the tests pass when using the most recently released
-  version.
+  sure that all the tests pass when using both the latest `git`
+  version as well as the most recently released version.
 * It’s also recommended to (*manually*) use
   [`hunspell`](https://hunspell.github.io/) for spell
   checking—in addition to using `codespell` and `scspell`.
