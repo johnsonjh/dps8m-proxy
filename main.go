@@ -825,7 +825,7 @@ func init() { //nolint:gochecknoinits
 	pflag.StringVar(&compressLevel,
 		"compress-level", "normal",
 		"Compression level for gzip, lzip, and zstd\r\n"+
-			"    algorithms [\"fast\", \"normal\", \"high\"]\r\n"+
+			"    [\"fast\", \"normal\", \"high\"]\r\n"+
 			"   ")
 
 	pflag.BoolVar(&noCompress,
@@ -842,7 +842,7 @@ func init() { //nolint:gochecknoinits
 	pflag.Var((*octalPermValue)(&logDirPerm),
 		"log-dir-perm",
 		"Permissions (octal) for new log directories\r\n"+
-			"    [e.g., \"755\", \"750\"]")
+			"    [e.g., \"750\", \"755\"]")
 
 	pflag_mustLookup("log-dir-perm").DefValue = "750"
 
@@ -1081,7 +1081,7 @@ func main() {
 				gopsClose()
 			}
 
-			log.Fatalf("%sERROR: Invalid --console-log value: %s.  Must be 'quiet' or 'noquiet'",
+			log.Fatalf("%sERROR: Illegal --console-log value: %s.  Must be 'quiet' or 'noquiet'",
 				errorPrefix(), consoleLog) // LINTED: Fatalf
 		}
 
@@ -1163,7 +1163,7 @@ func main() {
 			gopsClose()
 		}
 
-		log.Fatalf("%sERROR: Invalid --compress-algo: %s",
+		log.Fatalf("%sERROR: Illegal --compress-algo: %s",
 			errorPrefix(), compressAlgo) // LINTED: Fatalf
 	}
 
@@ -1175,7 +1175,7 @@ func main() {
 			gopsClose()
 		}
 
-		log.Fatalf("%sERROR: Invalid --compress-level: %s",
+		log.Fatalf("%sERROR: Illegal --compress-level: %s",
 			errorPrefix(), compressLevel) // LINTED: Fatalf
 	}
 
