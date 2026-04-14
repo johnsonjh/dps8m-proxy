@@ -113,10 +113,10 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
     compile them, and install the `proxy` binary to `${GOEXE}/proxy`
     (which will be `${HOME}/go/bin/proxy` for most users).
 
-  * For users requiring completely offline builds, we provide a
-    [source archive](https://dps8m.gitlab.io/proxy/proxy.src.tar.gz)
-    for the current release which
-    [vendors](https://go.dev/ref/mod#vendoring) all dependencies.
+* For users requiring completely offline builds, we provide a
+  [source archive](https://dps8m.gitlab.io/proxy/proxy.src.tar.gz)
+  for the current release which
+  [vendors](https://go.dev/ref/mod#vendoring) all dependencies.
 
 ## Usage
 
@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.0.58 (2026-Apr-14 gf554f33) [linux/amd64]
+DPS8M Proxy v1.0.59 (2026-Apr-14 gbbf149f) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,12 +326,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.0.58 (2026-Apr-14 gf554f33) [linux/amd64]
+DPS8M Proxy v1.0.59 (2026-Apr-14 gbbf149f) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.0.58                          |
+| dps8m/proxy               | v1.0.59                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -484,8 +484,8 @@ their session to access the following TELNET control features:
   | `Home`            | `Control + A` |
   | `Delete`          | `Control + D` |
   | `End`             | `Control + E` |
-  | `Up`              | `Escape + v`  |
-  | `Down`            | `Control + V` |
+  | `Page Up`         | `Escape + v`  |
+  | `Page Down`       | `Control + V` |
   | `Up`              | `Control + P` |
   | `Down`            | `Control + N` |
   | `Right`           | `Control + F` |
@@ -626,8 +626,8 @@ predecessor (code statistics 📈 provided by
 <th>85</th>
 <th>92</th>
 <th>403</th>
-<th>175</th>
-<th>20351</th>
+<th>177</th>
+<th>20387</th>
 <th>350</th>
 </tr><tr>
 <th>Markdown</th>
@@ -637,7 +637,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>509</th>
 <th>0</th>
-<th>29762</th>
+<th>29754</th>
 <th>496</th>
 </tr><tr>
 <th>Systemd</th>
@@ -667,8 +667,8 @@ predecessor (code statistics 📈 provided by
 <th>2386</th>
 <th>910</th>
 <th>8040</th>
-<th>1888</th>
-<th>301811</th>
+<th>1890</th>
+<th>301839</th>
 <th>5375</th>
 </tr></tfoot></table>
 
