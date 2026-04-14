@@ -45,10 +45,12 @@ clean:
 	@env printf '%s\n' "🧹 Cleaning..." 2> /dev/null || :
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) clean -v || \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) \
+		$(GO) clean -v || \
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) clean -v -mod=mod
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) \
+		$(GO) clean -v -mod=readonly
 	$(RM) -r ./cross.bin/
 	$(RM) ./README.md.sed
 	$(RM) ./README.md.awk
