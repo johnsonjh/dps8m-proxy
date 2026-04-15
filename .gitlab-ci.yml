@@ -31,7 +31,7 @@ pages:
     - apk update || true
     - apk add '!usr-merge-nag' 2> /dev/null || true
     - apk upgrade --prune || true
-    - apk add bash brotli curl gawk gcompat git go grep lzip pdpmake pigz py3-pip python3 sed shellcheck tar tree yash zip
+    - apk add bash brotli curl gawk gcompat git go grep libarchive-tools pdpmake pigz py3-pip python3 sed shellcheck tar tree yash zip
     - ln -fs "$(command -v yash)" /bin/sh
     - export SHELL=/bin/sh
     - export PATH="$HOME/go/bin:$PATH"
@@ -52,7 +52,7 @@ pages:
     - cp -f proxy /tmp
     - pdpmake cross
     - mv -f cross.bin public
-    - ( cd $HOME && mkdir -p x-tools && cd x-tools && curl -fsSL https://github.com/johnsonjh/ndk/releases/download/r29/android-ndk-r30b1.tar.lz | lzip -dc | tar xf - ) || true
+    - ( cd $HOME && mkdir -p x-tools/android-ndk && cd x-tools && curl -fsSL https://dl.google.com/android/repository/android-ndk-r30-beta1-linux.zip | bsdtar -xf - --strip-components=1 -C android-ndk) || true
     - env MAKE=pdpmake yash ./.cross-android.sh || true
     - mv -f proxy.android.arm public || true
     - mv -f proxy.android.386 public || true
