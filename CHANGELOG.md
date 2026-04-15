@@ -35,11 +35,15 @@
     variable to improve maintainability.
   * Added a fallback mechanism to the `clean` target in the `Makefile`
     to try `-mod=readonly` if the default `go clean` operation fails.
+[]()
 
+[]()
 * Dependency Management
   * Reorganized `go.mod` to explicitly separate direct, indirect,
     and test dependencies.
+[]()
 
+[]()
 * CI/CD Updates
   * Optimized the GitLab CI/CD pipelines by removing the unnecessary
     installation of Perl.
@@ -48,7 +52,9 @@
 
 * Build System & Tooling Improvements
   * Replace Perl scripts with Awk scripts for documentation rebuilds.
+[]()
 
+[]()
 * Installation & Usage Documentation Updates
   * Added detailed documentation for system-wide installations using
     `make install` and `make install-strip`, including information
@@ -57,7 +63,9 @@
     `env GOTOOLCHAIN=auto` for a more robust installation experience.
   * Refined the explanation of how target-specific text files are
     served when using the `--alt-host` functionality.
+[]()
 
+[]()
 * Markdown and Formatting
   * Normalized punctuation, spacing, and Markdown formatting throughout
     the documentation to improve consistency and readability.
@@ -75,7 +83,9 @@
     temporary documentation build artifacts.
   * Updated `.gitignore` to exclude new temporary documentation build
     files (`README.md.awk`).
+[]()
 
+[]()
 * Documentation Improvements
   * Refined the visual layout of the documentation by categorizing
     the `--iconv` option details into clear bullet points.
@@ -90,12 +100,16 @@
     explicit ("Disable the user SSH connection banner").
   * Improved the documentation for whitelist and blacklist file formats
     to clarify that they should contain "one item per line."
+[]()
 
+[]()
 * Build System Improvements
   * Enhanced the documentation generation process in the `Makefile`
     to automatically redact the full local path of the binary from
     the generated help text.
+[]()
 
+[]()
 * Testing Improvements
   * Refined the implementation of `TestNaturalLess` in `main_test.go`
     for better formatting and readability.
@@ -131,10 +145,14 @@
     flexible input by normalizing case, spaces, dashes, underscores,
     and common abbreviations like "cp" for "codepage," "win" for
     "windows," and "mac" for "macintosh."
+[]()
 
+[]()
 * Dependency Updates
   * Updated Go compiler version from 1.26.1 to 1.26.2
+[]()
 
+[]()
 * Testing Improvements
   * Added test cases for the new natural sort algorithm, including
     scenarios for mixed alphanumeric strings and standard character
@@ -158,7 +176,9 @@
   * New CLI Option `--no-menu`: Added a new command-line flag to
     disable the SSH "Control-]" user menu, allowing for more
     restricted session configurations.
-    
+[]()
+
+[]()
 * Interactive Menu Enhancements:
   * Added the `C` command to the user control menu to allow users to
     toggle character map conversion (if enabled via `--iconv`)
@@ -167,10 +187,14 @@
     the `S` (Show Status) menu option.
   * Fixed bugs in the output alignment of the user control menu and
     improved connection statistics output.
+[]()
 
+[]()
 * CI/CD Updates
   * Updated the Android build pipeline to use Android NDK r30-beta1.
+[]()
 
+[]()
 * Testing Improvements
   * Added `TestFindCharmap` to verify the character map name
     normalization and fuzzy lookup logic.
@@ -183,7 +207,9 @@
   * New CLI Option `--no-filter`: Added a new command-line flag to
     disable the automatic stripping of NULL characters from the TELNET
     data stream.
+[]()
 
+[]()
 * Code Quality & Maintenance
   * Updated linting suppressions to align with the latest
     `golangci-lint` rules.
@@ -305,7 +331,9 @@
 * Dependency Updates
   * Updated spf13/pflag from v1.0.11-0.20251007101450-6fcfbc9910e1
     to v1.0.11-0.20260110151513-b85eb9e15911
+[]()
 
+[]()
 * Build System Improvements
   * Updated `Makefile` to clear the `goimports` cache before
     running `gopls` linting checks, avoiding a possible warning.
@@ -321,7 +349,9 @@
 
 * Code Improvements
   * Normalized code style by adding missing whitespace in main.go.
+[]()
 
+[]()
 * Dependency Updates
   * Updated github.com/google/gops from
     v0.3.29-0.20250514124927-a2d8f7790eac to the final v0.3.29 release.
@@ -332,7 +362,9 @@
 * New Features & Improvements
   * Improved performance and memory efficiency by preallocating data
     buffers in the TELNET negotiation logic.
+[]()
 
+[]()
 * Build System Improvements
   * Updated `.update-deps.sh` to optimize dependency update order.
   * Updated `.gitignore` to exclude additional temporary and
@@ -365,7 +397,9 @@
     directory exists.
   * Updated `.gitignore` to include core files and the
     `vendor` directory.
+[]()
 
+[]()
 * CI/CD Updates
   * Deactivated the Python venv after linting and fixed tar
     path exclusions.
@@ -449,7 +483,9 @@
   * Refactored code by moving all version identification and printing
     functions to a dedicated file.
   * Removed unused IEC size constants from the `main` package.
+[]()
 
+[]()
 * Build System Improvements
   * Added Emacs-style backup file patterns to the
     `.gitignore` configuration.
@@ -473,7 +509,9 @@
   * Corrected the help text for the `--ssh-addr` argument by changing
     the text "strings" to just "string".
   * Improved the formatting of help output by adding missing spaces.
+[]()
 
+[]()
 * Build System Improvements
   * Enabled the `color` and `trace` options of the `govulncheck`
     linting tool.
@@ -544,7 +582,9 @@
     affecting the `nilaway` and `revive` commands.
   * Appeased `gofumpt` by adjusting variable declaration
     in `trap_darwin.go`.
+[]()
 
+[]()
 * Code Quality Improvements
   * Ensured `CloseHandle` is deferred with error suppression
     in `trap_windows.go`.
