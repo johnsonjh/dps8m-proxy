@@ -13,8 +13,8 @@
   * Updated command-line flag descriptions for `--compress-level` and
     `--log-dir-perm` to be more concise and consistent.
   * Transposed the example octal permissions for `--log-dir-perm`
-    from `755`, `750` to `750`, `755` to align with the default value
-    of `750`.
+    from "`755`, `750`" to "`750`, `755`" to align with the default
+    value of `750`.
   * Standardized error messages for `--console-log`, `--compress-algo`,
     and `--compress-level` by changing "Invalid" to "Illegal" for
     better consistency.
@@ -91,7 +91,7 @@
   * Refined the visual layout of the documentation by categorizing
     the `--iconv` option details into clear bullet points.
   * Improved clarity in the description of the `--no-filter` option,
-    emphasizing its requirement for ZMODEM and other NULL-terminated
+    emphasizing its requirement for ZMODEM and other `NULL`-terminated
     packet protocols.
 
 # v1.0.55
@@ -144,8 +144,8 @@
   * Enhanced Character Map Matching: Significantly improved the
     `--iconv` character map name matching logic. It now supports more
     flexible input by normalizing case, spaces, dashes, underscores,
-    and common abbreviations like "cp" for "codepage," "win" for
-    "windows," and "mac" for "macintosh."
+    and common abbreviations like "CP" for "Code Page," "Win" for
+    "Windows," and "Mac" for "Macintosh."
 []()
 
 []()
@@ -167,7 +167,7 @@
   * Added detailed descriptions for the `--iconv` option, explaining
     its use for character map conversion of TELNET text to UTF-8.
   * Added documentation for the new `--no-filter` option, which
-    disables the stripping of NULL characters.
+    disables the stripping of `NULL` characters.
   * Updated the user control menu documentation to include the new `C`
     command, which toggles character set conversion during a session.
 
@@ -206,8 +206,8 @@
 
 * New Features & Improvements
   * New CLI Option `--no-filter`: Added a new command-line flag to
-    disable the automatic stripping of NULL characters from the TELNET
-    data stream.
+    disable the automatic stripping of `NULL` characters from the
+    TELNET data stream.
 []()
 
 []()
