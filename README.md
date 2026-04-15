@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.1.1 (2026-Apr-15 g6f547de) [linux/amd64]
+DPS8M Proxy v1.1.1* (2026-Apr-15 g71b8d22+) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,12 +326,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.1.1 (2026-Apr-15 g6f547de) [linux/amd64]
+DPS8M Proxy v1.1.1* (2026-Apr-15 g71b8d22+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.1.1                           |
+| dps8m/proxy               | v1.1.1*                          |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -620,6 +620,16 @@ predecessor (code statistics 📈 provided by
 <th>12974</th>
 <th>208</th>
 </tr><tr>
+<th>Markdown</th>
+<th>2</th>
+<th>1130</th>
+<th>191</th>
+<th>0</th>
+<th>939</th>
+<th>0</th>
+<th>47335</th>
+<th>844</th>
+</tr><tr>
 <th>Makefile</th>
 <th>1</th>
 <th>591</th>
@@ -629,16 +639,6 @@ predecessor (code statistics 📈 provided by
 <th>180</th>
 <th>20752</th>
 <th>355</th>
-</tr><tr>
-<th>Markdown</th>
-<th>1</th>
-<th>635</th>
-<th>126</th>
-<th>0</th>
-<th>509</th>
-<th>0</th>
-<th>29754</th>
-<th>496</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -662,14 +662,14 @@ predecessor (code statistics 📈 provided by
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
-<th>28</th>
-<th>11349</th>
-<th>2389</th>
+<th>29</th>
+<th>11844</th>
+<th>2454</th>
 <th>913</th>
-<th>8047</th>
+<th>8477</th>
 <th>1893</th>
-<th>302339</th>
-<th>5380</th>
+<th>319920</th>
+<th>5728</th>
 </tr></tfoot></table>
 
 
