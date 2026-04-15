@@ -31,7 +31,7 @@
 * Build System & Tooling Improvements
   * Significantly improved `Makefile` clarity by reorganizing variables
     and reducing long lines.
-  * Move Go template for dependency version checking to `GOLIST_TMPL`
+  * Moved Go template for dependency version checking to `GOLIST_TMPL`
     variable to improve maintainability.
   * Added a fallback mechanism to the `clean` target in the `Makefile`
     to try `-mod=readonly` if the default `go clean` operation fails.
@@ -51,7 +51,7 @@
 # v1.0.57
 
 * Build System & Tooling Improvements
-  * Replace Perl scripts with Awk scripts for documentation rebuilds.
+  * Replaced Perl scripts with Awk scripts for documentation rebuilds.
 []()
 
 []()
@@ -266,7 +266,9 @@
 * New Features & Improvements
   * Migrated inline gosec exceptions to standard `golangci-lint`
     syntax in `utf8.go`.
+[]()
 
+[]()
 * Dependency Updates
   * Updated golang.org/x/net from v0.50.0 to v0.51.0
 
@@ -299,7 +301,9 @@
 * Dependency Updates
   * Updated Go compiler version from 1.25.6 to 1.25.7
   * Updated github.com/miekg/dns from v1.1.70 to v1.1.72
+[]()
 
+[]()
 * Build System Improvements
   * Updated `.golangci.yml` configuration.
   * Added `nolint:unqueryvet` directives to database bucket access in
@@ -360,7 +364,7 @@
 # v1.0.28
 
 * New Features & Improvements
-  * Improved performance and memory efficiency by preallocating data
+  * Improved performance and memory efficiency by pre-allocating data
     buffers in the TELNET negotiation logic.
 []()
 
@@ -403,8 +407,8 @@
 * CI/CD Updates
   * Deactivated the Python venv after linting and fixed tar
     path exclusions.
-  * Built new `proxy.src.tar.gz` source archive (vendoring
-    all modules).
+  * Added new `proxy.src.tar.gz` source archive (vendoring
+    all modules) to GitLab Pages deployment.
   * Ensured proper `GOPROXY` variable is set in GitLab CI environment.
 
 # v1.0.24
@@ -569,7 +573,9 @@
 
 * New Features & Improvements
   * Refined code style in the version reporting functionality.
+[]()
 
+[]()
 * Dependency Updates
   * Updated golang.org/x/term from v0.36.0 to v0.37.0.
   * Updated golang.org/x/mod from v0.29.0 to v0.30.0.
