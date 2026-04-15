@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.1.1 (2026-Apr-15 g41d00c3) [linux/amd64]
+DPS8M Proxy v1.1.1 (2026-Apr-15 g283acbf) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,7 +326,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.1.1 (2026-Apr-15 g41d00c3) [linux/amd64]
+DPS8M Proxy v1.1.1 (2026-Apr-15 g283acbf) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -627,7 +627,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>943</th>
 <th>0</th>
-<th>47454</th>
+<th>47456</th>
 <th>847</th>
 </tr><tr>
 <th>Makefile</th>
@@ -668,14 +668,14 @@ predecessor (code statistics 📈 provided by
 <th>913</th>
 <th>8481</th>
 <th>1893</th>
-<th>320039</th>
+<th>320041</th>
 <th>5731</th>
 </tr></tfoot></table>
 
 
 ## Changes
 
-* The [CHANGELOG.md](CHANGELOG.md) file summarizes the most important
+* The [`CHANGELOG.md`](CHANGELOG.md) file summarizes the most important
   changes in each version.
 * If you are looking for more details, you can use the GitLab
   [Repository graph](https://gitlab.com/dps8m/proxy/-/network/master)
