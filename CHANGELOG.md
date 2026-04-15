@@ -277,8 +277,8 @@
 * New Features & Improvements
   * Added `--idle-def-max` and `--time-def-max` flags to set
     a connection timeout applied only to the default target.
-  * Improved configuration display to show both global and
-    default-target-only timeouts.
+  * Improved configuration display to show both global
+    and default-only timeouts.
   * Added validation to ensure effective idle timeouts are not
     greater than or equal to total connection timeouts.
   * Improved linter compliance between multiple versions by
