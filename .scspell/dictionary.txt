@@ -510,6 +510,7 @@ bonjour
 brotli
 captcha
 cflags
+changelog
 charmap
 charset
 cidr
