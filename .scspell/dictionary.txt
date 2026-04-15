@@ -475,6 +475,33 @@ laddr
 FILEID: 77970fc4-bc4b-11f0-b997-80ee73e9b8e7
 codeowners
 
+FILEID: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7
+codeowners
+distclean
+expandtab
+fcfbc
+goexe
+goimports
+golangci
+goleak
+golist
+gopath
+goproxy
+gops
+govulncheck
+klauspost
+maxcomlen
+miekg
+nilaway
+nolint
+nolintlint
+pflag
+readonly
+sstrip
+statsviz
+tmpl
+unqueryvet
+
 NATURAL:
 adduser
 avahi
@@ -483,6 +510,7 @@ bonjour
 brotli
 captcha
 cflags
+charmap
 charset
 cidr
 ckwin
@@ -496,6 +524,7 @@ cyrillic
 darwin
 davidrg
 dependabot
+deps
 destdir
 ecdsa
 emacs
@@ -508,6 +537,7 @@ gccgo
 gibibyte
 gibibytes
 github
+gitignore
 gitlab
 goawk
 godoclint
@@ -520,6 +550,7 @@ gopls
 goroutines
 gosec
 gotags
+gotoolchain
 grep
 gzip
 hashicorp
@@ -563,13 +594,16 @@ multics
 namespaces
 noexpandtab
 openssh
+parallelization
 pdpmake
 perl
 pigz
 pkcs
+preallocating
 prebuilt
 proxying
 realtime
+refactored
 reqs
 ripgrep
 roadmap
@@ -609,8 +643,10 @@ websocket
 whitelist
 whitelisted
 whitesource
+workaround
 workflows
 xauth
+xcode
 xterm
 xxxxxx
 xyzzy
