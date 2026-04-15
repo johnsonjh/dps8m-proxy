@@ -179,7 +179,7 @@
 []()
 
 []()
-* Interactive Menu Enhancements:
+* Interactive Menu Enhancements
   * Added the `C` command to the user control menu to allow users to
     toggle character map conversion (if enabled via `--iconv`)
     during a session.
