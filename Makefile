@@ -83,7 +83,16 @@ test:
 	@env printf '%s\n' "🧪 Running 'go test -v .'" 2> /dev/null || :
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) test -v .
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) test -v
+
+##############################################################################
+# Target: coverage
+
+coverage cover:
+	@env printf '%s\n' "🧪 Running 'go test -v .'" 2> /dev/null || :
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) test -v -cover
 
 ##############################################################################
 # Target: lint
@@ -100,6 +109,7 @@ lint check:
 	$(MAKE) clean
 	@env printf '\n%s\n' "⚙️ Running linters..." 2> /dev/null || :
 	$(MAKE) \
+		cover \
 		scspell \
 		codespell \
 		reuse \
@@ -568,7 +578,8 @@ install:
 	reuse gofmt goverify gotidydiff golangci-lint staticcheck nilaway \
 	revive errcheck deadcode govulncheck gopls gofumpt shfmt shellcheck \
 	codespell tags ctags gtags GRPATH GRTAGS GTAGS govet doc docs scc \
-	cross scspell scspell-fix strip sstrip install-strip install
+	cross scspell scspell-fix cover coverage strip sstrip install-strip \
+	install
 
 ##############################################################################
 # Local Variables:
