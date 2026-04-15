@@ -471,7 +471,9 @@
 
 * Dependency Updates
   * Updated github.com/klauspost/compress from v1.18.1 to v1.18.2.
+[]()
 
+[]()
 * New Features & Improvements
   * Added `--keymap` option for enabling Emacs keymapping mode
     by default.
@@ -495,7 +497,7 @@
 # v1.0.12
 
 * Dependency Updates
- * Updated github.com/arl/statsviz from v0.7.3 to v0.8.0.
+  * Updated github.com/arl/statsviz from v0.7.3 to v0.8.0.
 
 # v1.0.11
 
