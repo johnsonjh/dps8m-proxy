@@ -149,7 +149,7 @@
 
 []()
 * Dependency Updates
-  * Updated Go compiler version from 1.26.1 to 1.26.2
+  * Updated Go compiler from v1.26.1 to v1.26.2.
 []()
 
 []()
@@ -239,19 +239,19 @@
 # v1.0.43
 
 * Dependency Updates
-  * Updated golang.org/x/sys from v0.41.0 to v0.42.0
-  * Updated golang.org/x/sync from v0.19.0 to v0.20.0
+  * Updated golang.org/x/sys from v0.41.0 to v0.42.0.
+  * Updated golang.org/x/sync from v0.19.0 to v0.20.0.
 
 # v1.0.42
 
 * Dependency Updates
-  * Updated Go compiler version from 1.26.0 to 1.26.1
+  * Updated Go compiler from v1.26.0 to v1.26.1.
 
 # v1.0.41
 
 * Dependency Updates
   * Updated spf13/pflag from v1.0.11-0.20260110151513-b85eb9e15911
-    to v1.0.11-0.20260305102058-3d32e71abc0b
+    to v1.0.11-0.20260305102058-3d32e71abc0b.
 
 # v1.0.40
 
@@ -270,7 +270,7 @@
 
 []()
 * Dependency Updates
-  * Updated golang.org/x/net from v0.50.0 to v0.51.0
+  * Updated golang.org/x/net from v0.50.0 to v0.51.0.
 
 # v1.0.38
 
@@ -287,20 +287,20 @@
 # v1.0.37
 
 * Dependency Updates
-  * Updated Go compiler version from 1.25.7 to 1.26.0
-  * Updated github.com/klauspost/compress from v1.18.3 to v1.18.4
-  * Updated golang.org/x/crypto from v0.47.0 to v0.48.0
-  * Updated golang.org/x/mod from v0.32.0 to v0.33.0
-  * Updated golang.org/x/net from v0.49.0 to v0.50.0
-  * Updated golang.org/x/sys from v0.40.0 to v0.41.0
-  * Updated golang.org/x/term from v0.39.0 to v0.40.0
-  * Updated golang.org/x/tools from v0.41.0 to v0.42.0
+  * Updated Go compiler from v1.25.7 to v1.26.0.
+  * Updated github.com/klauspost/compress from v1.18.3 to v1.18.4.
+  * Updated golang.org/x/crypto from v0.47.0 to v0.48.0.
+  * Updated golang.org/x/mod from v0.32.0 to v0.33.0.
+  * Updated golang.org/x/net from v0.49.0 to v0.50.0.
+  * Updated golang.org/x/sys from v0.40.0 to v0.41.0.
+  * Updated golang.org/x/term from v0.39.0 to v0.40.0.
+  * Updated golang.org/x/tools from v0.41.0 to v0.42.0.
 
 # v1.0.36
 
 * Dependency Updates
-  * Updated Go compiler version from 1.25.6 to 1.25.7
-  * Updated github.com/miekg/dns from v1.1.70 to v1.1.72
+  * Updated Go compiler from v1.25.6 to v1.25.7.
+  * Updated github.com/miekg/dns from v1.1.70 to v1.1.72.
 []()
 
 []()
@@ -312,29 +312,29 @@
 # v1.0.35
 
 * Dependency Updates
-  * Updated github.com/klauspost/compress from v1.18.2 to v1.18.3
+  * Updated github.com/klauspost/compress from v1.18.2 to v1.18.3.
 
 # v1.0.34
 
 * Dependency Updates
-  * Updated Go compiler version from 1.25.5 to 1.25.6
+  * Updated Go compiler from v1.25.5 to v1.25.6.
 
 # v1.0.33
 
 * Dependency Updates
-  * Updated golang.org/x/tools from v0.40.0 to v0.41.0
+  * Updated golang.org/x/tools from v0.40.0 to v0.41.0.
 
 # v1.0.32
 
 * Dependency Updates
-  * Updated golang.org/x/crypto from v0.46.0 to v0.47.0
-  * Updated golang.org/x/net from v0.48.0 to v0.49.0
+  * Updated golang.org/x/crypto from v0.46.0 to v0.47.0.
+  * Updated golang.org/x/net from v0.48.0 to v0.49.0.
 
 # v1.0.31
 
 * Dependency Updates
   * Updated spf13/pflag from v1.0.11-0.20251007101450-6fcfbc9910e1
-    to v1.0.11-0.20260110151513-b85eb9e15911
+    to v1.0.11-0.20260110151513-b85eb9e15911.
 []()
 
 []()
@@ -345,9 +345,9 @@
 # v1.0.30
 
 * Dependency Updates
-  * Updated github.com/miekg/dns from v1.1.69 to v1.1.70
-  * Updated golang.org/x/mod from v0.31.0 to v0.32.0
-  * Updated golang.org/x/term from v0.38.0 to v0.39.0
+  * Updated github.com/miekg/dns from v1.1.69 to v1.1.70.
+  * Updated golang.org/x/mod from v0.31.0 to v0.32.0.
+  * Updated golang.org/x/term from v0.38.0 to v0.39.0.
 
 # v1.0.29
 
@@ -359,7 +359,7 @@
 * Dependency Updates
   * Updated github.com/google/gops from
     v0.3.29-0.20250514124927-a2d8f7790eac to the final v0.3.29 release.
-  * Updated golang.org/x/sys from v0.39.0 to v0.40.0
+  * Updated golang.org/x/sys from v0.39.0 to v0.40.0.
 
 # v1.0.28
 
@@ -469,7 +469,7 @@
 # v1.0.15
 
 * Dependency Updates
-  * Updated Go compiler version from 1.25.4 to 1.25.5.
+  * Updated Go compiler from v1.25.4 to v1.25.5.
 
 # v1.0.14
 
