@@ -428,7 +428,7 @@ README.md doc docs: README.md.tmpl proxy
 # Target: scc
 
 SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
-		 .whitesource,.golangci.yml,dependabot.yml,.txt,CHANGELOG.md," \
+		 .whitesource,.golangci.yml,dependabot.yml,.txt,CHANGELOG.md" \
 		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown' \
 		 --include-symlinks
 
