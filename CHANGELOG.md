@@ -22,7 +22,7 @@
 # v1.0.59
 
 * Build System Improvements
-  * Updated the `clean` target in the `Makefile` to suppress
+  * Updated the `clean` make target in the `Makefile` to suppress
     unnecessary error output and improve the robustness of the cleanup
     process.
 
@@ -33,8 +33,9 @@
     and reducing long lines.
   * Moved Go template for dependency version checking to `GOLIST_TMPL`
     variable to improve maintainability.
-  * Added a fallback mechanism to the `clean` target in the `Makefile`
-    to try `-mod=readonly` if the default `go clean` operation fails.
+  * Added a fallback mechanism to the `clean` make target in
+    the `Makefile` to try using `-mod=readonly` if the default
+    `go clean` operation fails.
 []()
 
 []()
@@ -61,8 +62,8 @@
     on `PREFIX` and `DESTDIR` environment variables.
   * Improved the `go install` documentation to recommend using
     `env GOTOOLCHAIN=auto` for a more robust installation experience.
-  * Refined the explanation of how target-specific text files are
-    served when using the `--alt-host` functionality.
+  * Refined the explanation of how TELNET target-specific banner file
+    are served when using the `--alt-host` functionality.
 []()
 
 []()
@@ -79,7 +80,7 @@
     include the actual list of supported character maps for the
     `--iconv` flag.
   * Improved Awk detection in the `Makefile`.
-  * Improved the `clean` target in the `Makefile` to remove new
+  * Improved the `clean` make target in the `Makefile` to remove new
     temporary documentation build artifacts.
   * Updated `.gitignore` to exclude new temporary documentation build
     files (`README.md.awk`).
@@ -136,10 +137,10 @@
 # v1.0.51
 
 * New Features & Improvements
-  * Natural Sort Ordering: Implemented a new natural sort algorithm for
-    ordering character map lists and target routes, ensuring that
-    strings containing numbers are sorted logically (e.g., "ISO 8859-2"
-    comes before "ISO 8859-10").
+  * Natural Sort Ordering: Implemented a new natural sort algorithm
+    for ordering character map lists and TELNET target routes,
+    ensuring that strings containing numbers are sorted logically
+    (e.g., "ISO 8859-2" comes before "ISO 8859-10").
   * Enhanced Character Map Matching: Significantly improved the
     `--iconv` character map name matching logic. It now supports more
     flexible input by normalizing case, spaces, dashes, underscores,
@@ -276,9 +277,9 @@
 
 * New Features & Improvements
   * Added `--idle-def-max` and `--time-def-max` flags to set
-    a connection timeout applied only to the default target.
-  * Improved configuration display to show both global
-    and default-only timeouts.
+    a connection timeout applied only for the default TELNET target.
+  * Improved configuration display to show both global and
+    default-only timeouts.
   * Added validation to ensure effective idle timeouts are not
     greater than or equal to total connection timeouts.
   * Improved linter compliance between multiple versions by
@@ -390,7 +391,7 @@
   * Updated scripts to resect `GOPROXY` from the user environment.
   * Updated scripts to use the `DIRECT` variable to control Go
     proxy use.
-  * Added `sstrip` an alias for `strip` target in the `Makefile`.
+  * Added `sstrip` an alias for `strip` make target in the `Makefile`.
   * Fixed a bug on illumos for the `strip` make target by not stripping
     the program using the illumos `strip` tool (due to known bugs that
     corrupt Golang binaries).
