@@ -3,6 +3,9 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
+# v1.1.1
+* TBD
+
 # v1.1.0
 * New Features & Improvements
   * Updated command-line flag descriptions for `--compress-level` and
