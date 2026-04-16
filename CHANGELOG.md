@@ -939,7 +939,7 @@
 
 * New Features & Improvements
   * Implemented support for connecting to TELNET targets over UNIX
-  * domain sockets.
+    domain sockets.
   * Added sanitization of non-ASCII characters from system error
     messages prior to transmitting them to connected clients.
   * Enhanced connection handling by ensuring all TCP connections
