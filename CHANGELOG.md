@@ -21,6 +21,11 @@
 
 # v1.0.59
 
+* Documentation Updates
+  * Fix incorrect Emacs key remapping table PgUp/PgDn details.
+[]()
+
+[]()
 * Build System Improvements
   * Updated the `clean` make target in the `Makefile` to suppress
     unnecessary error output and improve the robustness of the cleanup
