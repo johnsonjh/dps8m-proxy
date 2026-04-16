@@ -698,7 +698,58 @@
 * CI/CD Updates
   * Added support for GitLab and GitHub `CODEOWNERS`.
 
-# v0.1.67 to v0.1.1
+# v0.1.67
+
+* Build System Improvements
+  * Added a lint check to verify that the top-level `LICENSE`
+    file exactly matches `LICENSES/MIT.txt`.
+[]()
+
+[]()
+  * Updated the list of required development tools to include
+    the POSIX.1 `diff` utility.
+
+# v0.1.66
+
+* CI/CD Updates
+  * Updated the GitLab CI configuration to use `pigz` compression
+    level 9.
+[]()
+
+[]()
+* Build System Improvements
+  * Modified the linter setup script to support the `VERBOSE`
+    environment variable for controlling installation output.
+  * Added the installation of `gotags` and `gogtags` tag generators
+    to the linter setup script.
+  * Enhanced the linter setup script to use the configured
+    `GO` variable for all tool installations.
+
+# v0.1.65
+
+* New Features & Improvements
+  * Switched to unsigned integers for certificate sizes
+    and connection timeouts.
+  * Added validation to ensure connection timeout values
+    remain within safe ranges.
+[]()
+
+[]()
+* Build System Improvements
+  * Updated the `.gitignore` file to exclude more output files.
+
+# v0.1.64
+
+* Dependency Updates
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from v1.25.3 to v1.25.4.
+
+# v0.1.63
+
+* TBD
+
+# v0.1.62 to v0.1.1
 
 * TBD
 
