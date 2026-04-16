@@ -1230,7 +1230,7 @@
   * Added a new (MIT-0 licensed) lint setup script to automate
     the installation of Go-based linters and development tools.
   * Added a new script to facilitate automated dependency updates.
-  * Added these cripts to be checked by the `shfmt` and
+  * Added these scripts to be checked by the `shfmt` and
     ShellCheck linters.
 
 # v0.1.23 to v0.1.1
