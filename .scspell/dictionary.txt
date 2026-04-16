@@ -477,9 +477,13 @@ codeowners
 
 FILEID: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7
 codeowners
+deadcode
+depguard
 distclean
+errorf
 expandtab
 fcfbc
+gcompat
 goexe
 goimports
 golangci
@@ -489,21 +493,32 @@ gopath
 goproxy
 gops
 govulncheck
+ioutil
+ireturn
 klauspost
+libcap
 maxcomlen
 miekg
 nilaway
+noinlineerr
 nolint
 nolintlint
+perfsprint
 pflag
+printf
 readonly
+shfmt
 sstrip
 statsviz
+stdbuf
 tmpl
 unqueryvet
+wrapcheck
+zopfli
 
 NATURAL:
 adduser
+american
 avahi
 bbolt
 bonjour
@@ -516,9 +531,11 @@ charset
 cidr
 ckwin
 cocomo
+codebase
 codepage
 codeql
 codespell
+coreutils
 ctags
 cygwin
 cyrillic
@@ -526,10 +543,12 @@ darwin
 davidrg
 dependabot
 deps
+dereferences
 destdir
 ecdsa
 emacs
 emoji
+english
 entrypoint
 etcd
 formatters
@@ -581,6 +600,7 @@ logfile
 logon
 logout
 logwriter
+lookups
 loopback
 lzip
 makefile

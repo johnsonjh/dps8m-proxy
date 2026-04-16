@@ -165,6 +165,12 @@
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.26.1 to v1.26.2.
+  * Updated
+    [linux/libs/security/libcap/cap](kernel.org/pub/linux/libs/security/libcap/cap)
+    from from v1.2.77 to v1.2.78.
+  * Updated
+    [linux/libs/security/libcap/psx](kernel.org/pub/linux/libs/security/libcap/psx)
+    from from v1.2.77 to v1.2.78.
 []()
 
 []()
@@ -191,6 +197,8 @@
   * New CLI Option `--no-menu`: Added a new command-line flag to
     disable the SSH `Control-]` user menu, allowing for more
     restricted session configurations.
+  * New CLI Option `--iconv`: Added a new command-line flag to
+    enable conversion of legacy character maps to UTF-8.
 []()
 
 []()
@@ -233,7 +241,7 @@
 
 * Dependency Updates
   * Updated
-    [github.com/klauspost/compress](https://github.com/klauspost/compress)
+    [klauspost/compress](https://github.com/klauspost/compress)
     from v1.18.4 to v1.18.5.
 
 # v1.0.46
@@ -319,7 +327,7 @@
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.25.7 to v1.26.0.
   * Updated
-    [github.com/klauspost/compress](https://github.com/klauspost/compress)
+    [klauspost/compress](https://github.com/klauspost/compress)
     from v1.18.3 to v1.18.4.
   * Updated [golang.org/x/crypto](https://golang.org/x/crypto)
     from v0.47.0 to v0.48.0.
@@ -354,7 +362,7 @@
 
 * Dependency Updates
   * Updated
-    [github.com/klauspost/compress](https://github.com/klauspost/compress)
+    [klauspost/compress](https://github.com/klauspost/compress)
     from v1.18.2 to v1.18.3.
 
 # v1.0.34
@@ -443,7 +451,7 @@
 * Build System Improvements
   * Updated scripts to resect `GOPROXY` from the user environment.
   * Updated scripts to use the `DIRECT` variable to control Go
-    proxy use.
+    proxy use, and no longer prioritizing direct module downloads.
   * Added `sstrip` an alias for `strip` make target in the `Makefile`.
   * Fixed a bug on illumos for the `strip` make target by not stripping
     the program using the illumos `strip` tool (due to a known bug that
@@ -463,7 +471,8 @@
     path exclusions.
   * Added new `proxy.src.tar.gz` source archive (vendoring
     all modules) to GitLab Pages deployment.
-  * Ensured proper `GOPROXY` variable is set in GitLab CI environment.
+  * Ensured proper `GOPROXY` variable is set in the
+    GitLab CI/CD environment.
 
 # v1.0.24
 
@@ -539,7 +548,7 @@
 
 * Dependency Updates
   * Updated
-    [github.com/klauspost/compress](https://github.com/klauspost/compress)
+    [klauspost/compress](https://github.com/klauspost/compress)
     from v1.18.1 to v1.18.2.
 []()
 
@@ -713,8 +722,8 @@
 # v0.1.66
 
 * CI/CD Updates
-  * Updated the GitLab CI configuration to call `pigz` with
-    compression level 9.
+  * Updated the GitLab CI/CD configuration to call `pigz` with
+    compression level 9 (instead of Zopfli).
 []()
 
 []()
@@ -748,9 +757,310 @@
 
 # v0.1.63
 
-* TBD
+* New Features & Improvements
+  * Added `--cert-rsa-bits` and `--cert-ecdsa-bits` command-line flags
+    to allow users to specify key sizes for RSA and ECDSA host
+    key generation.
+  * Updated host key generation logging routines to include the sizes
+    of the generated keys.
 
-# v0.1.62 to v0.1.1
+# v0.1.62
+
+* Build System Improvements
+  * Enabled symbol tables and DWARF information in pre-compiled
+    release binaries by removing `-s` and `-w` linker flags.
+[]()
+
+[]()
+* Testing Improvements
+  * Integrated the upstream Google `deadcode` linter.
+  * Added automated installation of `deadcode` linter in the lint
+    setup script.
+  * Added `deadcode` make target to the `Makefile` for manual
+    and CI usage.
+
+# v0.1.61
+
+* New Features & Improvements
+  * Implemented numerous defensive `nil`-checks for connection
+    handling, mDNS listener addresses, and command-line arguments,
+    as suggested by NilAway.
+  * Added a `pflag_mustLookup` helper function to safely handle flag
+    lookups while preventing potential `nil` pointer dereferences.
+  * Normalized `fmt.Errorf` call formatting across the codebase for
+    better consistency and readability.
+[]()
+
+[]()
+* Testing Improvements
+  * Integrated the NilAway static analysis tool into the linting suite
+    for enhanced `nil`-safety verification.
+  * Added the `wsl_v5` linter to the project and addressed identified
+    style issues.
+  * Updated the lint setup script to automatically install and
+    configure the new linters.
+  * Adjusted `revive` linter configuration and addressed various
+    linting findings.
+
+# v0.1.60
+
+* New Features & Improvements
+  * Enhanced error reporting across the database, host key generation,
+    connection dialing, and logging modules (wrapping all returned
+    errors with contextual information), as suggested by `wrapcheck`.
+[]()
+
+[]()
+* Testing Improvements
+  * Enabled the `depguard` linter in the static analysis configuration
+    to restrict imports and explicitly deny usage of the deprecated
+    `io/ioutil` package.
+  * Enabled the `wrapcheck` linter to ensure all error returns from
+    external packages are properly wrapped.
+
+# v0.1.59
+
+* New Features & Improvements
+  * Updated error messages in the menu selection handler.
+  * Optimized performance by replacing string formatting with direct
+    string concatenation and formatting functions in logging
+    and configuration display paths.
+  * Added a missing newline in the Unix signal handling initialization
+    for improved code readability.
+[]()
+
+[]()
+* Testing Improvements
+  * Enabled the `perfsprint` linter in the static analysis
+    configuration and addressed all findings across the codebase.
+  * Added `nolint` directives to suppress specific false positives in
+    the UTF-8 handling logic.
+[]()
+
+[]()
+* Build System Improvements
+  * Adjusted the `GOPROXY` settings in the dependency update script.
+
+# v0.1.58
+
+* New Features & Improvements
+  * Implemented new Linux-specific detection mechanisms to identify
+    when the application is launched from a GUI environment.
+  * Added an explicit warning message to notify Linux users when the
+    application is started from a file manager rather than a terminal.
+  * Expanded the list of recognized Linux GUI launchers to include
+    common desktop environments and file managers.
+[]()
+
+[]()
+* CI/CD Updates
+  * Updated the GitLab CI/CD configuration to use Zopfli compression
+    via `pigz -11` for release assets.
+
+# v0.1.57
+
+* Build System Improvements
+  * Simplified the Android cross-compilation script by removing
+    redundant cleanup operations and stale code.
+  * Updated the cross-compilation helper scripts to dynamically
+    determine the Go toolchain version to use from the `go.mod` file.
+  * Added the Android cross-compilation script to be checked by the
+    `shfmt` and `shellcheck` linters.
+[]()
+
+[]()
+* Documentation Updates
+  * Updated the `socat` integration example in the documentation to
+    utilize UNIX domain sockets.
+  * Added a hyperlink to the `socat` home page.
+
+# v0.1.56
+
+* CI/CD Updates
+  * Optimized the GitLab CI/CD pipeline by caching the primary binary
+    during cross-compilation to prevent redundant builds and avoid
+    "dirty" version markers.
+
+# v0.1.55
+
+* CI/CD Updates
+  * Rebuilt the proxy binary during the deployment process to ensure
+    correct version information on the download web page.
+  * Removed redundant debugging code from the pipeline configuration.
+
+# v0.1.54
+
+* CI/CD Updates
+  * Corrected a bug preventing proper movement of Android build
+    artifacts to the public directory in the GitLab CI/CD pipeline.
+
+# v0.1.53
+
+* CI/CD Updates
+  * Added Alpine `bash` and `gcompat` packages to the
+    GitLab CI/CD environment.
+  * Updated the Android cross-compilation process in GitLab CI/CD
+    to explicitly pass `pdpmake` in the `MAKE` environment variable.
+
+# v0.1.52
+
+* CI/CD Updates
+  * Added a new Android cross-compilation job to the
+    GitLab CI/CD pipeline.
+  * Added `lzip`, `tar`, and the Android NDK to the GitLab CI/CD
+    environment to facilitate Android CI builds.
+[]()
+
+[]()
+* Build System Improvements
+  * Added a new `.cross-android.sh` script to automate Android
+    cross-compilation using the Android NDK.
+  * Modified the `.cross.sh` script to exclude Android targets and
+    refer users to the new `.cross-android.sh` script.
+  * Updated the `Makefile` to be more POSIX-compliant and allowed
+    overriding `GOTOOLCHAIN` and `CGO_ENABLED` variables.
+[]()
+
+[]()
+* Testing Improvements
+  * Enabled the `ireturn` linter in the static analysis configuration
+    and addressed its findings.
+[]()
+
+[]()
+* New Features & Improvements
+  * Improved the console warning message for GUI launches on Linux to
+    specifically mention not using a file manager.
+  * Updated the `.gitignore` file to exclude
+    Android-specific artifacts.
+
+# v0.1.51
+
+* New Features & Improvements
+  * Implemented support for connecting to TELNET targets over UNIX
+  * domain sockets.
+  * Added sanitization of non-ASCII characters from system error
+    messages prior to transmitting them to connected clients.
+  * Enhanced connection handling by ensuring all TCP connections
+    utilize the `NoDelay` option.
+  * Updated the console warning for GUI launches to appear after the
+    help text for better visibility.
+  * Standardized all spelling to American English conventions.
+  * Improved connection termination logic by removing redundant
+    mutex locking.
+  * Enhanced error logging for failed TELNET target connections with
+    better contextual information.
+[]()
+
+[]()
+* Testing Improvements
+  * Refactored code structure to satisfy the `noinlineerr` linter.
+  * Applied `ireturn` linter compliance to key loading functions.
+[]()
+
+[]()
+* Build System Improvements
+  * Updated the dependency maintenance script to prioritize direct
+    module downloads from the proxy.
+  * Code cleanup for improved readability.
+
+# v0.1.50
+
+* Build System Improvements
+  * Improved the console output messages for the `scspell`
+    and `scspell-fix` make targets.
+
+# v0.1.49
+
+* New Features & Improvements
+  * Added a new `--no-console` command-line argument to completely
+    disable the interactive admin console.
+[]()
+
+[]()
+* Build System Improvements
+  * Improved build reliability on macOS by explicitly calling
+    the external `printf` utility (known to properly handle
+    Unicode output).
+
+# v0.1.48
+
+* New Features & Improvements
+  * Applied various minor style and whitespace adjustments to enhance
+    code consistency and readability.
+[]()
+
+[]()
+* Dependency updates
+  * Updated
+    [linux/libs/security/libcap/cap](kernel.org/pub/linux/libs/security/libcap/cap)
+    from v1.2.76 to v1.2.77.
+  * Updated
+    [linux/libs/security/libcap/psx](kernel.org/pub/linux/libs/security/libcap/psx)
+    from v1.2.76 to v1.2.77.
+
+# v0.1.47
+
+* Documentation Updates
+  * Added information about source code tag generation using the
+    `gogtags`, `gotags`, and `universal-ctags` tools to the
+    project documentation.
+
+# v0.1.46
+
+* New Features & Improvements
+  * Implemented detection for GUI-based launches on Windows, macOS,
+    and Linux to prevent accidental execution outside of a terminal.
+  * Added a prompt to wait for the Enter key to be pressed when a GUI
+    launch is detected before exiting the application.
+  * Updated the help and usage information output to include the
+    project home page and bug reporting URL.
+  * Extended the `.gitignore` file to include IBM OS/400 specific
+    build artifacts.
+[]()
+
+[]()
+* Dependency updates
+  * Promoted [golang.org/x/sys](golang.org/x/sys) from an indirect to
+    a direct dependency at version v0.37.0.
+[]()
+
+[]()
+* Build System Improvements
+  * Refactored signal handling and process scanning logic into
+    platform-specific files for better maintainability.
+
+# v0.1.45
+
+* New Features & Improvements
+  * Improved grammatical clarity, corrected typographical errors, and
+    added hyperlinks in the project documentation.
+
+# v0.1.44
+
+* New Features & Improvements
+  * Corrected typographical and grammatical errors in
+    the documentation.
+
+# v0.1.43
+
+* CI/CD Updates
+  * Eliminated the `coreutils` package dependency by removing the
+    use of the `stdbuf` command in the GitLab CI/CD configuration.
+
+# v0.1.42
+
+* CI/CD Updates
+  * Added the `coreutils` package to the CI/CD Alpine build
+    environment (to provide the `stdbuf` utility).
+  * Utilized `stdbuf` to ensure line-buffered output for several
+    build and test commands.
+  * Corrected quoting for the `PATH` environment variable in
+    the GitLab CI/CD configuration.
+  * Removed redundant Go telemetry reconfiguration from the CI
+    build scripts.
+
+# v0.1.41
 
 * TBD
 
