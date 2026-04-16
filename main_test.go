@@ -234,29 +234,31 @@ func TestFindCharmap(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
+		t.Run(tt.name,
+			func(t *testing.T) {
+				t.Parallel()
 
-			cm := findCharmap(tt.input)
-			if tt.expected == "" {
-				if cm != nil {
-					t.Errorf("findCharmap(%q) expected nil, got %v",
-						tt.input, cm)
-				}
-			} else {
-				if cm == nil {
-					t.Errorf("findCharmap(%q) expected %q, got nil",
-						tt.input, tt.expected)
+				cm := findCharmap(tt.input)
+				if tt.expected == "" {
+					if cm != nil {
+						t.Errorf("findCharmap(%q) expected nil, got %v",
+							tt.input, cm)
+					}
 				} else {
-					got := fmt.Sprintf("%v",
-						cm)
-					if !strings.Contains(strings.ToLower(got), strings.ToLower(tt.expected)) {
-						t.Errorf("findCharmap(%q) = %q, want it to contain %q",
-							tt.input, got, tt.expected)
+					if cm == nil {
+						t.Errorf("findCharmap(%q) expected %q, got nil",
+							tt.input, tt.expected)
+					} else {
+						got := fmt.Sprintf("%v",
+							cm)
+						if !strings.Contains(strings.ToLower(got), strings.ToLower(tt.expected)) {
+							t.Errorf("findCharmap(%q) = %q, want it to contain %q",
+								tt.input, got, tt.expected)
+						}
 					}
 				}
-			}
-		})
+			},
+		)
 	}
 }
 
@@ -299,7 +301,8 @@ func TestNaturalLess(t *testing.T) {
 					t.Errorf("naturalLess(%q, %q) = %v, want %v",
 						tt.s1, tt.s2, got, tt.expected)
 				}
-			})
+			},
+		)
 	}
 }
 
@@ -350,9 +353,11 @@ func TestNaturalSort(t *testing.T) {
 		"ISO 8859-16",
 	}
 
-	sort.Slice(input, func(i, j int) bool {
-		return naturalLess(input[i], input[j])
-	})
+	sort.Slice(input,
+		func(i, j int) bool {
+			return naturalLess(input[i], input[j])
+		},
+	)
 
 	for i := range input {
 		if input[i] != expected[i] {

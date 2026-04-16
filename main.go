@@ -1129,9 +1129,11 @@ func main() {
 				available = append(available, fmt.Sprintf("%v", cm))
 			}
 
-			sort.Slice(available, func(i, j int) bool {
-				return naturalLess(available[i], available[j])
-			})
+			sort.Slice(available,
+				func(i, j int) bool {
+					return naturalLess(available[i], available[j])
+				},
+			)
 
 			_, _ = fmt.Fprintf(os.Stdout, "\r\nValid --iconv character map strings:\r\n\r\n")
 
@@ -2474,12 +2476,14 @@ func listConnections(truncate bool) {
 			idle = time.Since(conn.lastActivityTime).Round(time.Second).String()
 		}
 
-		rows = append(rows, row{
-			ID:      conn.ID,
-			Details: details,
-			Link:    time.Since(conn.startTime).Round(time.Second).String(),
-			Idle:    idle,
-		})
+		rows = append(rows,
+			row{
+				ID:      conn.ID,
+				Details: details,
+				Link:    time.Since(conn.startTime).Round(time.Second).String(),
+				Idle:    idle,
+			},
+		)
 	}
 
 	maxID := len("Session ID")
@@ -2839,9 +2843,11 @@ func listConfiguration() {
 			users = append(users, user)
 		}
 
-		sort.Slice(users, func(i, j int) bool {
-			return naturalLess(users[i], users[j])
-		})
+		sort.Slice(users,
+			func(i, j int) bool {
+				return naturalLess(users[i], users[j])
+			},
+		)
 
 		for _, user := range users {
 			hostPort := altHosts[user]
@@ -6418,12 +6424,14 @@ func listGoroutines() {
 			caller = strings.TrimSpace(lines[2])
 		}
 
-		goroutines = append(goroutines, GoroutineInfo{
-			ID:         id,
-			State:      state,
-			Entrypoint: entrypoint,
-			Caller:     caller,
-		})
+		goroutines = append(goroutines,
+			GoroutineInfo{
+				ID:         id,
+				State:      state,
+				Entrypoint: entrypoint,
+				Caller:     caller,
+			},
+		)
 	}
 
 	if len(goroutines) == 0 { // Not possible!
@@ -6437,10 +6445,18 @@ func listGoroutines() {
 	allRows := make([]row, 0, len(goroutines)*4)
 
 	for _, g := range goroutines {
-		allRows = append(allRows, row{"Name", "Goroutine #" + g.ID})
-		allRows = append(allRows, row{"State", g.State})
-		allRows = append(allRows, row{"Entrypoint", g.Entrypoint})
-		allRows = append(allRows, row{"Caller", g.Caller})
+		allRows = append(allRows,
+			row{"Name", "Goroutine #" + g.ID},
+		)
+		allRows = append(allRows,
+			row{"State", g.State},
+		)
+		allRows = append(allRows,
+			row{"Entrypoint", g.Entrypoint},
+		)
+		allRows = append(allRows,
+			row{"Caller", g.Caller},
+		)
 	}
 
 	maxName := 0

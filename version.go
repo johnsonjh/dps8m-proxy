@@ -127,7 +127,8 @@ func printVersion(short bool) {
 
 func printVersionTable() {
 	type row struct {
-		Name, Version string
+		Name,
+		Version string
 	}
 
 	var rows []row
@@ -141,10 +142,12 @@ func printVersionTable() {
 			v += "*"
 		}
 
-		rows = append(rows, row{
-			Name:    sanitizeName(info.Main.Path),
-			Version: sanitizeVersion(v),
-		})
+		rows = append(
+			rows, row{
+				Name:    sanitizeName(info.Main.Path),
+				Version: sanitizeVersion(v),
+			},
+		)
 
 		for _, dep := range info.Deps {
 			orig := dep.Version
@@ -154,10 +157,12 @@ func printVersionTable() {
 				v += "*"
 			}
 
-			rows = append(rows, row{
-				Name:    sanitizeName(dep.Path),
-				Version: sanitizeVersion(v),
-			})
+			rows = append(
+				rows, row{
+					Name:    sanitizeName(dep.Path),
+					Version: sanitizeVersion(v),
+				},
+			)
 		}
 	}
 
@@ -188,11 +193,13 @@ func printVersionTable() {
 		compVer += "*"
 	}
 
-	rows = append(rows, row{
-		Name: fmt.Sprintf("Go compiler (%s)",
-			runtime.Compiler),
-		Version: compVer,
-	})
+	rows = append(
+		rows, row{
+			Name: fmt.Sprintf("Go compiler (%s)",
+				runtime.Compiler),
+			Version: compVer,
+		},
+	)
 
 	var componentName string
 
