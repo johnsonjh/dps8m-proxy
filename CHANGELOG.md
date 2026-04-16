@@ -87,8 +87,8 @@
   * Improved Awk detection in the `Makefile`.
   * Improved the `clean` make target in the `Makefile` to remove new
     temporary documentation build artifacts.
-  * Updated `.gitignore` to exclude new temporary documentation build
-    files (`README.md.awk`).
+  * Updated `.gitignore` to exclude new temporary documentation
+    build files.
 []()
 
 []()
