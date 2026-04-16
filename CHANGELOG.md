@@ -1153,8 +1153,6 @@
     utilizing the built-in `max` function.
   * Removed redundant `return` statements from multiple files to
     satisfy `gopls` checks.
-  * Corrected the `gopls` installation commands in the lint
-    setup script.
 
 # v0.1.32
 
