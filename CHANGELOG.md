@@ -1102,8 +1102,8 @@
 # v0.1.36
 
 * New Features & Improvements
-  * Reformat help output to maintain consistent indentation and style
-    after update to latest `pflag` version.
+  * Reformatted help output to maintain consistent indentation
+    and style after updates to latest `pflag` dependency.
   * Improved version reporting of the `pflag` dependency to show more
     human-readable version information.
 []()
