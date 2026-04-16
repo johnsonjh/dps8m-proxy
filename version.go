@@ -142,8 +142,8 @@ func printVersionTable() {
 			v += "*"
 		}
 
-		rows = append(
-			rows, row{
+		rows = append(rows,
+			row{
 				Name:    sanitizeName(info.Main.Path),
 				Version: sanitizeVersion(v),
 			},
@@ -157,8 +157,8 @@ func printVersionTable() {
 				v += "*"
 			}
 
-			rows = append(
-				rows, row{
+			rows = append(rows,
+				row{
 					Name:    sanitizeName(dep.Path),
 					Version: sanitizeVersion(v),
 				},
@@ -193,8 +193,8 @@ func printVersionTable() {
 		compVer += "*"
 	}
 
-	rows = append(
-		rows, row{
+	rows = append(rows,
+		row{
 			Name: fmt.Sprintf("Go compiler (%s)",
 				runtime.Compiler),
 			Version: compVer,
