@@ -1014,22 +1014,22 @@
     and Linux to prevent accidental execution outside of a terminal.
   * Added a prompt to wait for the Enter key to be pressed when a GUI
     launch is detected before exiting the application.
-  * Updated the help and usage information output to include the
-    project home page and bug reporting URL.
+  * Refactored signal handling logic into platform-specific files
+    for better maintainability.
   * Extended the `.gitignore` file to include IBM OS/400 specific
     build artifacts.
+[]()
+
+[]()
+* Documentation Updates
+  * Updated the help and usage information output to include the
+    project home page and bug reporting URL.
 []()
 
 []()
 * Dependency updates
   * Promoted [x/sys](golang.org/x/sys) from an indirect to
     a direct dependency at version v0.37.0.
-[]()
-
-[]()
-* Build System Improvements
-  * Refactored signal handling logic into platform-specific files
-    for better maintainability.
 
 # v0.1.45
 
