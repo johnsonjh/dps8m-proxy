@@ -476,6 +476,7 @@ FILEID: 77970fc4-bc4b-11f0-b997-80ee73e9b8e7
 codeowners
 
 FILEID: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7
+appendf
 codeowners
 deadcode
 depguard
@@ -508,6 +509,7 @@ pflag
 printf
 readonly
 shfmt
+sprintf
 sstrip
 statsviz
 stdbuf
@@ -671,6 +673,7 @@ xcode
 xterm
 xxxxxx
 xyzzy
+yaml
 zmodem
 zoneinfo
 zstandard

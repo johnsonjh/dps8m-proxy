@@ -993,7 +993,7 @@
 []()
 
 []()
-* Dependency updates
+* Dependency Updates
   * Updated
     [libcap/cap](https://kernel.org/pub/linux/libs/security/libcap/cap)
     from v1.2.76 to v1.2.77.
@@ -1028,7 +1028,7 @@
 []()
 
 []()
-* Dependency updates
+* Dependency Updates
   * Promoted [x/sys](golang.org/x/sys) from an indirect to
     a direct dependency at version v0.37.0.
 
@@ -1063,6 +1063,178 @@
     build scripts.
 
 # v0.1.41
+
+* CI/CD Updates
+  * Updated GitLab CI/CD configuration to address various YAML
+    style and syntax issues.
+
+# v0.1.40
+
+* CI/CD Updates
+  * Updated GitLab CI configuration to use the colon shell builtin
+    instead of `true` for command continuations.
+  * Added the `!usr-merge-nag` Alpine meta-package to the
+    GitLab CI/CD environment and ensured any error output is
+    redirected to null.
+[]()
+
+[]()
+* Build System Improvements
+  * Simplified shell commands in the `systemd` service file by
+    replacing `true` with the colon shell builtin.
+
+# v0.1.39
+
+* Documentation Updates
+  * Regenerated project documentation only.
+
+# v0.1.38
+
+* CI/CD Updates
+  * Updated the GitLab CI/CD configuration to use the linter setup
+    script (instead of explicit installation commands).
+
+# v0.1.37
+
+* Documentation Updates
+  * Added `gopls` to the list of required development tools.
+
+# v0.1.36
+
+* New Features & Improvements
+  * Reformat help output to maintain consistent indentation and style
+    after update to latest `pflag` version.
+  * Improved version reporting of the `pflag` dependency to show more
+    human-readable version information.
+[]()
+
+[]()
+* Build System Improvements
+  * Updated dependency update script to track the `pflag`
+    master branch.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated [spf13/pflag](https://github.com/spf13/pflag)
+    from v1.0.10 to v1.0.11-0.20251007101450-6fcfbc9910e1.
+[]()
+
+[]()
+* Internal Improvements
+  * Adjusted code in `main.go` to satisfy new linter requirements for
+    unchecked return values.
+
+# v0.1.35
+
+* Internal Improvements
+  * Simplified function signatures and improved code
+    formatting across the project via `gofumpt -s`.
+  * Adjusted whitespace and comments to improve source
+    code readability.
+
+# v0.1.34
+
+* Miscellaneous Improvements
+  * Fixed a typo in the `systemd` service file comments.
+
+# v0.1.33
+
+* Build System Improvements
+  * Integrated `gopls` into the linting process and added a
+    corresponding `Makefile` target.
+  * Updated the lint setup script to install
+    `gopls` and `govulncheck`.
+[]()
+
+[]()
+* Internal Improvements
+  * Modernized conditional logic in AIX-specific signal handling by
+    utilizing the built-in `max` function.
+  * Removed redundant `return` statements from multiple files to
+    satisfy `gopls` checks.
+  * Corrected the `gopls` installation commands in the lint
+    setup script.
+
+# v0.1.32
+
+* Dependency Updates
+  * Updated
+    [klauspost/compress](https://github.com/klauspost/compress)
+    from v1.18.0 to v1.18.1.
+
+# v0.1.31
+
+* New Features & Improvements
+  * Optimized string formatting operations by utilizing `fmt.Appendf`
+    in place of `fmt.Sprintf` wrapped in byte slices.
+  * Modernized conditional logic and data types by utilizing the
+    built-in `max` function and the `any` type.
+  * Updated the TELNET negotiation logic to identify and skip
+    malformed sub-negotiation packets.
+
+# v0.1.30
+
+* Dependency Updates
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from v1.25.2 to v1.25.3.
+
+# v0.1.29
+
+* Dependency Updates
+  * Updated [x/crypto](https://golang.org/x/crypto)
+    from v0.42.0 to v0.43.0.
+  * Updated [x/term](https://golang.org/x/term)
+    from v0.35.0 to v0.36.0.
+  * Updated [x/mod](https://golang.org/x/mod)
+    from v0.28.0 to v0.29.0.
+  * Updated [x/net](https://golang.org/x/net)
+    from v0.45.0 to v0.46.0.
+  * Updated [x/tools](https://golang.org/x/tools)
+    from v0.37.0 to v0.38.0.
+
+# v0.1.28
+
+* Dependency Updates
+  * Updated [x/sys](https://golang.org/x/sys)
+    from v0.36.0 to v0.37.0.
+
+# v0.1.27
+
+* Build System Improvements
+  * Removed the (unnecessary) `SHELL` override from the `Makefile`.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from v1.25.1 to v1.25.2.
+  * Updated [arl/statsviz](https://github.com/arl/statsviz)
+    from v0.7.1 to v0.7.2.
+  * Updated [x/net](https://golang.org/x/net)
+    from v0.44.0 to v0.45.0.
+
+# v0.1.26
+
+* Documentation Updates
+  * Regenerated project documentation only.
+
+# v0.1.25
+
+* Internal Improvements
+  * Enabled (and appeased) the `godoclint` linter.
+
+# v0.1.24
+
+* Build System Improvements
+  * Added a new MIT-0 licensed lint setup script to automate
+    the installation of Go-based linters and development tools.
+  * Added a new script to facilitate automated dependency updates.
+  * Integrated usage of these scripts into the `Makefile`.
+
+# v0.1.23 to v0.1.1
 
 * TBD
 
