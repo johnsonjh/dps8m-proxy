@@ -706,6 +706,7 @@
 []()
 
 []()
+* Documentation Updates
   * Updated the list of required development tools to include
     the POSIX.1 `diff` utility.
 
