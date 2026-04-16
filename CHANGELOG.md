@@ -183,7 +183,7 @@
 
 * New Features & Improvements
   * New CLI Option `--no-menu`: Added a new command-line flag to
-    disable the SSH "Control-]" user menu, allowing for more
+    disable the SSH `Control-]` user menu, allowing for more
     restricted session configurations.
 []()
 
