@@ -30,12 +30,14 @@ var oneTime sync.Once
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func showCapabilityMessage(exePath string) {
-	oneTime.Do(func() {
-		log.Printf("%sCAP_NET_BIND_SERVICE is required to bind privileged (<1024) ports\r\n",
-			warnPrefix())
-		log.Printf("%sFix: sudo setcap 'cap_net_bind_service+ep' %q\r\n",
-			toolPrefix(), exePath)
-	})
+	oneTime.Do(
+		func() {
+			log.Printf("%sCAP_NET_BIND_SERVICE is required to bind privileged (<1024) ports\r\n",
+				warnPrefix())
+			log.Printf("%sFix: sudo setcap 'cap_net_bind_service+ep' %q\r\n",
+				toolPrefix(), exePath)
+		},
+	)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

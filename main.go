@@ -2267,7 +2267,11 @@ func toggleGracefulShutdown() {
 		if len(connections) == 0 {
 			connectionsMutex.Unlock()
 
-			shutdownOnce.Do(func() { close(shutdownSignal) })
+			shutdownOnce.Do(
+				func() {
+					close(shutdownSignal)
+				},
+			)
 		} else {
 			connectionsMutex.Unlock()
 		}
@@ -2305,81 +2309,83 @@ func toggleDenyNewConnections() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func immediateShutdown() {
-	shutdownOnce.Do(func() {
-		log.Printf("%sImmediate shutdown initiated.\r\n",
-			boomPrefix())
+	shutdownOnce.Do(
+		func() {
+			log.Printf("%sImmediate shutdown initiated.\r\n",
+				boomPrefix())
 
-		if isConsoleLogQuiet {
-			_, _ = fmt.Fprintf(os.Stdout,
-				"%s %sImmediate shutdown initiated.\r\n",
-				nowStamp(), boomPrefix())
-		}
-
-		connectionsMutex.Lock()
-
-		for _, conn := range connections {
-			if conn.channel != nil {
-				_, err := conn.channel.Write(
-					[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
-				if err != nil {
-					log.Printf("%sError writing to channel for %s: %v",
-						warnPrefix(), conn.ID, err)
-				}
-
-				connUptime := time.Since(conn.startTime)
-				log.Printf("%sLINKDOWN [%s] %s@%s (link time %s)",
-					yellowDotPrefix(), conn.ID, conn.userName,
-					conn.hostName, connUptime.Round(time.Second))
+			if isConsoleLogQuiet {
+				_, _ = fmt.Fprintf(os.Stdout,
+					"%s %sImmediate shutdown initiated.\r\n",
+					nowStamp(), boomPrefix())
 			}
 
-			if conn.cancelFunc != nil {
-				conn.cancelFunc()
-			}
-
-			if conn.sshConn != nil {
-				err := conn.sshConn.Close()
-				if err != nil {
-					log.Printf("%sError closing SSH connection for %s: %v",
-						alertPrefix(), conn.ID, err)
-				}
-			}
-		}
-
-		connectionsMutex.Unlock()
-
-		for {
 			connectionsMutex.Lock()
 
-			if len(connections) == 0 {
-				connectionsMutex.Unlock()
+			for _, conn := range connections {
+				if conn.channel != nil {
+					_, err := conn.channel.Write(
+						[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+					if err != nil {
+						log.Printf("%sError writing to channel for %s: %v",
+							warnPrefix(), conn.ID, err)
+					}
 
-				break
+					connUptime := time.Since(conn.startTime)
+					log.Printf("%sLINKDOWN [%s] %s@%s (link time %s)",
+						yellowDotPrefix(), conn.ID, conn.userName,
+						conn.hostName, connUptime.Round(time.Second))
+				}
+
+				if conn.cancelFunc != nil {
+					conn.cancelFunc()
+				}
+
+				if conn.sshConn != nil {
+					err := conn.sshConn.Close()
+					if err != nil {
+						log.Printf("%sError closing SSH connection for %s: %v",
+							alertPrefix(), conn.ID, err)
+					}
+				}
 			}
 
 			connectionsMutex.Unlock()
 
-			time.Sleep(100 * time.Millisecond)
-		}
+			for {
+				connectionsMutex.Lock()
 
-		loggingWg.Wait()
+				if len(connections) == 0 {
+					connectionsMutex.Unlock()
 
-		closeDB()
+					break
+				}
 
-		if isConsoleLogQuiet {
-			_, _ = fmt.Fprintf(os.Stdout,
-				"%s %sExiting.\r\n",
-				nowStamp(), byePrefix())
-		}
+				connectionsMutex.Unlock()
 
-		log.Printf("%sExiting.\r\n",
-			byePrefix())
+				time.Sleep(100 * time.Millisecond)
+			}
 
-		if enableGops {
-			gopsClose()
-		}
+			loggingWg.Wait()
 
-		os.Exit(0)
-	})
+			closeDB()
+
+			if isConsoleLogQuiet {
+				_, _ = fmt.Fprintf(os.Stdout,
+					"%s %sExiting.\r\n",
+					nowStamp(), byePrefix())
+			}
+
+			log.Printf("%sExiting.\r\n",
+				byePrefix())
+
+			if enableGops {
+				gopsClose()
+			}
+
+			os.Exit(0)
+		},
+	)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3556,7 +3562,11 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		if gracefulShutdownMode.Load() && len(connections) == 0 {
 			connectionsMutex.Unlock()
 
-			shutdownOnce.Do(func() { close(shutdownSignal) })
+			shutdownOnce.Do(
+				func() {
+					close(shutdownSignal)
+				},
+			)
 		} else {
 			connectionsMutex.Unlock()
 		}

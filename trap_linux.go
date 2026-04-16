@@ -84,7 +84,9 @@ func getProcName(pid int) (string, error) {
 		return "", err
 	}
 
-	defer func() { _ = procDir.Close() }()
+	defer func() {
+		_ = procDir.Close()
+	}()
 
 	commFd, err := unix.Openat(int(procDir.Fd()), //nolint:gosec,nolintlint
 		"comm", unix.O_RDONLY, 0)
@@ -104,7 +106,9 @@ func getProcName(pid int) (string, error) {
 			pid)
 	}
 
-	defer func() { _ = commFile.Close() }()
+	defer func() {
+		_ = commFile.Close()
+	}()
 
 	const maxCommLen = 32 // TASK_COMM_LEN * 2
 
@@ -132,7 +136,9 @@ func getPpid(pid int) (int, error) {
 		return 0, err
 	}
 
-	defer func() { _ = procDir.Close() }()
+	defer func() {
+		_ = procDir.Close()
+	}()
 
 	statusFd, err := unix.Openat(int(procDir.Fd()), //nolint:gosec,nolintlint
 		"status", unix.O_RDONLY, 0)
@@ -152,7 +158,9 @@ func getPpid(pid int) (int, error) {
 			pid)
 	}
 
-	defer func() { _ = statusFile.Close() }()
+	defer func() {
+		_ = statusFile.Close()
+	}()
 
 	scanner := bufio.NewScanner(statusFile)
 
