@@ -1227,10 +1227,10 @@
 # v0.1.24
 
 * Build System Improvements
-  * Added a new MIT-0 licensed lint setup script to automate
+  * Added a new (MIT-0 licensed) lint setup script to automate
     the installation of Go-based linters and development tools.
   * Added a new script to facilitate automated dependency updates.
-  * Integrated usage of these scripts into the `Makefile`.
+  * Integrated automated usage of these scripts into the `Makefile`.
 
 # v0.1.23 to v0.1.1
 
