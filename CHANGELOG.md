@@ -166,10 +166,10 @@
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.26.1 to v1.26.2.
   * Updated
-    [libcap/cap](kernel.org/pub/linux/libs/security/libcap/cap)
+    [libcap/cap](https://kernel.org/pub/linux/libs/security/libcap/cap)
     from from v1.2.77 to v1.2.78.
   * Updated
-    [libcap/psx](kernel.org/pub/linux/libs/security/libcap/psx)
+    [libcap/psx](https://kernel.org/pub/linux/libs/security/libcap/psx)
     from from v1.2.77 to v1.2.78.
 []()
 
@@ -994,10 +994,10 @@
 []()
 * Dependency updates
   * Updated
-    [libcap/cap](kernel.org/pub/linux/libs/security/libcap/cap)
+    [libcap/cap](https://kernel.org/pub/linux/libs/security/libcap/cap)
     from v1.2.76 to v1.2.77.
   * Updated
-    [libcap/psx](kernel.org/pub/linux/libs/security/libcap/psx)
+    [libcap/psx](https://kernel.org/pub/linux/libs/security/libcap/psx)
     from v1.2.76 to v1.2.77.
 
 # v0.1.47
