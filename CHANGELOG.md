@@ -1233,9 +1233,13 @@
   * Added these scripts to be checked by the `shfmt` and
     ShellCheck linters.
 
-# v0.1.23 to v0.1.1
+# v0.1.23 to v0.1.2
 
 * TBD
+
+# v0.1.1
+
+* Initial public release.
 
 <!--
 Local Variables:
