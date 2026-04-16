@@ -941,7 +941,8 @@
   * Implemented support for connecting to TELNET targets over UNIX
     domain sockets.
   * Added sanitization of non-ASCII characters from system error
-    messages prior to transmitting them to connected clients.
+    messages prior to transmitting them to connected clients, and
+    a new `--no-sanitize` option to disable this new behavior.
   * Enhanced connection handling by ensuring all TCP connections
     utilize the `NoDelay` option.
   * Updated the console warning for GUI launches to appear after the
