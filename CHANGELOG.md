@@ -62,7 +62,7 @@
     on `PREFIX` and `DESTDIR` environment variables.
   * Improved the `go install` documentation to recommend using
     `env GOTOOLCHAIN=auto` for a more robust installation experience.
-  * Refined the explanation of how TELNET target-specific banner file
+  * Refined the explanation of how TELNET target-specific banner files
     are served when using the `--alt-host` functionality.
 []()
 
