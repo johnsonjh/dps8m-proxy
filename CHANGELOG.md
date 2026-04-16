@@ -1022,7 +1022,7 @@
 
 []()
 * Dependency updates
-  * Promoted [golang.org/x/sys](golang.org/x/sys) from an indirect to
+  * Promoted [x/sys](golang.org/x/sys) from an indirect to
     a direct dependency at version v0.37.0.
 []()
 
