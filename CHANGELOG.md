@@ -1028,8 +1028,8 @@
 
 []()
 * Build System Improvements
-  * Refactored signal handling and process scanning logic into
-    platform-specific files for better maintainability.
+  * Refactored signal handling logic into platform-specific files
+    for better maintainability.
 
 # v0.1.45
 
