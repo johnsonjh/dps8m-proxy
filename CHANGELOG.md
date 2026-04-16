@@ -46,7 +46,7 @@
 
 []()
 * CI/CD Updates
-  * Optimized the GitLab CI/CD pipelines by removing the unnecessary
+  * Optimized the GitLab CI/CD pipeline by removing the unnecessary
     installation of Perl.
 
 # v1.0.57
@@ -394,7 +394,7 @@
 # v1.0.29
 
 * Code Improvements
-  * Normalized code style by adding missing whitespace in main.go.
+  * Normalized code style by adding missing whitespace in `main.go`.
 []()
 
 []()
@@ -436,8 +436,8 @@
     proxy use.
   * Added `sstrip` an alias for `strip` make target in the `Makefile`.
   * Fixed a bug on illumos for the `strip` make target by not stripping
-    the program using the illumos `strip` tool (due to known bugs that
-    corrupt Golang binaries).
+    the program using the illumos `strip` tool (due to a known bug that
+    corrupts Go binaries).
   * Updated the `strip` make target to use the `sstrip` tool
     if available.
   * Updated the `Makefile` to only cleanup a `vendor` directory when
@@ -449,7 +449,7 @@
 
 []()
 * CI/CD Updates
-  * Deactivated the Python venv after linting and fixed tar
+  * Deactivated the Python `venv` after linting and fixed `tar`
     path exclusions.
   * Added new `proxy.src.tar.gz` source archive (vendoring
     all modules) to GitLab Pages deployment.
@@ -492,8 +492,8 @@
 * New Features & Improvements
   * Improved robustness of SSH session handling by adding explicit
     checks for `nil` connections and contexts.
-  * Improved safety of connection log generation when handling missing
-    address information.
+  * Improved safety of connection log generation routines when
+    handling missing address information.
 
 # v1.0.18
 
@@ -541,8 +541,8 @@
 # v1.0.13
 
 * New Features & Improvements
-  * Refactored code by moving all version identification and printing
-    functions to a dedicated file.
+  * Refactored code by consolidating all version identification and
+    printing functions to a dedicated file.
   * Removed unused IEC size constants from the `main` package.
 []()
 
@@ -613,7 +613,7 @@
 
 * Build System Improvements
   * Added `proxy.exe` to the `.gitignore` file.
-  * Improved the linting setup script support for Windows
+  * Improved the linting setup script support for Microsoft Windows
     including Cygwin support.
   * Updated the linting setup script to provide sane defaults
     for `GOPATH` and `GOEXE`.
@@ -647,8 +647,8 @@
 
 * Build System Improvements
   * Added Emacs local variables configuration block to the `Makefile`.
-  * Appeased linters for Windows-specific code paths and improved
-    the `trap_windows.go` error handling logic.
+  * Appeased linters for Microsoft Windows-specific code paths and
+    improved the `trap_windows.go` error handling logic.
   * Implemented a workaround for an Apple Xcode-specific `make` bug
     affecting the `nilaway` and `revive` commands.
   * Appeased `gofumpt` by adjusting variable declaration
