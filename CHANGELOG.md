@@ -1052,7 +1052,7 @@
 # v0.1.42
 
 * CI/CD Updates
-  * Added the `coreutils` package to the CI/CD Alpine build
+  * Added the `coreutils` package to the GitLab CI/CD Alpine build
     environment (to provide the `stdbuf` utility).
   * Utilized `stdbuf` to ensure line-buffered output for several
     build and test commands.
