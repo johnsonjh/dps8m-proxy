@@ -797,10 +797,10 @@
     for enhanced `nil`-safety verification.
   * Added the `wsl_v5` linter to the project and addressed identified
     style issues.
-  * Updated the lint setup script to automatically install and
-    configure the new linters.
   * Adjusted `revive` linter configuration and addressed various
     linting findings.
+  * Updated the lint setup script to automatically install and
+    configure the new linters.
 
 # v0.1.60
 
@@ -845,7 +845,8 @@
 
 * New Features & Improvements
   * Implemented new Linux-specific detection mechanisms to identify
-    when the application is launched from a GUI environment.
+    when the application is launched from native Linux
+    GUI environments.
   * Added an explicit warning message to notify Linux users when the
     application is started from a file manager rather than a terminal.
   * Expanded the list of recognized Linux GUI launchers to include
