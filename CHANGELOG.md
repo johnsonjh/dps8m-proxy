@@ -866,7 +866,7 @@
   * Updated the cross-compilation helper scripts to dynamically
     determine the Go toolchain version to use from the `go.mod` file.
   * Added the Android cross-compilation script to be checked by the
-    `shfmt` and `shellcheck` linters.
+    `shfmt` and ShellCheck linters.
 []()
 
 []()
@@ -1230,7 +1230,8 @@
   * Added a new (MIT-0 licensed) lint setup script to automate
     the installation of Go-based linters and development tools.
   * Added a new script to facilitate automated dependency updates.
-  * Integrated automated usage of these scripts into the `Makefile`.
+  * Added these cripts to be checked by the `shfmt` and
+    ShellCheck linters.
 
 # v0.1.23 to v0.1.1
 
