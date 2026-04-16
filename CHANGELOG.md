@@ -490,7 +490,7 @@
 * Dependency Updates
   * Updated [miekg/dns](https://github.com/miekg/dns)
     from v1.1.68 to v1.1.69.
-  * Updated [go.uber.org/goleak](https://go.uber.org/goleak)
+  * Updated [uber/goleak](https://go.uber.org/goleak)
     from v1.3.1-0.20241121203838-4ff5fa6529ee to
     v1.3.1-0.20251210191316-2b7fd8a0d244.
 
