@@ -713,8 +713,8 @@
 # v0.1.66
 
 * CI/CD Updates
-  * Updated the GitLab CI configuration to use `pigz` compression
-    level 9.
+  * Updated the GitLab CI configuration to call `pigz` with
+    compression level 9.
 []()
 
 []()
