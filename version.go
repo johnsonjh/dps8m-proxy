@@ -26,7 +26,9 @@ import (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-var nameReplacements = []struct{ old, new string }{
+var nameReplacements = []struct {
+	old, new string
+}{
 	{"pub/linux/libs/security", "..."},
 	{"github.com/", ""},
 	{"gitlab.com/", ""},
@@ -34,7 +36,9 @@ var nameReplacements = []struct{ old, new string }{
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-var versionReplacements = []struct{ old, new string }{
+var versionReplacements = []struct {
+	old, new string
+}{
 	{"v1.0.11-0.20260305102058-3d32e71abc0b", "v1.0.11* (2026-Mar-05, g3d32e71)"},
 }
 
@@ -122,7 +126,9 @@ func printVersion(short bool) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func printVersionTable() {
-	type row struct{ Name, Version string }
+	type row struct {
+		Name, Version string
+	}
 
 	var rows []row
 

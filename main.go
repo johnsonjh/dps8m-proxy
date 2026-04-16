@@ -1823,7 +1823,9 @@ func handleConsoleInput() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func showHelp() {
-	type row struct{ Key, Description string }
+	type row struct {
+		Key, Description string
+	}
 
 	rows := []row{
 		{"c ", "Show Configuration and Status"},
@@ -1873,7 +1875,9 @@ func showHelp() {
 
 func showStats() {
 	if dbPath == "" {
-		type row struct{ Name, Value string }
+		type row struct {
+			Name, Value string
+		}
 
 		rows := []row{
 			{
@@ -2020,7 +2024,10 @@ func showStats() {
 
 		fmt.Print("\r\n")
 	} else {
-		type row struct{ Name, Value, Lifetime string }
+		type row struct {
+			Name,
+			Value, Lifetime string
+		}
 
 		rows := []row{
 			{
@@ -6423,7 +6430,9 @@ func listGoroutines() {
 		return
 	}
 
-	type row struct{ Name, Value string }
+	type row struct {
+		Name, Value string
+	}
 
 	allRows := make([]row, 0, len(goroutines)*4)
 
