@@ -284,7 +284,7 @@
 # v1.0.39
 
 * New Features & Improvements
-  * Migrated inline gosec exceptions to standard `golangci-lint`
+  * Migrated inline `gosec` exceptions to standard `golangci-lint`
     syntax in `utf8.go`.
 []()
 
