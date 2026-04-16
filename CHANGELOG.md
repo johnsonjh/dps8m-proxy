@@ -162,7 +162,8 @@
 
 []()
 * Dependency Updates
-  * Updated the [Go compiler](https://go.dev/doc/devel/release)
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.26.1 to v1.26.2.
 []()
 
@@ -268,7 +269,8 @@
 # v1.0.42
 
 * Dependency Updates
-  * Updated the [Go compiler](https://go.dev/doc/devel/release)
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.26.0 to v1.26.1.
 
 # v1.0.41
@@ -313,7 +315,8 @@
 # v1.0.37
 
 * Dependency Updates
-  * Updated the [Go compiler](https://go.dev/doc/devel/release)
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.25.7 to v1.26.0.
   * Updated
     [github.com/klauspost/compress](https://github.com/klauspost/compress)
@@ -334,7 +337,8 @@
 # v1.0.36
 
 * Dependency Updates
-  * Updated the [Go compiler](https://go.dev/doc/devel/release)
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.25.6 to v1.25.7.
   * Updated [github.com/miekg/dns](https://github.com/miekg/dns)
     from v1.1.70 to v1.1.72.
@@ -356,7 +360,8 @@
 # v1.0.34
 
 * Dependency Updates
-  * Updated the [Go compiler](https://go.dev/doc/devel/release)
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.25.5 to v1.25.6.
 
 # v1.0.33
@@ -526,7 +531,8 @@
 # v1.0.15
 
 * Dependency Updates
-  * Updated the [Go compiler](https://go.dev/doc/devel/release)
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.25.4 to v1.25.5.
 
 # v1.0.14
