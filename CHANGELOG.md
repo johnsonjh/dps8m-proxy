@@ -1141,8 +1141,8 @@
 # v0.1.33
 
 * Build System Improvements
-  * Integrated `gopls` into the linting process and added a
-    corresponding `Makefile` target.
+  * Integrated `gopls` and `govulncheck` into the linting process
+    and added corresponding `Makefile` targets.
   * Updated the lint setup script to install
     `gopls` and `govulncheck`.
 []()
