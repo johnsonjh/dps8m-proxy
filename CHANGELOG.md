@@ -3,7 +3,17 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.1 (2026-04-17)
+# v1.1.2 (2026-04-17)
+
+* CI/CD Updates
+  * Replaced the GitLab CI/CD installation of the `libarchive-tools`
+    Alpine package with the `unzip` package.
+  * Fixed a bug in the GitLab CI/CD pipeline for Android
+    cross-compilation by using the InfoZip `unzip` utility to extract
+    the Android NDK archive (instead of `bsdtar`) so file permissions
+    are properly preserved.
+
+# v1.1.1 (2026-04-17 17:19:21)
 
 * New Features & Improvements
   * Applied numerous style and quality enhancements throughout the
