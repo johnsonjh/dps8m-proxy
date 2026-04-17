@@ -1229,7 +1229,7 @@
 
 # v0.1.24 (2025-09-17 15:05:39)
 
-* Build System Improvements
+* _Build System Improvements_
   * Added a new (MIT-0 licensed) lint setup script to automate
     the installation of Go-based linters and development tools.
   * Added a new script to facilitate automated dependency updates.
