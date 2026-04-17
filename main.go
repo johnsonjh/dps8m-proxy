@@ -1878,7 +1878,8 @@ func showHelp() {
 func showStats() {
 	if dbPath == "" {
 		type row struct {
-			Name, Value string
+			Name,
+			Value string
 		}
 
 		rows := []row{
