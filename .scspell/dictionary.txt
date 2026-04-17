@@ -511,11 +511,13 @@ pflag
 printf
 readonly
 refname
+setcap
 shfmt
 sprintf
 sstrip
 statsviz
 stdbuf
+systemctl
 tmpl
 unqueryvet
 wrapcheck
