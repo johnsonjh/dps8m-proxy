@@ -449,7 +449,7 @@
 # v1.0.25
 
 * Build System Improvements
-  * Updated scripts to resect `GOPROXY` from the user environment.
+  * Updated scripts to respect `GOPROXY` from the user environment.
   * Updated scripts to use the `DIRECT` variable to control Go
     proxy use, and no longer prioritizing direct module downloads.
   * Added `sstrip` an alias for `strip` `make` target in
