@@ -5,7 +5,21 @@
 
 # v1.1.1 (2026-04-17)
 
-* TBD
+* New Features & Improvements
+  * Improved the `Makefile` and linting process by adding a dedicated
+    `coverage` `make` target for automated test coverage reporting.
+  * Applied numerous style and quality enhancements throughout the
+    codebase.
+* Build System Improvements
+  * Integrated the new `coverage` `make` target into the standard
+    linting and static analysis workflow.
+* CI/CD Updates
+  * Replaced the GitLab CI/CD installation of the `lzip` Alpine
+    package with `libarchive-tools` package (which provides the
+    `bsdtar` utility).
+  * Optimized the GitLab CI/CD pipeline for Android cross-compilation
+    by migrating to official Google-provided Android NDK distribution
+    and utilizing `bsdtar` for streaming extraction.
 
 # v1.1.0 (2026-04-14 13:23:01)
 
