@@ -513,13 +513,17 @@ readonly
 refname
 setcap
 shfmt
+sorairolake
 sprintf
 sstrip
 statsviz
 stdbuf
+systemcrypto
 systemctl
 tmpl
+ulikunitz
 unqueryvet
+usernames
 wrapcheck
 zopfli
 
@@ -527,6 +531,7 @@ NATURAL:
 adduser
 american
 avahi
+backend
 bbolt
 bonjour
 brotli
@@ -535,6 +540,7 @@ cflags
 changelog
 charmap
 charset
+checksum
 cidr
 ckwin
 cocomo
@@ -558,6 +564,7 @@ emoji
 english
 entrypoint
 etcd
+fips
 formatters
 formfeed
 gccgo
