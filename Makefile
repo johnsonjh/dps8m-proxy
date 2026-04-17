@@ -464,9 +464,9 @@ scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 		--report-only \
 		--override-dictionary ./.scspell/dictionary.txt \
 		--base-dict ./.scspell/basedict.txt \
-		$$( find . \( -path ./.git -o -path ./.venv -o -name '.doc.tmpl' \
-			-o -name 'README.md' \) -prune -o -type f -exec \
-			grep -l 'scspell-id:' {} \; )
+		$$( find . \( -path ./.git -o -path ./.venv -o -path ./vendor \
+			-o -name '.doc.tmpl' -o -name 'README.md' \) \
+			-prune -o -type f -exec grep -l 'scspell-id:' {} \; )
 
 ##############################################################################
 # Target: scspell-fix
@@ -481,9 +481,9 @@ scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 	scspell \
 		--override-dictionary ./.scspell/dictionary.txt \
 		--base-dict ./.scspell/basedict.txt \
-		$$( find . \( -path ./.git -o -path ./.venv -o -name '.doc.tmpl' \
-			-o -name 'README.md' \) -prune -o -type f -exec \
-			grep -l 'scspell-id:' {} \; )
+		$$( find . \( -path ./.git -o -path ./.venv -o -path ./vendor \
+			-o -name '.doc.tmpl' -o -name 'README.md' \) \
+			-prune -o -type f -exec grep -l 'scspell-id:' {} \; )
 
 ##############################################################################
 # Target: strip
