@@ -421,6 +421,11 @@ README.md doc docs: README.md.tmpl proxy
 	  -e 's|^Usage for .*/proxy:|Usage for proxy:|' < \
 	  ./README.md > ./README.md.sed && \
 		$(MV) ./README.md.sed ./README.md
+	@env printf '\n%s\n' "⚙️ Sed: Redacting compiler version extension..." \
+		2> /dev/null || :
+	$(SED) 's|-X:nodwarf5|           |' < \
+	  ./README.md > ./README.md.sed && \
+		$(MV) ./README.md.sed ./README.md
 	@env printf '\n%s\n\n' "📗 README.md generation successful." \
 		2> /dev/null || :
 

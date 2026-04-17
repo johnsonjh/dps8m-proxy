@@ -13,6 +13,9 @@
 * Build System Improvements
   * Integrated a new `coverage` `make` target into the standard
     linting and static analysis workflow.
+  * Enhanced the documentation generation process in the `Makefile`
+    to automatically redact the `-X:nodwarf5` compiler version
+    extension, if present, from the generated help text.
 * CI/CD Updates
   * Replaced the GitLab CI/CD installation of the `lzip` Alpine
     package with `libarchive-tools` package (which provides the
