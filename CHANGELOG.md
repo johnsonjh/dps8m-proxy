@@ -1268,17 +1268,17 @@
 
 # v0.1.19 (2025-09-08 01:58:49)
 
-* Build System Improvements
-  * Improved `setcap` detection in the `Makefile`.
-[]()
-
-[]()
 * New Features & Improvements
   * Mitigated potential crashes in the connection termination logic.
   * Implemented additional safety checks and improved locking
     during connection termination.
   * Ensured terminated connections were removed from the active
     sessions map.
+[]()
+
+[]()
+* Build System Improvements
+  * Improved `setcap` detection in the `Makefile`.
 []()
 
 []()
