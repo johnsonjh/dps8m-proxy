@@ -485,6 +485,7 @@ distclean
 errorf
 expandtab
 fcfbc
+filepath
 fkickers
 gcompat
 goexe
@@ -501,8 +502,10 @@ ioutil
 ireturn
 klauspost
 libcap
+loglevel
 maxcomlen
 miekg
+mipssf
 nilaway
 noinlineerr
 nolint
@@ -526,6 +529,7 @@ ulikunitz
 unqueryvet
 usernames
 vendored
+versioning
 wrapcheck
 zopfli
 
