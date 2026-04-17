@@ -1333,11 +1333,10 @@ NOTE: Date and time for git tags generated with:
 git for-each-ref --sort=creatordate \
   --format='%(refname:short) %(creatordate:unix)' refs/tags |
 while read -r tag ts; do
-  utc=$(date -u -d "@$ts" +%Y-%m-%dT%H:%M:%SZ)
+  utc=$(date -u -d "@$ts" +"("%Y-%m-%d" "%H:%M:%S")")
   printf '%s %s\n' "${tag:?}" "${utc:?}"
 done
 -->
-
 <!--
 Local Variables:
 mode: markdown
