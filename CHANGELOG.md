@@ -6,12 +6,12 @@
 # v1.1.1 (2026-04-17)
 
 * New Features & Improvements
-  * Improved the `Makefile` and linting process by adding a dedicated
-    `coverage` `make` target for automated test coverage reporting.
   * Applied numerous style and quality enhancements throughout the
     codebase.
+  * Add a new `CHANGELOG.md` file detailing the changes in each
+    released version of the software.
 * Build System Improvements
-  * Integrated the new `coverage` `make` target into the standard
+  * Integrated a new `coverage` `make` target into the standard
     linting and static analysis workflow.
 * CI/CD Updates
   * Replaced the GitLab CI/CD installation of the `lzip` Alpine
