@@ -214,7 +214,7 @@
 
 []()
 * CI/CD Updates
-  * Updated the Android build pipeline to use Android NDK r30-beta1.
+  * Updated the Android build pipeline to use Android NDK `r30-beta1`.
 []()
 
 []()
