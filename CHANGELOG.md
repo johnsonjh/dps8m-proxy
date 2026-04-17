@@ -452,7 +452,8 @@
 * Build System Improvements
   * Updated scripts to respect `GOPROXY` from the user environment.
   * Updated scripts to use the `DIRECT` variable to control Go
-    proxy use, and no longer prioritizing direct module downloads.
+    proxy use, and no longer prioritizing direct module downloads
+    by default.
   * Added `sstrip` an alias for `strip` `make` target in
     the `Makefile`.
   * Fixed a bug on illumos for the `strip` `make` target by not
