@@ -4691,6 +4691,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						return ctx.Done()
 					}():
 						return
+
 					default:
 					}
 
