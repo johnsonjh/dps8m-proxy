@@ -439,7 +439,8 @@
 # v1.0.27 (2025-12-23 07:29:21)
 
 * CI/CD Updates
-  * Improved packaging and archiving of source code in the CI pipeline.
+  * Improved packaging and archiving of source code in
+    GitLab the CI/CD pipeline.
 
 # v1.0.26 (2025-12-23 07:06:20)
 
@@ -780,7 +781,7 @@
   * Added automated installation of `deadcode` linter in the lint
     setup script.
   * Added `deadcode` `make` target to the `Makefile` for manual
-    and CI usage.
+    and CI/CD usage.
 
 # v0.1.61 (2025-11-03 03:05:11)
 
@@ -912,7 +913,7 @@
   * Added a new Android cross-compilation job to the
     GitLab CI/CD pipeline.
   * Added `lzip`, `tar`, and the Android NDK to the GitLab CI/CD
-    environment to facilitate Android CI builds.
+    environment to facilitate Android CI/CD builds.
 []()
 
 []()
@@ -1075,7 +1076,7 @@
 # v0.1.40 (2025-10-23 02:17:42)
 
 * CI/CD Updates
-  * Updated GitLab CI configuration to use the colon shell builtin
+  * Updated GitLab CI/CD configuration to use the colon shell builtin
     instead of `true` for command continuations.
   * Added the `!usr-merge-nag` Alpine meta-package to the
     GitLab CI/CD environment and ensured any error output is
