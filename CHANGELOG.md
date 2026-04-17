@@ -1070,14 +1070,12 @@
 # v0.1.41 (2025-10-23 02:21:06)
 
 * CI/CD Updates
-  * Updated GitLab CI/CD configuration to address various YAML
-    style and syntax issues.
+  * Updated GitLab CI/CD configuration to address YAML style
+    and syntax issues.
 
 # v0.1.40 (2025-10-23 02:17:42)
 
 * CI/CD Updates
-  * Updated GitLab CI/CD configuration to use the colon shell builtin
-    instead of `true` for command continuations.
   * Added the `!usr-merge-nag` Alpine meta-package to the
     GitLab CI/CD environment and ensured any error output is
     redirected to `/dev/null`.
