@@ -5,7 +5,7 @@
 
 # v1.1.1
 
-* TBD
+* Code audit
 
 # v1.1.0 (2026-04-14 13:23:01)
 
@@ -1205,7 +1205,7 @@
 # v0.1.27 (2025-10-07 23:47:27)
 
 * Build System Improvements
-  * Removed the (unnecessary) `SHELL` override from the `Makefile`.
+  * Removed the unnecessary `SHELL` override from the `Makefile`.
 []()
 
 []()
@@ -1293,63 +1293,221 @@
 
 # v0.1.18 (2025-09-06 04:43:46)
 
-* TBD
+* New Features & Improvements
+  * Added support for lzip compression of log files.
+[]()
+
+[]()
+* Build System Improvements
+  * Updated the cross-compilation script to use POSIX-conforming
+    shell syntax for PID referencing.
+[]()
+
+[]()
+* Dependency Updates
+  * Added
+    [`sorairolake/lzip-go`](https://github.com/sorairolake/lzip-go)
+    `v0.3.8`.
+  * Removed [`google/go-cmp`](https://github.com/google/go-cmp)
+    `v0.7.0`.
 
 # v0.1.17 (2025-09-04 00:48:36)
 
-* TBD
+* Build System Improvements
+  * Refactored `Makefile` to use the colon shell builtin instead of
+    the `true` command.
+  * Integrated automatic `README.md` restoration into the `Makefile`
+    linting target.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.9` to `v1.0.10`.
 
 # v0.1.16 (2025-09-01 10:09:54)
 
-* TBD
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.8` to `v1.0.9`.
 
 # v0.1.15 (2025-08-31 21:42:25)
 
-* TBD
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.7` to `v1.0.8`.
 
 # v0.1.14 (2025-08-31 05:27:40)
 
-* TBD
+* New Features & Improvements
+  * Removed "`b`", "`3`", and "`4`" from the safe character subset
+    used for shareable username generation.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated [`ulikunitz/xz`](https://github.com/ulikunitz/xz)
+    from `v0.5.13` to `v0.5.15`.
 
 # v0.1.13 (2025-08-22 07:00:40)
 
-* TBD
+* New Features & Improvements
+  * Corrected misplaced parentheses in the mDNS help text.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated [`ulikunitz/xz`](https://github.com/ulikunitz/xz)
+    from `v0.5.12` to `v0.5.13`.
 
 # v0.1.12 (2025-08-19 18:41:46)
 
-* TBD
+* New Features & Improvements
+  * Integrated `gops` and mDNS status into the interactive
+    configuration display.
+  * Updated the mDNS descriptions to use more precise wording.
+[]()
+
+[]()
+* Build System Improvements
+  * Modified the `Makefile` to skip granting capabilities
+    when installing inside a Docker container.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated [`etcd/bbolt`](https://go.etcd.io/bbolt)
+    from `v1.4.2` to `v1.4.3`.
 
 # v0.1.11 (2025-08-15 11:54:36)
 
-* TBD
+* CI/CD Updates
+  * Switched back to using the binary `golangci-lint` installer.
 
 # v0.1.10 (2025-08-13 21:34:44)
 
-* TBD
+* New Features & Improvements
+  * Further restricted the safe character subset used for
+    generating shareable usernames.
+[]()
+
+[]()
+* Build System Improvements
+  * Improved the `Makefile` and cross-compilation scripts to better
+    handle custom Go toolchains and checksum database settings.
+  * Refined the `go` command detection logic in the build system.
 
 # v0.1.9 (2025-08-12 22:24:05)
 
-* TBD
+* Dependency Updates
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.24.6` to `v1.25.0`.
+[]()
+
+[]()
+* CI/CD Updates
+  * Switched the `golangci-lint` installation method to build from
+    source code via `go install` to accommodate the Go major
+    version update.
 
 # v0.1.8 (2025-08-12 01:43:39)
 
-* TBD
+* New Features & Improvements
+  * Implemented mDNS-SD (Multicast DNS Service Discovery) support
+    for SSH listeners.
+  * Added a new `--mdns` command-line flag to enable mDNS service
+    advertisements.
+  * Reordered the startup sequence to ensure the version
+    information is always printed early during initialization.
+  * Removed broken support for Microsoft Go `systemcrypto`
+    FIPS 140 backend.
+[]()
+
+[]()
+* Dependency Updates
+  * Added [`hashicorp/mdns`](https://github.com/hashicorp/mdns)
+    `v1.0.6`.
+  * Added [`google/go-cmp`](https://github.com/google/go-cmp)
+    `v0.7.0`.
+  * Added [`miekg/dns`](https://github.com/miekg/dns)
+    `v1.1.68`.
+  * Added [`x/mod`](https://golang.org/x/mod)
+    `v0.27.0`.
+  * Added [`x/net`](https://golang.org/x/net)
+    `v0.43.0`.
+  * Added [`x/sync`](https://golang.org/x/sync)
+    `v0.16.0`.
+  * Added [`x/tools`](https://golang.org/x/tools)
+    `v0.36.0`.
 
 # v0.1.7 (2025-08-08 00:05:24)
 
-* TBD
+* Dependency Updates
+  * Updated [`arl/statsviz`](https://github.com/arl/statsviz)
+    from `v0.7.0` to `v0.7.1`.
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
+    from `v0.40.0` to `v0.41.0`.
+  * Updated [`x/term`](https://golang.org/x/term)
+    from `v0.33.0` to `v0.34.0`.
 
 # v0.1.6 (2025-08-07 13:07:02)
 
-* TBD
+* Dependency Updates
+  * Updated [`x/sys`](https://golang.org/x/sys)
+    from `v0.34.0` to `v0.35.0`.
 
 # v0.1.5 (2025-08-07 00:34:16)
 
-* TBD
+* New Features & Improvements
+  * Added the `--license` command-line option to display the
+    software license details.
+  * Added support for ECDSA host keys
+    (and the `ssh_host_ecdsa_key.pem` file).
+  * Enhanced `gops` diagnostic agent management to ensure clean
+    shutdowns across all exit paths.
+  * Removed the characters "`g`" and "`9`" from the shareable
+    username generation safe character subset.
+  * Optimized the `stripEmoji` function by preallocating the
+    output buffer.
+  * Improved the `Connection` struct layout to reduce memory padding.
+[]()
+
+[]()
+* Build System Improvements
+  * Modified the `Makefile` to use the `GO` variable for the full
+    Go compiler path.
+  * Updated the `distclean` `make` target to include the
+    `ssh_host_ecdsa_key.pem` file.
+  * Improved the `Makefile` to automatically enable `GOSUMDB`
+    if it is detected as being disabled.
+[]()
+
+[]()
+* CI/CD Updates
+  * Configured the GitLab CI/CD pipeline to save and restore
+    vendored dependencies.
+  * Optimized the GitLab CI/CD build environment by removing
+    the redundant installation of GNU Make.
+  * Consolidated multiple Python `pip` installation commands
+    into a single step for improved pipeline efficiency.
+  * Explicitly set `GOSUMDB` and `GOPROXY` environment variables
+    in the GitLab CI/CD configuration.
+  * Disabled Go toolchain telemetry in the GitLab CI/CD
+    build environment.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.24.5` to `v1.24.6`.
 
 # v0.1.4 (2025-08-01 23:57:49)
 
-* TBD
+* New Features & Improvements
+  * Fixed a bug where the database log level was being checked
+    before the database was enabled.
 
 # v0.1.3 (2025-08-01 22:07:08)
 
