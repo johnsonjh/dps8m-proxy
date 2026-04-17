@@ -26,7 +26,9 @@ import (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-var nameReplacements = []struct{ old, new string }{
+var nameReplacements = []struct {
+	old, new string
+}{
 	{"pub/linux/libs/security", "..."},
 	{"github.com/", ""},
 	{"gitlab.com/", ""},
@@ -34,7 +36,9 @@ var nameReplacements = []struct{ old, new string }{
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-var versionReplacements = []struct{ old, new string }{
+var versionReplacements = []struct {
+	old, new string
+}{
 	{"v1.0.11-0.20260305102058-3d32e71abc0b", "v1.0.11* (2026-Mar-05, g3d32e71)"},
 }
 
@@ -122,7 +126,10 @@ func printVersion(short bool) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func printVersionTable() {
-	type row struct{ Name, Version string }
+	type row struct {
+		Name,
+		Version string
+	}
 
 	var rows []row
 
@@ -135,10 +142,12 @@ func printVersionTable() {
 			v += "*"
 		}
 
-		rows = append(rows, row{
-			Name:    sanitizeName(info.Main.Path),
-			Version: sanitizeVersion(v),
-		})
+		rows = append(rows,
+			row{
+				Name:    sanitizeName(info.Main.Path),
+				Version: sanitizeVersion(v),
+			},
+		)
 
 		for _, dep := range info.Deps {
 			orig := dep.Version
@@ -148,10 +157,12 @@ func printVersionTable() {
 				v += "*"
 			}
 
-			rows = append(rows, row{
-				Name:    sanitizeName(dep.Path),
-				Version: sanitizeVersion(v),
-			})
+			rows = append(rows,
+				row{
+					Name:    sanitizeName(dep.Path),
+					Version: sanitizeVersion(v),
+				},
+			)
 		}
 	}
 
@@ -182,11 +193,13 @@ func printVersionTable() {
 		compVer += "*"
 	}
 
-	rows = append(rows, row{
-		Name: fmt.Sprintf("Go compiler (%s)",
-			runtime.Compiler),
-		Version: compVer,
-	})
+	rows = append(rows,
+		row{
+			Name: fmt.Sprintf("Go compiler (%s)",
+				runtime.Compiler),
+			Version: compVer,
+		},
+	)
 
 	var componentName string
 

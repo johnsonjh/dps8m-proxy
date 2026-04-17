@@ -47,7 +47,9 @@ func getParentProc() (*windows.ProcessEntry32, error) {
 			err)
 	}
 
-	defer func() { _ = windows.CloseHandle(snap) }()
+	defer func() {
+		_ = windows.CloseHandle(snap)
+	}()
 
 	procs := make(map[uint32]windows.ProcessEntry32)
 

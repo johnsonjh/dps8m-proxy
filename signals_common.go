@@ -28,12 +28,15 @@ func handleSignal(s os.Signal) {
 	case syscall.SIGHUP:
 		log.Printf("%sSIGHUP received: Reloading whitelist and/or blacklist.\r\n",
 			bellPrefix())
+
 		reloadLists()
 
 	case syscall.SIGUSR1:
 		log.Printf("%sSIGUSR1 received: Initiating graceful shutdown.\r\n",
 			bellPrefix())
+
 		gracefulShutdownMode.Store(true)
+
 		connectionsMutex.Lock()
 
 		if len(connections) == 0 {
@@ -51,6 +54,7 @@ func handleSignal(s os.Signal) {
 	case syscall.SIGUSR2:
 		log.Printf("%sSIGUSR2 received: Denying new connections.\r\n",
 			bellPrefix())
+
 		denyNewConnectionsMode.Store(true)
 
 	case syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:

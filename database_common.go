@@ -280,53 +280,55 @@ func initDB() {
 			errorPrefix(), err) // LINTED: Fatalf
 	}
 
-	err = db.Update(func(tx *bbolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists(metaBucketName)
-		if err != nil {
-			return fmt.Errorf("failed to create meta bucket: %w",
-				err)
-		}
-
-		val := bucket.Get(shutdownMarkerKey) //nolint:unqueryvet,nolintlint
-
-		if bytes.Equal(val, []byte("0")) {
-			log.Printf("%sUnclean database shutdown detected!",
-				warnPrefix())
-		} else {
-			t, err := time.Parse(time.RFC3339, string(val))
+	err = db.Update(
+		func(tx *bbolt.Tx) error {
+			bucket, err := tx.CreateBucketIfNotExists(metaBucketName)
 			if err != nil {
-				log.Printf("%sUnable to parse clean shutdown marker date '%s'.",
-					warnPrefix(), string(val))
-			} else {
-				log.Printf("%sDatabase last shutdown %s.",
-					dbPrefix(), t.Format("2006-Jan-02 15:04:05"))
-			}
-		}
-
-		startTimeVal := bucket.Get(initialStartTimeKey) //nolint:unqueryvet,nolintlint
-		if startTimeVal == nil {
-			err := bucket.Put(initialStartTimeKey,
-				[]byte(startTime.Format(time.RFC3339)))
-			if err != nil {
-				return fmt.Errorf("failed to write initial start time: %w",
+				return fmt.Errorf("failed to create meta bucket: %w",
 					err)
 			}
 
-			persistedStartTime = startTime
-		} else {
-			pStartTime, err := time.Parse(time.RFC3339, string(startTimeVal))
-			if err != nil {
-				log.Printf("%sERROR: Failed to parse persisted start time: %v",
-					warnPrefix(), err)
+			val := bucket.Get(shutdownMarkerKey) //nolint:unqueryvet,nolintlint
+
+			if bytes.Equal(val, []byte("0")) {
+				log.Printf("%sUnclean database shutdown detected!",
+					warnPrefix())
+			} else {
+				t, err := time.Parse(time.RFC3339, string(val))
+				if err != nil {
+					log.Printf("%sUnable to parse clean shutdown marker date '%s'.",
+						warnPrefix(), string(val))
+				} else {
+					log.Printf("%sDatabase last shutdown %s.",
+						dbPrefix(), t.Format("2006-Jan-02 15:04:05"))
+				}
+			}
+
+			startTimeVal := bucket.Get(initialStartTimeKey) //nolint:unqueryvet,nolintlint
+			if startTimeVal == nil {
+				err := bucket.Put(initialStartTimeKey,
+					[]byte(startTime.Format(time.RFC3339)))
+				if err != nil {
+					return fmt.Errorf("failed to write initial start time: %w",
+						err)
+				}
 
 				persistedStartTime = startTime
 			} else {
-				persistedStartTime = pStartTime
-			}
-		}
+				pStartTime, err := time.Parse(time.RFC3339, string(startTimeVal))
+				if err != nil {
+					log.Printf("%sERROR: Failed to parse persisted start time: %v",
+						warnPrefix(), err)
 
-		return bucket.Put(shutdownMarkerKey, []byte("0"))
-	})
+					persistedStartTime = startTime
+				} else {
+					persistedStartTime = pStartTime
+				}
+			}
+
+			return bucket.Put(shutdownMarkerKey, []byte("0"))
+		},
+	)
 	if err != nil {
 		log.Printf("%sERROR: Failed to initialize database metadata: %v",
 			errorPrefix(), err)
@@ -342,88 +344,90 @@ func writeCountersToDB() {
 		return
 	}
 
-	err := db.Update(func(tx *bbolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists(countersBucketName)
-		if err != nil {
-			return fmt.Errorf("failed to create counters bucket: %w",
-				err)
-		}
-
-		counters := map[string]uint64{
-			"telnetConnectionsTotal": lifetimeTelnetConnectionsTotal.Load() +
-				telnetConnectionsTotal.Load(),
-
-			"altHostRoutesTotal": lifetimeAltHostRoutesTotal.Load() +
-				altHostRoutesTotal.Load(),
-
-			"telnetFailuresTotal": lifetimeTelnetFailuresTotal.Load() +
-				telnetFailuresTotal.Load(),
-
-			"peakUsersTotal": lifetimePeakUsersTotal.Load(),
-
-			"trafficOutTotal": lifetimeTrafficOutTotal.Load() +
-				trafficOutTotal.Load(),
-
-			"trafficInTotal": lifetimeTrafficInTotal.Load() +
-				trafficInTotal.Load(),
-
-			"sshConnectionsTotal": lifetimeSSHconnectionsTotal.Load() +
-				sshConnectionsTotal.Load(),
-
-			"sshSessionsTotal": lifetimeSSHsessionsTotal.Load() +
-				sshSessionsTotal.Load(),
-
-			"monitorSessionsTotal": lifetimeMonitorSessionsTotal.Load() +
-				monitorSessionsTotal.Load(),
-
-			"sshRequestTimeoutTotal": lifetimeSSHrequestTimeoutTotal.Load() +
-				sshRequestTimeoutTotal.Load(),
-
-			"sshIllegalSubsystemTotal": lifetimeSSHillegalSubsystemTotal.Load() +
-				sshIllegalSubsystemTotal.Load(),
-
-			"sshExecRejectedTotal": lifetimeSSHexecRejectedTotal.Load() +
-				sshExecRejectedTotal.Load(),
-
-			"acceptErrorsTotal": lifetimeAcceptErrorsTotal.Load() +
-				acceptErrorsTotal.Load(),
-
-			"sshHandshakeFailedTotal": lifetimeSSHhandshakeFailedTotal.Load() +
-				sshHandshakeFailedTotal.Load(),
-
-			"adminKillsTotal": lifetimeAdminKillsTotal.Load() +
-				adminKillsTotal.Load(),
-
-			"idleKillsTotal": lifetimeIdleKillsTotal.Load() +
-				idleKillsTotal.Load(),
-
-			"timeKillsTotal": lifetimeTimeKillsTotal.Load() +
-				timeKillsTotal.Load(),
-
-			"delayAbandonedTotal": lifetimeDelayAbandonedTotal.Load() +
-				delayAbandonedTotal.Load(),
-
-			"rejectedTotal": lifetimeRejectedTotal.Load() +
-				rejectedTotal.Load(),
-
-			"exemptedTotal": lifetimeExemptedTotal.Load() +
-				exemptedTotal.Load(),
-		}
-
-		for key, val := range counters {
-			buf := make([]byte, 8)
-
-			binary.BigEndian.PutUint64(buf, val)
-
-			err := bucket.Put([]byte(key), buf)
+	err := db.Update(
+		func(tx *bbolt.Tx) error {
+			bucket, err := tx.CreateBucketIfNotExists(countersBucketName)
 			if err != nil {
-				return fmt.Errorf("failed to write counter %s: %w",
-					key, err)
+				return fmt.Errorf("failed to create counters bucket: %w",
+					err)
 			}
-		}
 
-		return nil
-	})
+			counters := map[string]uint64{
+				"telnetConnectionsTotal": lifetimeTelnetConnectionsTotal.Load() +
+					telnetConnectionsTotal.Load(),
+
+				"altHostRoutesTotal": lifetimeAltHostRoutesTotal.Load() +
+					altHostRoutesTotal.Load(),
+
+				"telnetFailuresTotal": lifetimeTelnetFailuresTotal.Load() +
+					telnetFailuresTotal.Load(),
+
+				"peakUsersTotal": lifetimePeakUsersTotal.Load(),
+
+				"trafficOutTotal": lifetimeTrafficOutTotal.Load() +
+					trafficOutTotal.Load(),
+
+				"trafficInTotal": lifetimeTrafficInTotal.Load() +
+					trafficInTotal.Load(),
+
+				"sshConnectionsTotal": lifetimeSSHconnectionsTotal.Load() +
+					sshConnectionsTotal.Load(),
+
+				"sshSessionsTotal": lifetimeSSHsessionsTotal.Load() +
+					sshSessionsTotal.Load(),
+
+				"monitorSessionsTotal": lifetimeMonitorSessionsTotal.Load() +
+					monitorSessionsTotal.Load(),
+
+				"sshRequestTimeoutTotal": lifetimeSSHrequestTimeoutTotal.Load() +
+					sshRequestTimeoutTotal.Load(),
+
+				"sshIllegalSubsystemTotal": lifetimeSSHillegalSubsystemTotal.Load() +
+					sshIllegalSubsystemTotal.Load(),
+
+				"sshExecRejectedTotal": lifetimeSSHexecRejectedTotal.Load() +
+					sshExecRejectedTotal.Load(),
+
+				"acceptErrorsTotal": lifetimeAcceptErrorsTotal.Load() +
+					acceptErrorsTotal.Load(),
+
+				"sshHandshakeFailedTotal": lifetimeSSHhandshakeFailedTotal.Load() +
+					sshHandshakeFailedTotal.Load(),
+
+				"adminKillsTotal": lifetimeAdminKillsTotal.Load() +
+					adminKillsTotal.Load(),
+
+				"idleKillsTotal": lifetimeIdleKillsTotal.Load() +
+					idleKillsTotal.Load(),
+
+				"timeKillsTotal": lifetimeTimeKillsTotal.Load() +
+					timeKillsTotal.Load(),
+
+				"delayAbandonedTotal": lifetimeDelayAbandonedTotal.Load() +
+					delayAbandonedTotal.Load(),
+
+				"rejectedTotal": lifetimeRejectedTotal.Load() +
+					rejectedTotal.Load(),
+
+				"exemptedTotal": lifetimeExemptedTotal.Load() +
+					exemptedTotal.Load(),
+			}
+
+			for key, val := range counters {
+				buf := make([]byte, 8)
+
+				binary.BigEndian.PutUint64(buf, val)
+
+				err := bucket.Put([]byte(key), buf)
+				if err != nil {
+					return fmt.Errorf("failed to write counter %s: %w",
+						key, err)
+				}
+			}
+
+			return nil
+		},
+	)
 	if err != nil {
 		log.Printf("%sERROR: Failed to write counters to database: %v",
 			errorPrefix(), err)
@@ -437,45 +441,47 @@ func loadCountersFromDB() {
 		return
 	}
 
-	err := db.View(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket(countersBucketName)
-		if bucket == nil {
-			return nil
-		}
-
-		counters := map[string]*atomic.Uint64{
-			"telnetConnectionsTotal":   &lifetimeTelnetConnectionsTotal,
-			"altHostRoutesTotal":       &lifetimeAltHostRoutesTotal,
-			"telnetFailuresTotal":      &lifetimeTelnetFailuresTotal,
-			"peakUsersTotal":           &lifetimePeakUsersTotal,
-			"trafficOutTotal":          &lifetimeTrafficOutTotal,
-			"trafficInTotal":           &lifetimeTrafficInTotal,
-			"sshConnectionsTotal":      &lifetimeSSHconnectionsTotal,
-			"sshSessionsTotal":         &lifetimeSSHsessionsTotal,
-			"monitorSessionsTotal":     &lifetimeMonitorSessionsTotal,
-			"sshRequestTimeoutTotal":   &lifetimeSSHrequestTimeoutTotal,
-			"sshIllegalSubsystemTotal": &lifetimeSSHillegalSubsystemTotal,
-			"sshExecRejectedTotal":     &lifetimeSSHexecRejectedTotal,
-			"acceptErrorsTotal":        &lifetimeAcceptErrorsTotal,
-			"sshHandshakeFailedTotal":  &lifetimeSSHhandshakeFailedTotal,
-			"adminKillsTotal":          &lifetimeAdminKillsTotal,
-			"idleKillsTotal":           &lifetimeIdleKillsTotal,
-			"timeKillsTotal":           &lifetimeTimeKillsTotal,
-			"delayAbandonedTotal":      &lifetimeDelayAbandonedTotal,
-			"rejectedTotal":            &lifetimeRejectedTotal,
-			"exemptedTotal":            &lifetimeExemptedTotal,
-		}
-
-		for key, val := range counters {
-			data := bucket.Get([]byte(key))
-
-			if len(data) == 8 {
-				val.Store(binary.BigEndian.Uint64(data))
+	err := db.View(
+		func(tx *bbolt.Tx) error {
+			bucket := tx.Bucket(countersBucketName)
+			if bucket == nil {
+				return nil
 			}
-		}
 
-		return nil
-	})
+			counters := map[string]*atomic.Uint64{
+				"telnetConnectionsTotal":   &lifetimeTelnetConnectionsTotal,
+				"altHostRoutesTotal":       &lifetimeAltHostRoutesTotal,
+				"telnetFailuresTotal":      &lifetimeTelnetFailuresTotal,
+				"peakUsersTotal":           &lifetimePeakUsersTotal,
+				"trafficOutTotal":          &lifetimeTrafficOutTotal,
+				"trafficInTotal":           &lifetimeTrafficInTotal,
+				"sshConnectionsTotal":      &lifetimeSSHconnectionsTotal,
+				"sshSessionsTotal":         &lifetimeSSHsessionsTotal,
+				"monitorSessionsTotal":     &lifetimeMonitorSessionsTotal,
+				"sshRequestTimeoutTotal":   &lifetimeSSHrequestTimeoutTotal,
+				"sshIllegalSubsystemTotal": &lifetimeSSHillegalSubsystemTotal,
+				"sshExecRejectedTotal":     &lifetimeSSHexecRejectedTotal,
+				"acceptErrorsTotal":        &lifetimeAcceptErrorsTotal,
+				"sshHandshakeFailedTotal":  &lifetimeSSHhandshakeFailedTotal,
+				"adminKillsTotal":          &lifetimeAdminKillsTotal,
+				"idleKillsTotal":           &lifetimeIdleKillsTotal,
+				"timeKillsTotal":           &lifetimeTimeKillsTotal,
+				"delayAbandonedTotal":      &lifetimeDelayAbandonedTotal,
+				"rejectedTotal":            &lifetimeRejectedTotal,
+				"exemptedTotal":            &lifetimeExemptedTotal,
+			}
+
+			for key, val := range counters {
+				data := bucket.Get([]byte(key))
+
+				if len(data) == 8 {
+					val.Store(binary.BigEndian.Uint64(data))
+				}
+			}
+
+			return nil
+		},
+	)
 	if err != nil {
 		log.Printf("%sERROR: Failed to load counters from database: %v",
 			errorPrefix(), err)
@@ -488,15 +494,17 @@ func closeDB() {
 	if db != nil {
 		writeCountersToDB()
 
-		err := db.Update(func(tx *bbolt.Tx) error {
-			bucket, err := tx.CreateBucketIfNotExists(metaBucketName)
-			if err != nil {
-				return fmt.Errorf("failed to create meta bucket: %w",
-					err)
-			}
+		err := db.Update(
+			func(tx *bbolt.Tx) error {
+				bucket, err := tx.CreateBucketIfNotExists(metaBucketName)
+				if err != nil {
+					return fmt.Errorf("failed to create meta bucket: %w",
+						err)
+				}
 
-			return bucket.Put(shutdownMarkerKey, []byte(time.Now().Format(time.RFC3339)))
-		})
+				return bucket.Put(shutdownMarkerKey, []byte(time.Now().Format(time.RFC3339)))
+			},
+		)
 		if err != nil {
 			log.Printf("%sERROR: Failed to set clean shutdown marker: %v",
 				errorPrefix(), err)

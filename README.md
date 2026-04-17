@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.1.0 (2026-Apr-14 gef6615d) [linux/amd64]
+DPS8M Proxy v1.1.1 (2026-Apr-17 g22ea0f7) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,12 +326,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.1.0 (2026-Apr-14 gef6615d) [linux/amd64]
+DPS8M Proxy v1.1.1 (2026-Apr-17 g22ea0f7) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.1.0                           |
+| dps8m/proxy               | v1.1.1                           |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -602,43 +602,43 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>20</th>
-<th>9389</th>
-<th>2034</th>
-<th>589</th>
-<th>6766</th>
+<th>9474</th>
+<th>2040</th>
+<th>590</th>
+<th>6844</th>
 <th>1679</th>
-<th>227140</th>
-<th>4129</th>
+<th>227742</th>
+<th>4148</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
-<th>439</th>
+<th>440</th>
 <th>100</th>
-<th>112</th>
+<th>113</th>
 <th>227</th>
 <th>34</th>
-<th>12974</th>
-<th>208</th>
+<th>12988</th>
+<th>209</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>580</th>
-<th>85</th>
-<th>92</th>
-<th>403</th>
-<th>177</th>
-<th>20387</th>
-<th>350</th>
+<th>596</th>
+<th>87</th>
+<th>94</th>
+<th>415</th>
+<th>182</th>
+<th>21014</th>
+<th>357</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>635</th>
+<th>637</th>
 <th>126</th>
 <th>0</th>
-<th>509</th>
+<th>511</th>
 <th>0</th>
-<th>29754</th>
-<th>496</th>
+<th>29859</th>
+<th>498</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -657,27 +657,29 @@ predecessor (code statistics 📈 provided by
 <th>10</th>
 <th>68</th>
 <th>0</th>
-<th>3968</th>
+<th>4013</th>
 <th>75</th>
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
 <th>28</th>
-<th>11336</th>
-<th>2386</th>
-<th>910</th>
-<th>8040</th>
-<th>1890</th>
-<th>301828</th>
-<th>5375</th>
+<th>11440</th>
+<th>2394</th>
+<th>914</th>
+<th>8132</th>
+<th>1895</th>
+<th>303221</th>
+<th>5404</th>
 </tr></tfoot></table>
 
 
 ## Changes
 
-* If you are looking for a ChangeLog, you can use the GitLab
+* The [`CHANGELOG.md`](CHANGELOG.md) file summarizes the most important
+  changes in each version.
+* If you are looking for more details, you can use the GitLab
   [Repository graph](https://gitlab.com/dps8m/proxy/-/network/master)
-  to see the changes in each release.
+  to see all the commits for each release.
 
 ## Future plans
 

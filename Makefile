@@ -83,7 +83,16 @@ test:
 	@env printf '%s\n' "🧪 Running 'go test -v .'" 2> /dev/null || :
 	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && \
-		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) test -v .
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) test -v
+
+##############################################################################
+# Target: coverage
+
+coverage cover:
+	@env printf '%s\n' "🧪 Running 'go test -v .'" 2> /dev/null || :
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) test -v -cover
 
 ##############################################################################
 # Target: lint
@@ -100,6 +109,7 @@ lint check:
 	$(MAKE) clean
 	@env printf '\n%s\n' "⚙️ Running linters..." 2> /dev/null || :
 	$(MAKE) \
+		cover \
 		scspell \
 		codespell \
 		reuse \
@@ -411,6 +421,11 @@ README.md doc docs: README.md.tmpl proxy
 	  -e 's|^Usage for .*/proxy:|Usage for proxy:|' < \
 	  ./README.md > ./README.md.sed && \
 		$(MV) ./README.md.sed ./README.md
+	@env printf '\n%s\n' "⚙️ Sed: Redacting compiler version extension..." \
+		2> /dev/null || :
+	$(SED) 's|-X:nodwarf5|           |' < \
+	  ./README.md > ./README.md.sed && \
+		$(MV) ./README.md.sed ./README.md
 	@env printf '\n%s\n\n' "📗 README.md generation successful." \
 		2> /dev/null || :
 
@@ -418,7 +433,7 @@ README.md doc docs: README.md.tmpl proxy
 # Target: scc
 
 SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
-		 .whitesource,.golangci.yml,dependabot.yml,.txt" \
+		 .whitesource,.golangci.yml,dependabot.yml,.txt,CHANGELOG.md" \
 		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown' \
 		 --include-symlinks
 
@@ -454,9 +469,9 @@ scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 		--report-only \
 		--override-dictionary ./.scspell/dictionary.txt \
 		--base-dict ./.scspell/basedict.txt \
-		$$( find . \( -path ./.git -o -path ./.venv -o -name '.doc.tmpl' \
-			-o -name 'README.md' \) -prune -o -type f -exec \
-			grep -l 'scspell-id:' {} \; )
+		$$( find . \( -path ./.git -o -path ./.venv -o -path ./vendor \
+			-o -name '.doc.tmpl' -o -name 'README.md' \) \
+			-prune -o -type f -exec grep -l 'scspell-id:' {} \; )
 
 ##############################################################################
 # Target: scspell-fix
@@ -471,9 +486,9 @@ scspell-fix: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 	scspell \
 		--override-dictionary ./.scspell/dictionary.txt \
 		--base-dict ./.scspell/basedict.txt \
-		$$( find . \( -path ./.git -o -path ./.venv -o -name '.doc.tmpl' \
-			-o -name 'README.md' \) -prune -o -type f -exec \
-			grep -l 'scspell-id:' {} \; )
+		$$( find . \( -path ./.git -o -path ./.venv -o -path ./vendor \
+			-o -name '.doc.tmpl' -o -name 'README.md' \) \
+			-prune -o -type f -exec grep -l 'scspell-id:' {} \; )
 
 ##############################################################################
 # Target: strip
@@ -568,7 +583,8 @@ install:
 	reuse gofmt goverify gotidydiff golangci-lint staticcheck nilaway \
 	revive errcheck deadcode govulncheck gopls gofumpt shfmt shellcheck \
 	codespell tags ctags gtags GRPATH GRTAGS GTAGS govet doc docs scc \
-	cross scspell scspell-fix strip sstrip install-strip install
+	cross scspell scspell-fix cover coverage strip sstrip install-strip \
+	install
 
 ##############################################################################
 # Local Variables:

@@ -1129,9 +1129,11 @@ func main() {
 				available = append(available, fmt.Sprintf("%v", cm))
 			}
 
-			sort.Slice(available, func(i, j int) bool {
-				return naturalLess(available[i], available[j])
-			})
+			sort.Slice(available,
+				func(i, j int) bool {
+					return naturalLess(available[i], available[j])
+				},
+			)
 
 			_, _ = fmt.Fprintf(os.Stdout, "\r\nValid --iconv character map strings:\r\n\r\n")
 
@@ -1823,7 +1825,9 @@ func handleConsoleInput() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func showHelp() {
-	type row struct{ Key, Description string }
+	type row struct {
+		Key, Description string
+	}
 
 	rows := []row{
 		{"c ", "Show Configuration and Status"},
@@ -1873,7 +1877,10 @@ func showHelp() {
 
 func showStats() {
 	if dbPath == "" {
-		type row struct{ Name, Value string }
+		type row struct {
+			Name,
+			Value string
+		}
 
 		rows := []row{
 			{
@@ -2020,7 +2027,10 @@ func showStats() {
 
 		fmt.Print("\r\n")
 	} else {
-		type row struct{ Name, Value, Lifetime string }
+		type row struct {
+			Name,
+			Value, Lifetime string
+		}
 
 		rows := []row{
 			{
@@ -2267,7 +2277,11 @@ func toggleGracefulShutdown() {
 		if len(connections) == 0 {
 			connectionsMutex.Unlock()
 
-			shutdownOnce.Do(func() { close(shutdownSignal) })
+			shutdownOnce.Do(
+				func() {
+					close(shutdownSignal)
+				},
+			)
 		} else {
 			connectionsMutex.Unlock()
 		}
@@ -2305,81 +2319,83 @@ func toggleDenyNewConnections() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func immediateShutdown() {
-	shutdownOnce.Do(func() {
-		log.Printf("%sImmediate shutdown initiated.\r\n",
-			boomPrefix())
+	shutdownOnce.Do(
+		func() {
+			log.Printf("%sImmediate shutdown initiated.\r\n",
+				boomPrefix())
 
-		if isConsoleLogQuiet {
-			_, _ = fmt.Fprintf(os.Stdout,
-				"%s %sImmediate shutdown initiated.\r\n",
-				nowStamp(), boomPrefix())
-		}
-
-		connectionsMutex.Lock()
-
-		for _, conn := range connections {
-			if conn.channel != nil {
-				_, err := conn.channel.Write(
-					[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
-				if err != nil {
-					log.Printf("%sError writing to channel for %s: %v",
-						warnPrefix(), conn.ID, err)
-				}
-
-				connUptime := time.Since(conn.startTime)
-				log.Printf("%sLINKDOWN [%s] %s@%s (link time %s)",
-					yellowDotPrefix(), conn.ID, conn.userName,
-					conn.hostName, connUptime.Round(time.Second))
+			if isConsoleLogQuiet {
+				_, _ = fmt.Fprintf(os.Stdout,
+					"%s %sImmediate shutdown initiated.\r\n",
+					nowStamp(), boomPrefix())
 			}
 
-			if conn.cancelFunc != nil {
-				conn.cancelFunc()
-			}
-
-			if conn.sshConn != nil {
-				err := conn.sshConn.Close()
-				if err != nil {
-					log.Printf("%sError closing SSH connection for %s: %v",
-						alertPrefix(), conn.ID, err)
-				}
-			}
-		}
-
-		connectionsMutex.Unlock()
-
-		for {
 			connectionsMutex.Lock()
 
-			if len(connections) == 0 {
-				connectionsMutex.Unlock()
+			for _, conn := range connections {
+				if conn.channel != nil {
+					_, err := conn.channel.Write(
+						[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+					if err != nil {
+						log.Printf("%sError writing to channel for %s: %v",
+							warnPrefix(), conn.ID, err)
+					}
 
-				break
+					connUptime := time.Since(conn.startTime)
+					log.Printf("%sLINKDOWN [%s] %s@%s (link time %s)",
+						yellowDotPrefix(), conn.ID, conn.userName,
+						conn.hostName, connUptime.Round(time.Second))
+				}
+
+				if conn.cancelFunc != nil {
+					conn.cancelFunc()
+				}
+
+				if conn.sshConn != nil {
+					err := conn.sshConn.Close()
+					if err != nil {
+						log.Printf("%sError closing SSH connection for %s: %v",
+							alertPrefix(), conn.ID, err)
+					}
+				}
 			}
 
 			connectionsMutex.Unlock()
 
-			time.Sleep(100 * time.Millisecond)
-		}
+			for {
+				connectionsMutex.Lock()
 
-		loggingWg.Wait()
+				if len(connections) == 0 {
+					connectionsMutex.Unlock()
 
-		closeDB()
+					break
+				}
 
-		if isConsoleLogQuiet {
-			_, _ = fmt.Fprintf(os.Stdout,
-				"%s %sExiting.\r\n",
-				nowStamp(), byePrefix())
-		}
+				connectionsMutex.Unlock()
 
-		log.Printf("%sExiting.\r\n",
-			byePrefix())
+				time.Sleep(100 * time.Millisecond)
+			}
 
-		if enableGops {
-			gopsClose()
-		}
+			loggingWg.Wait()
 
-		os.Exit(0)
-	})
+			closeDB()
+
+			if isConsoleLogQuiet {
+				_, _ = fmt.Fprintf(os.Stdout,
+					"%s %sExiting.\r\n",
+					nowStamp(), byePrefix())
+			}
+
+			log.Printf("%sExiting.\r\n",
+				byePrefix())
+
+			if enableGops {
+				gopsClose()
+			}
+
+			os.Exit(0)
+		},
+	)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2461,12 +2477,14 @@ func listConnections(truncate bool) {
 			idle = time.Since(conn.lastActivityTime).Round(time.Second).String()
 		}
 
-		rows = append(rows, row{
-			ID:      conn.ID,
-			Details: details,
-			Link:    time.Since(conn.startTime).Round(time.Second).String(),
-			Idle:    idle,
-		})
+		rows = append(rows,
+			row{
+				ID:      conn.ID,
+				Details: details,
+				Link:    time.Since(conn.startTime).Round(time.Second).String(),
+				Idle:    idle,
+			},
+		)
 	}
 
 	maxID := len("Session ID")
@@ -2826,9 +2844,11 @@ func listConfiguration() {
 			users = append(users, user)
 		}
 
-		sort.Slice(users, func(i, j int) bool {
-			return naturalLess(users[i], users[j])
-		})
+		sort.Slice(users,
+			func(i, j int) bool {
+				return naturalLess(users[i], users[j])
+			},
+		)
 
 		for _, user := range users {
 			hostPort := altHosts[user]
@@ -3556,7 +3576,11 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		if gracefulShutdownMode.Load() && len(connections) == 0 {
 			connectionsMutex.Unlock()
 
-			shutdownOnce.Do(func() { close(shutdownSignal) })
+			shutdownOnce.Do(
+				func() {
+					close(shutdownSignal)
+				},
+			)
 		} else {
 			connectionsMutex.Unlock()
 		}
@@ -4667,6 +4691,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						return ctx.Done()
 					}():
 						return
+
 					default:
 					}
 
@@ -6401,27 +6426,39 @@ func listGoroutines() {
 			caller = strings.TrimSpace(lines[2])
 		}
 
-		goroutines = append(goroutines, GoroutineInfo{
-			ID:         id,
-			State:      state,
-			Entrypoint: entrypoint,
-			Caller:     caller,
-		})
+		goroutines = append(goroutines,
+			GoroutineInfo{
+				ID:         id,
+				State:      state,
+				Entrypoint: entrypoint,
+				Caller:     caller,
+			},
+		)
 	}
 
 	if len(goroutines) == 0 { // Not possible!
 		return
 	}
 
-	type row struct{ Name, Value string }
+	type row struct {
+		Name, Value string
+	}
 
 	allRows := make([]row, 0, len(goroutines)*4)
 
 	for _, g := range goroutines {
-		allRows = append(allRows, row{"Name", "Goroutine #" + g.ID})
-		allRows = append(allRows, row{"State", g.State})
-		allRows = append(allRows, row{"Entrypoint", g.Entrypoint})
-		allRows = append(allRows, row{"Caller", g.Caller})
+		allRows = append(allRows,
+			row{"Name", "Goroutine #" + g.ID},
+		)
+		allRows = append(allRows,
+			row{"State", g.State},
+		)
+		allRows = append(allRows,
+			row{"Entrypoint", g.Entrypoint},
+		)
+		allRows = append(allRows,
+			row{"Caller", g.Caller},
+		)
 	}
 
 	maxName := 0

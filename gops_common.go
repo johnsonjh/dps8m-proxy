@@ -27,10 +27,12 @@ const gopsEnabled = true
 
 func gopsInit() {
 	go func() {
-		_ = agent.Listen(agent.Options{
-			ReuseSocketAddrAndPort: true,
-			ShutdownCleanup:        false,
-		})
+		_ = agent.Listen(
+			agent.Options{
+				ReuseSocketAddrAndPort: true,
+				ShutdownCleanup:        false,
+			},
+		)
 	}()
 }
 

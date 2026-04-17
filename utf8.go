@@ -38,18 +38,20 @@ var (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func haveUTF8support() bool {
-	utf8SupportOnce.Do(func() {
-		if os.Getenv("PROXY_FORCE_UTF8") == "1" { //nolint:gocritic
-			utf8Support = true // Undocumented: for debugging use.
-		} else if os.Getenv("PROXY_FORCE_NO_UTF8") == "1" {
-			utf8Support = false // Undocumented: for debugging use.
-		} else if !term.IsTerminal(int(os.Stdout.Fd())) { //nolint:gosec,nolintlint
-			utf8Support = false
-		} else {
-			utf8Support = isUTF8plan9() || isUTF8wasi() || isUTF8js() ||
-				isUTF8windows() || isUTF8unix() || canOutputUTF8()
-		}
-	})
+	utf8SupportOnce.Do(
+		func() {
+			if os.Getenv("PROXY_FORCE_UTF8") == "1" { //nolint:gocritic
+				utf8Support = true // Undocumented: for debugging use.
+			} else if os.Getenv("PROXY_FORCE_NO_UTF8") == "1" {
+				utf8Support = false // Undocumented: for debugging use.
+			} else if !term.IsTerminal(int(os.Stdout.Fd())) { //nolint:gosec,nolintlint
+				utf8Support = false
+			} else {
+				utf8Support = isUTF8plan9() || isUTF8wasi() || isUTF8js() ||
+					isUTF8windows() || isUTF8unix() || canOutputUTF8()
+			}
+		},
+	)
 
 	return utf8Support
 }
