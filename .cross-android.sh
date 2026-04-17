@@ -35,6 +35,7 @@ NDKPATH="${NDKHOME:?}/toolchains/llvm/prebuilt/linux-x86_64/bin"
 ###############################################################################
 # Android cross-compilation (uses Android NDK)
 
+# android/arm
 "${MAKE:-make}" clean
 env "${MAKE:-make}" \
   CC="${NDKPATH:?}/armv7a-linux-androideabi21-clang" \
