@@ -507,7 +507,7 @@
     path exclusions.
   * Added new `proxy.src.tar.gz` source archive
     ([vendoring](https://go.dev/ref/mod#vendoring) all modules)
-    to GitLab Pages deployment.
+    to [GitLab Pages deployment](https://dps8m.gitlab.io/proxy/).
   * Ensured proper `GOPROXY` variable is set in the
     GitLab CI/CD environment.
 
@@ -923,7 +923,8 @@
 
 * CI/CD Updates
   * Rebuilt the proxy binary during the deployment process to ensure
-    correct version information on the download web page.
+    correct version information on
+    the [download web page](https://dps8m.gitlab.io/proxy/).
   * Removed redundant debugging code from the pipeline configuration.
 
 # v0.1.54 (2025-10-31 00:14:28)
