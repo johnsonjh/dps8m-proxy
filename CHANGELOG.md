@@ -1107,7 +1107,7 @@
 
 * New Features & Improvements
   * Reformatted help output to maintain consistent indentation
-    and style after updates to latest `pflag` dependency.
+    and style after updating to latest `pflag` dependency.
   * Improved version reporting of the `pflag` dependency to show more
     human-readable version information.
 []()
@@ -1239,23 +1239,57 @@
 
 # v0.1.23 (2025-09-13 23:43:22)
 
-* TBD
+* Dependency Updates
+  * Updated [`x/mod`](https://golang.org/x/mod)
+    from `v0.27.0` to `v0.28.0`.
+  * Updated [`x/net`](https://golang.org/x/net)
+    from `v0.43.0` to `v0.44.0`.
+  * Updated [`x/tools`](https://golang.org/x/tools) 
+    from `v0.36.0` to `v0.37.0`.
 
 # v0.1.22 (2025-09-10 15:08:34)
 
-* TBD
+* Dependency Updates
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
+    from `v0.41.0` to `v0.42.0`.
 
 # v0.1.21 (2025-09-08 05:21:02)
 
-* TBD
+* Build System Improvements
+  * Updated the `Makefile` to check for the `systemctl` command
+    before trying to execute it during the installation process.
+  * Tidied the `go.sum` file.
 
 # v0.1.20 (2025-09-08 05:12:30)
 
-* TBD
+* Dependency Updates
+  * Updated [`x/term`](https://golang.org/x/term)
+    from `v0.34.0` to `v0.35.0`.
 
 # v0.1.19 (2025-09-08 01:58:49)
 
-* TBD
+* Build System Improvements
+  * Improved `setcap` detection in the `Makefile`.
+[]()
+
+[]()
+* New Features & Improvements
+  * Mitigated potential crashes in the connection termination logic.
+  * Implemented additional safety checks and improved locking
+    during connection termination.
+  * Ensured terminated connections were removed from the active
+    sessions map.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.25.0` to `v1.25.1`.
+  * Updated [`x/sync`](https://golang.org/x/sync)
+    from `v0.16.0` to `v0.17.0`.
+  * Updated [`x/sys`](https://golang.org/x/sys)
+    from `v0.35.0` to `v0.36.0`.
 
 # v0.1.18 (2025-09-06 04:43:46)
 
