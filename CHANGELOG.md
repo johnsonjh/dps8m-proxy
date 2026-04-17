@@ -1527,7 +1527,7 @@
 * Build System Improvements
   * Added a `golist` `make` target to identify
     outdated dependencies.
-  * Expanded cross-compilation support to include
+  * Extended the cross-compilation script to add support for
     `linux/mipssf` targets (no-FPU hardware requiring
     software floating point).
 []()
@@ -1554,10 +1554,6 @@
     octal permissions for generated host keys.
   * Enhanced the interactive configuration display to include
     the active certificate directory.
-[]()
-
-[]()
-* Build System Improvements
   * Updated the code to utilize `filepath.Join` for consistent
     path construction across platforms.
   * Standardized the default format for file permissions across
