@@ -725,7 +725,7 @@
 
 * CI/CD Updates
   * Updated the GitLab CI/CD configuration to call `pigz` with
-    compression level 9 (instead of Zopfli).
+    compression level `9` (instead of Zopfli).
 []()
 
 []()
