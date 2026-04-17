@@ -3,9 +3,9 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.1
+# v1.1.1 (2026-04-17)
 
-* Code audit
+* TBD
 
 # v1.1.0 (2026-04-14 13:23:01)
 
@@ -1145,10 +1145,10 @@
 # v0.1.33 (2025-10-21 04:33:42)
 
 * Build System Improvements
-  * Integrated `gopls` and `govulncheck` into the linting process
-    and added corresponding `Makefile` targets.
-  * Updated the lint setup script to install
-    `gopls` and `govulncheck`.
+  * Integrated `gopls` into the linting process and added a
+    corresponding `make` target.
+  * Updated the lint setup script to install the
+    `gopls` and `govulncheck` linters.
 []()
 
 []()
@@ -1470,7 +1470,8 @@
     username generation safe character subset.
   * Optimized the `stripEmoji` function by preallocating the
     output buffer.
-  * Improved the `Connection` struct layout to reduce memory padding.
+  * Improved the `Connection` struct layout to reduce
+    memory usage by eliminating padding.
 []()
 
 []()
@@ -1486,7 +1487,7 @@
 []()
 * CI/CD Updates
   * Configured the GitLab CI/CD pipeline to save and restore
-    vendored dependencies.
+    [vendored](https://go.dev/ref/mod#vendoring) dependencies.
   * Optimized the GitLab CI/CD build environment by removing
     the redundant installation of GNU Make.
   * Consolidated multiple Python `pip` installation commands
@@ -1511,11 +1512,66 @@
 
 # v0.1.3 (2025-08-01 22:07:08)
 
-* TBD
+* New Features & Improvements
+  * Implemented logging for the BBoltDB database engine.
+  * Added the `--db-loglevel` command-line flag to configure
+    the database engine logging output level.
+  * Renamed the `--no-gops` flag to `--gops` and avoid starting
+    the `gops` diagnostic agent by default.
+  * Fixed back-end connections for IPv6 systems by properly
+    utilizing `net.JoinHostPort`.
+  * Removed support for shorthand command-line flags.
+[]()
+
+[]()
+* Build System Improvements
+  * Added a `golist` `make` target to identify
+    outdated dependencies.
+  * Expanded cross-compilation support to include
+    `linux/mipssf` targets (no-FPU hardware requiring
+    software floating point).
+[]()
+
+[]()
+* Testing Improvements
+  * Integrated `govulncheck` into the Makefile and linting target
+    to identify potential vulnerabilities.
+[]()
+
+[]()
+* CI/CD Updates
+  * Optimized the GitLab CI/CD pipeline by removing redundant
+    diagnostic output and tool installation steps.
+  * Integrated `govulncheck` into the automated
+    GitLab CI/CD pipeline.
 
 # v0.1.2 (2025-07-30 23:28:13)
 
-* TBD
+* New Features & Improvements
+  * Added the `--cert-dir` configuration option to specify the
+    SSH host certificate directory.
+  * Added the `--cert-perm` configuration option to define the
+    octal permissions for generated host keys.
+  * Enhanced the interactive configuration display to include
+    the active certificate directory.
+[]()
+
+[]()
+* Build System Improvements
+  * Updated the code to utilize `filepath.Join` for consistent
+    path construction across platforms.
+  * Standardized the default format for file permissions across
+    all configuration options.
+[]()
+
+[]()
+* CI/CD Updates
+  * Improved the GitLab CI/CD pipeline by adding the `GIT_DEPTH`
+    variable (defined to `0`) to the configuration, ensuring a
+    full repository clone, as required for automatic versioning.
+  * Fixed a bug affecting the documentation generation process
+    within the GitLab CI/CD pipeline by using the correct
+    command-line flags.
 
 # v0.1.1 (2025-07-29 04:19:57)
 
