@@ -1079,7 +1079,7 @@
     instead of `true` for command continuations.
   * Added the `!usr-merge-nag` Alpine meta-package to the
     GitLab CI/CD environment and ensured any error output is
-    redirected to null.
+    redirected to `/dev/null`.
 []()
 
 []()
