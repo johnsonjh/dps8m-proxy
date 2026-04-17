@@ -196,6 +196,7 @@ jstemmer
 juntaki
 lintsetup
 nilaway
+nodwarf
 notparallel
 pflag
 printf
