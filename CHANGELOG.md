@@ -18,11 +18,12 @@
     extension, if present, from the generated help text.
 * CI/CD Updates
   * Replaced the GitLab CI/CD installation of the `lzip` Alpine
-    package with `libarchive-tools` package (which provides the
+    package with the `libarchive-tools` package (which provides the
     `bsdtar` utility).
   * Optimized the GitLab CI/CD pipeline for Android cross-compilation
-    by migrating to official Google-provided Android NDK distribution
-    and utilizing `bsdtar` for streaming extraction.
+    by migrating to the official Google-provided URL for the
+    Android NDK distribution and utilizing `bsdtar` for
+    streaming extraction.
 
 # v1.1.0 (2026-04-14 13:23:01)
 
