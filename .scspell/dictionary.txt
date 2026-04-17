@@ -485,6 +485,7 @@ distclean
 errorf
 expandtab
 fcfbc
+fkickers
 gcompat
 goexe
 goimports
