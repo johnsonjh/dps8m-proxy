@@ -123,27 +123,27 @@
 # v1.0.54
 
 * Dependency Updates
-  * Updated [x/tools](https://golang.org/x/tools)
+  * Updated [`x/tools`](https://golang.org/x/tools)
     from v0.43.0 to v0.44.0.
 
 # v1.0.53
 
 * Dependency Updates
-  * Updated [x/crypto](https://golang.org/x/crypto)
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
     from v0.49.0 to v0.50.0.
-  * Updated [x/term](https://golang.org/x/term)
+  * Updated [`x/term`](https://golang.org/x/term)
     from v0.41.0 to v0.42.0.
-  * Updated [x/text](https://golang.org/x/text)
+  * Updated [`x/text`](https://golang.org/x/text)
     from v0.35.0 to v0.36.0.
-  * Updated [x/mod](https://golang.org/x/mod)
+  * Updated [`x/mod`](https://golang.org/x/mod)
     from v0.34.0 to v0.35.0.
-  * Updated [x/net](https://golang.org/x/net)
+  * Updated [`x/net`](https://golang.org/x/net)
     from v0.52.0 to v0.53.0.
 
 # v1.0.52
 
 * Dependency Updates
-  * Updated [x/sys](https://golang.org/x/sys)
+  * Updated [`x/sys`](https://golang.org/x/sys)
     from v0.42.0 to v0.43.0.
 
 # v1.0.51
@@ -166,10 +166,10 @@
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.26.1 to v1.26.2.
   * Updated
-    [libcap/cap](https://kernel.org/pub/linux/libs/security/libcap/cap)
+    [`libcap/cap`](https://kernel.org/pub/linux/libs/security/libcap/cap)
     from from v1.2.77 to v1.2.78.
   * Updated
-    [libcap/psx](https://kernel.org/pub/linux/libs/security/libcap/psx)
+    [`libcap/psx`](https://kernel.org/pub/linux/libs/security/libcap/psx)
     from from v1.2.77 to v1.2.78.
 []()
 
@@ -241,37 +241,37 @@
 
 * Dependency Updates
   * Updated
-    [klauspost/compress](https://github.com/klauspost/compress)
+    [`klauspost/compress`](https://github.com/klauspost/compress)
     from v1.18.4 to v1.18.5.
 
 # v1.0.46
 
 * Dependency Updates
-  * Updated [x/tools](https://golang.org/x/tools)
+  * Updated [`x/tools`](https://golang.org/x/tools)
     from v0.42.0 to v0.43.0.
 
 # v1.0.45
 
 * Dependency Updates
-  * Updated [x/net](https://golang.org/x/net)
+  * Updated [`x/net`](https://golang.org/x/net)
     from v0.51.0 to v0.52.0.
 
 # v1.0.44
 
 * Dependency Updates
-  * Updated [x/crypto](https://golang.org/x/crypto)
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
     from v0.48.0 to v0.49.0.
-  * Updated [x/term](https://golang.org/x/term)
+  * Updated [`x/term`](https://golang.org/x/term)
     from v0.40.0 to v0.41.0.
-  * Updated [x/mod](https://golang.org/x/mod)
+  * Updated [`x/mod`](https://golang.org/x/mod)
     from v0.33.0 to v0.34.0.
 
 # v1.0.43
 
 * Dependency Updates
-  * Updated [x/sys](https://golang.org/x/sys)
+  * Updated [`x/sys`](https://golang.org/x/sys)
     from v0.41.0 to v0.42.0.
-  * Updated [x/sync](https://golang.org/x/sync)
+  * Updated [`x/sync`](https://golang.org/x/sync)
     from v0.19.0 to v0.20.0.
 
 # v1.0.42
@@ -284,7 +284,7 @@
 # v1.0.41
 
 * Dependency Updates
-  * Updated [spf13/pflag](https://github.com/spf13/pflag)
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from v1.0.11-0.20260110151513-b85eb9e15911 to
     v1.0.11-0.20260305102058-3d32e71abc0b.
 
@@ -305,7 +305,7 @@
 
 []()
 * Dependency Updates
-  * Updated [x/net](https://golang.org/x/net)
+  * Updated [`x/net`](https://golang.org/x/net)
     from v0.50.0 to v0.51.0.
 
 # v1.0.38
@@ -327,19 +327,19 @@
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.25.7 to v1.26.0.
   * Updated
-    [klauspost/compress](https://github.com/klauspost/compress)
+    [`klauspost/compress`](https://github.com/klauspost/compress)
     from v1.18.3 to v1.18.4.
-  * Updated [x/crypto](https://golang.org/x/crypto)
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
     from v0.47.0 to v0.48.0.
-  * Updated [x/mod](https://golang.org/x/mod)
+  * Updated [`x/mod`](https://golang.org/x/mod)
     from v0.32.0 to v0.33.0.
-  * Updated [x/net](https://golang.org/x/net)
+  * Updated [`x/net`](https://golang.org/x/net)
     from v0.49.0 to v0.50.0.
-  * Updated [x/sys](https://golang.org/x/sys)
+  * Updated [`x/sys`](https://golang.org/x/sys)
     from v0.40.0 to v0.41.0.
-  * Updated [x/term](https://golang.org/x/term)
+  * Updated [`x/term`](https://golang.org/x/term)
     from v0.39.0 to v0.40.0.
-  * Updated [x/tools](https://golang.org/x/tools)
+  * Updated [`x/tools`](https://golang.org/x/tools)
     from v0.41.0 to v0.42.0.
 
 # v1.0.36
@@ -348,7 +348,7 @@
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.25.6 to v1.25.7.
-  * Updated [miekg/dns](https://github.com/miekg/dns)
+  * Updated [`miekg/dns`](https://github.com/miekg/dns)
     from v1.1.70 to v1.1.72.
 []()
 
@@ -362,7 +362,7 @@
 
 * Dependency Updates
   * Updated
-    [klauspost/compress](https://github.com/klauspost/compress)
+    [`klauspost/compress`](https://github.com/klauspost/compress)
     from v1.18.2 to v1.18.3.
 
 # v1.0.34
@@ -375,21 +375,21 @@
 # v1.0.33
 
 * Dependency Updates
-  * Updated [x/tools](https://golang.org/x/tools)
+  * Updated [`x/tools`](https://golang.org/x/tools)
     from v0.40.0 to v0.41.0.
 
 # v1.0.32
 
 * Dependency Updates
-  * Updated [x/crypto](https://golang.org/x/crypto)
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
     from v0.46.0 to v0.47.0.
-  * Updated [x/net](https://golang.org/x/net)
+  * Updated [`x/net`](https://golang.org/x/net)
     from v0.48.0 to v0.49.0.
 
 # v1.0.31
 
 * Dependency Updates
-  * Updated [spf13/pflag](https://github.com/spf13/pflag)
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from v1.0.11-0.20251007101450-6fcfbc9910e1 to
     v1.0.11-0.20260110151513-b85eb9e15911.
 []()
@@ -402,11 +402,11 @@
 # v1.0.30
 
 * Dependency Updates
-  * Updated [miekg/dns](https://github.com/miekg/dns)
+  * Updated [`miekg/dns`](https://github.com/miekg/dns)
     from v1.1.69 to v1.1.70.
-  * Updated [x/mod](https://golang.org/x/mod)
+  * Updated [`x/mod`](https://golang.org/x/mod)
     from v0.31.0 to v0.32.0.
-  * Updated [x/term](https://golang.org/x/term)
+  * Updated [`x/term`](https://golang.org/x/term)
     from v0.38.0 to v0.39.0.
 
 # v1.0.29
@@ -417,10 +417,10 @@
 
 []()
 * Dependency Updates
-  * Updated [google/gops](https://github.com/google/gops)
+  * Updated [`google/gops`](https://github.com/google/gops)
     from v0.3.29-0.20250514124927-a2d8f7790eac to the final
     v0.3.29 release.
-  * Updated [x/sys](https://golang.org/x/sys)
+  * Updated [`x/sys`](https://golang.org/x/sys)
     from v0.39.0 to v0.40.0.
 
 # v1.0.28
@@ -488,22 +488,22 @@
 # v1.0.22
 
 * Dependency Updates
-  * Updated [miekg/dns](https://github.com/miekg/dns)
+  * Updated [`miekg/dns`](https://github.com/miekg/dns)
     from v1.1.68 to v1.1.69.
-  * Updated [uber/goleak](https://go.uber.org/goleak)
+  * Updated [`uber/goleak`](https://go.uber.org/goleak)
     from v1.3.1-0.20241121203838-4ff5fa6529ee to
     v1.3.1-0.20251210191316-2b7fd8a0d244.
 
 # v1.0.21
 
 * Dependency Updates
-  * Updated [x/tools](https://golang.org/x/tools)
+  * Updated [`x/tools`](https://golang.org/x/tools)
     from v0.39.0 to v0.40.0.
 
 # v1.0.20
 
 * Dependency Updates
-  * Updated [x/net](https://golang.org/x/net)
+  * Updated [`x/net`](https://golang.org/x/net)
     from v0.47.0 to v0.48.0.
 
 # v1.0.19
@@ -517,19 +517,19 @@
 # v1.0.18
 
 * Dependency Updates
-  * Updated [x/crypto](https://golang.org/x/crypto)
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
     from v0.45.0 to v0.46.0.
-  * Updated [x/term](https://golang.org/x/term)
+  * Updated [`x/term`](https://golang.org/x/term)
     from v0.37.0 to v0.38.0.
-  * Updated [x/mod](https://golang.org/x/mod)
+  * Updated [`x/mod`](https://golang.org/x/mod)
     from v0.30.0 to v0.31.0.
 
 # v1.0.17
 
 * Dependency Updates
-  * Updated [x/sys](https://golang.org/x/sys)
+  * Updated [`x/sys`](https://golang.org/x/sys)
     from v0.38.0 to v0.39.0.
-  * Updated [x/sync](https://golang.org/x/sync)
+  * Updated [`x/sync`](https://golang.org/x/sync)
     from v0.18.0 to v0.19.0.
 
 # v1.0.16
@@ -548,7 +548,7 @@
 
 * Dependency Updates
   * Updated
-    [klauspost/compress](https://github.com/klauspost/compress)
+    [`klauspost/compress`](https://github.com/klauspost/compress)
     from v1.18.1 to v1.18.2.
 []()
 
@@ -576,7 +576,7 @@
 # v1.0.12
 
 * Dependency Updates
-  * Updated [arl/statsviz](https://github.com/arl/statsviz)
+  * Updated [`arl/statsviz`](https://github.com/arl/statsviz)
     from v0.7.3 to v0.8.0.
 
 # v1.0.11
@@ -601,13 +601,13 @@
 # v1.0.9
 
 * Dependency Updates
-  * Updated [x/crypto](https://golang.org/x/crypto)
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
     from v0.44.0 to v0.45.0.
 
 # v1.0.8
 
 * Dependency Updates
-  * Updated [arl/statsviz](https://github.com/arl/statsviz)
+  * Updated [`arl/statsviz`](https://github.com/arl/statsviz)
     from v0.7.2 to v0.7.3.
 
 # v1.0.7
@@ -620,7 +620,7 @@
 # v1.0.6
 
 * Dependency Updates
-  * Updated [x/tools](https://golang.org/x/tools)
+  * Updated [`x/tools`](https://golang.org/x/tools)
     from v0.38.0 to v0.39.0.
 
 # v1.0.5
@@ -645,9 +645,9 @@
 # v1.0.3
 
 * Dependency Updates
-  * Updated [x/crypto](https://golang.org/x/crypto)
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
     from v0.43.0 to v0.44.0.
-  * Updated [x/net](https://golang.org/x/net)
+  * Updated [`x/net`](https://golang.org/x/net)
     from v0.46.0 to v0.47.0.
 
 # v1.0.2
@@ -658,9 +658,9 @@
 
 []()
 * Dependency Updates
-  * Updated [x/term](https://golang.org/x/term)
+  * Updated [`x/term`](https://golang.org/x/term)
     from v0.36.0 to v0.37.0.
-  * Updated [x/mod](https://golang.org/x/mod)
+  * Updated [`x/mod`](https://golang.org/x/mod)
     from v0.29.0 to v0.30.0.
 
 # v1.0.1
@@ -697,9 +697,9 @@
 # v0.1.69
 
 * Dependency Updates
-  * Updated [x/sys](https://golang.org/x/sys)
+  * Updated [`x/sys`](https://golang.org/x/sys)
     from v0.37.0 to v0.38.0.
-  * Updated [x/sync](https://golang.org/x/sync)
+  * Updated [`x/sync`](https://golang.org/x/sync)
     from v0.17.0 to v0.18.0.
 
 # v0.1.68
@@ -995,10 +995,10 @@
 []()
 * Dependency Updates
   * Updated
-    [libcap/cap](https://kernel.org/pub/linux/libs/security/libcap/cap)
+    [`libcap/cap`](https://kernel.org/pub/linux/libs/security/libcap/cap)
     from v1.2.76 to v1.2.77.
   * Updated
-    [libcap/psx](https://kernel.org/pub/linux/libs/security/libcap/psx)
+    [`libcap/psx`](https://kernel.org/pub/linux/libs/security/libcap/psx)
     from v1.2.76 to v1.2.77.
 
 # v0.1.47
@@ -1029,7 +1029,7 @@
 
 []()
 * Dependency Updates
-  * Promoted [x/sys](golang.org/x/sys) from an indirect to
+  * Promoted [`x/sys`](golang.org/x/sys) from an indirect to
     a direct dependency at version v0.37.0.
 
 # v0.1.45
@@ -1116,7 +1116,7 @@
 
 []()
 * Dependency Updates
-  * Updated [spf13/pflag](https://github.com/spf13/pflag)
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from v1.0.10 to v1.0.11-0.20251007101450-6fcfbc9910e1.
 []()
 
@@ -1149,8 +1149,8 @@
 
 []()
 * Internal Improvements
-  * Modernized conditional logic in AIX-specific signal handling by
-    utilizing the built-in `max` function.
+  * Modernized conditional logic in IBM AIX-specific signal handling
+    by utilizing the built-in `max` function.
   * Removed redundant `return` statements from multiple files to
     satisfy `gopls` checks.
 
@@ -1158,7 +1158,7 @@
 
 * Dependency Updates
   * Updated
-    [klauspost/compress](https://github.com/klauspost/compress)
+    [`klauspost/compress`](https://github.com/klauspost/compress)
     from v1.18.0 to v1.18.1.
 
 # v0.1.31
@@ -1181,21 +1181,21 @@
 # v0.1.29
 
 * Dependency Updates
-  * Updated [x/crypto](https://golang.org/x/crypto)
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
     from v0.42.0 to v0.43.0.
-  * Updated [x/term](https://golang.org/x/term)
+  * Updated [`x/term`](https://golang.org/x/term)
     from v0.35.0 to v0.36.0.
-  * Updated [x/mod](https://golang.org/x/mod)
+  * Updated [`x/mod`](https://golang.org/x/mod)
     from v0.28.0 to v0.29.0.
-  * Updated [x/net](https://golang.org/x/net)
+  * Updated [`x/net`](https://golang.org/x/net)
     from v0.45.0 to v0.46.0.
-  * Updated [x/tools](https://golang.org/x/tools)
+  * Updated [`x/tools`](https://golang.org/x/tools)
     from v0.37.0 to v0.38.0.
 
 # v0.1.28
 
 * Dependency Updates
-  * Updated [x/sys](https://golang.org/x/sys)
+  * Updated [`x/sys`](https://golang.org/x/sys)
     from v0.36.0 to v0.37.0.
 
 # v0.1.27
@@ -1209,9 +1209,9 @@
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from v1.25.1 to v1.25.2.
-  * Updated [arl/statsviz](https://github.com/arl/statsviz)
+  * Updated [`arl/statsviz`](https://github.com/arl/statsviz)
     from v0.7.1 to v0.7.2.
-  * Updated [x/net](https://golang.org/x/net)
+  * Updated [`x/net`](https://golang.org/x/net)
     from v0.44.0 to v0.45.0.
 
 # v0.1.26
