@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.2 (2026-04-17)
+# v1.1.3
+
+* TBD
+
+# v1.1.2 (2026-04-17 17:52:10)
 
 * CI/CD Updates
   * Replaced the GitLab CI/CD installation of the `libarchive-tools`
