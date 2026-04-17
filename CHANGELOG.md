@@ -22,12 +22,12 @@
 # v1.0.59
 
 * Documentation Updates
-  * Fix incorrect Emacs key remapping table PgUp/PgDn details.
+  * Fix incorrect Emacs key remapping table `PgUp`/`PgDn` details.
 []()
 
 []()
 * Build System Improvements
-  * Updated the `clean` make target in the `Makefile` to suppress
+  * Updated the `clean` `make` target in the `Makefile` to suppress
     unnecessary error output and improve the robustness of the cleanup
     process.
 
@@ -38,7 +38,7 @@
     and reducing long lines.
   * Moved Go template for dependency version checking to `GOLIST_TMPL`
     variable to improve maintainability.
-  * Added a fallback mechanism to the `clean` make target in
+  * Added a fallback mechanism to the `clean` `make` target in
     the `Makefile` to try using `-mod=readonly` if the default
     `go clean` operation fails.
 []()
@@ -85,8 +85,8 @@
     include the actual list of supported character maps for the
     `--iconv` flag.
   * Improved Awk detection in the `Makefile`.
-  * Improved the `clean` make target in the `Makefile` to remove new
-    temporary documentation build artifacts.
+  * Improved the `clean` `make` target in the `Makefile` to remove
+    new temporary documentation build artifacts.
   * Updated `.gitignore` to exclude new temporary documentation
     build files.
 []()
@@ -452,14 +452,15 @@
   * Updated scripts to resect `GOPROXY` from the user environment.
   * Updated scripts to use the `DIRECT` variable to control Go
     proxy use, and no longer prioritizing direct module downloads.
-  * Added `sstrip` an alias for `strip` make target in the `Makefile`.
-  * Fixed a bug on illumos for the `strip` make target by not stripping
-    the program using the illumos `strip` tool (due to a known bug that
-    corrupts Go binaries).
-  * Updated the `strip` make target to use the `sstrip` tool
+  * Added `sstrip` an alias for `strip` `make` target in
+    the `Makefile`.
+  * Fixed a bug on illumos for the `strip` `make` target by not
+    stripping the program using the illumos `strip` tool (due to
+    a known bug that corrupts Go binaries).
+  * Updated the `strip` `make` target to use the `sstrip` tool
     if available.
   * Updated the `Makefile` to only cleanup a `vendor` directory when
-    using the `distclean` make target, and only when the `.git`
+    using the `distclean` `make` target, and only when the `.git`
     directory exists.
   * Updated `.gitignore` to include core files and the
     `vendor` directory.
@@ -469,8 +470,9 @@
 * CI/CD Updates
   * Deactivated the Python `venv` after linting and fixed `tar`
     path exclusions.
-  * Added new `proxy.src.tar.gz` source archive (vendoring
-    all modules) to GitLab Pages deployment.
+  * Added new `proxy.src.tar.gz` source archive
+    ([vendoring](https://go.dev/ref/mod#vendoring) all modules)
+    to GitLab Pages deployment.
   * Ensured proper `GOPROXY` variable is set in the
     GitLab CI/CD environment.
 
@@ -776,7 +778,7 @@
   * Integrated the upstream Google `deadcode` linter.
   * Added automated installation of `deadcode` linter in the lint
     setup script.
-  * Added `deadcode` make target to the `Makefile` for manual
+  * Added `deadcode` `make` target to the `Makefile` for manual
     and CI usage.
 
 # v0.1.61
@@ -970,7 +972,7 @@
 
 * Build System Improvements
   * Improved the console output messages for the `scspell`
-    and `scspell-fix` make targets.
+    and `scspell-fix` `make` targets.
 
 # v0.1.49
 
