@@ -3,7 +3,13 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.3 (2026-04-18)
+# v1.1.4 (2026-04-18)
+
+* CI/CD Updates
+  * Add the actual git commit text details to offline version
+    information (rather than just "release").
+
+# v1.1.3 (2026-04-18 17:39:04)
 
 * New Features & Improvements
   * Enhanced `gops` diagnostic agent management to ensure clean
