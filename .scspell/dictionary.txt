@@ -536,6 +536,9 @@ versioning
 wrapcheck
 zopfli
 
+FILEID: a2f33500-3b42-11f1-b5ba-80ee73e9b8e7
+goleak
+
 NATURAL:
 adduser
 american

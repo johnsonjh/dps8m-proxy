@@ -3,15 +3,24 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.2 (2026-04-17)
+# v1.1.3 (2026-04-18)
+
+* New Features & Improvements
+  * Enhanced `gops` diagnostic agent management to ensure clean
+    shutdowns across all panic paths.
+  * Extended version display routines to support offline builds.
+* CI/CD Updates
+  * Added version information to the offline source code archive.
+
+# v1.1.2 (2026-04-17 17:52:10)
 
 * CI/CD Updates
   * Replaced the GitLab CI/CD installation of the `libarchive-tools`
     Alpine package with the `unzip` package.
   * Fixed a bug in the GitLab CI/CD pipeline for Android
-    cross-compilation by using the InfoZip `unzip` utility to extract
-    the Android NDK archive (instead of `bsdtar`) so file permissions
-    are properly preserved.
+    cross-compilation by using the InfoZip `unzip` utility
+    (instead of `bsdtar`) to extract the Android NDK archive
+    so file permissions are properly preserved.
 
 # v1.1.1 (2026-04-17 17:19:21)
 
@@ -242,7 +251,8 @@
 
 []()
 * CI/CD Updates
-  * Updated the Android build pipeline to use Android NDK `r30-beta1`.
+  * Updated the Android build pipeline to use Android NDK `r30-beta1`
+    (updated from `r29`).
 []()
 
 []()
@@ -488,7 +498,7 @@
     stripping the program using the illumos `strip` tool (due to
     a known bug that corrupts Go binaries).
   * Updated the `strip` `make` target to use the
-    [`sstrip`](https://github.com/BR903/ELFkickers) tool
+    [`sstrip`](https://git.sr.ht/~breadbox/ELFkickers) tool
     if available.
   * Updated the `Makefile` to only cleanup a `vendor` directory when
     using the `distclean` `make` target, and only when the `.git`
@@ -503,7 +513,7 @@
     path exclusions.
   * Added new `proxy.src.tar.gz` source archive
     ([vendoring](https://go.dev/ref/mod#vendoring) all modules)
-    to GitLab Pages deployment.
+    to [GitLab Pages deployment](https://dps8m.gitlab.io/proxy/).
   * Ensured proper `GOPROXY` variable is set in the
     GitLab CI/CD environment.
 
@@ -919,7 +929,8 @@
 
 * CI/CD Updates
   * Rebuilt the proxy binary during the deployment process to ensure
-    correct version information on the download web page.
+    correct version information on
+    the [download web page](https://dps8m.gitlab.io/proxy/).
   * Removed redundant debugging code from the pipeline configuration.
 
 # v0.1.54 (2025-10-31 00:14:28)

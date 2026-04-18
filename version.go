@@ -14,6 +14,7 @@ package main
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 import (
+	_ "embed"
 	"fmt"
 	"log"
 	"regexp"
@@ -23,6 +24,11 @@ import (
 	"time"
 	"unicode/utf8"
 )
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+//go:embed .version
+var versionText string
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -135,17 +141,18 @@ func printVersionTable() {
 
 	info, ok := debug.ReadBuildInfo()
 	if ok {
-		orig := info.Main.Version
-		v := trimVersion(orig, info.Main.Sum)
+		v := getMainModuleVersion()
 
-		if strings.Contains(orig, "+dirty") {
-			v += "*"
+		if strings.TrimSpace(versionText) != "" {
+			if i := strings.Index(v, " ("); i != -1 {
+				v = v[:i]
+			}
 		}
 
 		rows = append(rows,
 			row{
 				Name:    sanitizeName(info.Main.Path),
-				Version: sanitizeVersion(v),
+				Version: v,
 			},
 		)
 
@@ -314,13 +321,18 @@ func formatCompilerVersion(ver string) string {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func getMainModuleVersion() string {
+	v := strings.TrimSpace(versionText)
+	if v != "" {
+		return sanitizeVersion(v)
+	}
+
 	info, ok := debug.ReadBuildInfo()
 	if !ok {
 		return ""
 	}
 
 	orig := info.Main.Version
-	v := trimVersion(orig, info.Main.Sum)
+	v = trimVersion(orig, info.Main.Sum)
 
 	if strings.Contains(orig, "+dirty") {
 		v += "*"

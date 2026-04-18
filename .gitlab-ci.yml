@@ -59,9 +59,11 @@ pages:
     - mv -f proxy.android.amd64 public || true
     - mv -f /tmp/proxy .
     - go mod vendor
+    - go version -m proxy | awk "/$(printf '\t')mod$(printf '\t')/ { printf \$3; print \"$(date +' (%Y-%b-%d release)')\" }" > .version
     - tar --exclude=.git --exclude=public --exclude=cross.bin --exclude=proxy --exclude=tags --exclude=GTAGS --exclude=GRTAGS --exclude=GPATH --exclude=.venv -cf ./public/proxy.src.tar -C . . --transform='s,^\./,./proxy/,'
     - pigz -9 -f -m -v ./public/proxy.src.tar
     - rm -rf ./vendor
+    - printf '%s' "" > .version
     - cd public
     - for i in proxy.windows.*; do [ -f "${i:?}" ] || continue; mv -f -- "${i:?}" "${i:?}.exe"; done
     - for f in proxy.windows.*.exe; do [ -f "${f:?}" ] || continue; base="${f%.exe}"; zipname="$(printf '%s\n' "${base:?}" | awk -F. '{ for (i = 1; i < NF; i++) printf "%s-", $i; print $NF ".zip" }')"; (go version -m "${f:?}" || printf '%s\n' ".") | zip -z9 "${zipname:?}" "${f:?}"; done && rm -f *.exe

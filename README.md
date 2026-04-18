@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.1.2 (2026-Apr-17 g12f2988) [linux/amd64]
+DPS8M Proxy v1.1.3 (2026-Apr-18 gd0cdc71) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,12 +326,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.1.2 (2026-Apr-17 g12f2988) [linux/amd64]
+DPS8M Proxy v1.1.3 (2026-Apr-18 gd0cdc71) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.1.2                           |
+| dps8m/proxy               | v1.1.3                           |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -601,14 +601,14 @@ predecessor (code statistics 📈 provided by
 </tr></thead>
 <tbody><tr>
 <th>Go</th>
-<th>20</th>
-<th>9474</th>
-<th>2040</th>
-<th>590</th>
-<th>6844</th>
-<th>1679</th>
-<th>227742</th>
-<th>4148</th>
+<th>21</th>
+<th>9570</th>
+<th>2062</th>
+<th>612</th>
+<th>6896</th>
+<th>1692</th>
+<th>230128</th>
+<th>4172</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -622,13 +622,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>596</th>
+<th>597</th>
 <th>87</th>
 <th>94</th>
-<th>415</th>
+<th>416</th>
 <th>182</th>
-<th>21014</th>
-<th>357</th>
+<th>21041</th>
+<th>358</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
@@ -652,24 +652,24 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>YAML</th>
 <th>1</th>
-<th>84</th>
+<th>86</th>
 <th>6</th>
 <th>10</th>
-<th>68</th>
+<th>70</th>
 <th>0</th>
-<th>4071</th>
-<th>75</th>
+<th>4239</th>
+<th>77</th>
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
-<th>28</th>
-<th>11440</th>
-<th>2394</th>
-<th>914</th>
-<th>8132</th>
-<th>1895</th>
-<th>303279</th>
-<th>5404</th>
+<th>29</th>
+<th>11539</th>
+<th>2416</th>
+<th>936</th>
+<th>8187</th>
+<th>1908</th>
+<th>305860</th>
+<th>5431</th>
 </tr></tfoot></table>
 
 
