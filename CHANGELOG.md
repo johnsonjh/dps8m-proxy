@@ -13,9 +13,9 @@
   * Replaced the GitLab CI/CD installation of the `libarchive-tools`
     Alpine package with the `unzip` package.
   * Fixed a bug in the GitLab CI/CD pipeline for Android
-    cross-compilation by using the InfoZip `unzip` utility to extract
-    the Android NDK archive (instead of `bsdtar`) so file permissions
-    are properly preserved.
+    cross-compilation by using the InfoZip `unzip` utility
+    (instead of `bsdtar`) to extract the Android NDK archive
+    so file permissions are properly preserved.
 
 # v1.1.1 (2026-04-17 17:19:21)
 
