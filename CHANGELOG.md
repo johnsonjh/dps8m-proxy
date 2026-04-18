@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.5 (2025-04-18)
+# v1.1.6
+        
+* TBD   
+
+# v1.1.5 (2026-04-18 18:05:00)
 
 * CI/CD Updates
   * Fix a bug generating the git commit details for offline version
