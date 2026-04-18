@@ -67,7 +67,6 @@ distclean: clean
 	$(RM) ./tags ./GPATH ./GRTAGS ./GTAGS
 	$(RM) -r ./log/
 	test -d ./.git && $(RM) -r ./vendor/ || :
-	printf '%s' "" > .version
 
 ##############################################################################
 # Target: tidy
