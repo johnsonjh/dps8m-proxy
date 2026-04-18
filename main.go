@@ -951,6 +951,10 @@ func init() { //nolint:gochecknoinits
 func pflag_mustLookup(name string) *pflag.Flag { //nolint:revive
 	f := pflag.Lookup(name)
 	if f == nil {
+		if enableGops {
+			gopsClose()
+		}
+
 		panic("internal error: flag " + name + " not defined")
 	}
 
@@ -5802,6 +5806,10 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 		if strings.HasPrefix(f.Name(), prefix) {
 			parts := strings.SplitN(f.Name()[len(prefix):], ".", 2)
 			if parts == nil {
+				if enableGops {
+					gopsClose()
+				}
+
 				panic("internal error: SplitN returned nil (impossible)")
 			}
 
