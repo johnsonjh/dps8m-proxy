@@ -10,18 +10,19 @@
 # v1.1.6 (2026-04-18 18:17:13)
         
 * New Features & Improvements
-  * Don't clear the `.version` file in `distclean` `make` target.
+  * Fixed a bug in offline builds by not clearing the `.version` file
+    in `distclean` `make` target.
 
 # v1.1.5 (2026-04-18 18:05:00)
 
 * CI/CD Updates
-  * Fix a bug generating the git commit details for offline version
+  * Fixed a bug generating the git commit details for offline version
     information introduced in the last release.
 
 # v1.1.4 (2026-04-18 17:50:34)
 
 * CI/CD Updates
-  * Add the actual git commit text details to the offline version
+  * Added the actual git commit text details to the offline version
     information (rather than just "release").
 
 # v1.1.3 (2026-04-18 17:39:04)
