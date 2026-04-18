@@ -16,7 +16,7 @@
 
 * CI/CD Updates
   * Fix a bug generating the git commit details for offline version
-    information introduced in the last version.
+    information introduced in the last release.
 
 # v1.1.4 (2026-04-18 17:50:34)
 
