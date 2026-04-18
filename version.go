@@ -141,10 +141,18 @@ func printVersionTable() {
 
 	info, ok := debug.ReadBuildInfo()
 	if ok {
+		v := getMainModuleVersion()
+
+		if strings.TrimSpace(versionText) != "" {
+			if i := strings.Index(v, " ("); i != -1 {
+				v = v[:i]
+			}
+		}
+
 		rows = append(rows,
 			row{
 				Name:    sanitizeName(info.Main.Path),
-				Version: getMainModuleVersion(),
+				Version: v,
 			},
 		)
 
