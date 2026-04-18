@@ -8,6 +8,9 @@
 * New Features & Improvements
   * Enhanced `gops` diagnostic agent management to ensure clean
     shutdowns across all panic paths.
+  * Extended version display routines to support offline builds.
+* CI/CD Updates
+  * Added version information to the offline source code archive.
 
 # v1.1.2 (2026-04-17 17:52:10)
 
