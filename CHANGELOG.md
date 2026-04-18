@@ -3,9 +3,10 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.6
+# v1.1.6 (2025-04-18)
         
-* TBD   
+* New Features & Improvements
+  * Don't clear the `.version` file in `distclean` `make` target.
 
 # v1.1.5 (2026-04-18 18:05:00)
 
