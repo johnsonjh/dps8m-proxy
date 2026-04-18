@@ -492,7 +492,7 @@
     stripping the program using the illumos `strip` tool (due to
     a known bug that corrupts Go binaries).
   * Updated the `strip` `make` target to use the
-    [`sstrip`](https://github.com/BR903/ELFkickers) tool
+    [`sstrip`](https://git.sr.ht/~breadbox/ELFkickers) tool
     if available.
   * Updated the `Makefile` to only cleanup a `vendor` directory when
     using the `distclean` `make` target, and only when the `.git`
