@@ -59,7 +59,7 @@ pages:
     - mv -f proxy.android.amd64 public || true
     - mv -f /tmp/proxy .
     - go mod vendor
-    - go version -m proxy | awk "/$(printf '\t')mod$(printf '\t')/ { printf \$3; print \"$(date +" (%Y-%b-%d $(git describe --abbrev=7 --dirty='' | sed 's/.*-//'))")\" }" > .version
+    - go version -m proxy | awk "/$(printf '\t')mod$(printf '\t')/ { printf \$3; print \"$(date +" (%Y-%b-%d $(git describe --always --abbrev=7 --dirty='' --tags --long | sed 's/.*-//'))")\" }" > .version
     - tar --exclude=.git --exclude=public --exclude=cross.bin --exclude=proxy --exclude=tags --exclude=GTAGS --exclude=GRTAGS --exclude=GPATH --exclude=.venv -cf ./public/proxy.src.tar -C . . --transform='s,^\./,./proxy/,'
     - pigz -9 -f -m -v ./public/proxy.src.tar
     - rm -rf ./vendor
