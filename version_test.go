@@ -36,10 +36,8 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		versionText = originalVersionText
 	}()
 
-	t.Run("Priority of versionText",
+	t.Run("Priority of versionText", //nolint:paralleltest,nolintlint
 		func(t *testing.T) {
-			t.Parallel()
-
 			versionText = "v9.9.9\n"
 			got := getMainModuleVersion()
 
@@ -51,10 +49,8 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		},
 	)
 
-	t.Run("Fallback to BuildInfo",
+	t.Run("Fallback to BuildInfo", //nolint:paralleltest,nolintlint
 		func(t *testing.T) {
-			t.Parallel()
-
 			versionText = ""
 			got := getMainModuleVersion()
 

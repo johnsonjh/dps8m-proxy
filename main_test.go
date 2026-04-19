@@ -233,11 +233,9 @@ func TestFindCharmap(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 		{"invalid", "NoSuchCharmap", ""},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range tests { //nolint:paralleltest,nolintlint
 		t.Run(tt.name,
 			func(t *testing.T) {
-				t.Parallel()
-
 				cm := findCharmap(tt.input)
 				if tt.expected == "" {
 					if cm != nil {
@@ -264,12 +262,12 @@ func TestFindCharmap(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func TestNaturalLess(t *testing.T) {
-	t.Parallel()
-
+func TestNaturalLess(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 	if enableGops {
 		gopsClose()
 	}
+
+	defer goleak.VerifyNone(t)
 
 	tests := []struct {
 		s1       string
@@ -294,12 +292,10 @@ func TestNaturalLess(t *testing.T) {
 		{"ISO-8859-6E", "ISO 8859-16", true}, //nolint:goconst,nolintlint
 	}
 
-	for _, tt := range tests {
+	for _, tt := range tests { //nolint:paralleltest,nolintlint
 		t.Run(fmt.Sprintf("%s_%s",
 			tt.s1, tt.s2),
 			func(t *testing.T) {
-				t.Parallel()
-
 				got := naturalLess(tt.s1, tt.s2)
 				if got != tt.expected {
 					t.Errorf("naturalLess(%q, %q) = %v, want %v",
@@ -312,12 +308,12 @@ func TestNaturalLess(t *testing.T) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func TestNaturalSort(t *testing.T) {
+func TestNaturalSort(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 	if enableGops {
 		gopsClose()
 	}
 
-	t.Parallel()
+	defer goleak.VerifyNone(t)
 
 	input := []string{
 		"ISO 8859-1",
@@ -375,7 +371,6 @@ func TestNaturalSort(t *testing.T) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
 // Local Variables:
 // mode: go
 // tab-width: 4
