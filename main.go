@@ -6229,7 +6229,10 @@ func compressLogFile(logFilePath string) {
 		}
 
 		writer, err = lzip.NewWriterOptions(
-			compressedFile, &lzip.WriterOptions{DictSize: lzipDictSize})
+			compressedFile, &lzip.WriterOptions{
+				DictSize: lzipDictSize,
+			},
+		)
 		if err != nil {
 			log.Printf("%sError creating lzip writer for %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
@@ -6368,9 +6371,19 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 		ip := net.ParseIP(line)
 		if ip != nil {
 			if ip.To4() != nil {
-				networks = append(networks, &net.IPNet{IP: ip, Mask: net.CIDRMask(32, 32)})
+				networks = append(
+					networks, &net.IPNet{
+						IP:   ip,
+						Mask: net.CIDRMask(32, 32),
+					},
+				)
 			} else {
-				networks = append(networks, &net.IPNet{IP: ip, Mask: net.CIDRMask(128, 128)})
+				networks = append(
+					networks, &net.IPNet{
+						IP:   ip,
+						Mask: net.CIDRMask(128, 128),
+					},
+				)
 			}
 
 			continue

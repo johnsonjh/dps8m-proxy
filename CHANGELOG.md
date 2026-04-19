@@ -5,8 +5,8 @@
 
 # v1.1.7
 
-* Testing Improvements
-  * Normalized code style across all tests.
+* Code Quality & Maintenance
+  * Normalized code style to be more consistent across the codebase.
 
 # v1.1.6 (2026-04-18 18:17:13)
         
