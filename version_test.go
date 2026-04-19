@@ -24,6 +24,10 @@ import (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
+	if enableGops {
+		gopsClose()
+	}
+
 	defer goleak.VerifyNone(t)
 
 	originalVersionText := versionText
@@ -32,38 +36,44 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		versionText = originalVersionText
 	}()
 
-	t.Run("Priority of versionText", func(t *testing.T) {
-		t.Parallel()
+	t.Run("Priority of versionText",
+		func(t *testing.T) {
+			t.Parallel()
 
-		versionText = "v9.9.9\n"
-		got := getMainModuleVersion()
+			versionText = "v9.9.9\n"
+			got := getMainModuleVersion()
 
-		want := "v9.9.9"
-		if got != want {
-			t.Errorf("getMainModuleVersion() = %q, want %q", got, want)
-		}
-	})
+			want := "v9.9.9"
+			if got != want {
+				t.Errorf("getMainModuleVersion() = %q, want %q",
+					got, want)
+			}
+		},
+	)
 
-	t.Run("Fallback to BuildInfo", func(t *testing.T) {
-		t.Parallel()
+	t.Run("Fallback to BuildInfo",
+		func(t *testing.T) {
+			t.Parallel()
 
-		versionText = ""
-		got := getMainModuleVersion()
+			versionText = ""
+			got := getMainModuleVersion()
 
-		info, ok := debug.ReadBuildInfo()
-		if !ok {
-			t.Skip("Build info not available")
-		}
+			info, ok := debug.ReadBuildInfo()
+			if !ok {
+				t.Skip("Build info not available")
+			}
 
-		want := sanitizeVersion(trimVersion(info.Main.Version, info.Main.Sum))
-		if strings.Contains(info.Main.Version, "+dirty") {
-			want += "*"
-		}
+			want := sanitizeVersion(trimVersion(info.Main.Version, info.Main.Sum))
+			if strings.Contains(info.Main.Version, "+dirty") {
+				want += "*"
+			}
 
-		if got != want {
-			t.Errorf("getMainModuleVersion() = %q, want %q", got, want)
-		}
-	})
+			if got != want {
+				t.Errorf("getMainModuleVersion() = %q, want %q",
+					got, want)
+			}
+		},
+	)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

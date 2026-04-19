@@ -267,6 +267,10 @@ func TestFindCharmap(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 func TestNaturalLess(t *testing.T) {
 	t.Parallel()
 
+	if enableGops {
+		gopsClose()
+	}
+
 	tests := []struct {
 		s1       string
 		s2       string
@@ -309,6 +313,10 @@ func TestNaturalLess(t *testing.T) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func TestNaturalSort(t *testing.T) {
+	if enableGops {
+		gopsClose()
+	}
+
 	t.Parallel()
 
 	input := []string{
