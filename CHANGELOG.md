@@ -7,6 +7,12 @@
 
 * Code Quality & Maintenance
   * Normalized code style to be more consistent across the codebase.
+[]()
+
+[]()
+* Build System Improvements
+  * Simplified shell commands in the cross-compilation shell scripts
+    by replacing `true` with the colon shell builtin.
 
 # v1.1.6 (2026-04-18 18:17:13)
         
