@@ -13,6 +13,8 @@
 * Build System Improvements
   * Simplified shell commands in the cross-compilation shell scripts
     by replacing `true` with the colon shell builtin.
+  * Implemented a workaround for an Apple Xcode-specific `make v3.81`
+    bug affecting the `lint` `make` target.
 
 # v1.1.6 (2026-04-18 18:17:13)
         
@@ -741,8 +743,8 @@
   * Added Emacs local variables configuration block to the `Makefile`.
   * Appeased linters for Microsoft Windows-specific code paths and
     improved the `trap_windows.go` error handling logic.
-  * Implemented a workaround for an Apple Xcode-specific `make` bug
-    affecting the `nilaway` and `revive` commands.
+  * Implemented a workaround for an Apple Xcode-specific `make v3.81`
+    bug affecting the `nilaway` and `revive` `make` targets.
   * Appeased `gofumpt` by adjusting variable declaration
     in `trap_darwin.go`.
 []()

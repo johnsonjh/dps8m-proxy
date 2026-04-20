@@ -288,7 +288,9 @@ gopls:
 		$(RM) -r "${HOME:-/home}/.cache/goimports" > /dev/null 2>&1 || :; \
 		set -x; env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
-		'GOSUMDB=sum.golang.org' || :) gopls check -severity=hint ./*.go
+		'GOSUMDB=sum.golang.org' || :) \
+		gopls check -severity=hint \
+			./*.go
 
 ##############################################################################
 # Target: gofumpt
