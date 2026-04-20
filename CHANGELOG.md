@@ -5,8 +5,15 @@
 
 # v1.1.7
 
+* New Features & Improvements
+  * Hopefully fixed a bug causing timeout logic rarely not drop
+    some long-running connections.
+[]()
+
+[]()
 * Code Quality & Maintenance
   * Normalized code style to be more consistent across the codebase.
+  * Added additional defensive checking for `nil` channels.
 []()
 
 []()
