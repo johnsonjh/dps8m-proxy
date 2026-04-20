@@ -1573,26 +1573,28 @@ func main() {
 						idleTime > time.Duration(effIdleMax)*time.Second { //nolint:gosec,nolintlint
 						idleKillsTotal.Add(1)
 
-						connUptime := time.Since(conn.startTime)
 						log.Printf("%sIDLEKILL [%s] %s@%s (idle %s, link %s)",
 							yellowDotPrefix(), id, conn.userName,
 							conn.hostName, idleTime.Round(time.Second),
 							connUptime.Round(time.Second))
 
-						_, err := conn.channel.Write(fmt.Appendf(nil,
-							"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
-							connUptime.Round(time.Second)))
-						if err != nil {
-							log.Printf(
-								"%sError writing idle timeout message to channel for %s: %v",
-								warnPrefix(), id, err)
+						if conn.channel != nil {
+							_, err := conn.channel.Write(fmt.Appendf(nil,
+								"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
+								connUptime.Round(time.Second)))
+							if err != nil {
+								log.Printf(
+									"%sError writing idle timeout message "+
+										"to channel for %s: %v",
+									warnPrefix(), id, err)
+							}
 						}
 
 						if conn.sshConn == nil {
 							log.Printf("%sError: sshConn is nil for connection %s",
 								warnPrefix(), id)
 						} else {
-							err = conn.sshConn.Close()
+							err := conn.sshConn.Close()
 							if err != nil {
 								log.Printf("%sError closing SSH connection for %s: %v",
 									warnPrefix(), id, err)
@@ -1605,25 +1607,27 @@ func main() {
 							effTimeMax)*time.Second {
 						timeKillsTotal.Add(1)
 
-						connUptime := time.Since(conn.startTime)
 						log.Printf("%sTIMEKILL [%s] %s@%s (link time %s)",
 							yellowDotPrefix(), id, conn.userName,
 							conn.hostName, connUptime.Round(time.Second))
 
-						_, err := conn.channel.Write(fmt.Appendf(nil,
-							"\r\n\r\nCONNECTION TIMEOUT (link time %s)\r\n\r\n",
-							connUptime.Round(time.Second)))
-						if err != nil {
-							log.Printf(
-								"%sError writing connection timeout message to channel for %s: %v",
-								warnPrefix(), id, err)
+						if conn.channel != nil {
+							_, err := conn.channel.Write(fmt.Appendf(nil,
+								"\r\n\r\nCONNECTION TIMEOUT (link time %s)\r\n\r\n",
+								connUptime.Round(time.Second)))
+							if err != nil {
+								log.Printf(
+									"%sError writing connection timeout message "+
+										"to channel for %s: %v",
+									warnPrefix(), id, err)
+							}
 						}
 
 						if conn.sshConn == nil {
 							log.Printf("%sError: sshConn is nil for connection %s",
 								warnPrefix(), id)
 						} else {
-							err = conn.sshConn.Close()
+							err := conn.sshConn.Close()
 							if err != nil {
 								log.Printf("%sError closing SSH connection for %s: %v",
 									warnPrefix(), id, err)
@@ -3525,6 +3529,9 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	conn.targetHost = defaultHost
 	conn.targetPort = defaultPort
 
+	_, isAltHost := altHosts[conn.userName]
+	conn.isDefaultTarget = !isAltHost
+
 	connectionsMutex.Lock()
 
 	found := false
@@ -4321,25 +4328,18 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 	var targetDest string
 
-	var isAltHost bool
-
-	altHostPort, ok := altHosts[conn.userName]
-	if ok {
-		targetDest = altHostPort
-		isAltHost = true
-	} else {
+	if conn.isDefaultTarget {
 		targetDest = telnetHostPort
-		isAltHost = false
+	} else {
+		targetDest = altHosts[conn.userName]
 	}
-
-	conn.isDefaultTarget = !isAltHost
 
 	targetHost, targetPort, err := parseHostPort(targetDest)
 	if err != nil {
 		var errMsg string
 
 		sanitizedErrStr := sanitizeNonASCII(err.Error())
-		if isAltHost {
+		if !conn.isDefaultTarget {
 			errMsg = fmt.Sprintf("Error parsing alt-host for user %s: %v",
 				conn.userName, sanitizedErrStr)
 		} else {
@@ -4365,7 +4365,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		return
 	}
 
-	if isAltHost {
+	if !conn.isDefaultTarget {
 		altHostRoutesTotal.Add(1)
 
 		log.Printf("%sALTROUTE [%s] %s -> %s",
