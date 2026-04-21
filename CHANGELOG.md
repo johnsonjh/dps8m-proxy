@@ -6,7 +6,7 @@
 # v1.1.7
 
 * New Features & Improvements
-  * Hopefully fixed a bug causing timeout logic rarely not drop
+  * Hopefully fixed a bug causing timeout logic to rarely not drop
     some long-running connections.
 []()
 
