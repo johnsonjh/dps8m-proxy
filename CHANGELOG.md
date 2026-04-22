@@ -18,9 +18,9 @@
 
 []()
 * Documentation Updates
-  * Make it clear that the string argument accepted for the
-    `--telnet-host` and `--alt-host` options can be a path to a socket
-    file as well as a host:port combo.
+  * Made it clearer that the `string` argument accepted by the
+    `--telnet-host` and `--alt-host` options can be a path to
+    a socket file as well as a host:port combo.
 []()
 
 []()
