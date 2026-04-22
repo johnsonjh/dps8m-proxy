@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.1.7 (2026-Apr-21 g87bc4b1) [linux/amd64]
+DPS8M Proxy v1.1.7 (2026-Apr-22 g04a99f1) [linux/amd64]
 
 Usage for proxy:
 
@@ -146,10 +146,10 @@ Usage for proxy:
                                     ["0.0" to "30.0" seconds] (no default)
   --no-banner                   Disable the user SSH connection banner
   --no-menu                     Disable the user SSH 'Control-]' menu
-  --telnet-host <string>        Default TELNET target [host:port]
-                                    (default "127.0.0.1:6180")
-  --alt-host <string>           Alternate TELNET target(s) [sshuser@host:port]
-                                    (multiple allowed)
+  --telnet-host <string>        Default TELNET target [host:port
+                                   or socket path] (default "127.0.0.1:6180")
+  --alt-host <string>           Alternate TELNET target(s) [sshuser@host:port
+                                    or socket path] (multiple allowed)
   --iconv <string>              Character map conversion of text to UTF-8
                                     [e.g., "IBM Code Page 437"] (no default)
   --debug-telnet                Debug TELNET option negotiation
@@ -326,7 +326,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.1.7 (2026-Apr-21 g87bc4b1) [linux/amd64]
+DPS8M Proxy v1.1.7 (2026-Apr-22 g04a99f1) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -607,8 +607,8 @@ predecessor (code statistics 📈 provided by
 <th>612</th>
 <th>6921</th>
 <th>1699</th>
-<th>230554</th>
-<th>4174</th>
+<th>230583</th>
+<th>4176</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -668,8 +668,8 @@ predecessor (code statistics 📈 provided by
 <th>936</th>
 <th>8213</th>
 <th>1915</th>
-<th>306331</th>
-<th>5433</th>
+<th>306360</th>
+<th>5435</th>
 </tr></tfoot></table>
 
 
