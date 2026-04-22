@@ -17,6 +17,13 @@
 []()
 
 []()
+* Documentation Updates
+  * Make it clear that the string argument accepted for the
+    `--telnet-host` and `--alt-host` options can be a path to a socket
+    file as well as a host:port combo.
+[]()
+
+[]()
 * Build System Improvements
   * Simplified shell commands in the cross-compilation shell scripts
     by replacing `true` with the colon shell builtin.
