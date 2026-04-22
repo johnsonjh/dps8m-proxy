@@ -751,13 +751,13 @@ func init() { //nolint:gochecknoinits
 
 	pflag.StringVar(&telnetHostPort,
 		"telnet-host", "127.0.0.1:6180",
-		"Default TELNET target [host:port]\r\n"+
-			"   ")
+		"Default TELNET target [host:port\r\n"+
+			"   or socket path]")
 
 	pflag.Var(&altHostFlag{},
 		"alt-host",
-		"Alternate TELNET target(s) [sshuser@host:port]\r\n"+
-			"    (multiple allowed)")
+		"Alternate TELNET target(s) [sshuser@host:port\r\n"+
+			"    or socket path] (multiple allowed)")
 
 	pflag.StringVar(&iconv,
 		"iconv", "",
