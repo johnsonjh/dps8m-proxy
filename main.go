@@ -757,7 +757,7 @@ func init() { //nolint:gochecknoinits
 	pflag.Var(&altHostFlag{},
 		"alt-host",
 		"Alternate TELNET target(s) [sshuser@host:port\r\n"+
-			"    or socket path] (multiple allowed)")
+			"    or \"sshuser@/path\"] (multiple allowed)")
 
 	pflag.StringVar(&iconv,
 		"iconv", "",
