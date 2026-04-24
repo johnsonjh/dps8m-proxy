@@ -23,6 +23,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -37,6 +38,7 @@ const dbEnabled = true
 
 var (
 	db                  *bbolt.DB
+	dbMutex             sync.RWMutex
 	dbPath              string
 	dbTime              uint64
 	persistedStartTime  time.Time
@@ -340,6 +342,14 @@ func initDB() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func writeCountersToDB() {
+	dbMutex.RLock()
+
+	defer dbMutex.RUnlock()
+
+	writeCountersToDBLocked()
+}
+
+func writeCountersToDBLocked() {
 	if db == nil {
 		return
 	}
@@ -491,8 +501,12 @@ func loadCountersFromDB() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func closeDB() {
+	dbMutex.Lock()
+
+	defer dbMutex.Unlock()
+
 	if db != nil {
-		writeCountersToDB()
+		writeCountersToDBLocked()
 
 		err := db.Update(
 			func(tx *bbolt.Tx) error {
@@ -511,6 +525,9 @@ func closeDB() {
 		}
 
 		err = db.Close()
+
+		db = nil
+
 		if err != nil {
 			log.Printf("%sERROR: Failed to close statistics database: %v",
 				errorPrefix(), err)

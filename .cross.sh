@@ -26,7 +26,7 @@ CGO_ENABLED=0
 GOTOOLCHAIN="$(grep '^go .*$' go.mod | tr -cd 'go0-9.\n')+auto"
 # shellcheck disable=SC2015
 "${GO:?}" env 2>&1 | grep -q "GOSUMDB=.*off.*" \
-  && GOSUMDB='sum.golang.org' || true
+  && GOSUMDB='sum.golang.org' || :
 
 export GO CGO_ENABLED GOTOOLCHAIN GOSUMDB
 

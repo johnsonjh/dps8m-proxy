@@ -24,6 +24,10 @@ import (
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
+	if enableGops {
+		gopsClose()
+	}
+
 	defer goleak.VerifyNone(t)
 
 	originalVersionText := versionText
@@ -32,38 +36,40 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		versionText = originalVersionText
 	}()
 
-	t.Run("Priority of versionText", func(t *testing.T) {
-		t.Parallel()
+	t.Run("Priority of versionText", //nolint:paralleltest,nolintlint
+		func(t *testing.T) {
+			versionText = "v9.9.9\n"
+			got := getMainModuleVersion()
 
-		versionText = "v9.9.9\n"
-		got := getMainModuleVersion()
+			want := "v9.9.9"
+			if got != want {
+				t.Errorf("getMainModuleVersion() = %q, want %q",
+					got, want)
+			}
+		},
+	)
 
-		want := "v9.9.9"
-		if got != want {
-			t.Errorf("getMainModuleVersion() = %q, want %q", got, want)
-		}
-	})
+	t.Run("Fallback to BuildInfo", //nolint:paralleltest,nolintlint
+		func(t *testing.T) {
+			versionText = ""
+			got := getMainModuleVersion()
 
-	t.Run("Fallback to BuildInfo", func(t *testing.T) {
-		t.Parallel()
+			info, ok := debug.ReadBuildInfo()
+			if !ok {
+				t.Skip("Build info not available")
+			}
 
-		versionText = ""
-		got := getMainModuleVersion()
+			want := sanitizeVersion(trimVersion(info.Main.Version, info.Main.Sum))
+			if strings.Contains(info.Main.Version, "+dirty") {
+				want += "*"
+			}
 
-		info, ok := debug.ReadBuildInfo()
-		if !ok {
-			t.Skip("Build info not available")
-		}
-
-		want := sanitizeVersion(trimVersion(info.Main.Version, info.Main.Sum))
-		if strings.Contains(info.Main.Version, "+dirty") {
-			want += "*"
-		}
-
-		if got != want {
-			t.Errorf("getMainModuleVersion() = %q, want %q", got, want)
-		}
-	})
+			if got != want {
+				t.Errorf("getMainModuleVersion() = %q, want %q",
+					got, want)
+			}
+		},
+	)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

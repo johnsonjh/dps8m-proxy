@@ -3,21 +3,61 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.6 (2025-04-18)
+# v1.1.7
+
+* New Features & Improvements
+  * Fixed TELNET NAWS updates and SSH user session deadlock, making
+    updates fully asynchronous.
+  * Hopefully fixed a bug causing timeout logic to rarely not drop
+    some long-running connections.
+  * Improved reliability of TELNET negotiations with a more robust
+    parser and improved timeout logic.
+  * Fixed a hang during proxy shutdown by implementing non-blocking
+    channel termination.
+  * Added check to guarantee the database is closed only after all
+    background routines have stopped.
+[]()
+
+[]()
+* Code Quality & Maintenance
+  * Normalized code style to be more consistent across the codebase.
+  * Added additional defensive checking for `nil` channels.
+  * Improved log file handling to prevent hangs if a log file failed
+    to open.
+  * Improved robustness by adding proactive `nil` safety checks
+    to `sendNaws` and `handleSession`.
+[]()
+
+[]()
+* Documentation Updates
+  * Made it clearer that the `string` argument accepted by the
+    `--telnet-host` and `--alt-host` options can be a path to
+    a socket file as well as a host:port combo.
+[]()
+
+[]()
+* Build System Improvements
+  * Simplified shell commands in the cross-compilation shell scripts
+    by replacing `true` with the colon shell builtin.
+  * Implemented a workaround for an Apple Xcode-specific `make v3.81`
+    bug affecting the `lint` `make` target.
+
+# v1.1.6 (2026-04-18 18:17:13)
         
 * New Features & Improvements
-  * Don't clear the `.version` file in `distclean` `make` target.
+  * Fixed a bug in offline builds by not clearing the `.version` file
+    in `distclean` `make` target.
 
 # v1.1.5 (2026-04-18 18:05:00)
 
 * CI/CD Updates
-  * Fix a bug generating the git commit details for offline version
-    information introduced in the last version.
+  * Fixed a bug generating the git commit details for offline version
+    information introduced in the last release.
 
 # v1.1.4 (2026-04-18 17:50:34)
 
 * CI/CD Updates
-  * Add the actual git commit text details to the offline version
+  * Added the actual git commit text details to the offline version
     information (rather than just "release").
 
 # v1.1.3 (2026-04-18 17:39:04)
@@ -729,8 +769,8 @@
   * Added Emacs local variables configuration block to the `Makefile`.
   * Appeased linters for Microsoft Windows-specific code paths and
     improved the `trap_windows.go` error handling logic.
-  * Implemented a workaround for an Apple Xcode-specific `make` bug
-    affecting the `nilaway` and `revive` commands.
+  * Implemented a workaround for an Apple Xcode-specific `make v3.81`
+    bug affecting the `nilaway` and `revive` `make` targets.
   * Appeased `gofumpt` by adjusting variable declaration
     in `trap_darwin.go`.
 []()
