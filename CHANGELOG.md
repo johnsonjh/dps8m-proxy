@@ -3,7 +3,9 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.7 (2026-04-24)
+# v1.1.8
+
+# v1.1.7 (2026-04-24 21:58:10)
 
 * New Features & Improvements
   * Fixed TELNET NAWS updates and SSH user session deadlock, making
