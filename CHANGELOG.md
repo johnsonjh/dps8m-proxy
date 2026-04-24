@@ -23,11 +23,11 @@
 []()
 * Code Quality & Maintenance
   * Normalized code style to be more consistent across the codebase.
-  * Added additional defensive checking for `nil` channels.
   * Improved log file handling to prevent hangs if a log file failed
     to open.
   * Improved robustness by adding proactive `nil` safety checks
     to `sendNaws` and `handleSession`.
+  * Added additional defensive checking for `nil` channels.
 []()
 
 []()
