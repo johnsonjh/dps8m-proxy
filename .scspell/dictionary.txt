@@ -508,6 +508,7 @@ loglevel
 maxcomlen
 miekg
 mipssf
+naws
 nilaway
 nodwarf
 noinlineerr

@@ -426,20 +426,21 @@ func decodeTelnetData(decoder *encoding.Decoder, fwd []byte) []byte {
 
 	for i < len(fwd) {
 		if fwd[i] == TelcmdIAC {
-			end := i + 1 // Found IAC
-			if end < len(fwd) {
-				cmd := fwd[end]
+			if i+1 < len(fwd) {
+				cmd := fwd[i+1]
 
 				switch cmd {
 				case TelcmdWILL, TelcmdWONT, TelcmdDO, TelcmdDONT:
-					end += 2
+					result = append(result, fwd[i:i+3]...)
+					i += 3
 
 				case TelcmdSB:
 					foundSE := false
 
-					for j := end + 1; j < len(fwd)-1; j++ { // Look for IAC SE
+					for j := i + 2; j < len(fwd)-1; j++ {
 						if fwd[j] == TelcmdIAC && fwd[j+1] == TelcmdSE {
-							end = j + 2
+							result = append(result, fwd[i:j+2]...)
+							i = j + 2
 							foundSE = true
 
 							break
@@ -447,45 +448,43 @@ func decodeTelnetData(decoder *encoding.Decoder, fwd []byte) []byte {
 					}
 
 					if !foundSE {
-						end = len(fwd)
+						result = append(result, fwd[i:]...)
+						i = len(fwd)
 					}
 
-				case TelcmdIAC:
-					decoded, _, err := transform.Bytes(decoder, []byte{255}) // Escaped IAC
+				case TelcmdIAC: // Escaped IAC
+					data := []byte{TelcmdIAC}
+
+					decoded, _, err := transform.Bytes(decoder, data)
 					if err == nil {
 						result = append(result, decoded...)
 					} else {
-						result = append(result, 255)
+						result = append(result, data...)
 					}
 
 					i += 2
 
-					continue
-
 				default:
-					end++
+					result = append(result, fwd[i:i+2]...)
+					i += 2
 				}
 			} else {
-				end = len(fwd)
+				result = append(result, fwd[i])
+				i++
 			}
-
-			if end > len(fwd) {
-				end = len(fwd)
-			}
-
-			result = append(result, fwd[i:end]...)
-			i = end
 		} else {
-			start := i // Data segment
+			start := i
 			for i < len(fwd) && fwd[i] != TelcmdIAC {
 				i++
 			}
 
-			decoded, _, err := transform.Bytes(decoder, fwd[start:i])
+			data := fwd[start:i]
+
+			decoded, _, err := transform.Bytes(decoder, data)
 			if err == nil {
 				result = append(result, decoded...)
 			} else {
-				result = append(result, fwd[start:i]...)
+				result = append(result, data...)
 			}
 		}
 	}
@@ -2338,39 +2337,80 @@ func immediateShutdown() {
 					nowStamp(), boomPrefix())
 			}
 
+			type connInfo struct {
+				channel    ssh.Channel
+				cancelFunc context.CancelFunc
+				sshConn    *ssh.ServerConn
+				id         string
+				userName   string
+				hostName   string
+				startTime  time.Time
+			}
+
 			connectionsMutex.Lock()
 
+			conns := make([]connInfo, 0, len(connections))
 			for _, conn := range connections {
-				if conn.channel != nil {
-					_, err := conn.channel.Write(
-						[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
-					if err != nil {
-						log.Printf("%sError writing to channel for %s: %v",
-							warnPrefix(), conn.ID, err)
-					}
-
-					connUptime := time.Since(conn.startTime)
-					log.Printf("%sLINKDOWN [%s] %s@%s (link time %s)",
-						yellowDotPrefix(), conn.ID, conn.userName,
-						conn.hostName, connUptime.Round(time.Second))
-				}
-
-				if conn.cancelFunc != nil {
-					conn.cancelFunc()
-				}
-
-				if conn.sshConn != nil {
-					err := conn.sshConn.Close()
-					if err != nil {
-						log.Printf("%sError closing SSH connection for %s: %v",
-							alertPrefix(), conn.ID, err)
-					}
-				}
+				conns = append(conns,
+					connInfo{
+						channel:    conn.channel,
+						cancelFunc: conn.cancelFunc,
+						sshConn:    conn.sshConn,
+						id:         conn.ID,
+						userName:   conn.userName,
+						hostName:   conn.hostName,
+						startTime:  conn.startTime,
+					},
+				)
 			}
 
 			connectionsMutex.Unlock()
 
-			for {
+			for _, ci := range conns {
+				if ci.channel != nil {
+					// Don't block on writing to the channel during shutdown
+					done := make(chan struct{})
+
+					go func() {
+						_, _ = ci.channel.Write(
+							[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+
+						close(done)
+					}()
+
+					select {
+					case <-done:
+					case <-time.After(100 * time.Millisecond):
+					}
+
+					connUptime := time.Since(ci.startTime)
+					log.Printf("%sLINKDOWN [%s] %s@%s (link time %s)",
+						yellowDotPrefix(), ci.id, ci.userName,
+						ci.hostName, connUptime.Round(time.Second))
+				}
+
+				if ci.cancelFunc != nil {
+					ci.cancelFunc()
+				}
+
+				if ci.sshConn != nil {
+					err := ci.sshConn.Close()
+					if err != nil {
+						log.Printf("%sError closing SSH connection for %s: %v",
+							alertPrefix(), ci.id, err)
+					}
+				}
+			}
+
+			select {
+			case <-shutdownSignal:
+				// Already closed
+
+			default:
+				close(shutdownSignal)
+			}
+
+			for i := range 50 {
 				connectionsMutex.Lock()
 
 				if len(connections) == 0 {
@@ -2379,10 +2419,30 @@ func immediateShutdown() {
 					break
 				}
 
+				if i == 49 {
+					ids := make([]string, 0, len(connections))
+					for id := range connections {
+						ids = append(ids, id)
+					}
+
+					log.Printf(
+						"%sWarning: immediate shutdown timed out waiting for connections: %v",
+						warnPrefix(), ids)
+				}
+
 				connectionsMutex.Unlock()
 
 				time.Sleep(100 * time.Millisecond)
 			}
+
+			if isConsoleLogQuiet {
+				_, _ = fmt.Fprintf(os.Stdout,
+					"%s %sWaiting for logs to flush...\r\n",
+					nowStamp(), bellPrefix())
+			}
+
+			log.Printf("%sWaiting for logs to flush...",
+				bellPrefix())
 
 			loggingWg.Wait()
 
@@ -3101,9 +3161,10 @@ func killConnection(id string) {
 
 func killAllConnections() {
 	connectionsMutex.Lock()
-	defer connectionsMutex.Unlock()
 
 	if len(connections) == 0 {
+		connectionsMutex.Unlock()
+
 		fmt.Printf("\r%s No active connections to kill.\r\n",
 			nowStamp())
 
@@ -3113,59 +3174,75 @@ func killAllConnections() {
 	fmt.Printf("\r%s %sKilling all %d active connections...\r\n",
 		nowStamp(), skullPrefix(), len(connections))
 
-	idsToKill := make([]string, 0, len(connections))
-
-	for id := range connections {
-		idsToKill = append(idsToKill, id)
+	type connToKill struct {
+		id        string
+		channel   ssh.Channel
+		userName  string
+		hostName  string
+		startTime time.Time
+		sshConn   *ssh.ServerConn
 	}
 
-	for _, id := range idsToKill {
-		conn := connections[id]
+	connsToKill := make([]connToKill, 0, len(connections))
 
-		if conn == nil {
-			continue
-		}
+	for id, conn := range connections {
+		connsToKill = append(connsToKill,
+			connToKill{
+				id:        id,
+				channel:   conn.channel,
+				userName:  conn.userName,
+				hostName:  conn.hostName,
+				startTime: conn.startTime,
+				sshConn:   conn.sshConn,
+			},
+		)
+	}
 
+	connectionsMutex.Unlock()
+
+	for _, c := range connsToKill {
 		if isConsoleLogQuiet {
 			_, err := fmt.Fprintf(os.Stdout,
 				"%s %sKilling connection %s...\r\n",
-				nowStamp(), skullPrefix(), id)
+				nowStamp(), skullPrefix(), c.id)
 			if err != nil {
 				log.Printf("%sError writing to Stdout: %v",
 					warnPrefix(), err)
 			}
 		}
 
-		if conn.channel != nil {
-			_, err := conn.channel.Write(
+		if c.channel != nil {
+			_, err := c.channel.Write(
 				[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
 			if err != nil {
 				log.Printf("%sError writing to channel for %s: %v",
-					warnPrefix(), conn.ID, err)
+					warnPrefix(), c.id, err)
 			}
 		}
 
-		connUptime := time.Since(conn.startTime)
+		connUptime := time.Since(c.startTime)
 		log.Printf("%sTERMKILL [%s] %s@%s (link time %s)",
-			yellowDotPrefix(), conn.ID, conn.userName,
-			conn.hostName, connUptime.Round(time.Second))
+			yellowDotPrefix(), c.id, c.userName,
+			c.hostName, connUptime.Round(time.Second))
 
 		adminKillsTotal.Add(1)
 
-		if conn.sshConn == nil {
+		if c.sshConn == nil {
 			log.Printf("%sError: sshConn is nil for connection %s",
-				warnPrefix(), conn.ID)
+				warnPrefix(), c.id)
 
-			return
+			continue
 		}
 
-		err := conn.sshConn.Close()
+		err := c.sshConn.Close()
 		if err != nil {
 			log.Printf("%sError closing SSH connection for %s: %v",
-				warnPrefix(), conn.ID, err)
+				warnPrefix(), c.id, err)
 		}
 
-		delete(connections, id)
+		connectionsMutex.Lock()
+		delete(connections, c.id)
+		connectionsMutex.Unlock()
 	}
 
 	fmt.Printf("\r%s %sAll active connections killed.\r\n",
@@ -3175,6 +3252,11 @@ func killAllConnections() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func sendNaws(conn *Connection, width, height uint32) {
+	tc := conn.telnetConn
+	if !conn.nawsActive || tc == nil {
+		return
+	}
+
 	if width == 0 ||
 		width > 65535 {
 		width = 1
@@ -3192,7 +3274,18 @@ func sendNaws(conn *Connection, width, height uint32) {
 		TelcmdIAC, TelcmdSE,
 	}
 
-	_, err := conn.telnetConn.Write(packet)
+	if debugNegotiation {
+		log.Printf("%sDEBUG: sending NAWS to TELNET target: %d x %d",
+			blueDotPrefix(), width, height)
+	}
+
+	_ = tc.SetWriteDeadline(time.Now().Add(time.Second))
+
+	defer func() {
+		_ = tc.SetWriteDeadline(time.Time{})
+	}()
+
+	_, err := tc.Write(packet)
 	if err != nil {
 		log.Printf("%sError sending NAWS to TELNET target for %s: %v",
 			warnPrefix(), conn.ID, err)
@@ -3734,7 +3827,17 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	sessionStarted := make(chan bool, 1)
 
 	go func() {
+		if debugNegotiation {
+			log.Printf("%sDEBUG: starting SSH request loop for %s",
+				blueDotPrefix(), conn.ID)
+		}
+
 		for req := range requests {
+			if debugNegotiation {
+				log.Printf("%sDEBUG: SSH request received for %s: %s (want reply: %v)",
+					blueDotPrefix(), conn.ID, req.Type, req.WantReply)
+			}
+
 			switch req.Type {
 			case "pty-req":
 				termLen := req.Payload[3]
@@ -3748,10 +3851,19 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					conn.initialWindowWidth = width
 					conn.initialWindowHeight = height
 
-					if conn.telnetConn != nil {
+					tc := conn.telnetConn
+					if tc != nil {
 						nawsWill := []byte{TelcmdIAC, TelcmdWILL, TeloptNAWS}
 
-						_, err := conn.telnetConn.Write(nawsWill)
+						if debugNegotiation {
+							log.Printf("%sDEBUG: offering NAWS to TELNET target for %s",
+								blueDotPrefix(), conn.ID)
+						}
+
+						_ = tc.SetWriteDeadline(time.Now().Add(time.Second))
+						_, err := tc.Write(nawsWill)
+						_ = tc.SetWriteDeadline(time.Time{})
+
 						if err != nil {
 							log.Printf("%sError sending IAC WILL NAWS to TELNET target for %s: %v",
 								warnPrefix(), conn.ID, err)
@@ -3761,29 +3873,44 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 				err := req.Reply(true, nil)
 				if err != nil {
-					log.Printf("%sError replying to request: %v",
-						warnPrefix(), err)
+					log.Printf("%sError replying to pty-req for %s: %v",
+						warnPrefix(), conn.ID, err)
 				}
 
 			case "window-change":
+				if debugNegotiation {
+					log.Printf("%sDEBUG: window-change received for %s",
+						blueDotPrefix(), conn.ID)
+				}
+
 				if len(req.Payload) == 16 {
 					width := binary.BigEndian.Uint32(req.Payload[:4])
 					height := binary.BigEndian.Uint32(req.Payload[4:8])
 
-					if conn.telnetConn != nil {
-						sendNaws(conn, width, height)
+					if debugNegotiation {
+						log.Printf("%sDEBUG: window-change payload for %s: width=%d, height=%d",
+							blueDotPrefix(), conn.ID, width, height)
 					}
 
 					err := req.Reply(true, nil)
 					if err != nil {
-						log.Printf("%sError replying to window-change request: %v",
-							warnPrefix(), err)
+						log.Printf("%sError replying to window-change request for %s: %v",
+							warnPrefix(), conn.ID, err)
+					}
+
+					if conn.telnetConn != nil {
+						go sendNaws(conn, width, height)
 					}
 				} else {
+					if debugNegotiation {
+						log.Printf("%sDEBUG: window-change payload size mismatch for %s: %d != 16",
+							warnPrefix(), conn.ID, len(req.Payload))
+					}
+
 					err := req.Reply(false, nil)
 					if err != nil {
-						log.Printf("%sError replying to window-change request (failure): %v",
-							warnPrefix(), err)
+						log.Printf("%sError replying to window-change request (failure) for %s: %v",
+							warnPrefix(), conn.ID, err)
 					}
 				}
 
@@ -3799,8 +3926,6 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					log.Printf("%sError replying to request: %v",
 						warnPrefix(), err)
 				}
-
-				return
 
 			case "exec":
 				if !suppressLogs {
@@ -3843,8 +3968,6 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							warnPrefix(), conn.ID, err)
 					}
 				}
-
-				return
 
 			case "subsystem":
 				if len(req.Payload) >= 4 {
@@ -3894,8 +4017,6 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 										warnPrefix(), conn.ID, err)
 								}
 							}
-
-							return
 						}
 					}
 				}
@@ -3918,12 +4039,22 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 	select {
 	case proceed := <-sessionStarted:
+		if debugNegotiation {
+			log.Printf("%sDEBUG: session start signal received for %s (proceed=%v)",
+				blueDotPrefix(), conn.ID, proceed)
+		}
+
 		if !proceed {
 			return
 		}
 
 	case <-time.After(2 * time.Second):
 		sshRequestTimeoutTotal.Add(1)
+
+		if debugNegotiation {
+			log.Printf("%sDEBUG: session start timeout for %s",
+				warnPrefix(), conn.ID)
+		}
 
 		if !suppressLogs {
 			remoteAddr := "unknown"
@@ -4423,6 +4554,15 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	}
 
 	conn.telnetConn = remote
+	telnetReader := bufio.NewReader(remote)
+
+	go func() {
+		if ctx != nil {
+			<-ctx.Done()
+		}
+
+		_ = remote.Close()
+	}()
 
 	defer func() {
 		err := remote.Close()
@@ -4432,7 +4572,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		}
 	}()
 
-	negotiateTelnet(remote, channel, logwriter, conn)
+	negotiateTelnet(telnetReader, remote, channel, logwriter, conn)
 
 	if conn.nawsActive && conn.initialWindowWidth > 0 && conn.initialWindowHeight > 0 {
 		sendNaws(conn, conn.initialWindowWidth, conn.initialWindowHeight)
@@ -4559,7 +4699,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					if conn.emacsKeymapEnabled {
 						replacement, ok := emacsKeymap[string(escSequence)]
 						if ok {
+							_ = remote.SetWriteDeadline(time.Now().Add(time.Second))
 							m, err := remote.Write([]byte(replacement))
+							_ = remote.SetWriteDeadline(time.Time{})
+
 							if err != nil {
 								log.Printf("%sError writing to remote for %s: %v",
 									warnPrefix(), conn.ID, err)
@@ -4581,7 +4724,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							isPrefix := emacsKeymapPrefixes[string(escSequence)]; isPrefix {
 							escTimer = time.After(50 * time.Millisecond)
 						} else {
+							_ = remote.SetWriteDeadline(time.Now().Add(time.Second))
 							m, err := remote.Write(escSequence)
+							_ = remote.SetWriteDeadline(time.Time{})
+
 							if err != nil {
 								log.Printf("%sError writing to remote for %s: %v",
 									warnPrefix(), conn.ID, err)
@@ -4601,7 +4747,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							escTimer = nil
 						}
 					} else {
+						_ = remote.SetWriteDeadline(time.Now().Add(time.Second))
 						m, err := remote.Write(escSequence)
+						_ = remote.SetWriteDeadline(time.Time{})
+
 						if err != nil {
 							log.Printf("%sError writing to remote for %s: %v",
 								warnPrefix(), conn.ID, err)
@@ -4624,7 +4773,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					escSequence = append(escSequence, b)
 					escTimer = time.After(50 * time.Millisecond)
 				} else {
+					_ = remote.SetWriteDeadline(time.Now().Add(time.Second))
 					m, err := remote.Write([]byte{b})
+					_ = remote.SetWriteDeadline(time.Time{})
+
 					if err != nil {
 						log.Printf("%sError writing to remote for %s: %v",
 							warnPrefix(), conn.ID, err)
@@ -4679,7 +4831,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					warnPrefix(), conn.ID, err)
 			}
 
-			n, err := remote.Read(buf)
+			n, err := telnetReader.Read(buf)
 			trafficInTotal.Add(uint64(n)) //nolint:gosec,nolintlint
 
 			if err != nil {
@@ -4783,8 +4935,9 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						warnPrefix(), conn.ID, err)
 				}
 
-				connectionsMutex.Lock()
+				var monitors []ssh.Channel
 
+				connectionsMutex.Lock()
 				for _, c := range connections {
 					if c.monitoring {
 						if c.monitoredConnection == nil {
@@ -4795,16 +4948,19 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						}
 
 						if c.monitoredConnection.ID == conn.ID {
-							_, err := c.channel.Write(fwd)
-							if err != nil {
-								log.Printf("%sError writing to channel for %s: %v",
-									warnPrefix(), c.ID, err)
-							}
+							monitors = append(monitors, c.channel)
 						}
 					}
 				}
-
 				connectionsMutex.Unlock()
+
+				for _, monCh := range monitors {
+					_, err := monCh.Write(fwd)
+					if err != nil {
+						log.Printf("%sError writing to monitor channel: %v",
+							warnPrefix(), err)
+					}
+				}
 
 				if conn.iconvEnabled && conn.iconvDecoder != nil {
 					_, err = logwriter.Write(fwd)
@@ -4904,12 +5060,12 @@ func sendBanner(sshConn *ssh.ServerConn, ch ssh.Channel, conn *Connection) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Connection) {
+func negotiateTelnet(r *bufio.Reader, remote net.Conn, ch ssh.Channel, logw io.Writer,
+	conn *Connection,
+) {
 	type telnetState struct {
 		weWill   bool
 		theyWill bool
-		// weDo  bool
-		// theyD bool
 	}
 
 	telnetStates := make(map[byte]*telnetState)
@@ -4922,7 +5078,33 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 		TeloptTTYPE:           true,
 	}
 
-	err := remote.SetReadDeadline(time.Now().Add(time.Second / 3))
+	// Proactively negotiate options we support
+	for opt, supported := range supportedOptions {
+		if supported {
+			if opt == TeloptEcho {
+				continue
+			}
+
+			state := &telnetState{weWill: true}
+			telnetStates[opt] = state
+
+			sendIAC(remote, TelcmdWILL, opt)
+			writeNegotiation(ch, logw,
+				"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]",
+				conn.userName)
+
+			if opt == TeloptBinary || opt == TeloptSuppressGoAhead {
+				state.weWill = true
+
+				sendIAC(remote, TelcmdDO, opt)
+				writeNegotiation(ch, logw,
+					"[SENT "+cmdName(TelcmdDO)+" "+optName(opt)+"]",
+					conn.userName)
+			}
+		}
+	}
+
+	err := remote.SetReadDeadline(time.Now().Add(time.Second))
 	if err != nil {
 		log.Printf("%sError setting read deadline: %v",
 			warnPrefix(), err)
@@ -4936,12 +5118,8 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 		}
 	}()
 
-	buf := make([]byte, 512)
-
 	for {
-		n, err := remote.Read(buf)
-		trafficInTotal.Add(uint64(n)) //nolint:gosec,nolintlint
-
+		b, err := r.ReadByte()
 		if err != nil {
 			var ne net.Error
 			if errors.As(err, &ne) && ne.Timeout() {
@@ -4951,156 +5129,170 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 			return
 		}
 
-		i := 0
-		for i < n {
-			if buf[i] == TelcmdIAC {
-				if i+2 < n { //nolint:gocritic
-					cmd, opt := buf[i+1], buf[i+2] //nolint:gosec,nolintlint
-					writeNegotiation(ch, logw,
-						"[RCVD "+cmdName(cmd)+" "+optName(opt)+"]", conn.userName)
+		trafficInTotal.Add(1)
 
-					state, ok := telnetStates[opt]
-					if !ok {
-						state = &telnetState{}
-						telnetStates[opt] = state
+		if b == TelcmdIAC {
+			b2, err := r.ReadByte()
+			if err != nil {
+				return
+			}
+
+			trafficInTotal.Add(1)
+
+			switch b2 {
+			case TelcmdWILL, TelcmdWONT, TelcmdDO, TelcmdDONT:
+				b3, err := r.ReadByte()
+				if err != nil {
+					return
+				}
+
+				trafficInTotal.Add(1)
+
+				cmd, opt := b2, b3
+				writeNegotiation(ch, logw,
+					"[RCVD "+cmdName(cmd)+" "+optName(opt)+"]", conn.userName)
+
+				state, ok := telnetStates[opt]
+				if !ok {
+					state = &telnetState{}
+					telnetStates[opt] = state
+				}
+
+				switch cmd {
+				case TelcmdWILL:
+					if supportedOptions[opt] {
+						if !state.theyWill {
+							state.theyWill = true
+
+							sendIAC(remote, TelcmdDO, opt)
+							writeNegotiation(ch, logw,
+								"[SENT "+cmdName(TelcmdDO)+" "+optName(opt)+"]",
+								conn.userName)
+						}
+					} else {
+						sendIAC(remote, TelcmdDONT, opt)
+						writeNegotiation(ch, logw,
+							"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]",
+							conn.userName)
 					}
 
-					switch cmd {
-					case TelcmdWILL:
-						if supportedOptions[opt] {
-							if !state.theyWill {
-								state.theyWill = true
+				case TelcmdWONT:
+					if state.theyWill {
+						state.theyWill = false
 
-								sendIAC(remote, TelcmdDO, opt)
-								writeNegotiation(ch, logw,
-									"[SENT "+cmdName(TelcmdDO)+" "+optName(opt)+"]",
-									conn.userName)
+						sendIAC(remote, TelcmdDONT, opt)
+						writeNegotiation(ch, logw,
+							"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]",
+							conn.userName)
+					}
+
+				case TelcmdDO:
+					if opt == TeloptNAWS { //nolint:gocritic
+						if !conn.nawsActive {
+							conn.nawsActive = true
+
+							if debugNegotiation {
+								log.Printf("%sDEBUG: NAWS activated for %s",
+									blueDotPrefix(), conn.ID)
 							}
-						} else {
-							sendIAC(remote, TelcmdDONT, opt)
-							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]",
-								conn.userName)
 						}
 
-					case TelcmdWONT:
-						if state.theyWill {
-							state.theyWill = false
-
-							sendIAC(remote, TelcmdDONT, opt)
-							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdDONT)+" "+optName(opt)+"]",
-								conn.userName)
-						}
-
-					case TelcmdDO:
-						if opt == TeloptNAWS { //nolint:gocritic
-							if !conn.nawsActive {
-								conn.nawsActive = true
-							}
+						sendIAC(remote, TelcmdWILL, opt)
+						writeNegotiation(ch, logw,
+							"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]",
+							conn.userName)
+					} else if supportedOptions[opt] {
+						if !state.weWill {
+							state.weWill = true
 
 							sendIAC(remote, TelcmdWILL, opt)
 							writeNegotiation(ch, logw,
 								"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]",
 								conn.userName)
-						} else if supportedOptions[opt] {
-							if !state.weWill {
-								state.weWill = true
-
-								sendIAC(remote, TelcmdWILL, opt)
-								writeNegotiation(ch, logw,
-									"[SENT "+cmdName(TelcmdWILL)+" "+optName(opt)+"]",
-									conn.userName)
-							}
-						} else {
-							sendIAC(remote, TelcmdWONT, opt)
-							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]",
-								conn.userName)
 						}
-
-					case TelcmdDONT:
-						if state.weWill {
-							state.weWill = false
-
-							sendIAC(remote, TelcmdWONT, opt)
-							writeNegotiation(ch, logw,
-								"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]",
-								conn.userName)
-						}
-
-					case TelcmdSB:
-						seIndex := -1
-
-						for j := i + 3; j < n-1; j++ {
-							if buf[j] == TelcmdIAC && buf[j+1] == TelcmdSE {
-								seIndex = j
-
-								break
-							}
-						}
-
-						if seIndex != -1 {
-							if i+2 >= len(buf) || i+3 > seIndex { // Malformed packet?
-								continue // Skip this sub-negotiation.
-							}
-
-							subOpt := buf[i+2] //nolint:gosec,nolintlint
-							subData := buf[i+3 : seIndex]
-
-							writeNegotiation(ch, logw,
-								"[RCVD SB "+optName(subOpt)+" ... IAC SE]", conn.userName)
-
-							if !supportedOptions[subOpt] {
-								i = seIndex + 2
-
-								continue
-							}
-
-							if subOpt ==
-								TeloptTTYPE && len(subData) > 0 && subData[0] == TelnetSend {
-								if conn.termType != "" {
-									data := make([]byte, 0, 4+len(conn.termType)+2)
-									data = append(data, TelcmdIAC, TelcmdSB, TeloptTTYPE, TelnetIs)
-									data = append(data, []byte(conn.termType)...)
-									data = append(data, TelcmdIAC, TelcmdSE)
-
-									_, err := remote.Write(data)
-									if err != nil {
-										log.Printf("%sError writing TELNET TTYPE response: %v",
-											warnPrefix(), err)
-									}
-
-									writeNegotiation(ch, logw,
-										"[SENT SB "+optName(TeloptTTYPE)+" IS "+
-											conn.termType+" IAC SE]", conn.userName)
-								} else {
-									sendIAC(remote, TelcmdWONT, TeloptTTYPE)
-									writeNegotiation(ch, logw,
-										"[SENT WONT "+optName(TeloptTTYPE)+"]", conn.userName)
-								}
-							}
-
-							i = seIndex + 2
-
-							continue
-						}
-
-					default:
+					} else {
+						sendIAC(remote, TelcmdWONT, opt)
+						writeNegotiation(ch, logw,
+							"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]",
+							conn.userName)
 					}
 
-					i += 3
-				} else if i+1 < n && buf[i+1] == TelcmdSB { //nolint:gosec,nolintlint
-					writeNegotiation(ch, logw, "[RCVD IAC SB (incomplete)]", conn.userName)
+				case TelcmdDONT:
+					if state.weWill {
+						state.weWill = false
 
-					i += 2
-				} else {
-					writeNegotiation(ch, logw, "[RCVD IAC (incomplete)]", conn.userName)
-
-					i++
+						sendIAC(remote, TelcmdWONT, opt)
+						writeNegotiation(ch, logw,
+							"[SENT "+cmdName(TelcmdWONT)+" "+optName(opt)+"]",
+							conn.userName)
+					}
 				}
-			} else {
-				data := buf[i : i+1]
+
+			case TelcmdSB:
+				opt, err := r.ReadByte()
+				if err != nil {
+					return
+				}
+
+				trafficInTotal.Add(1)
+
+				var subData []byte
+
+				for {
+					b4, err := r.ReadByte()
+					if err != nil {
+						return
+					}
+
+					trafficInTotal.Add(1)
+
+					if b4 == TelcmdIAC {
+						b5, err := r.ReadByte()
+						if err != nil {
+							return
+						}
+
+						trafficInTotal.Add(1)
+
+						if b5 == TelcmdSE {
+							break
+						}
+
+						subData = append(subData, TelcmdIAC, b5)
+					} else {
+						subData = append(subData, b4)
+					}
+				}
+
+				writeNegotiation(ch, logw,
+					"[RCVD SB "+optName(opt)+" ... IAC SE]", conn.userName)
+
+				if supportedOptions[opt] && opt == TeloptTTYPE &&
+					len(subData) > 0 && subData[0] == TelnetSend {
+					if conn.termType != "" {
+						data := make([]byte, 0, 4+len(conn.termType)+2)
+						data = append(data, TelcmdIAC, TelcmdSB, TeloptTTYPE, TelnetIs)
+						data = append(data, []byte(conn.termType)...)
+						data = append(data, TelcmdIAC, TelcmdSE)
+
+						_, err := remote.Write(data)
+						if err != nil {
+							log.Printf("%sError writing TELNET TTYPE response: %v",
+								warnPrefix(), err)
+						}
+
+						writeNegotiation(ch, logw,
+							"[SENT SB "+optName(TeloptTTYPE)+" IS "+
+								conn.termType+" IAC SE]", conn.userName)
+					} else {
+						sendIAC(remote, TelcmdWONT, TeloptTTYPE)
+						writeNegotiation(ch, logw,
+							"[SENT WONT "+optName(TeloptTTYPE)+"]", conn.userName)
+					}
+				}
+
+			case TelcmdIAC: // Escaped IAC
+				data := []byte{TelcmdIAC}
 				if conn.iconvEnabled && conn.iconvDecoder != nil {
 					decoded, _, err := transform.Bytes(conn.iconvDecoder, data)
 					if err == nil {
@@ -5110,8 +5302,21 @@ func negotiateTelnet(remote net.Conn, ch ssh.Channel, logw io.Writer, conn *Conn
 
 				_, _ = ch.Write(data)
 				_, _ = logw.Write(data)
-				i++
+
+			default:
+				// Skip other IAC commands
 			}
+		} else {
+			data := []byte{b}
+			if conn.iconvEnabled && conn.iconvDecoder != nil {
+				decoded, _, err := transform.Bytes(conn.iconvDecoder, data)
+				if err == nil {
+					data = decoded
+				}
+			}
+
+			_, _ = ch.Write(data)
+			_, _ = logw.Write(data)
 		}
 	}
 }
@@ -5820,8 +6025,6 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 		}
 	}
 
-	loggingWg.Add(1)
-
 	seq := maxSeq + 1
 	base := fmt.Sprintf("%s_%s_%d",
 		ts, sid, seq)
@@ -5833,6 +6036,8 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 		return nil, "", fmt.Errorf("failed to open log file: %w",
 			err)
 	}
+
+	loggingWg.Add(1)
 
 	return f, pathBase, nil
 }

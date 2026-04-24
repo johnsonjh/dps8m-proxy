@@ -6,14 +6,25 @@
 # v1.1.7
 
 * New Features & Improvements
+  * Fixed TELNET NAWS updates and SSH user session deadlock, making
+    updates fully asynchronous.
   * Hopefully fixed a bug causing timeout logic to rarely not drop
     some long-running connections.
+  * Improved reliability of TELNET negotiations with a more robust
+    parser and improved timeout logic.
+  * Fixed a hang during proxy shutdown by implementing non-blocking
+    channel termination.
+  * Added check to guarantee the database is closed only after all
+    background routines have stopped.
 []()
 
 []()
 * Code Quality & Maintenance
   * Normalized code style to be more consistent across the codebase.
   * Added additional defensive checking for `nil` channels.
+  * Improved log file handling to prevent hangs if a log file failed
+  * Improved robustness by adding proactive `nil` safety checks
+    to `sendNaws` and `handleSession`.
 []()
 
 []()
