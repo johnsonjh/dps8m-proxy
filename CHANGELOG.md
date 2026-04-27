@@ -3,9 +3,12 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.10-dev
+# v1.1.10 (2026-04-27)
 
-* TBD
+* New Features & Improvements
+  * Fixed the version reporting for released versions built without
+    version control information present (*i.e.*, builds from the
+    offline source code archive).
 
 # v1.1.9 (2026-04-27 23:31:02)
 

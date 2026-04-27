@@ -61,17 +61,16 @@ func isGitSHA(s string) bool {
 func printVersion(short bool) {
 	versionString := "DPS8M Proxy"
 
-	versionString += func() string {
-		v := getMainModuleVersion()
-		if v != "" {
-			return " " + v
-		}
+	v := getMainModuleVersion()
+	if v != "" {
+		versionString += " " + v
+	}
 
-		return ""
-	}()
+	if strings.Contains(versionString, " (") {
+		goto skipVCS
+	}
 
-	info, ok := debug.ReadBuildInfo()
-	if ok {
+	if info, ok := debug.ReadBuildInfo(); ok {
 		var date, commit string
 
 		var modified bool
@@ -111,6 +110,7 @@ func printVersion(short bool) {
 		}
 	}
 
+skipVCS:
 	versionString += fmt.Sprintf(" [%s/%s]",
 		runtime.GOOS, runtime.GOARCH)
 
@@ -335,6 +335,10 @@ func getMainModuleVersion() string {
 
 	if sv := sanitizeVersion(v); sv != v {
 		return sv
+	}
+
+	if strings.Contains(v, " (") {
+		return sanitizeVersion(v)
 	}
 
 	if v == "(devel)" { //nolint:goconst,nolintlint
