@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.10 (2026-04-27)
+# v1.1.11
+
+* TBD
+
+# v1.1.10 (2026-04-27 23:54:34)
 
 * New Features & Improvements
   * Fixed the version reporting for released versions built without
