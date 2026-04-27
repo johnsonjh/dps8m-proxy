@@ -322,23 +322,47 @@ func formatCompilerVersion(ver string) string {
 
 func getMainModuleVersion() string {
 	v := strings.TrimSpace(versionText)
-	if v != "" {
-		return sanitizeVersion(v)
+	if v == "" {
+		info, ok := debug.ReadBuildInfo()
+		if ok {
+			v = info.Main.Version
+		}
 	}
 
-	info, ok := debug.ReadBuildInfo()
-	if !ok {
+	if v == "" {
 		return ""
 	}
 
-	orig := info.Main.Version
-	v = trimVersion(orig, info.Main.Sum)
-
-	if strings.Contains(orig, "+dirty") {
-		v += "*"
+	if sv := sanitizeVersion(v); sv != v {
+		return sv
 	}
 
-	return sanitizeVersion(v)
+	if v == "(devel)" { //nolint:goconst,nolintlint
+		return v
+	}
+
+	clean := v
+	if i := strings.IndexAny(v, " +*"); i != -1 {
+		clean = v[:i]
+	}
+
+	isDev := strings.Contains(clean, "-")
+
+	base := clean
+	if before, _, ok := strings.Cut(clean, "-"); ok {
+		base = before
+	}
+
+	res := base
+	if strings.Contains(v, "+dirty") || strings.Contains(v, "*") {
+		res += "*"
+	}
+
+	if isDev {
+		res += "-dev"
+	}
+
+	return sanitizeVersion(res)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

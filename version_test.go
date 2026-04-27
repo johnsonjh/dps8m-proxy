@@ -15,7 +15,6 @@ package main
 
 import (
 	"runtime/debug"
-	"strings"
 	"testing"
 
 	"go.uber.org/goleak"
@@ -49,6 +48,32 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		},
 	)
 
+	t.Run("Dev version", //nolint:paralleltest,nolintlint
+		func(t *testing.T) {
+			versionText = "v1.1.8-0.20260424221546-c497c3506794"
+			got := getMainModuleVersion()
+
+			want := "v1.1.8-dev"
+			if got != want {
+				t.Errorf("getMainModuleVersion() = %q, want %q",
+					got, want)
+			}
+		},
+	)
+
+	t.Run("Dirty dev version", //nolint:paralleltest,nolintlint
+		func(t *testing.T) {
+			versionText = "v1.1.8-0.20260424221546-c497c3506794+dirty"
+			got := getMainModuleVersion()
+
+			want := "v1.1.8*-dev"
+			if got != want {
+				t.Errorf("getMainModuleVersion() = %q, want %q",
+					got, want)
+			}
+		},
+	)
+
 	t.Run("Fallback to BuildInfo", //nolint:paralleltest,nolintlint
 		func(t *testing.T) {
 			versionText = ""
@@ -59,14 +84,19 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 				t.Skip("Build info not available")
 			}
 
-			want := sanitizeVersion(trimVersion(info.Main.Version, info.Main.Sum))
-			if strings.Contains(info.Main.Version, "+dirty") {
-				want += "*"
+			orig := info.Main.Version
+			if orig == "(devel)" { //nolint:goconst,nolintlint
+				want := "(devel)"
+				if got != want {
+					t.Errorf("getMainModuleVersion() = %q, want %q",
+						got, want)
+				}
+
+				return
 			}
 
-			if got != want {
-				t.Errorf("getMainModuleVersion() = %q, want %q",
-					got, want)
+			if got == "" {
+				t.Errorf("getMainModuleVersion() returned empty string")
 			}
 		},
 	)

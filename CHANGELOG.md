@@ -5,6 +5,10 @@
 
 # v1.1.8
 
+* New Features & Improvements
+  * Changed version reporting to more clearly identify non-release
+    versions (appending the `-dev` suffix to these versions).
+
 # v1.1.7 (2026-04-24 21:58:10)
 
 * New Features & Improvements
