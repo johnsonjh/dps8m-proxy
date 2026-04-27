@@ -74,6 +74,19 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		},
 	)
 
+	t.Run("Pretty version", //nolint:paralleltest,nolintlint
+		func(t *testing.T) {
+			versionText = "v1.1.9 (2026-Apr-27 g443ff0e)"
+			got := getMainModuleVersion()
+
+			want := "v1.1.9 (2026-Apr-27 g443ff0e)"
+			if got != want {
+				t.Errorf("getMainModuleVersion() = %q, want %q",
+					got, want)
+			}
+		},
+	)
+
 	t.Run("Fallback to BuildInfo", //nolint:paralleltest,nolintlint
 		func(t *testing.T) {
 			versionText = ""
