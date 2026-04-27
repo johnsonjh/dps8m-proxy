@@ -3,7 +3,13 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.7 (2026-04-24)
+# v1.1.8
+
+* New Features & Improvements
+  * Changed version reporting to more clearly identify non-release
+    versions (appending the `-dev` suffix to these versions).
+
+# v1.1.7 (2026-04-24 21:58:10)
 
 * New Features & Improvements
   * Fixed TELNET NAWS updates and SSH user session deadlock, making
@@ -21,11 +27,11 @@
 []()
 * Code Quality & Maintenance
   * Normalized code style to be more consistent across the codebase.
-  * Added additional defensive checking for `nil` channels.
   * Improved log file handling to prevent hangs if a log file failed
     to open.
   * Improved robustness by adding proactive `nil` safety checks
     to `sendNaws` and `handleSession`.
+  * Added additional defensive checking for `nil` channels.
 []()
 
 []()
