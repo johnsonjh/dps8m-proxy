@@ -5,7 +5,9 @@
 
 # v1.1.11-dev
 
-* TBD
+* Code Quality & Maintenance
+  * Improved mocking for the version reporting tests, added additional
+    version reporting tests, and appeased all source code linters.
 
 # v1.1.10 (2026-04-27 23:54:34)
 
