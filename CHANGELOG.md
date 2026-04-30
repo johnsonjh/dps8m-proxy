@@ -3,11 +3,18 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.11-dev
+# v1.1.11
 
 * Code Quality & Maintenance
   * Improved mocking for the version reporting tests, added additional
     version reporting tests, and appeased all source code linters.
+()[]
+
+()[]
+* Dependency Updates
+  * Updated
+    [`klauspost/compress`](https://github.com/klauspost/compress)
+    from `v1.18.5` to `v1.18.6`.
 
 # v1.1.10 (2026-04-27 23:54:34)
 
