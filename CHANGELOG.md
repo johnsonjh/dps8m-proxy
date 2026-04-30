@@ -12,9 +12,9 @@
 * Code Quality & Maintenance
   * Improved mocking for the version reporting tests, added additional
     version reporting tests, and appeased all source code linters.
-()[]
+[]()
 
-()[]
+[]()
 * Dependency Updates
   * Updated
     [`klauspost/compress`](https://github.com/klauspost/compress)
