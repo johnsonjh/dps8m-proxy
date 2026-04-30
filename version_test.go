@@ -30,9 +30,11 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 	defer goleak.VerifyNone(t)
 
 	originalVersionText := versionText
+	originalReadBuildInfo := readBuildInfo
 
 	defer func() {
 		versionText = originalVersionText
+		readBuildInfo = originalReadBuildInfo
 	}()
 
 	t.Run("Priority of versionText", //nolint:paralleltest,nolintlint
@@ -74,12 +76,14 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		},
 	)
 
+	const prettyVersion = "v1.1.9 (2026-Apr-27 g443ff0e)"
+
 	t.Run("Pretty version", //nolint:paralleltest,nolintlint
 		func(t *testing.T) {
-			versionText = "v1.1.9 (2026-Apr-27 g443ff0e)"
+			versionText = prettyVersion
 			got := getMainModuleVersion()
 
-			want := "v1.1.9 (2026-Apr-27 g443ff0e)"
+			want := prettyVersion
 			if got != want {
 				t.Errorf("getMainModuleVersion() = %q, want %q",
 					got, want)
@@ -87,32 +91,122 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		},
 	)
 
-	t.Run("Fallback to BuildInfo", //nolint:paralleltest,nolintlint
+	const v119 = "v1.1.9"
+
+	t.Run("Fallback to BuildInfo (No VCS)", //nolint:paralleltest,nolintlint
 		func(t *testing.T) {
 			versionText = ""
+			readBuildInfo = func() (*debug.BuildInfo, bool) {
+				return &debug.BuildInfo{
+					Main: debug.Module{
+						Version: v119,
+					},
+				}, true
+			}
+
 			got := getMainModuleVersion()
+			want := v119
 
-			info, ok := debug.ReadBuildInfo()
-			if !ok {
-				t.Skip("Build info not available")
-			}
-
-			orig := info.Main.Version
-			if orig == "(devel)" { //nolint:goconst,nolintlint
-				want := "(devel)"
-				if got != want {
-					t.Errorf("getMainModuleVersion() = %q, want %q",
-						got, want)
-				}
-
-				return
-			}
-
-			if got == "" {
-				t.Errorf("getMainModuleVersion() returned empty string")
+			if got != want {
+				t.Errorf("getMainModuleVersion() = %q, want %q",
+					got, want)
 			}
 		},
 	)
+
+	t.Run("Fallback to BuildInfo (With VCS)", //nolint:paralleltest,nolintlint
+		func(t *testing.T) {
+			versionText = ""
+			readBuildInfo = func() (*debug.BuildInfo, bool) {
+				return &debug.BuildInfo{
+					Main: debug.Module{
+						Version: v119,
+					},
+					Settings: []debug.BuildSetting{
+						{
+							Key:   "vcs.revision",
+							Value: "1234567890abcdef1234567890abcdef12345678",
+						},
+						{
+							Key:   "vcs.time",
+							Value: "2026-04-27T12:00:00Z",
+						},
+					},
+				}, true
+			}
+
+			got := getMainModuleVersion()
+
+			want := v119
+
+			if got != want {
+				t.Errorf("getMainModuleVersion() = %q, want %q",
+					got, want)
+			}
+		},
+	)
+
+	const devel = "(devel)"
+
+	t.Run("BuildInfo (Devel)", //nolint:paralleltest,nolintlint
+		func(t *testing.T) {
+			versionText = ""
+			readBuildInfo = func() (*debug.BuildInfo, bool) {
+				return &debug.BuildInfo{
+					Main: debug.Module{
+						Version: devel,
+					},
+				}, true
+			}
+
+			got := getMainModuleVersion()
+			want := devel
+
+			if got != want {
+				t.Errorf("getMainModuleVersion() = %q, want %q",
+					got, want)
+			}
+		},
+	)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func TestPrintVersion_Mocked(_ *testing.T) { //nolint:paralleltest,nolintlint
+	originalVersionText := versionText
+	originalReadBuildInfo := readBuildInfo
+	originalShowVersion := showVersion
+
+	defer func() {
+		versionText = originalVersionText
+		readBuildInfo = originalReadBuildInfo
+		showVersion = originalShowVersion
+	}()
+
+	showVersion = false
+
+	const prettyVersion = "v1.1.9 (2026-Apr-27 g443ff0e)"
+
+	versionText = prettyVersion
+	readBuildInfo = func() (*debug.BuildInfo, bool) {
+		return &debug.BuildInfo{
+			Main: debug.Module{
+				Version: "v1.1.9",
+			},
+			Settings: []debug.BuildSetting{
+				{
+					Key:   "vcs.revision",
+					Value: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+				},
+				{
+					Key:   "vcs.time",
+					Value: "2026-01-01T00:00:00Z",
+				},
+			},
+		}, true
+	}
+
+	printVersion(true)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

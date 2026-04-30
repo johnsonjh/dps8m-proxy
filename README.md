@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.1.10 (2026-Apr-27 gcd90b90) [linux/amd64]
+DPS8M Proxy v1.1.11-dev (2026-Apr-30 gd27b575) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,17 +326,17 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.1.10 (2026-Apr-27 gcd90b90) [linux/amd64]
+DPS8M Proxy v1.1.11-dev (2026-Apr-30 gd27b575) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.1.10                          |
+| dps8m/proxy               | v1.1.11-dev                      |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
 | hashicorp/mdns            | v1.0.6                           |
-| klauspost/compress        | v1.18.5                          |
+| klauspost/compress        | v1.18.6                          |
 | miekg/dns                 | v1.1.72                          |
 | sorairolake/lzip-go       | v0.3.8                           |
 | spf13/pflag               | v1.0.11* (2026-Mar-05, g3d32e71) |
@@ -602,13 +602,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>21</th>
-<th>9885</th>
-<th>2114</th>
-<th>614</th>
-<th>7157</th>
-<th>1756</th>
-<th>236773</th>
-<th>4339</th>
+<th>9989</th>
+<th>2132</th>
+<th>616</th>
+<th>7241</th>
+<th>1755</th>
+<th>239001</th>
+<th>4372</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -663,13 +663,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>29</th>
-<th>11855</th>
-<th>2468</th>
-<th>938</th>
-<th>8449</th>
-<th>1972</th>
-<th>312550</th>
-<th>5598</th>
+<th>11959</th>
+<th>2486</th>
+<th>940</th>
+<th>8533</th>
+<th>1971</th>
+<th>314778</th>
+<th>5631</th>
 </tr></tfoot></table>
 
 

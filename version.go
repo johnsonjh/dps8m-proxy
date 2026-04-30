@@ -32,6 +32,10 @@ var versionText string
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+var readBuildInfo = debug.ReadBuildInfo
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 var nameReplacements = []struct {
 	old, new string
 }{
@@ -70,20 +74,26 @@ func printVersion(short bool) {
 		goto skipVCS
 	}
 
-	if info, ok := debug.ReadBuildInfo(); ok {
+	if info, ok := readBuildInfo(); ok {
 		var date, commit string
 
 		var modified bool
 
+		const (
+			vcsTime     = "vcs.time"
+			vcsRevision = "vcs.revision"
+			vcsModified = "vcs.modified"
+		)
+
 		for _, setting := range info.Settings {
 			switch setting.Key {
-			case "vcs.time":
+			case vcsTime:
 				date = setting.Value
 
-			case "vcs.revision":
+			case vcsRevision:
 				commit = setting.Value
 
-			case "vcs.modified":
+			case vcsModified:
 				modified = (setting.Value == "true")
 			}
 		}
@@ -139,7 +149,7 @@ func printVersionTable() {
 
 	var rows []row
 
-	info, ok := debug.ReadBuildInfo()
+	info, ok := readBuildInfo()
 	if ok {
 		v := getMainModuleVersion()
 
@@ -323,7 +333,7 @@ func formatCompilerVersion(ver string) string {
 func getMainModuleVersion() string {
 	v := strings.TrimSpace(versionText)
 	if v == "" {
-		info, ok := debug.ReadBuildInfo()
+		info, ok := readBuildInfo()
 		if ok {
 			v = info.Main.Version
 		}
