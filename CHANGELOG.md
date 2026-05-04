@@ -3,14 +3,27 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.11 (2026-Apr-30)
+# v1.1.12-dev
+
+* Code Quality & Maintenance
+  * Improved code formatting across the project by conforming to
+    current git `gofumpt -extra` and `golangci-lint` standards.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260305102058-3d32e71abc0b`
+    to `v1.0.11-0.20260504082836-ee87ca5ff3b6`.
+
+# v1.1.11 (2026-04-30 18:26:54)
 
 * Code Quality & Maintenance
   * Improved mocking for the version reporting tests, added additional
     version reporting tests, and appeased all source code linters.
-()[]
+[]()
 
-()[]
+[]()
 * Dependency Updates
   * Updated
     [`klauspost/compress`](https://github.com/klauspost/compress)

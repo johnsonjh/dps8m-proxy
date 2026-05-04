@@ -22,7 +22,7 @@ require (
 	github.com/hashicorp/mdns v1.0.6
 	github.com/klauspost/compress v1.18.6
 	github.com/sorairolake/lzip-go v0.3.8
-	github.com/spf13/pflag v1.0.11-0.20260305102058-3d32e71abc0b
+	github.com/spf13/pflag v1.0.11-0.20260504082836-ee87ca5ff3b6
 	github.com/ulikunitz/xz v0.5.15
 	go.etcd.io/bbolt v1.4.3
 	golang.org/x/crypto v0.50.0

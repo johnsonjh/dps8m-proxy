@@ -999,19 +999,23 @@ func main() {
 		switch runtime.GOOS {
 		case "windows":
 			fmt.Print(
-				"It is intended to be invoked from a Command Prompt or Windows Terminal session.")
+				"It is intended to be invoked from a Command Prompt or Windows Terminal session.",
+			)
 
 		case "darwin":
 			fmt.Printf(
-				"It is intended to be invoked from a command prompt (e.g., via Terminal.app).")
+				"It is intended to be invoked from a command prompt (e.g., via Terminal.app).",
+			)
 
 		case "linux":
 			fmt.Printf(
-				"It is intended to be invoked from a command prompt (not a file manager or GUI).")
+				"It is intended to be invoked from a command prompt (not a file manager or GUI).",
+			)
 
 		default:
 			fmt.Printf(
-				"It is intended to be invoked from a command prompt (and not a GUI launcher).")
+				"It is intended to be invoked from a command prompt (and not a GUI launcher).",
+			)
 		}
 
 		fmt.Print("\r\n\r\nPress Enter (or Return) to exit ... ")
@@ -1132,7 +1136,8 @@ func main() {
 				available = append(available, fmt.Sprintf("%v", cm))
 			}
 
-			sort.Slice(available,
+			sort.Slice(
+				available,
 				func(i, j int) bool {
 					return naturalLess(available[i], available[j])
 				},
@@ -1355,7 +1360,8 @@ func main() {
 
 	edSigner, err := loadOrCreateHostKey(filepath.Join(
 		certDir,
-		"ssh_host_ed25519_key.pem"),
+		"ssh_host_ed25519_key.pem",
+	),
 		"ed25519")
 	if err != nil {
 		if isConsoleLogQuiet {
@@ -1374,7 +1380,8 @@ func main() {
 
 	rsaSigner, err := loadOrCreateHostKey(filepath.Join(
 		certDir,
-		"ssh_host_rsa_key.pem"),
+		"ssh_host_rsa_key.pem",
+	),
 		"rsa")
 	if err != nil {
 		if isConsoleLogQuiet {
@@ -1393,7 +1400,8 @@ func main() {
 
 	ecdsaSigner, err := loadOrCreateHostKey(filepath.Join(
 		certDir,
-		"ssh_host_ecdsa_key.pem"),
+		"ssh_host_ecdsa_key.pem",
+	),
 		"ecdsa")
 	if err != nil {
 		if isConsoleLogQuiet {
@@ -1585,7 +1593,8 @@ func main() {
 								log.Printf(
 									"%sError writing idle timeout message "+
 										"to channel for %s: %v",
-									warnPrefix(), id, err)
+									warnPrefix(), id, err,
+								)
 							}
 						}
 
@@ -1603,7 +1612,8 @@ func main() {
 						delete(connections, id)
 					} else if effTimeMax > 0 &&
 						connUptime > time.Duration( //nolint:gosec,nolintlint
-							effTimeMax)*time.Second {
+							effTimeMax,
+						)*time.Second {
 						timeKillsTotal.Add(1)
 
 						log.Printf("%sTIMEKILL [%s] %s@%s (link time %s)",
@@ -1618,7 +1628,8 @@ func main() {
 								log.Printf(
 									"%sError writing connection timeout message "+
 										"to channel for %s: %v",
-									warnPrefix(), id, err)
+									warnPrefix(), id, err,
+								)
 							}
 						}
 
@@ -1656,7 +1667,8 @@ func debugInit(addr string) {
 
 	mux.Handle("/debug/vars", http.DefaultServeMux)
 
-	mux.HandleFunc("/",
+	mux.HandleFunc(
+		"/",
 		func(w http.ResponseWriter, _ *http.Request) {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			_, _ = fmt.Fprint(w, `
@@ -1861,7 +1873,8 @@ func showHelp() {
 		}
 	}
 
-	border := fmt.Sprintf("\r+=%s=+=%s=+\r\n",
+	border := fmt.Sprintf(
+		"\r+=%s=+=%s=+\r\n",
 		strings.Repeat("=", maxKey), strings.Repeat("=", maxDesc),
 	)
 
@@ -2351,7 +2364,8 @@ func immediateShutdown() {
 
 			conns := make([]connInfo, 0, len(connections))
 			for _, conn := range connections {
-				conns = append(conns,
+				conns = append(
+					conns,
 					connInfo{
 						channel:    conn.channel,
 						cancelFunc: conn.cancelFunc,
@@ -2373,7 +2387,8 @@ func immediateShutdown() {
 
 					go func() {
 						_, _ = ci.channel.Write(
-							[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+							[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"),
+						)
 
 						close(done)
 					}()
@@ -2427,7 +2442,8 @@ func immediateShutdown() {
 
 					log.Printf(
 						"%sWarning: immediate shutdown timed out waiting for connections: %v",
-						warnPrefix(), ids)
+						warnPrefix(), ids,
+					)
 				}
 
 				connectionsMutex.Unlock()
@@ -2485,7 +2501,8 @@ func listConnections(truncate bool) {
 		conns = append(conns, conn)
 	}
 
-	sort.Slice(conns,
+	sort.Slice(
+		conns,
 		func(i, j int) bool {
 			return conns[i].startTime.Before(conns[j].startTime)
 		},
@@ -2545,7 +2562,8 @@ func listConnections(truncate bool) {
 			idle = time.Since(conn.lastActivityTime).Round(time.Second).String()
 		}
 
-		rows = append(rows,
+		rows = append(
+			rows,
 			row{
 				ID:      conn.ID,
 				Details: details,
@@ -2578,7 +2596,8 @@ func listConnections(truncate bool) {
 		}
 	}
 
-	border := fmt.Sprintf("\r+=%s=+=%s=+=%s=+=%s=+\r\n",
+	border := fmt.Sprintf(
+		"\r+=%s=+=%s=+=%s=+=%s=+\r\n",
 		strings.Repeat("=", maxID),
 		strings.Repeat("=", maxDetails),
 		strings.Repeat("=", maxLink),
@@ -2606,7 +2625,8 @@ func listConnections(truncate bool) {
 	if userTruncat {
 		fmt.Printf(
 			"\r\n* %sSome Connections Details have been truncated, use 'cg' for wider output.\r\n",
-			alertPrefix())
+			alertPrefix(),
+		)
 	}
 
 	fmt.Printf("\r\n")
@@ -2912,7 +2932,8 @@ func listConfiguration() {
 			users = append(users, user)
 		}
 
-		sort.Slice(users,
+		sort.Slice(
+			users,
 			func(i, j int) bool {
 				return naturalLess(users[i], users[j])
 			},
@@ -3038,7 +3059,8 @@ func reloadLists() {
 		if err != nil {
 			reloadErrors = append(
 				reloadErrors, fmt.Sprintf("Blacklist rejected: %v",
-					err))
+					err),
+			)
 		} else {
 			newBlacklistedNetworks = networks
 			blacklistReloaded = true
@@ -3050,7 +3072,8 @@ func reloadLists() {
 		if err != nil {
 			reloadErrors = append(
 				reloadErrors, fmt.Sprintf("Whitelist rejected: %v",
-					err))
+					err),
+			)
 		} else {
 			newWhitelistedNetworks = networks
 			whitelistReloaded = true
@@ -3131,7 +3154,8 @@ func killConnection(id string) {
 
 	if conn.channel != nil {
 		_, err := conn.channel.Write(
-			[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+			[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"),
+		)
 		if err != nil {
 			log.Printf("%sError writing to channel for %s: %v",
 				warnPrefix(), conn.ID, err)
@@ -3186,7 +3210,8 @@ func killAllConnections() {
 	connsToKill := make([]connToKill, 0, len(connections))
 
 	for id, conn := range connections {
-		connsToKill = append(connsToKill,
+		connsToKill = append(
+			connsToKill,
 			connToKill{
 				id:        id,
 				channel:   conn.channel,
@@ -3213,7 +3238,8 @@ func killAllConnections() {
 
 		if c.channel != nil {
 			_, err := c.channel.Write(
-				[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"))
+				[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"),
+			)
 			if err != nil {
 				log.Printf("%sError writing to channel for %s: %v",
 					warnPrefix(), c.id, err)
@@ -3484,7 +3510,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		PublicKeyCallback: func( //nolint:gosec,nolintlint
 			c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error,
 		) {
-			line := fmt.Sprintf("VALIDATE [%s] %s@%s %q:%s",
+			line := fmt.Sprintf(
+				"VALIDATE [%s] %s@%s %q:%s",
 				sid, c.User(), c.RemoteAddr(),
 				pubKey.Type(), ssh.FingerprintSHA256(pubKey),
 			)
@@ -3694,7 +3721,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		if !suppressLogs {
 			host, _, err := net.SplitHostPort(conn.hostName)
 			if err != nil {
-				log.Printf("%sTEARDOWN [%s] %s@"+unknownHost,
+				log.Printf(
+					"%sTEARDOWN [%s] %s@"+unknownHost,
 					yellowDotPrefix(), sid,
 					func() string {
 						if conn.userName == "" {
@@ -3705,7 +3733,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 					}(),
 				)
 			} else {
-				log.Printf("%sTEARDOWN [%s] %s@%s",
+				log.Printf(
+					"%sTEARDOWN [%s] %s@%s",
 					yellowDotPrefix(), sid,
 					func() string {
 						if conn.userName == "" {
@@ -3730,7 +3759,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		addr = sshConn.RemoteAddr().String()
 	}
 
-	handshakeLog := fmt.Sprintf("VALIDATE [%s] %s@%s \"ssh\":%s",
+	handshakeLog := fmt.Sprintf(
+		"VALIDATE [%s] %s@%s \"ssh\":%s",
 		sid,
 		func() string {
 			if conn.userName == "" {
@@ -3753,7 +3783,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	for newCh := range chans {
 		if newCh.ChannelType() != "session" {
 			err := newCh.Reject(
-				ssh.UnknownChannelType, "only session allowed")
+				ssh.UnknownChannelType, "only session allowed",
+			)
 			if err != nil {
 				log.Printf("%sError rejecting channel: %v",
 					warnPrefix(), err)
@@ -4178,17 +4209,20 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			raw, err := getFileContent(blockFile, conn.userName)
 			if err == nil {
 				blockMessageContent := strings.ReplaceAll(
-					strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
+					strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n",
+				)
 
 				_, err := channel.Write(
-					[]byte(blockMessageContent + "\r\n"))
+					[]byte(blockMessageContent + "\r\n"),
+				)
 				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
 				}
 			} else {
 				_, err := channel.Write(
-					[]byte("Connection blocked.\r\n"))
+					[]byte("Connection blocked.\r\n"),
+				)
 				if err != nil {
 					log.Printf("%sError writing to channel for %s: %v",
 						warnPrefix(), conn.ID, err)
@@ -4345,7 +4379,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		denyMsg, err := getFileContent(denyFile, conn.userName)
 		if err == nil {
 			txt := strings.ReplaceAll(
-				strings.ReplaceAll(string(denyMsg), "\r\n", "\n"), "\n", "\r\n")
+				strings.ReplaceAll(string(denyMsg), "\r\n", "\n"), "\n", "\r\n",
+			)
 
 			_, err := channel.Write([]byte("\r\n"))
 			if err != nil {
@@ -4378,7 +4413,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	raw, err := getFileContent(issueFile, conn.userName)
 	if err == nil {
 		txt := strings.ReplaceAll(
-			strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
+			strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n",
+		)
 
 		_, err := channel.Write([]byte(txt + "\r\n"))
 		if err != nil {
@@ -4426,7 +4462,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		logwriter = logfile
 
 		_, err := logwriter.Write(
-			[]byte(nowStamp() + " Session start\r\n"))
+			[]byte(nowStamp() + " Session start\r\n"),
+		)
 		if err != nil {
 			log.Printf("%sError writing to log for %s: %v",
 				warnPrefix(), conn.ID, err)
@@ -4825,7 +4862,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 		for {
 			err := remote.SetReadDeadline(
-				time.Now().Add(100 * time.Millisecond))
+				time.Now().Add(100 * time.Millisecond),
+			)
 			if err != nil {
 				log.Printf("%sError setting read deadline for %s: %v",
 					warnPrefix(), conn.ID, err)
@@ -6141,7 +6179,8 @@ func nowStamp() string {
 
 func getFileContent(baseFilename, username string) ([]byte, error) {
 	userSpecificFile := fmt.Sprintf(
-		"%s-%s.txt", strings.TrimSuffix(baseFilename, ".txt"), username)
+		"%s-%s.txt", strings.TrimSuffix(baseFilename, ".txt"), username,
+	)
 
 	content, err := os.ReadFile(userSpecificFile) //nolint:gosec,nolintlint
 	if err == nil {
@@ -6227,7 +6266,8 @@ func rotateConsoleLogAt(t time.Time) {
 	logDir := filepath.Dir(logPath)
 
 	err := os.MkdirAll(
-		logDir, os.FileMode(logDirPerm)) //nolint:gosec,nolintlint
+		logDir, os.FileMode(logDirPerm), //nolint:gosec,nolintlint
+	)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sERROR: Failed to create console log directory: %v\r\n",
@@ -6253,7 +6293,8 @@ func rotateConsoleLogAt(t time.Time) {
 
 	file, err := os.OpenFile( //nolint:gosec,nolintlint
 		logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND,
-		os.FileMode(logPerm)) //nolint:gosec,nolintlint
+		os.FileMode(logPerm), //nolint:gosec,nolintlint
+	)
 	if err != nil {
 		if isConsoleLogQuiet {
 			isConsoleLogQuiet = false
@@ -6463,7 +6504,8 @@ func compressLogFile(logFilePath string) {
 		}
 
 		writer, err = zstd.NewWriter(
-			compressedFile, zstd.WithEncoderLevel(zstdLevel))
+			compressedFile, zstd.WithEncoderLevel(zstdLevel),
+		)
 		if err != nil {
 			log.Printf("%sError creating zstd writer for %q: %v", //nolint:gosec,nolintlint
 				warnPrefix(), compressedFilePath, err)
@@ -6532,7 +6574,8 @@ func compressLogFile(logFilePath string) {
 	if err != nil {
 		log.Printf( //nolint:gosec,nolintlint
 			"%sError removing original log %q after compression: %v",
-			warnPrefix(), logFilePath, err)
+			warnPrefix(), logFilePath, err,
+		)
 	}
 }
 
@@ -6652,7 +6695,8 @@ func listGoroutines() {
 			caller = strings.TrimSpace(lines[2])
 		}
 
-		goroutines = append(goroutines,
+		goroutines = append(
+			goroutines,
 			GoroutineInfo{
 				ID:         id,
 				State:      state,
@@ -6673,16 +6717,20 @@ func listGoroutines() {
 	allRows := make([]row, 0, len(goroutines)*4)
 
 	for _, g := range goroutines {
-		allRows = append(allRows,
+		allRows = append(
+			allRows,
 			row{"Name", "Goroutine #" + g.ID},
 		)
-		allRows = append(allRows,
+		allRows = append(
+			allRows,
 			row{"State", g.State},
 		)
-		allRows = append(allRows,
+		allRows = append(
+			allRows,
 			row{"Entrypoint", g.Entrypoint},
 		)
-		allRows = append(allRows,
+		allRows = append(
+			allRows,
 			row{"Caller", g.Caller},
 		)
 	}
@@ -6700,7 +6748,8 @@ func listGoroutines() {
 		}
 	}
 
-	border := fmt.Sprintf("+=%s=+=%s=+\n",
+	border := fmt.Sprintf(
+		"+=%s=+=%s=+\n",
 		strings.Repeat("=", maxName), strings.Repeat("=", maxVal),
 	)
 

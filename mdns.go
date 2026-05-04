@@ -94,7 +94,8 @@ func announceMDNS(listener net.Listener, listenHost string, altHosts map[string]
 			if err != nil {
 				log.Printf(
 					"%sError resolving \"%s\" for mDNS: %v - falling back to all interfaces",
-					warnPrefix(), listenHost, err)
+					warnPrefix(), listenHost, err,
+				)
 
 				useAllInterfaces = true
 			} else {
@@ -199,7 +200,8 @@ func announceMDNS(listener net.Listener, listenHost string, altHosts map[string]
 			port)
 
 		defaultService, err := mdns.NewMDNSService(
-			defaultInstance, service, "local.", hostname, port, ifaceIPs, defaultTxt)
+			defaultInstance, service, "local.", hostname, port, ifaceIPs, defaultTxt,
+		)
 		if err != nil {
 			log.Printf("%sError creating default mDNS service for interface %s: %s",
 				alertPrefix(), iface.Name, err)
@@ -236,7 +238,8 @@ func announceMDNS(listener net.Listener, listenHost string, altHosts map[string]
 				name, port)
 
 			altHostService, err := mdns.NewMDNSService(
-				altInstance, service, "local.", hostname, port, ifaceIPs, txt)
+				altInstance, service, "local.", hostname, port, ifaceIPs, txt,
+			)
 			if err != nil {
 				log.Printf("Error creating mDNS service for %s on interface %s: %s",
 					name, iface.Name, err)

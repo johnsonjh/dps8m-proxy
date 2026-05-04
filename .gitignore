@@ -17,6 +17,7 @@ cross.bin/
 *.db
 deny-*.txt
 dps8m-proxy
+/dps8m-proxy.json
 GPATH
 GRTAGS
 GTAGS
@@ -29,8 +30,8 @@ proxy
 proxy.android*
 proxy.exe
 proxy.os400*
-README.md.sed
 README.md.awk
+README.md.sed
 ssh_host_ecdsa_key.pem
 ssh_host_ed25519_key.pem
 ssh_host_rsa_key.pem
