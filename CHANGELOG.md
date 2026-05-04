@@ -5,7 +5,16 @@
 
 # v1.1.12-dev
 
-* TBD
+* Code Quality & Maintenance
+  * Improved code formatting across the project by conforming to
+    current git `gofumpt -extra` and `golangci-lint` standards.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260305102058-3d32e71abc0b`
+    to `v1.0.11-0.20260504082836-ee87ca5ff3b6`.
 
 # v1.1.11 (2026-04-30 18:26:54)
 
