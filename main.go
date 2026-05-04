@@ -6266,8 +6266,8 @@ func rotateConsoleLogAt(t time.Time) {
 	logDir := filepath.Dir(logPath)
 
 	err := os.MkdirAll(
-		logDir, os.FileMode(logDirPerm),
-	) //nolint:gosec,nolintlint
+		logDir, os.FileMode(logDirPerm), //nolint:gosec,nolintlint
+	)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sERROR: Failed to create console log directory: %v\r\n",
@@ -6293,8 +6293,8 @@ func rotateConsoleLogAt(t time.Time) {
 
 	file, err := os.OpenFile( //nolint:gosec,nolintlint
 		logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND,
-		os.FileMode(logPerm),
-	) //nolint:gosec,nolintlint
+		os.FileMode(logPerm), //nolint:gosec,nolintlint
+	)
 	if err != nil {
 		if isConsoleLogQuiet {
 			isConsoleLogQuiet = false

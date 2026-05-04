@@ -37,8 +37,8 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		readBuildInfo = originalReadBuildInfo
 	}()
 
-	t.Run(
-		"Priority of versionText", //nolint:paralleltest,nolintlint
+	t.Run( //nolint:paralleltest,nolintlint
+		"Priority of versionText",
 		func(t *testing.T) {
 			versionText = "v9.9.9\n"
 			got := getMainModuleVersion()
@@ -51,8 +51,8 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		},
 	)
 
-	t.Run(
-		"Dev version", //nolint:paralleltest,nolintlint
+	t.Run( //nolint:paralleltest,nolintlint
+		"Dev version",
 		func(t *testing.T) {
 			versionText = "v1.1.8-0.20260424221546-c497c3506794"
 			got := getMainModuleVersion()
@@ -65,8 +65,8 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		},
 	)
 
-	t.Run(
-		"Dirty dev version", //nolint:paralleltest,nolintlint
+	t.Run( //nolint:paralleltest,nolintlint
+		"Dirty dev version",
 		func(t *testing.T) {
 			versionText = "v1.1.8-0.20260424221546-c497c3506794+dirty"
 			got := getMainModuleVersion()
@@ -81,8 +81,8 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 
 	const prettyVersion = "v1.1.9 (2026-Apr-27 g443ff0e)"
 
-	t.Run(
-		"Pretty version", //nolint:paralleltest,nolintlint
+	t.Run( //nolint:paralleltest,nolintlint
+		"Pretty version",
 		func(t *testing.T) {
 			versionText = prettyVersion
 			got := getMainModuleVersion()
@@ -97,8 +97,8 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 
 	const v119 = "v1.1.9"
 
-	t.Run(
-		"Fallback to BuildInfo (No VCS)", //nolint:paralleltest,nolintlint
+	t.Run( //nolint:paralleltest,nolintlint
+		"Fallback to BuildInfo (No VCS)",
 		func(t *testing.T) {
 			versionText = ""
 			readBuildInfo = func() (*debug.BuildInfo, bool) {
@@ -119,8 +119,8 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 		},
 	)
 
-	t.Run(
-		"Fallback to BuildInfo (With VCS)", //nolint:paralleltest,nolintlint
+	t.Run( //nolint:paralleltest,nolintlint
+		"Fallback to BuildInfo (With VCS)",
 		func(t *testing.T) {
 			versionText = ""
 			readBuildInfo = func() (*debug.BuildInfo, bool) {
@@ -154,8 +154,8 @@ func TestGetMainModuleVersion(t *testing.T) { //nolint:paralleltest,tparallel,no
 
 	const devel = "(devel)"
 
-	t.Run(
-		"BuildInfo (Devel)", //nolint:paralleltest,nolintlint
+	t.Run( //nolint:paralleltest,nolintlint
+		"BuildInfo (Devel)",
 		func(t *testing.T) {
 			versionText = ""
 			readBuildInfo = func() (*debug.BuildInfo, bool) {
