@@ -234,7 +234,8 @@ func TestFindCharmap(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 	}
 
 	for _, tt := range tests { //nolint:paralleltest,nolintlint
-		t.Run(tt.name,
+		t.Run(
+			tt.name,
 			func(t *testing.T) {
 				cm := findCharmap(tt.input)
 				if tt.expected == "" {
@@ -293,8 +294,9 @@ func TestNaturalLess(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 	}
 
 	for _, tt := range tests { //nolint:paralleltest,nolintlint
-		t.Run(fmt.Sprintf("%s_%s",
-			tt.s1, tt.s2),
+		t.Run(
+			fmt.Sprintf("%s_%s",
+				tt.s1, tt.s2),
 			func(t *testing.T) {
 				got := naturalLess(tt.s1, tt.s2)
 				if got != tt.expected {
@@ -357,7 +359,8 @@ func TestNaturalSort(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 		"ISO 8859-16",
 	}
 
-	sort.Slice(input,
+	sort.Slice(
+		input,
 		func(i, j int) bool {
 			return naturalLess(input[i], input[j])
 		},

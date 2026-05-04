@@ -49,7 +49,7 @@ var nameReplacements = []struct {
 var versionReplacements = []struct {
 	old, new string
 }{
-	{"v1.0.11-0.20260305102058-3d32e71abc0b", "v1.0.11* (2026-Mar-05, g3d32e71)"},
+	{"v1.0.11-0.20260504082836-ee87ca5ff3b6", "v1.0.11* (2026-May-04, gee87ca5)"},
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +159,8 @@ func printVersionTable() {
 			}
 		}
 
-		rows = append(rows,
+		rows = append(
+			rows,
 			row{
 				Name:    sanitizeName(info.Main.Path),
 				Version: v,
@@ -174,7 +175,8 @@ func printVersionTable() {
 				v += "*"
 			}
 
-			rows = append(rows,
+			rows = append(
+				rows,
 				row{
 					Name:    sanitizeName(dep.Path),
 					Version: sanitizeVersion(v),
@@ -188,7 +190,8 @@ func printVersionTable() {
 
 	compVer := raw
 
-	idx := strings.IndexFunc(raw,
+	idx := strings.IndexFunc(
+		raw,
 		func(r rune) bool {
 			return r >= '0' && r <= '9'
 		},
@@ -210,7 +213,8 @@ func printVersionTable() {
 		compVer += "*"
 	}
 
-	rows = append(rows,
+	rows = append(
+		rows,
 		row{
 			Name: fmt.Sprintf("Go compiler (%s)",
 				runtime.Compiler),
@@ -256,7 +260,8 @@ func printVersionTable() {
 		maxVer = verLen
 	}
 
-	border := fmt.Sprintf("+=%s=+=%s=+\r\n",
+	border := fmt.Sprintf(
+		"+=%s=+=%s=+\r\n",
 		strings.Repeat("=", maxName), strings.Repeat("=", maxVer),
 	)
 

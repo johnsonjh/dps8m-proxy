@@ -45,7 +45,8 @@ func runSignalHandlers() {
 			if s == syscall.SIGDANGER {
 				log.Printf(
 					"%sSIGDANGER received: Requesting garbage collection and freeing memory.\r\n",
-					boomPrefix())
+					boomPrefix(),
+				)
 				debug.FreeOSMemory()
 				lowerGOGC()
 			} else {
