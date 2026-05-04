@@ -3,7 +3,7 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.12-dev
+# v1.1.12 (2026-May-04)
 
 * Code Quality & Maintenance
   * Improved code formatting across the project by conforming to
