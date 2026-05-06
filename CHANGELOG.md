@@ -8,6 +8,12 @@
 * Build System Improvements
   * Integrated `pvs-golang` into the linting process and added a
     corresponding `make` target.
+[]()
+
+[]()
+* Code Quality & Maintenance
+  * Add `Local Variables` blocks to various files for easier editing
+    of the source code using GNU Emacs.
 
 # v1.1.13 (2026-05-06 01:21:54)
 
