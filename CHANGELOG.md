@@ -7,7 +7,7 @@
 
 * TBD
 
-# v1.1.13 v1.1.13 (2026-05-06 01:21:54)
+# v1.1.13 (2026-05-06 01:21:54)
 
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
