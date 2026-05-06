@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.1.13-dev (2026-May-06 g24397c9) [linux/amd64]
+DPS8M Proxy v1.1.13 (2026-May-06 g6b4ca98) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,31 +326,31 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.1.13-dev (2026-May-06 g24397c9) [linux/amd64]
+DPS8M Proxy v1.1.13 (2026-May-06 g6b4ca98) [linux/amd64]
 
-+===========================+=======================================+
-| Component                 | Version                               |
-+===========================+=======================================+
-| dps8m/proxy               | v1.1.13-dev                           |
-| arl/statsviz              | v0.8.0                                |
-| google/gops               | v0.3.29                               |
-| gorilla/websocket         | v1.5.3                                |
-| hashicorp/mdns            | v1.0.6                                |
-| klauspost/compress        | v1.18.6                               |
-| miekg/dns                 | v1.1.72                               |
-| sorairolake/lzip-go       | v0.3.8                                |
-| spf13/pflag               | v1.0.11-0.20260505231352-18450ea2f1d4 |
-| ulikunitz/xz              | v0.5.15                               |
-| go.etcd.io/bbolt          | v1.4.3                                |
-| golang.org/x/crypto       | v0.50.0                               |
-| golang.org/x/net          | v0.53.0                               |
-| golang.org/x/sys          | v0.43.0                               |
-| golang.org/x/term         | v0.42.0                               |
-| golang.org/x/text         | v0.36.0                               |
-| kernel.org/.../libcap/cap | v1.2.78                               |
-| kernel.org/.../libcap/psx | v1.2.78                               |
-| Go compiler (gc)          | v1.26.2                               |
-+===========================+=======================================+
++===========================+==================================+
+| Component                 | Version                          |
++===========================+==================================+
+| dps8m/proxy               | v1.1.13                          |
+| arl/statsviz              | v0.8.0                           |
+| google/gops               | v0.3.29                          |
+| gorilla/websocket         | v1.5.3                           |
+| hashicorp/mdns            | v1.0.6                           |
+| klauspost/compress        | v1.18.6                          |
+| miekg/dns                 | v1.1.72                          |
+| sorairolake/lzip-go       | v0.3.8                           |
+| spf13/pflag               | v1.0.11* (2026-May-05, g18450ea) |
+| ulikunitz/xz              | v0.5.15                          |
+| go.etcd.io/bbolt          | v1.4.3                           |
+| golang.org/x/crypto       | v0.50.0                          |
+| golang.org/x/net          | v0.53.0                          |
+| golang.org/x/sys          | v0.43.0                          |
+| golang.org/x/term         | v0.42.0                          |
+| golang.org/x/text         | v0.36.0                          |
+| kernel.org/.../libcap/cap | v1.2.78                          |
+| kernel.org/.../libcap/psx | v1.2.78                          |
+| Go compiler (gc)          | v1.26.2                          |
++===========================+==================================+
 ```
 
 * If you need to see additional details about the `proxy` binary,
