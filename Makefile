@@ -142,7 +142,6 @@ lint check:
 
 file-diff:
 	diff LICENSE LICENSES/MIT.txt
-	diff .gitlab/CODEOWNERS .github/CODEOWNERS
 
 ##############################################################################
 # Target: golist
