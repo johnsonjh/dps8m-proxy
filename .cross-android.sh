@@ -66,5 +66,16 @@ env "${MAKE:-make}" \
 mv -f "./proxy" "./proxy.android.amd64"
 
 ###############################################################################
+# Local Variables:
+# mode: shell
+# indent-tabs-mode: nil
+# sh-basic-offset: 2
+# tab-width: 2
+# fill-column: 80
+# eval: (add-hook 'before-save-hook 'untabify nil t)
+# eval: (setq-local display-fill-column-indicator-column 80)
+# eval: (display-fill-column-indicator-mode 1)
+# End:
+###############################################################################
 # vim: set ft=sh expandtab tabstop=2 cc=80 :
 ###############################################################################
