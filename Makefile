@@ -129,6 +129,7 @@ lint check:
 		nilaway \
 		golist \
 		govulncheck \
+		pvs-golang \
 		gopls
 	@test -z "$${CI_NO_CROSS:-}" && { \
 		env printf '\n%s\n' "🧩 Running 'make cross'..." 2> /dev/null || :; \
@@ -276,6 +277,23 @@ govulncheck:
 		govulncheck \
 			-show color,traces \
 			./...
+
+##############################################################################
+# Target: pvs-golang
+
+pvs-golang:
+	@command -v pvs-golang > /dev/null 2>&1 || \
+		{ env printf '%s\n' "⚠️ pvs-golang not found!" \
+			2> /dev/null || :; exit 0; } ; \
+		$(RM) "dps8m-proxy.json" > /dev/null 2>&1 || :; \
+		export PWD_P="$$(pwd -P)"; \
+		set -x; pvs-golang analyze \
+			--output "$${PWD_P:?}"/dps8m-proxy.json \
+			"$${PWD_P:?}"
+	@grep -q '  "warnings": \[\]$$' dps8m-proxy.json || \
+		{ jq < dps8m-proxy.json 2> /dev/null || \
+			{ printf '%s\n' "$$(cat ./dps8m-proxy.json)"; }; exit 1; } && \
+			{ printf '%s\n' "No warnings!"; set -x; $(RM) dps8m-proxy.json; }
 
 ##############################################################################
 # Target: gopls

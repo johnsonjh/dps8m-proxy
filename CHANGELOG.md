@@ -5,7 +5,9 @@
 
 # v1.1.14-dev
 
-* TBD
+* Build System Improvements
+  * Integrated `pvs-golang` into the linting process and added a
+    corresponding `make` target.
 
 # v1.1.13 (2026-05-06 01:21:54)
 
