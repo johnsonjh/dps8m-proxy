@@ -3,9 +3,12 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.13-dev
+# v1.1.13 (2026-May-06)
 
-* TBD
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260504082836-ee87ca5ff3b6`
+    to `v1.0.11-0.20260505231352-18450ea2f1d4`.
 
 # v1.1.12 (2026-05-04 09:45:34)
 
