@@ -129,6 +129,7 @@ lint check:
 		nilaway \
 		golist \
 		govulncheck \
+		pvs-golang \
 		gopls
 	@test -z "$${CI_NO_CROSS:-}" && { \
 		env printf '\n%s\n' "🧩 Running 'make cross'..." 2> /dev/null || :; \
@@ -276,6 +277,23 @@ govulncheck:
 		govulncheck \
 			-show color,traces \
 			./...
+
+##############################################################################
+# Target: pvs-golang
+
+pvs-golang:
+	@command -v pvs-golang > /dev/null 2>&1 || \
+		{ env printf '%s\n' "⚠️ pvs-golang not found!" \
+			2> /dev/null || :; exit 0; } ; \
+		$(RM) "dps8m-proxy.json" > /dev/null 2>&1 || :; \
+		export PWD_P="$$(pwd -P)"; \
+		set -x; "$$(command -v pvs-golang)" analyze \
+			--output "$${PWD_P:?}"/dps8m-proxy.json \
+			"$${PWD_P:?}"
+	@grep -q '  "warnings": \[\]$$' dps8m-proxy.json || \
+		{ jq < dps8m-proxy.json 2> /dev/null || \
+			{ printf '%s\n' "$$(cat dps8m-proxy.json)"; }; exit 1; } && \
+			{ printf '%s\n' "No warnings!"; set -x; $(RM) dps8m-proxy.json; }
 
 ##############################################################################
 # Target: gopls
@@ -589,8 +607,19 @@ install:
 
 ##############################################################################
 # Local Variables:
-# mode: make
-# tab-width: 4
+# mode: makefile
+# indent-tabs-mode: t
+# tab-width: 8
+# whitespace-style: (tabs tab-mark)
+# whitespace-display-mappings: ((tab-mark 9 [45] [45]))
+# fill-column: 80
+# eval: (setq-local whitespace-display-mappings
+#                   '((tab-mark 9
+#                               [45 45 45 45 45 45 62]
+#                               [45 45 45 45 45 45 62])))
+# eval: (whitespace-mode 1)
+# eval: (setq-local display-fill-column-indicator-column 80)
+# eval: (display-fill-column-indicator-mode 1)
 # End:
 ##############################################################################
 # vim: set ft=make noexpandtab tabstop=4 cc=78 :

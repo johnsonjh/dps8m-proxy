@@ -3,7 +3,26 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.13 (2026-May-06)
+# v1.1.14 (2026-05-07)
+
+* Build System Improvements
+  * Integrated `pvs-golang` into the linting process and added a
+    corresponding `make` target.
+[]()
+
+[]()
+* Code Quality & Maintenance
+  * Add `Local Variables` blocks to various files for easier editing
+    of the source code using GNU Emacs.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.26.2` to `v1.26.3`.
+
+# v1.1.13 (2026-05-06 01:21:54)
 
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
