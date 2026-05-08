@@ -6192,16 +6192,28 @@ func nowStamp() string {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func getFileContent(baseFilename, username string) ([]byte, error) {
-	userSpecificFile := fmt.Sprintf(
-		"%s-%s.txt", strings.TrimSuffix(baseFilename, ".txt"), username,
-	)
+	safeUsername := username != ""
 
-	content, err := os.ReadFile(userSpecificFile) //nolint:gosec,nolintlint
-	if err == nil {
-		return content, nil
+	for _, r := range username {
+		if r == '/' || r == '\\' || r == ':' || r < 0x20 || r == 0x7f {
+			safeUsername = false
+
+			break
+		}
 	}
 
-	content, err = os.ReadFile(baseFilename) //nolint:gosec,nolintlint
+	if safeUsername {
+		userSpecificFile := fmt.Sprintf(
+			"%s-%s.txt", strings.TrimSuffix(baseFilename, ".txt"), username,
+		)
+
+		content, err := os.ReadFile(userSpecificFile) //nolint:gosec,nolintlint
+		if err == nil {
+			return content, nil
+		}
+	}
+
+	content, err := os.ReadFile(baseFilename) //nolint:gosec,nolintlint
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w",
 			err)

@@ -6,16 +6,11 @@
 # v1.1.16-dev
 
 * New Features & Improvements
-  * Fixed a potential panic in the `SIGUSR1` signal handler by closing
-    the shutdown channel via `sync.Once`, ensuring all shutdown
-    listeners are reliably notified.
-  * Fixed a potential panic in the SSH `pty-req` handler caused by
-    out-of-bounds reads on malformed payloads, by validating the
-    payload length and parsing the `TERM` string length as a proper
-    big-endian `uint32` per RFC 4254.
+  * Fixed a potential panic in the `SIGUSR1` signal handler.
+  * Fixed a potential panic in the SSH `pty-req` handler.
   * Suppressed a spurious "Unable to parse clean shutdown marker
-    date" warning emitted when initializing a brand-new statistics
-    database, by skipping the check when the marker key is absent.
+    date" warning when initializing a new statistics database.
+  * Hardened per-althost content lookups.
 
 # v1.1.15 (2026-05-07 19:36:24)
 
