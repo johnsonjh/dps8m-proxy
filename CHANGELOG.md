@@ -316,8 +316,8 @@
     `listGoroutines` so an atypical `runtime.Stack` output
     cannot panic the console handler.
   * Eliminated a brief unlock window in shareable-username
-    generation by moving the random-name + collision-check
-    + map insert into a single critical section.
+    generation by moving the random-name + collision-check +
+    map insert into a single critical section.
   * Held the console-input "stopped unexpectedly" alert when
     `gracefulShutdownMode` is set so an operator-initiated
     graceful shutdown followed by stdin EOF no longer
