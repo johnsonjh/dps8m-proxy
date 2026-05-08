@@ -11,6 +11,7 @@
   * Suppressed a spurious "Unable to parse clean shutdown marker
     date" warning when initializing a new statistics database.
   * Hardened per-althost content lookups.
+  * Precompiled regular expressions for improved performance.
 
 # v1.1.15 (2026-05-07 19:36:24)
 

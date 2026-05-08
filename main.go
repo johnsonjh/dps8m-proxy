@@ -223,6 +223,13 @@ var (
 	denyFile                         = "deny.txt"
 	blockFile                        = "block.txt"
 	naturalSortRegexp                = regexp.MustCompile(`(\d+)|(\D+)`)
+	helpBoolFlagRegexp               = regexp.MustCompile(`\[=true\|false\]`)
+	helpLeadingSpacesRegexp          = regexp.MustCompile(`(?m)^ {6}`)
+	helpSSHAddrRegexp                = regexp.MustCompile(`--ssh-addr strings`)
+	helpStringTypeRegexp             = regexp.MustCompile(` string   `)
+	helpUintTypeRegexp               = regexp.MustCompile(` uint   `)
+	helpOctalTypeRegexp              = regexp.MustCompile(` octal   `)
+	helpFloatTypeRegexp              = regexp.MustCompile(` float   `)
 	compressAlgo                     string
 	compressLevel                    string
 	dbLogLevel                       string
@@ -672,20 +679,13 @@ func init() { //nolint:gochecknoinits
 		pflag.PrintDefaults()
 		pflag.CommandLine.SetOutput(os.Stdout)
 
-		re := regexp.MustCompile(`\[=true\|false\]`)
-		output := re.ReplaceAllString(buf.String(), "             ")
-		reSpaces := regexp.MustCompile(`(?m)^ {6}`)
-		output = reSpaces.ReplaceAllString(output, "  ")
-		reString := regexp.MustCompile(`--ssh-addr strings`)
-		output = reString.ReplaceAllString(output, "--ssh-addr string ")
-		stString := regexp.MustCompile(` string   `)
-		output = stString.ReplaceAllString(output, " <string> ")
-		uiString := regexp.MustCompile(` uint   `)
-		output = uiString.ReplaceAllString(output, " <uint> ")
-		ocString := regexp.MustCompile(` octal   `)
-		output = ocString.ReplaceAllString(output, " <octal> ")
-		flString := regexp.MustCompile(` float   `)
-		output = flString.ReplaceAllString(output, " <float> ")
+		output := helpBoolFlagRegexp.ReplaceAllString(buf.String(), "             ")
+		output = helpLeadingSpacesRegexp.ReplaceAllString(output, "  ")
+		output = helpSSHAddrRegexp.ReplaceAllString(output, "--ssh-addr string ")
+		output = helpStringTypeRegexp.ReplaceAllString(output, " <string> ")
+		output = helpUintTypeRegexp.ReplaceAllString(output, " <uint> ")
+		output = helpOctalTypeRegexp.ReplaceAllString(output, " <octal> ")
+		output = helpFloatTypeRegexp.ReplaceAllString(output, " <float> ")
 		_, _ = fmt.Fprint(os.Stdout,
 			output)
 		_, _ = fmt.Fprintf(os.Stdout,

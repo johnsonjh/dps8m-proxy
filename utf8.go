@@ -37,6 +37,10 @@ var (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+var utf8LocaleRegexp = regexp.MustCompile(`(?i)utf.?8`)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func haveUTF8support() bool {
 	utf8SupportOnce.Do(
 		func() {
@@ -82,13 +86,12 @@ func canOutputUTF8() bool {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func isUTF8unix() bool {
-	pattern := regexp.MustCompile(`(?i)utf.?8`)
 	keys := []string{"LC_ALL", "LC_CTYPE", "LANG", "TERM"}
 
 	for _, key := range keys {
 		val := os.Getenv(key)
 
-		if val != "" && pattern.MatchString(val) {
+		if val != "" && utf8LocaleRegexp.MatchString(val) {
 			return true
 		}
 	}

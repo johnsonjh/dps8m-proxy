@@ -555,6 +555,7 @@ codeowners
 
 NATURAL:
 adduser
+althost
 american
 avahi
 backend
