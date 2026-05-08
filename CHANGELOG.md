@@ -13,6 +13,9 @@
     out-of-bounds reads on malformed payloads, by validating the
     payload length and parsing the `TERM` string length as a proper
     big-endian `uint32` per RFC 4254.
+  * Suppressed a spurious "Unable to parse clean shutdown marker
+    date" warning emitted when initializing a brand-new statistics
+    database, by skipping the check when the marker key is absent.
 
 # v1.1.15 (2026-05-07 19:36:24)
 
