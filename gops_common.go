@@ -16,6 +16,8 @@ package main
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 import (
+	"log"
+
 	"github.com/google/gops/agent"
 )
 
@@ -27,12 +29,16 @@ const gopsEnabled = true
 
 func gopsInit() {
 	go func() {
-		_ = agent.Listen(
+		err := agent.Listen(
 			agent.Options{
 				ReuseSocketAddrAndPort: true,
 				ShutdownCleanup:        false,
 			},
 		)
+		if err != nil {
+			log.Printf("%sFailed to start gops agent: %v",
+				warnPrefix(), err)
+		}
 	}()
 }
 

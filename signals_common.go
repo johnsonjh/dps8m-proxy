@@ -37,18 +37,12 @@ func handleSignal(s os.Signal) {
 
 		gracefulShutdownMode.Store(true)
 
-		connectionsMutex.Lock()
-
-		if len(connections) == 0 {
-			connectionsMutex.Unlock()
-
+		if connectionsInFlight.Load() == 0 {
 			shutdownOnce.Do(
 				func() {
 					close(shutdownSignal)
 				},
 			)
-		} else {
-			connectionsMutex.Unlock()
 		}
 
 	case syscall.SIGUSR2:

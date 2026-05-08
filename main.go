@@ -162,6 +162,16 @@ const (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+const (
+	//nolint:godoclint,nolintlint
+	// A shareable username is a leading "_" followed by random chars.
+	shareableUsernameRandomLen = 20                             // random suffix length
+	shareableUsernameLen       = 1 + shareableUsernameRandomLen // including the leading "_"
+	shareableUsernameTailLen   = shareableUsernameLen - 3       // chars kept after "..." in displays
+)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 //go:embed LICENSE
 var licenseText string
 
@@ -322,7 +332,7 @@ type Connection struct {
 	initialWindowWidth  uint32
 	initialWindowHeight uint32
 	iconvDecoder        *encoding.Decoder
-	iconvEnabled        bool
+	iconvEnabled        atomic.Bool
 	isDefaultTarget     bool
 	emacsKeymapEnabled  bool
 	wasMonitored        bool
@@ -2307,18 +2317,12 @@ func toggleGracefulShutdown() {
 				nowStamp(), bellPrefix())
 		}
 
-		connectionsMutex.Lock()
-
-		if len(connections) == 0 {
-			connectionsMutex.Unlock()
-
+		if connectionsInFlight.Load() == 0 {
 			shutdownOnce.Do(
 				func() {
 					close(shutdownSignal)
 				},
 			)
-		} else {
-			connectionsMutex.Unlock()
 		}
 	}
 }
@@ -2543,9 +2547,9 @@ func listConnections(truncate bool) {
 
 		user := conn.sshConn.User()
 
-		if truncate && len(user) > 21 {
+		if truncate && len(user) > shareableUsernameLen {
 			userTruncat = true
-			user = "..." + user[len(user)-18:]
+			user = "..." + user[len(user)-shareableUsernameTailLen:]
 		}
 
 		var details, idle string
@@ -3327,7 +3331,7 @@ func killAllConnections() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func sendNaws(conn *Connection, width, height uint32) {
-	if !conn.nawsActive || conn.telnetConn == nil {
+	if !conn.nawsActive || !hasTelnetConn(conn) {
 		return
 	}
 
@@ -3677,7 +3681,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		cm := findCharmap(iconv)
 		if cm != nil {
 			conn.iconvDecoder = cm.NewDecoder()
-			conn.iconvEnabled = true
+			conn.iconvEnabled.Store(true)
 		}
 	}
 
@@ -3711,11 +3715,22 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		}
 	}
 
-	if !found && strings.HasPrefix(conn.userName, "_") && len(conn.userName) == 21 {
+	if !found && strings.HasPrefix(conn.userName, "_") &&
+		len(conn.userName) == shareableUsernameLen {
 		conn.invalidShare = true
 	}
 
 	connectionsInFlight.Add(1)
+
+	defer func() {
+		if connectionsInFlight.Add(^uint64(0)) == 0 && gracefulShutdownMode.Load() {
+			shutdownOnce.Do(
+				func() {
+					close(shutdownSignal)
+				},
+			)
+		}
+	}()
 
 	connections[sid] = conn
 
@@ -3765,14 +3780,6 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		delete(connections, sid)
 
 		connectionsMutex.Unlock()
-
-		if connectionsInFlight.Add(^uint64(0)) == 0 && gracefulShutdownMode.Load() {
-			shutdownOnce.Do(
-				func() {
-					close(shutdownSignal)
-				},
-			)
-		}
 
 		const unknownHost = "<UNKNOWN>"
 
@@ -3935,20 +3942,22 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			case "pty-req":
 				if len(req.Payload) >= 4 {
 					termLen := binary.BigEndian.Uint32(req.Payload[0:4])
+					payloadLen := uint64(len(req.Payload))
 
-					if len(req.Payload) >= 4+int(termLen) {
-						term := string(req.Payload[4 : 4+termLen])
+					if payloadLen >= 4+uint64(termLen) {
+						termLenInt := int(termLen)
+						term := string(req.Payload[4 : 4+termLenInt])
 						conn.termType = term
 
-						if len(req.Payload) >= 4+int(termLen)+8 {
-							off := 4 + int(termLen)
+						if payloadLen >= 4+uint64(termLen)+8 {
+							off := 4 + termLenInt
 							width := binary.BigEndian.Uint32(req.Payload[off : off+4])
 							height := binary.BigEndian.Uint32(req.Payload[off+4 : off+8])
 
 							conn.initialWindowWidth = width
 							conn.initialWindowHeight = height
 
-							if conn.telnetConn != nil {
+							if hasTelnetConn(conn) {
 								nawsWill := []byte{TelcmdIAC, TelcmdWILL, TeloptNAWS}
 
 								if debugNegotiation {
@@ -4001,7 +4010,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							warnPrefix(), conn.ID, err)
 					}
 
-					if conn.telnetConn != nil {
+					if hasTelnetConn(conn) {
 						go sendNaws(conn, width, height)
 					}
 				} else {
@@ -4673,11 +4682,11 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		_ = tcp2.SetNoDelay(true)
 	}
 
-	connectionsMutex.Lock()
+	conn.telnetWriteMutex.Lock()
 
 	conn.telnetConn = remote
 
-	connectionsMutex.Unlock()
+	conn.telnetWriteMutex.Unlock()
 
 	telnetReader := bufio.NewReader(remote)
 
@@ -5032,7 +5041,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					fwd = bytes.ReplaceAll(fwd, []byte{0}, []byte{})
 				}
 
-				if conn.iconvEnabled && conn.iconvDecoder != nil {
+				if conn.iconvEnabled.Load() && conn.iconvDecoder != nil {
 					fwd = decodeTelnetData(conn.iconvDecoder, fwd)
 				}
 
@@ -5072,7 +5081,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					}
 				}
 
-				if conn.iconvEnabled && conn.iconvDecoder != nil {
+				if conn.iconvEnabled.Load() && conn.iconvDecoder != nil {
 					_, err = logwriter.Write(fwd)
 				} else {
 					_, err = logwriter.Write(buf[:n])
@@ -5403,7 +5412,7 @@ func negotiateTelnet(r *bufio.Reader, remote net.Conn, ch ssh.Channel, logw io.W
 
 			case TelcmdIAC: // Escaped IAC
 				data := []byte{TelcmdIAC}
-				if conn.iconvEnabled && conn.iconvDecoder != nil {
+				if conn.iconvEnabled.Load() && conn.iconvDecoder != nil {
 					decoded, _, err := transform.Bytes(conn.iconvDecoder, data)
 					if err == nil {
 						data = decoded
@@ -5418,7 +5427,7 @@ func negotiateTelnet(r *bufio.Reader, remote net.Conn, ch ssh.Channel, logw io.W
 			}
 		} else {
 			data := []byte{b}
-			if conn.iconvEnabled && conn.iconvDecoder != nil {
+			if conn.iconvEnabled.Load() && conn.iconvDecoder != nil {
 				decoded, _, err := transform.Bytes(conn.iconvDecoder, data)
 				if err == nil {
 					data = decoded
@@ -5481,6 +5490,15 @@ func telnetWrite(conn *Connection, p []byte) (int, error) {
 	}
 
 	return n, nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func hasTelnetConn(conn *Connection) bool {
+	conn.telnetWriteMutex.Lock()
+	defer conn.telnetWriteMutex.Unlock()
+
+	return conn.telnetConn != nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -5871,9 +5889,9 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel,
 
 	case 'c', 'C':
 		if iconv != "" {
-			conn.iconvEnabled = !conn.iconvEnabled
+			conn.iconvEnabled.Store(!conn.iconvEnabled.Load())
 
-			if conn.iconvEnabled {
+			if conn.iconvEnabled.Load() {
 				_, err := ch.Write([]byte("\r\n>> Character map conversion ENABLED\r\n"))
 				if err != nil {
 					log.Printf("%s"+
@@ -6026,7 +6044,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel,
 				warnPrefix(), err)
 		}
 
-		if conn.iconvEnabled && iconv != "" {
+		if conn.iconvEnabled.Load() && iconv != "" {
 			_, err = ch.Write(fmt.Appendf(nil,
 				">> CNV - Character map \"%s\" to UTF-8 conversion enabled.\r\n",
 				iconv))
@@ -6230,7 +6248,7 @@ func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex)
 	const chars = "cdhkmnprswxyzCDFGJKMNPRSTXY57"
 
 	for {
-		b := make([]byte, 20)
+		b := make([]byte, shareableUsernameRandomLen)
 
 		_, err := rand.Read(b)
 		if err != nil {

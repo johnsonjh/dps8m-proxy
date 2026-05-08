@@ -35,6 +35,16 @@
   * Renamed the proxy traffic stats labels from "Inbound"/"Outbound"
     to the direction-explicit "SSH to TELNET" and "TELNET to SSH"
     so the displayed totals are unambiguous.
+  * Made graceful shutdown triggers consistent across all paths.
+  * Unified mutex protection for `conn.telnetConn` reads and writes.
+  * Hardened `pty-req` parsing against 32-bit integer overflow.
+  * Tightened in-flight connection counter Add/defer pairing.
+  * Eliminated data race on the user-triggered `iconv` toggle.
+  * Replaced some magic numbers with descriptively named constants.
+  * Log a debug warning if the `gops` diagnostic agent fails to start.
+  * Reduced mDNS shutdown-watcher goroutines to a single one per
+    announcement, instead of one per (interface, service) pair.
+  * Cleaned up an mDNS interface-matching loop.
 
 # v1.1.15 (2026-05-07 19:36:24)
 

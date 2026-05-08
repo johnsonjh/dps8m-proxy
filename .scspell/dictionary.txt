@@ -93,6 +93,7 @@ ttype
 tzdata
 uintptr
 ulikunitz
+usernames
 warningf
 wronly
 
@@ -555,6 +556,9 @@ goleak
 
 FILEID: ea37439c-48e0-11f1-a7af-80ee73e9b8e7
 codeowners
+
+FILEID: 842298dc-6bd1-11f0-ba59-80ee73e9b8e7
+sgops
 
 NATURAL:
 adduser

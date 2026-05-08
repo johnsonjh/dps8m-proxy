@@ -18,6 +18,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -140,12 +141,12 @@ func announceMDNS(listener net.Listener, listenHost string, altHosts map[string]
 					}
 				}
 
-				for _, adIP := range advertiseIPs {
-					if ip != nil && ip.Equal(adIP) {
-						targetInterfaces = append(targetInterfaces, &allInterfaces[i])
+				if ip == nil {
+					continue
+				}
 
-						break
-					}
+				if slices.ContainsFunc(advertiseIPs, ip.Equal) {
+					targetInterfaces = append(targetInterfaces, &allInterfaces[i])
 				}
 			}
 		}
@@ -157,6 +158,8 @@ func announceMDNS(listener net.Listener, listenHost string, altHosts map[string]
 
 		return
 	}
+
+	var servers []*mdns.Server
 
 	for _, iface := range targetInterfaces {
 		var ifaceIPs []net.IP
@@ -222,11 +225,7 @@ func announceMDNS(listener net.Listener, listenHost string, altHosts map[string]
 			continue
 		}
 
-		go func() {
-			<-shutdownSignal
-
-			_ = defaultServer.Shutdown()
-		}()
+		servers = append(servers, defaultServer)
 
 		for name, addr := range altHosts {
 			txt := []string{
@@ -241,8 +240,8 @@ func announceMDNS(listener net.Listener, listenHost string, altHosts map[string]
 				altInstance, service, "local.", hostname, port, ifaceIPs, txt,
 			)
 			if err != nil {
-				log.Printf("Error creating mDNS service for %s on interface %s: %s",
-					name, iface.Name, err)
+				log.Printf("%sError creating mDNS service for %s on interface %s: %s",
+					alertPrefix(), name, iface.Name, err)
 
 				continue
 			}
@@ -260,12 +259,18 @@ func announceMDNS(listener net.Listener, listenHost string, altHosts map[string]
 				continue
 			}
 
-			go func() {
-				<-shutdownSignal
-
-				_ = altServer.Shutdown()
-			}()
+			servers = append(servers, altServer)
 		}
+	}
+
+	if len(servers) > 0 {
+		go func() {
+			<-shutdownSignal
+
+			for _, srv := range servers {
+				_ = srv.Shutdown()
+			}
+		}()
 	}
 }
 
