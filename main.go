@@ -323,21 +323,21 @@ type Connection struct {
 	cancelFunc          context.CancelFunc
 	ID                  string
 	hostName            string
-	termType            string
+	termType            atomic.Pointer[string]
 	shareableUsername   string
 	targetHost          string
 	userName            string
 	basePath            string
 	targetPort          int
-	initialWindowWidth  uint32
-	initialWindowHeight uint32
+	initialWindowWidth  atomic.Uint32
+	initialWindowHeight atomic.Uint32
 	iconvDecoder        *encoding.Decoder
 	iconvEnabled        atomic.Bool
+	wasMonitored        atomic.Bool
+	nawsActive          atomic.Bool
 	isDefaultTarget     bool
 	emacsKeymapEnabled  bool
-	wasMonitored        bool
 	monitoring          bool
-	nawsActive          bool
 	invalidShare        bool
 }
 
@@ -2862,6 +2862,17 @@ func listConfiguration() {
 
 	var lifetimeString string
 
+	if !persistedStartTime.IsZero() {
+		lifetime := time.Since(persistedStartTime)
+		days := int(lifetime.Hours() / 24)
+		hours := int(lifetime.Hours()) % 24
+		minutes := int(lifetime.Minutes()) % 60
+		seconds := int(lifetime.Seconds()) % 60
+		lifetimeString = fmt.Sprintf("%dd%dh%dm%ds (created %s)",
+			days, hours, minutes, seconds,
+			persistedStartTime.Format("2006-Jan-02 15:04:05"))
+	}
+
 	if dbTime > 1 && lifetimeString != "" { //nolint:gocritic
 		updateMaxLength(fmt.Sprintf("Database enabled: %s, %d seconds between writes",
 			dbPath, dbTime))
@@ -2873,15 +2884,7 @@ func listConfiguration() {
 			dbPath))
 	}
 
-	if !persistedStartTime.IsZero() {
-		lifetime := time.Since(persistedStartTime)
-		days := int(lifetime.Hours() / 24)
-		hours := int(lifetime.Hours()) % 24
-		minutes := int(lifetime.Minutes()) % 60
-		seconds := int(lifetime.Seconds()) % 60
-		lifetimeString = fmt.Sprintf("%dd%dh%dm%ds (created %s)",
-			days, hours, minutes, seconds,
-			persistedStartTime.Format("2006-Jan-02 15:04:05"))
+	if lifetimeString != "" {
 		updateMaxLength("Database age: " + lifetimeString)
 	}
 
@@ -3331,7 +3334,7 @@ func killAllConnections() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func sendNaws(conn *Connection, width, height uint32) {
-	if !conn.nawsActive || !hasTelnetConn(conn) {
+	if !conn.nawsActive.Load() || !hasTelnetConn(conn) {
 		return
 	}
 
@@ -3708,7 +3711,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 			conn.monitoring = true
 			conn.monitoredConnection = existingConn
 			atomic.AddUint64(&existingConn.totalMonitors, 1)
-			existingConn.wasMonitored = true
+			existingConn.wasMonitored.Store(true)
+
 			found = true
 
 			break
@@ -3721,16 +3725,6 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	}
 
 	connectionsInFlight.Add(1)
-
-	defer func() {
-		if connectionsInFlight.Add(^uint64(0)) == 0 && gracefulShutdownMode.Load() {
-			shutdownOnce.Do(
-				func() {
-					close(shutdownSignal)
-				},
-			)
-		}
-	}()
 
 	connections[sid] = conn
 
@@ -3779,7 +3773,18 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 		delete(connections, sid)
 
+		fireShutdown := connectionsInFlight.Add(^uint64(0)) == 0 &&
+			gracefulShutdownMode.Load()
+
 		connectionsMutex.Unlock()
+
+		if fireShutdown {
+			shutdownOnce.Do(
+				func() {
+					close(shutdownSignal)
+				},
+			)
+		}
 
 		const unknownHost = "<UNKNOWN>"
 
@@ -3892,6 +3897,11 @@ func parseHostPort(hostPort string) (string, int, error) {
 			portStr)
 	}
 
+	if port < 1 || port > 65535 {
+		return "", 0, fmt.Errorf("port out of range (1-65535): %d",
+			port)
+	}
+
 	return host, port, nil
 }
 
@@ -3947,15 +3957,15 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					if payloadLen >= 4+uint64(termLen) {
 						termLenInt := int(termLen)
 						term := string(req.Payload[4 : 4+termLenInt])
-						conn.termType = term
+						conn.termType.Store(&term)
 
 						if payloadLen >= 4+uint64(termLen)+8 {
 							off := 4 + termLenInt
 							width := binary.BigEndian.Uint32(req.Payload[off : off+4])
 							height := binary.BigEndian.Uint32(req.Payload[off+4 : off+8])
 
-							conn.initialWindowWidth = width
-							conn.initialWindowHeight = height
+							conn.initialWindowWidth.Store(width)
+							conn.initialWindowHeight.Store(height)
 
 							if hasTelnetConn(conn) {
 								nawsWill := []byte{TelcmdIAC, TelcmdWILL, TeloptNAWS}
@@ -4442,8 +4452,24 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			}
 		}()
 
+		var monitoredDone <-chan struct{}
+
+		var ownDone <-chan struct{}
+
 		if conn.monitoredConnection != nil && conn.monitoredConnection.cancelCtx != nil {
-			<-conn.monitoredConnection.cancelCtx.Done()
+			monitoredDone = conn.monitoredConnection.cancelCtx.Done()
+		}
+
+		if ctx != nil {
+			ownDone = ctx.Done()
+		}
+
+		if monitoredDone != nil || ownDone != nil {
+			select {
+			case <-monitoredDone:
+
+			case <-ownDone:
+			}
 		}
 
 		dur := time.Since(conn.startTime)
@@ -4708,8 +4734,11 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 	negotiateTelnet(telnetReader, remote, channel, logwriter, conn)
 
-	if conn.nawsActive && conn.initialWindowWidth > 0 && conn.initialWindowHeight > 0 {
-		sendNaws(conn, conn.initialWindowWidth, conn.initialWindowHeight)
+	width := conn.initialWindowWidth.Load()
+	height := conn.initialWindowHeight.Load()
+
+	if conn.nawsActive.Load() && width > 0 && height > 0 {
+		sendNaws(conn, width, height)
 	}
 
 	var wg sync.WaitGroup
@@ -5035,13 +5064,14 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				atomic.AddUint64(&telnetIn, uint64(n))        //nolint:gosec,nolintlint
 				atomic.AddUint64(&conn.sshInTotal, uint64(n)) //nolint:gosec,nolintlint
 
+				iconvActive := conn.iconvEnabled.Load() && conn.iconvDecoder != nil
 				fwd := buf[:n]
 
 				if !noFilter {
 					fwd = bytes.ReplaceAll(fwd, []byte{0}, []byte{})
 				}
 
-				if conn.iconvEnabled.Load() && conn.iconvDecoder != nil {
+				if iconvActive {
 					fwd = decodeTelnetData(conn.iconvDecoder, fwd)
 				}
 
@@ -5081,7 +5111,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					}
 				}
 
-				if conn.iconvEnabled.Load() && conn.iconvDecoder != nil {
+				if iconvActive {
 					_, err = logwriter.Write(fwd)
 				} else {
 					_, err = logwriter.Write(buf[:n])
@@ -5307,8 +5337,8 @@ func negotiateTelnet(r *bufio.Reader, remote net.Conn, ch ssh.Channel, logw io.W
 
 				case TelcmdDO:
 					if opt == TeloptNAWS { //nolint:gocritic
-						if !conn.nawsActive {
-							conn.nawsActive = true
+						if !conn.nawsActive.Load() {
+							conn.nawsActive.Store(true)
 
 							if debugNegotiation {
 								log.Printf("%sDEBUG: NAWS activated for %s",
@@ -5388,10 +5418,15 @@ func negotiateTelnet(r *bufio.Reader, remote net.Conn, ch ssh.Channel, logw io.W
 
 				if supportedOptions[opt] && opt == TeloptTTYPE &&
 					len(subData) > 0 && subData[0] == TelnetSend {
-					if conn.termType != "" {
-						data := make([]byte, 0, 4+len(conn.termType)+2)
+					var termType string
+					if p := conn.termType.Load(); p != nil {
+						termType = *p
+					}
+
+					if termType != "" {
+						data := make([]byte, 0, 4+len(termType)+2)
 						data = append(data, TelcmdIAC, TelcmdSB, TeloptTTYPE, TelnetIs)
-						data = append(data, []byte(conn.termType)...)
+						data = append(data, []byte(termType)...)
 						data = append(data, TelcmdIAC, TelcmdSE)
 
 						_, err := telnetWrite(conn, data)
@@ -5402,7 +5437,7 @@ func negotiateTelnet(r *bufio.Reader, remote net.Conn, ch ssh.Channel, logw io.W
 
 						writeNegotiation(ch, logw,
 							"[SENT SB "+optName(TeloptTTYPE)+" IS "+
-								conn.termType+" IAC SE]", conn.userName)
+								termType+" IAC SE]", conn.userName)
 					} else {
 						sendIAC(conn, TelcmdWONT, TeloptTTYPE)
 						writeNegotiation(ch, logw,
@@ -5975,7 +6010,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel,
 				warnPrefix(), err)
 		}
 
-		if conn.wasMonitored {
+		if conn.wasMonitored.Load() {
 			connectionsMutex.Lock()
 
 			currentMonitors := 0
@@ -5997,8 +6032,10 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel,
 
 			connectionsMutex.Unlock()
 
+			totalMonitors := atomic.LoadUint64(&conn.totalMonitors)
+
 			timesStr := "times"
-			if conn.totalMonitors == 1 {
+			if totalMonitors == 1 {
 				timesStr = "time"
 			}
 
@@ -6009,7 +6046,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel,
 
 			_, err := ch.Write(fmt.Appendf(nil,
 				">> MON - Shared session has been viewed %d %s; %d %s currently online.\r\n",
-				conn.totalMonitors, timesStr, currentMonitors, userStr))
+				totalMonitors, timesStr, currentMonitors, userStr))
 			if err != nil {
 				log.Printf("%sError writing shared session information to channel: %v",
 					warnPrefix(), err)
@@ -6504,43 +6541,37 @@ func compressLogFile(logFilePath string) {
 
 	var writer io.WriteCloser
 
-	var gzipLevel int
+	var (
+		gzipLevel    int
+		zstdLevel    zstd.EncoderLevel
+		lzipDictSize uint32
+	)
 
 	switch compressLevel {
 	case "fast":
 		gzipLevel = gzip.BestSpeed
-
-	case "normal":
-		gzipLevel = gzip.DefaultCompression
-
-	case "high":
-		gzipLevel = gzip.BestCompression
-	}
-
-	var zstdLevel zstd.EncoderLevel
-
-	switch compressLevel {
-	case "fast":
 		zstdLevel = zstd.SpeedFastest
-
-	case "normal":
-		zstdLevel = zstd.SpeedDefault
-
-	case "high":
-		zstdLevel = zstd.SpeedBestCompression
-	}
-
-	var lzipDictSize uint32
-
-	switch compressLevel {
-	case "fast":
 		lzipDictSize = 1 << 16 // 64 KiB
 
 	case "normal":
+		gzipLevel = gzip.DefaultCompression
+		zstdLevel = zstd.SpeedDefault
 		lzipDictSize = lzip.DefaultDictSize
 
 	case "high":
+		gzipLevel = gzip.BestCompression
+		zstdLevel = zstd.SpeedBestCompression
 		lzipDictSize = lzip.MaxDictSize
+
+	default:
+		log.Printf(
+			"%sUnknown compression level %q, falling back to normal",
+			warnPrefix(), compressLevel,
+		)
+
+		gzipLevel = gzip.DefaultCompression
+		zstdLevel = zstd.SpeedDefault
+		lzipDictSize = lzip.DefaultDictSize
 	}
 
 	switch compressAlgo {
@@ -6566,6 +6597,8 @@ func compressLogFile(logFilePath string) {
 					warnPrefix(), err)
 			}
 
+			_ = os.Remove(compressedFilePath) //nolint:gosec,nolintlint
+
 			return
 		}
 
@@ -6590,6 +6623,8 @@ func compressLogFile(logFilePath string) {
 				log.Printf("%sError closing compressed file after xz writer error: %v",
 					warnPrefix(), err)
 			}
+
+			_ = os.Remove(compressedFilePath) //nolint:gosec,nolintlint
 
 			return
 		}
@@ -6620,6 +6655,8 @@ func compressLogFile(logFilePath string) {
 					warnPrefix(), err)
 			}
 
+			_ = os.Remove(compressedFilePath) //nolint:gosec,nolintlint
+
 			return
 		}
 
@@ -6646,6 +6683,8 @@ func compressLogFile(logFilePath string) {
 				log.Printf("%sError closing compressed file after zstd writer error: %v",
 					warnPrefix(), err)
 			}
+
+			_ = os.Remove(compressedFilePath) //nolint:gosec,nolintlint
 
 			return
 		}
@@ -6678,6 +6717,8 @@ func compressLogFile(logFilePath string) {
 		log.Printf("%sError writing to compressed file %q: %v", //nolint:gosec,nolintlint
 			warnPrefix(), compressedFilePath, err)
 
+		_ = os.Remove(compressedFilePath) //nolint:gosec,nolintlint
+
 		return
 	}
 
@@ -6686,6 +6727,8 @@ func compressLogFile(logFilePath string) {
 		log.Printf("%sError closing writer for %q: %v", //nolint:gosec,nolintlint
 			warnPrefix(), compressedFilePath, err)
 
+		_ = os.Remove(compressedFilePath) //nolint:gosec,nolintlint
+
 		return
 	}
 
@@ -6693,6 +6736,8 @@ func compressLogFile(logFilePath string) {
 	if err != nil {
 		log.Printf("%sError closing compressed file %q: %v", //nolint:gosec,nolintlint
 			warnPrefix(), compressedFilePath, err)
+
+		_ = os.Remove(compressedFilePath) //nolint:gosec,nolintlint
 
 		return
 	}

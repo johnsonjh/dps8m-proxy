@@ -45,6 +45,20 @@
   * Reduced mDNS shutdown-watcher goroutines to a single one per
     announcement, instead of one per (interface, service) pair.
   * Cleaned up an mDNS interface-matching loop.
+  * Fixed a goroutine leak when a monitoring session's own SSH
+    connection drops while the monitored connection is still active.
+  * Eliminated data race on the monitor count in shared session
+    status output.
+  * Eliminated data races on per-connection terminal type, NAWS
+    state, initial window size, and shared-session monitored flag.
+  * Rejected port `0` in TELNET host:port specifications.
+  * Made the in-flight connection count and the connections map
+    reach zero in lockstep on session teardown.
+  * Fixed status-display column sizing with very long database paths.
+  * Fix a possible bug reporting the status of the `iconv` flag.
+  * Cleaned up partial compressed log output on compression failures.
+  * Added a fallback for unknown compression levels so log
+    rotation can never silently produce an uncompressed output.
 
 # v1.1.15 (2026-05-07 19:36:24)
 

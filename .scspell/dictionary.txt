@@ -533,6 +533,7 @@ refname
 setcap
 shfmt
 sigusr
+snapshotted
 sorairolake
 sprintf
 sstrip
@@ -695,6 +696,7 @@ systemd
 tabstop
 tabstops
 tacacs
+teardown
 telnet
 timestamping
 tmux
