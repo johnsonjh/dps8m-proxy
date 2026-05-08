@@ -182,6 +182,7 @@ var (
 	altHosts                         = make(map[string]string)
 	blacklistedNetworks              []*net.IPNet
 	blacklistFile                    string
+	networksMutex                    sync.RWMutex
 	connections                      = make(map[string]*Connection)
 	connectionsMutex                 sync.Mutex
 	consoleInputActive               atomic.Bool
@@ -2807,13 +2808,20 @@ func listConfiguration() {
 
 	updateMaxLength("Debug HTTP Server: " + debugHTTPStr)
 
-	if blacklistFile == "" && len(blacklistedNetworks) == 0 { //nolint:gocritic
+	networksMutex.RLock()
+
+	blacklistLen := len(blacklistedNetworks)
+	whitelistLen := len(whitelistedNetworks)
+
+	networksMutex.RUnlock()
+
+	if blacklistFile == "" && blacklistLen == 0 { //nolint:gocritic
 		updateMaxLength("Blacklist: 0 entries active")
 	} else if whitelistFile != "" && blacklistFile == "" {
 		updateMaxLength("Blacklist: Deny all (due to whitelist only)")
 	} else {
 		s9 := fmt.Sprintf("Blacklist: %d entries active",
-			len(blacklistedNetworks))
+			blacklistLen)
 		updateMaxLength(s9)
 	}
 
@@ -2821,7 +2829,7 @@ func listConfiguration() {
 		updateMaxLength("Whitelist: 0 entries active")
 	} else {
 		s10 := fmt.Sprintf("Whitelist: %d entries active",
-			len(whitelistedNetworks))
+			whitelistLen)
 		updateMaxLength(s10)
 	}
 
@@ -2996,20 +3004,27 @@ func listConfiguration() {
 
 	b.WriteString(separator)
 
-	if blacklistFile == "" && len(blacklistedNetworks) == 0 { //nolint:gocritic
+	networksMutex.RLock()
+
+	blacklistLen = len(blacklistedNetworks)
+	whitelistLen = len(whitelistedNetworks)
+
+	networksMutex.RUnlock()
+
+	if blacklistFile == "" && blacklistLen == 0 { //nolint:gocritic
 		printRow(&b, "Blacklist: 0 entries active")
 	} else if whitelistFile != "" && blacklistFile == "" {
 		printRow(&b, "Blacklist: Deny all (due to whitelist only)")
 	} else {
 		printRow(&b, fmt.Sprintf("Blacklist: %d entries active",
-			len(blacklistedNetworks)))
+			blacklistLen))
 	}
 
 	if whitelistFile == "" {
 		printRow(&b, "Whitelist: 0 entries active")
 	} else {
 		printRow(&b, fmt.Sprintf("Whitelist: %d entries active",
-			len(whitelistedNetworks)))
+			whitelistLen))
 	}
 
 	b.WriteString(separator)
@@ -3097,6 +3112,9 @@ func reloadLists() {
 
 		return
 	}
+
+	networksMutex.Lock()
+	defer networksMutex.Unlock()
 
 	if blacklistReloaded {
 		blacklistedNetworks = newBlacklistedNetworks
@@ -4177,9 +4195,16 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		return
 	}
 
+	networksMutex.RLock()
+
+	blacklistSnapshot := blacklistedNetworks
+	whitelistSnapshot := whitelistedNetworks
+
+	networksMutex.RUnlock()
+
 	var rejectedByRule string
 
-	for _, ipNet := range blacklistedNetworks {
+	for _, ipNet := range blacklistSnapshot {
 		if ipNet.Contains(clientIP) {
 			rejectedByRule = ipNet.String()
 
@@ -4190,7 +4215,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 	if rejectedByRule != "" {
 		var exemptedByRule string
 
-		for _, ipNet := range whitelistedNetworks {
+		for _, ipNet := range whitelistSnapshot {
 			if ipNet.Contains(clientIP) {
 				exemptedByRule = ipNet.String()
 
