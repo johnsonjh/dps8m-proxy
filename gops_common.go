@@ -29,6 +29,8 @@ const gopsEnabled = true
 
 func gopsInit() {
 	go func() {
+		defer recoverGoroutine("gopsInit")
+
 		err := agent.Listen(
 			agent.Options{
 				ReuseSocketAddrAndPort: true,

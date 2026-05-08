@@ -30,6 +30,8 @@ func runSignalHandlers() {
 		syscall.SIGHUP, syscall.SIGUSR1, syscall.SIGUSR2)
 
 	go func() {
+		defer recoverGoroutine("signalHandler")
+
 		for s := range sigChan {
 			handleSignal(s)
 		}

@@ -29,6 +29,8 @@ func runSignalHandlers() {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGHUP)
 
 	go func() {
+		defer recoverGoroutine("signalHandler")
+
 		for s := range sigChan {
 			switch s {
 			case syscall.SIGHUP:

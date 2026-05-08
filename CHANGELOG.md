@@ -268,6 +268,34 @@
   * Removed the unused `logFile` and `basePath` fields from
     the connection struct (their last reader was deleted in
     the 2025-07-13 logging-race fix).
+  * Made the kill-connection, kill-all, and idle/time-killer
+    paths also remove the entry from the shareable-username
+    sibling map so a new connection cannot transiently
+    attach as a monitor of a connection that was just killed.
+  * Wrapped the console-input handler, the signal-dispatch
+    goroutine, the gops init goroutine, the mDNS shutdown
+    watcher, the abandon-SSH drain goroutines, the per-listener
+    accept goroutine, and the shutdown-watchdog logging-wait
+    goroutine in panic recovery for consistency with the rest
+    of the long-running goroutines.
+  * Surfaced an alert when the console-input handler stops
+    unexpectedly so an operator can tell the interactive
+    console has been disabled.
+  * Grew the `listGoroutines` stack-dump buffer dynamically
+    so a heavily loaded process is no longer truncated to
+    the first 1 MiB of goroutine output.
+  * Promoted the per-session `sshIn`, `sshOut`, `telnetIn`,
+    and `telnetOut` byte counters to `atomic.Uint64`,
+    eliminating a 32-bit alignment dependency on the
+    compiler's escape analysis.
+  * Packed the per-connection initial PTY window dimensions
+    into a single `atomic.Pointer[nawsSize]` so the post-
+    negotiation read can never observe a torn width/height
+    pair.
+  * Packed the per-connection TELNET target host and port
+    into a single `atomic.Pointer[targetEndpoint]` so the
+    status display can never observe a torn host/port pair
+    during alt-host transitions.
 []()
 
 []()

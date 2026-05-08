@@ -265,6 +265,8 @@ func announceMDNS(listener net.Listener, listenHost string, altHosts map[string]
 
 	if len(servers) > 0 {
 		go func() {
+			defer recoverGoroutine("mdns shutdown watcher")
+
 			<-shutdownSignal
 
 			for _, srv := range servers {

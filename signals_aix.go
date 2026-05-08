@@ -41,6 +41,8 @@ func runSignalHandlers() {
 		syscall.SIGHUP, syscall.SIGUSR1, syscall.SIGUSR2, syscall.SIGDANGER)
 
 	go func() {
+		defer recoverGoroutine("signalHandler")
+
 		for s := range sigChan {
 			if s == syscall.SIGDANGER {
 				log.Printf(

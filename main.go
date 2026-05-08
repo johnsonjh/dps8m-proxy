@@ -313,6 +313,11 @@ type nawsSize struct {
 	height uint32
 }
 
+type targetEndpoint struct {
+	host string
+	port int32
+}
+
 type Connection struct {
 	totalMonitors       uint64
 	startTime           time.Time
@@ -327,15 +332,13 @@ type Connection struct {
 	ID                  string
 	hostName            string
 	termType            atomic.Pointer[string]
-	targetHost          atomic.Pointer[string]
+	target              atomic.Pointer[targetEndpoint]
 	reverseHost         atomic.Pointer[string]
 	nawsPending         atomic.Pointer[nawsSize]
 	nawsKick            chan struct{}
 	shareableUsername   string
 	userName            string
-	targetPort          atomic.Int32
-	initialWindowWidth  atomic.Uint32
-	initialWindowHeight atomic.Uint32
+	initialWindow       atomic.Pointer[nawsSize]
 	iconvDecoder        *encoding.Decoder
 	iconvEnabled        atomic.Bool
 	wasMonitored        atomic.Bool
@@ -1039,6 +1042,8 @@ func shutdownWatchdog() {
 	loggingDone := make(chan struct{})
 
 	go func() {
+		defer recoverGoroutine("shutdownWatchdog logging-wait")
+
 		loggingWg.Wait()
 		close(loggingDone)
 	}()
@@ -1520,6 +1525,8 @@ func main() {
 
 	for _, addr := range sshAddr {
 		go func(addr string) {
+			defer recoverGoroutine("accept loop")
+
 			listener, err := net.Listen("tcp", addr)
 			if err != nil {
 				if isConsoleLogQuiet.Load() {
@@ -1745,6 +1752,7 @@ func main() {
 						})
 
 						delete(connections, id)
+						delete(shareableConnections, conn.shareableUsername)
 					} else if effTimeMax > 0 &&
 						connUptime > time.Duration( //nolint:gosec,nolintlint
 							effTimeMax,
@@ -1771,6 +1779,7 @@ func main() {
 						})
 
 						delete(connections, id)
+						delete(shareableConnections, conn.shareableUsername)
 					}
 				}
 
@@ -1846,6 +1855,19 @@ func debugInit(addr string) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func handleConsoleInput() {
+	defer func() {
+		select {
+		case <-shutdownSignal:
+
+		default:
+			log.Printf(
+				"%sConsole input handler has stopped unexpectedly; the interactive console will not respond.",
+				alertPrefix(),
+			)
+		}
+	}()
+	defer recoverGoroutine("handleConsoleInput")
+
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
@@ -2682,7 +2704,7 @@ func listConnections(truncate bool) {
 	}
 
 	userTruncat := false
-	rows := make([]row, 0, len(connections))
+	rows := make([]row, 0, len(conns))
 
 	for _, conn := range conns {
 		if conn.sshConn == nil {
@@ -2716,11 +2738,13 @@ func listConnections(truncate bool) {
 			targetInfo := ""
 
 			var targetHost string
-			if p := conn.targetHost.Load(); p != nil {
-				targetHost = *p
-			}
 
-			targetPort := int(conn.targetPort.Load())
+			var targetPort int
+
+			if t := conn.target.Load(); t != nil {
+				targetHost = t.host
+				targetPort = int(t.port)
+			}
 
 			if targetHost != "" {
 				if targetPort != 0 {
@@ -3374,6 +3398,7 @@ func killConnection(id string) {
 	connID := conn.ID
 
 	delete(connections, id)
+	delete(shareableConnections, conn.shareableUsername)
 
 	connectionsMutex.Unlock()
 
@@ -3414,12 +3439,13 @@ func killAllConnections() {
 		nowStamp(), skullPrefix(), len(connections))
 
 	type connToKill struct {
-		id        string
-		channel   ssh.Channel
-		userName  string
-		hostName  string
-		startTime time.Time
-		sshConn   *ssh.ServerConn
+		id                string
+		channel           ssh.Channel
+		userName          string
+		hostName          string
+		shareableUsername string
+		startTime         time.Time
+		sshConn           *ssh.ServerConn
 	}
 
 	connsToKill := make([]connToKill, 0, len(connections))
@@ -3428,12 +3454,13 @@ func killAllConnections() {
 		connsToKill = append(
 			connsToKill,
 			connToKill{
-				id:        id,
-				channel:   conn.channel,
-				userName:  conn.userName,
-				hostName:  conn.hostName,
-				startTime: conn.startTime,
-				sshConn:   conn.sshConn,
+				id:                id,
+				channel:           conn.channel,
+				userName:          conn.userName,
+				hostName:          conn.hostName,
+				shareableUsername: conn.shareableUsername,
+				startTime:         conn.startTime,
+				sshConn:           conn.sshConn,
 			},
 		)
 	}
@@ -3490,6 +3517,7 @@ func killAllConnections() {
 		connectionsMutex.Lock()
 
 		delete(connections, c.id)
+		delete(shareableConnections, c.shareableUsername)
 
 		connectionsMutex.Unlock()
 	}
@@ -3838,9 +3866,15 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 			return
 		}
 
-		go ssh.DiscardRequests(reqs)
+		go func() {
+			defer recoverGoroutine("abandonSSH discard")
+
+			ssh.DiscardRequests(reqs)
+		}()
 
 		go func() {
+			defer recoverGoroutine("abandonSSH chans drain")
+
 			for newCh := range chans {
 				_ = newCh.Reject(ssh.Prohibited, "session not authorized")
 			}
@@ -3922,7 +3956,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		cancelFunc:        cancel,
 		userName:          userName,
 		hostName:          hostName,
-		shareableUsername: newShareableUsername(connections, &connectionsMutex),
+		shareableUsername: newShareableUsername(&connectionsMutex),
 		nawsKick:          make(chan struct{}, 1),
 	}
 
@@ -3945,8 +3979,10 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		return
 	}
 
-	conn.targetHost.Store(&defaultHost)
-	conn.targetPort.Store(int32(defaultPort)) //nolint:gosec
+	conn.target.Store(&targetEndpoint{
+		host: defaultHost,
+		port: int32(defaultPort), //nolint:gosec
+	})
 
 	_, isAltHost := altHosts[conn.userName]
 	conn.isDefaultTarget = !isAltHost
@@ -4125,7 +4161,11 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 	keyLog = append(keyLog, handshakeLog)
 
-	go ssh.DiscardRequests(reqs)
+	go func() {
+		defer recoverGoroutine("ssh.DiscardRequests")
+
+		ssh.DiscardRequests(reqs)
+	}()
 
 	sessionAccepted := false
 
@@ -4264,8 +4304,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							width := binary.BigEndian.Uint32(req.Payload[off : off+4])
 							height := binary.BigEndian.Uint32(req.Payload[off+4 : off+8])
 
-							conn.initialWindowWidth.Store(width)
-							conn.initialWindowHeight.Store(height)
+							conn.initialWindow.Store(&nawsSize{width: width, height: height})
 
 							if hasTelnetConn(conn) {
 								nawsWill := []byte{TelcmdIAC, TelcmdWILL, TeloptNAWS}
@@ -4845,7 +4884,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 	start := time.Now()
 
-	var sshIn, sshOut, telnetIn, telnetOut uint64
+	var sshIn, sshOut, telnetIn, telnetOut atomic.Uint64
 
 	var logfile *os.File
 
@@ -4962,8 +5001,10 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			greenDotPrefix(), conn.ID, conn.userName, targetDest)
 	}
 
-	conn.targetHost.Store(&targetHost)
-	conn.targetPort.Store(int32(targetPort)) //nolint:gosec
+	conn.target.Store(&targetEndpoint{
+		host: targetHost,
+		port: int32(targetPort), //nolint:gosec
+	})
 
 	if !noLog {
 		_, err := logwriter.Write(fmt.Appendf(nil,
@@ -5042,8 +5083,11 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 	negotiateTelnet(telnetReader, remote, channel, logwriter, conn)
 
-	width := conn.initialWindowWidth.Load()
-	height := conn.initialWindowHeight.Load()
+	var width, height uint32
+	if sz := conn.initialWindow.Load(); sz != nil {
+		width = sz.width
+		height = sz.height
+	}
 
 	if conn.nawsActive.Load() && width > 0 && height > 0 {
 		conn.nawsPending.CompareAndSwap(nil, &nawsSize{width: width, height: height})
@@ -5120,7 +5164,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							warnPrefix(), conn.ID, err)
 					}
 
-					atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
+					telnetOut.Add(uint64(m)) //nolint:gosec,nolintlint
 
 					trafficOutTotal.Add(uint64(m)) //nolint:gosec,nolintlint
 
@@ -5140,7 +5184,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						warnPrefix(), conn.ID, err)
 				}
 
-				atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
+				telnetOut.Add(uint64(m)) //nolint:gosec,nolintlint
 
 				trafficOutTotal.Add(uint64(m)) //nolint:gosec,nolintlint
 
@@ -5156,7 +5200,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			case b := <-byteChan:
 				conn.lastActivityTime.Store(time.Now().UnixNano())
 
-				atomic.AddUint64(&sshIn, 1)
+				sshIn.Add(1)
 
 				if menuMode {
 					handleMenuSelection(b, conn, channel, logwriter,
@@ -5188,7 +5232,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 									warnPrefix(), conn.ID, err)
 							}
 
-							atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
+							telnetOut.Add(uint64(m)) //nolint:gosec,nolintlint
 
 							trafficOutTotal.Add(uint64(m)) //nolint:gosec,nolintlint
 
@@ -5210,7 +5254,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 									warnPrefix(), conn.ID, err)
 							}
 
-							atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
+							telnetOut.Add(uint64(m)) //nolint:gosec,nolintlint
 
 							trafficOutTotal.Add(uint64(m)) //nolint:gosec,nolintlint
 
@@ -5230,7 +5274,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 								warnPrefix(), conn.ID, err)
 						}
 
-						atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
+						telnetOut.Add(uint64(m)) //nolint:gosec,nolintlint
 
 						trafficOutTotal.Add(uint64(m)) //nolint:gosec,nolintlint
 
@@ -5253,7 +5297,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							warnPrefix(), conn.ID, err)
 					}
 
-					atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
+					telnetOut.Add(uint64(m)) //nolint:gosec,nolintlint
 
 					trafficOutTotal.Add(uint64(m)) //nolint:gosec,nolintlint
 
@@ -5272,7 +5316,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 							warnPrefix(), conn.ID, err)
 					}
 
-					atomic.AddUint64(&telnetOut, uint64(m)) //nolint:gosec,nolintlint
+					telnetOut.Add(uint64(m)) //nolint:gosec,nolintlint
 
 					trafficOutTotal.Add(uint64(m)) //nolint:gosec,nolintlint
 
@@ -5350,16 +5394,16 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				var inRateSSH, outRateSSH, inRateNVT, outRateNVT uint64
 
 				if secs > 0 {
-					inRateSSH = uint64(float64(atomic.LoadUint64(&sshIn)) / secs)
-					outRateSSH = uint64(float64(atomic.LoadUint64(&sshOut)) / secs)
-					inRateNVT = uint64(float64(atomic.LoadUint64(&telnetIn)) / secs)
-					outRateNVT = uint64(float64(atomic.LoadUint64(&telnetOut)) / secs)
+					inRateSSH = uint64(float64(sshIn.Load()) / secs)
+					outRateSSH = uint64(float64(sshOut.Load()) / secs)
+					inRateNVT = uint64(float64(telnetIn.Load()) / secs)
+					outRateNVT = uint64(float64(telnetOut.Load()) / secs)
 				}
 
 				_, err = channel.Write(fmt.Appendf(nil,
 					">> SSH - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
-					formatBytes(atomic.LoadUint64(&sshIn)),
-					formatBytes(atomic.LoadUint64(&sshOut)),
+					formatBytes(sshIn.Load()),
+					formatBytes(sshOut.Load()),
 					formatBytes(inRateSSH),
 					formatBytes(outRateSSH)))
 				if err != nil {
@@ -5369,8 +5413,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 				_, err = channel.Write(fmt.Appendf(nil,
 					">> NVT - in: %s, out: %s, in-rate: %s/s, out-rate: %s/s\r\n",
-					formatBytes(atomic.LoadUint64(&telnetIn)),
-					formatBytes(atomic.LoadUint64(&telnetOut)),
+					formatBytes(telnetIn.Load()),
+					formatBytes(telnetOut.Load()),
 					formatBytes(inRateNVT),
 					formatBytes(outRateNVT)))
 				if err != nil {
@@ -5394,7 +5438,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			}
 
 			if n > 0 {
-				atomic.AddUint64(&telnetIn, uint64(n)) //nolint:gosec,nolintlint
+				telnetIn.Add(uint64(n)) //nolint:gosec,nolintlint
 
 				iconvActive := conn.iconvEnabled.Load() && conn.iconvDecoder != nil
 				fwd := buf[:n]
@@ -5407,7 +5451,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					fwd = decodeTelnetData(conn.iconvDecoder, fwd)
 				}
 
-				atomic.AddUint64(&sshOut, uint64(len(fwd)))
+				sshOut.Add(uint64(len(fwd)))
 
 				_, err := channel.Write(fwd)
 				if err != nil {
@@ -6236,7 +6280,7 @@ func showMenu(ch ssh.Channel) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel,
-	logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *uint64, start time.Time,
+	logw io.Writer, sshIn, sshOut, telnetIn, telnetOut *atomic.Uint64, start time.Time,
 ) {
 	switch sel {
 	case '0':
@@ -6458,20 +6502,20 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel,
 			}
 		}
 
-		inSSH := atomic.LoadUint64(sshIn)
-		outSSH := atomic.LoadUint64(sshOut)
-		inNVT := atomic.LoadUint64(telnetIn)
-		outNVT := atomic.LoadUint64(telnetOut)
+		inSSH := sshIn.Load()
+		outSSH := sshOut.Load()
+		inNVT := telnetIn.Load()
+		outNVT := telnetOut.Load()
 
 		secs := dur.Seconds()
 
 		var inRateSSH, outRateSSH, inRateNVT, outRateNVT uint64
 
 		if secs > 0 {
-			inRateSSH = uint64(float64(atomic.LoadUint64(sshIn)) / secs)
-			outRateSSH = uint64(float64(atomic.LoadUint64(sshOut)) / secs)
-			inRateNVT = uint64(float64(atomic.LoadUint64(telnetIn)) / secs)
-			outRateNVT = uint64(float64(atomic.LoadUint64(telnetOut)) / secs)
+			inRateSSH = uint64(float64(sshIn.Load()) / secs)
+			outRateSSH = uint64(float64(sshOut.Load()) / secs)
+			inRateNVT = uint64(float64(telnetIn.Load()) / secs)
+			outRateNVT = uint64(float64(telnetOut.Load()) / secs)
 		}
 
 		_, err = ch.Write(fmt.Appendf(nil,
@@ -6730,7 +6774,7 @@ func newSessionID(connections map[string]*Connection, mutex *sync.Mutex) string 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func newShareableUsername(_ map[string]*Connection, mutex *sync.Mutex) string {
+func newShareableUsername(mutex *sync.Mutex) string {
 	const chars = "cdhkmnprswxyzCDFGJKMNPRSTXY57"
 
 	for {
@@ -7321,6 +7365,12 @@ func parseIPListFile(filePath string) ([]*net.IPNet, error) {
 func listGoroutines() {
 	buf := make([]byte, 1<<20)
 	stacklen := runtime.Stack(buf, true)
+
+	for stacklen == len(buf) && len(buf) < 16<<20 {
+		buf = make([]byte, 2*len(buf))
+		stacklen = runtime.Stack(buf, true)
+	}
+
 	stackTrace := string(buf[:stacklen])
 
 	goroutinesRaw := strings.Split(stackTrace, "\n\n")
