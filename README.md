@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.1.16-dev (2026-May-08 g4ee17f6) [linux/amd64]
+DPS8M Proxy v1.1.16-dev (2026-May-08 g192dc14) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,7 +326,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.1.16-dev (2026-May-08 g4ee17f6) [linux/amd64]
+DPS8M Proxy v1.1.16-dev (2026-May-08 g192dc14) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -345,8 +345,8 @@ DPS8M Proxy v1.1.16-dev (2026-May-08 g4ee17f6) [linux/amd64]
 | golang.org/x/crypto       | v0.50.0                          |
 | golang.org/x/net          | v0.53.0                          |
 | golang.org/x/sys          | v0.44.0                          |
-| golang.org/x/term         | v0.42.0                          |
-| golang.org/x/text         | v0.36.0                          |
+| golang.org/x/term         | v0.43.0                          |
+| golang.org/x/text         | v0.37.0                          |
 | kernel.org/.../libcap/cap | v1.2.78                          |
 | kernel.org/.../libcap/psx | v1.2.78                          |
 | Go compiler (gc)          | v1.26.3                          |
@@ -602,13 +602,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>21</th>
-<th>10733</th>
-<th>2312</th>
+<th>10780</th>
+<th>2317</th>
 <th>673</th>
-<th>7748</th>
-<th>1881</th>
-<th>255384</th>
-<th>4673</th>
+<th>7790</th>
+<th>1890</th>
+<th>256413</th>
+<th>4689</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -663,13 +663,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>29</th>
-<th>12788</th>
-<th>2668</th>
+<th>12835</th>
+<th>2673</th>
 <th>1063</th>
-<th>9057</th>
-<th>2105</th>
-<th>334175</th>
-<th>5967</th>
+<th>9099</th>
+<th>2114</th>
+<th>335204</th>
+<th>5983</th>
 </tr></tfoot></table>
 
 
