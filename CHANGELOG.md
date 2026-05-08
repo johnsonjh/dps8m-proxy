@@ -13,6 +13,7 @@
   * Hardened per-althost content lookups.
   * Precompiled regular expressions for improved performance.
   * Eliminated data races on console-logging state.
+  * Changed the code to update peak user count atomically.
 
 # v1.1.15 (2026-05-07 19:36:24)
 

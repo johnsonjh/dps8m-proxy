@@ -3683,12 +3683,27 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	connections[sid] = conn
 
 	currentLen := uint64(len(connections))
-	if currentLen > peakUsersTotal.Load() {
-		peakUsersTotal.Store(currentLen)
 
-		if dbEnabled {
-			if currentLen > lifetimePeakUsersTotal.Load() {
-				lifetimePeakUsersTotal.Store(currentLen)
+	for {
+		prev := peakUsersTotal.Load()
+		if currentLen <= prev {
+			break
+		}
+
+		if peakUsersTotal.CompareAndSwap(prev, currentLen) {
+			break
+		}
+	}
+
+	if dbEnabled {
+		for {
+			prev := lifetimePeakUsersTotal.Load()
+			if currentLen <= prev {
+				break
+			}
+
+			if lifetimePeakUsersTotal.CompareAndSwap(prev, currentLen) {
+				break
 			}
 		}
 	}
