@@ -531,6 +531,7 @@ printf
 readonly
 refname
 setcap
+setq
 shfmt
 sigusr
 snapshotted
