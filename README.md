@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.1.16-dev (2026-May-07 gfedb679) [linux/amd64]
+DPS8M Proxy v1.1.16-dev (2026-May-08 gc4457c3) [linux/amd64]
 
 Usage for proxy:
 
@@ -326,7 +326,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.1.16-dev (2026-May-07 gfedb679) [linux/amd64]
+DPS8M Proxy v1.1.16-dev (2026-May-08 gc4457c3) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -602,13 +602,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>21</th>
-<th>10057</th>
-<th>2132</th>
-<th>616</th>
-<th>7309</th>
-<th>1755</th>
-<th>239304</th>
-<th>4397</th>
+<th>10215</th>
+<th>2170</th>
+<th>661</th>
+<th>7384</th>
+<th>1777</th>
+<th>244244</th>
+<th>4451</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -627,28 +627,28 @@ predecessor (code statistics 📈 provided by
 <th>107</th>
 <th>430</th>
 <th>190</th>
-<th>22148</th>
+<th>22172</th>
 <th>382</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>637</th>
+<th>641</th>
 <th>126</th>
 <th>0</th>
-<th>511</th>
+<th>515</th>
 <th>0</th>
-<th>29859</th>
-<th>498</th>
+<th>30001</th>
+<th>502</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
-<th>209</th>
+<th>218</th>
 <th>35</th>
-<th>107</th>
+<th>116</th>
 <th>67</th>
 <th>0</th>
-<th>7605</th>
-<th>135</th>
+<th>7892</th>
+<th>143</th>
 </tr><tr>
 <th>YAML</th>
 <th>1</th>
@@ -663,13 +663,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>29</th>
-<th>12099</th>
-<th>2488</th>
-<th>997</th>
-<th>8614</th>
-<th>1979</th>
-<th>317642</th>
-<th>5685</th>
+<th>12270</th>
+<th>2526</th>
+<th>1051</th>
+<th>8693</th>
+<th>2001</th>
+<th>323035</th>
+<th>5745</th>
 </tr></tfoot></table>
 
 
@@ -815,6 +815,10 @@ predecessor (code statistics 📈 provided by
 <!--
 Local Variables:
 mode: markdown
+indent-tabs-mode: nil
+fill-column: 72
+eval: (setq-local display-fill-column-indicator-column 72)
+eval: (display-fill-column-indicator-mode 1)
 End:
 -->
 <!-- vim: set ft=markdown expandtab cc=72 : -->
