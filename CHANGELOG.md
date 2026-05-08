@@ -9,6 +9,10 @@
   * Fixed a potential panic in the `SIGUSR1` signal handler by closing
     the shutdown channel via `sync.Once`, ensuring all shutdown
     listeners are reliably notified.
+  * Fixed a potential panic in the SSH `pty-req` handler caused by
+    out-of-bounds reads on malformed payloads, by validating the
+    payload length and parsing the `TERM` string length as a proper
+    big-endian `uint32` per RFC 4254.
 
 # v1.1.15 (2026-05-07 19:36:24)
 

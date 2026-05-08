@@ -3871,35 +3871,49 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 			switch req.Type {
 			case "pty-req":
-				termLen := req.Payload[3]
-				term := string(req.Payload[4 : 4+termLen])
-				conn.termType = term
+				if len(req.Payload) >= 4 {
+					termLen := binary.BigEndian.Uint32(req.Payload[0:4])
 
-				if len(req.Payload) >= int(4+termLen+8) {
-					width := binary.BigEndian.Uint32(req.Payload[4+termLen : 4+termLen+4])
-					height := binary.BigEndian.Uint32(req.Payload[4+termLen+4 : 4+termLen+8])
+					if len(req.Payload) >= 4+int(termLen) {
+						term := string(req.Payload[4 : 4+termLen])
+						conn.termType = term
 
-					conn.initialWindowWidth = width
-					conn.initialWindowHeight = height
+						if len(req.Payload) >= 4+int(termLen)+8 {
+							off := 4 + int(termLen)
+							width := binary.BigEndian.Uint32(req.Payload[off : off+4])
+							height := binary.BigEndian.Uint32(req.Payload[off+4 : off+8])
 
-					tc := conn.telnetConn
-					if tc != nil {
-						nawsWill := []byte{TelcmdIAC, TelcmdWILL, TeloptNAWS}
+							conn.initialWindowWidth = width
+							conn.initialWindowHeight = height
 
-						if debugNegotiation {
-							log.Printf("%sDEBUG: offering NAWS to TELNET target for %s",
-								blueDotPrefix(), conn.ID)
+							tc := conn.telnetConn
+							if tc != nil {
+								nawsWill := []byte{TelcmdIAC, TelcmdWILL, TeloptNAWS}
+
+								if debugNegotiation {
+									log.Printf("%sDEBUG: offering NAWS to TELNET target for %s",
+										blueDotPrefix(), conn.ID)
+								}
+
+								_ = tc.SetWriteDeadline(time.Now().Add(time.Second))
+								_, err := tc.Write(nawsWill)
+								_ = tc.SetWriteDeadline(time.Time{})
+
+								if err != nil {
+									log.Printf(
+										"%sError sending IAC WILL NAWS to TELNET target for %s: %v",
+										warnPrefix(), conn.ID, err,
+									)
+								}
+							}
 						}
-
-						_ = tc.SetWriteDeadline(time.Now().Add(time.Second))
-						_, err := tc.Write(nawsWill)
-						_ = tc.SetWriteDeadline(time.Time{})
-
-						if err != nil {
-							log.Printf("%sError sending IAC WILL NAWS to TELNET target for %s: %v",
-								warnPrefix(), conn.ID, err)
-						}
+					} else if debugNegotiation {
+						log.Printf("%sDEBUG: pty-req payload too short for TERM (%d) for %s: %d",
+							warnPrefix(), termLen, conn.ID, len(req.Payload))
 					}
+				} else if debugNegotiation {
+					log.Printf("%sDEBUG: pty-req payload too short for %s: %d < 4",
+						warnPrefix(), conn.ID, len(req.Payload))
 				}
 
 				err := req.Reply(true, nil)
