@@ -19,7 +19,7 @@
     sends so it cannot leak or send on an unread channel after
     shutdown.
   * Eliminated potential data races when updating and reloading the
-    blacklist and whitelists.
+    blacklist and whitelist.
 
 # v1.1.15 (2026-05-07 19:36:24)
 
