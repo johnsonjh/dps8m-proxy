@@ -47,6 +47,7 @@ itoa
 klauspost
 linted
 loglevel
+lstat
 mccp
 mssp
 naws

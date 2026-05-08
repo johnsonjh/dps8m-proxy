@@ -37,7 +37,13 @@ func handleSignal(s os.Signal) {
 
 		gracefulShutdownMode.Store(true)
 
-		if connectionsInFlight.Load() == 0 {
+		connectionsMutex.Lock()
+
+		canShutdown := connectionsInFlight.Load() == 0
+
+		connectionsMutex.Unlock()
+
+		if canShutdown {
 			shutdownOnce.Do(
 				func() {
 					close(shutdownSignal)
