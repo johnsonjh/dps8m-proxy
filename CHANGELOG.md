@@ -21,6 +21,11 @@
   * Eliminated potential data races when updating and reloading the
     blacklist and whitelist.
   * Made graceful shutdown wait for connections to fully tear down.
+  * Fixed SSH handler by preventing it from sending a redundant second
+    reply when rejecting SFTP requests.
+  * Stopped holding the connections mutex during channel writes and
+    SSH connection closes, so a slow or stuck peer no longer stalls
+    the accept loop or other connection handlers.
 
 # v1.1.15 (2026-05-07 19:36:24)
 

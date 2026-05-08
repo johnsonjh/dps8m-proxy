@@ -1556,6 +1556,16 @@ func main() {
 				return
 
 			case <-time.After(checkInterval):
+				type pendingKill struct {
+					channel  ssh.Channel
+					sshConn  *ssh.ServerConn
+					msg      []byte
+					id       string
+					msgLabel string
+				}
+
+				var toKill []pendingKill
+
 				connectionsMutex.Lock()
 
 				for id, conn := range connections {
@@ -1588,29 +1598,20 @@ func main() {
 							conn.hostName, idleTime.Round(time.Second),
 							connUptime.Round(time.Second))
 
-						if conn.channel != nil {
-							_, err := conn.channel.Write(fmt.Appendf(nil,
-								"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
-								connUptime.Round(time.Second)))
-							if err != nil {
-								log.Printf(
-									"%sError writing idle timeout message "+
-										"to channel for %s: %v",
-									warnPrefix(), id, err,
-								)
-							}
-						}
-
 						if conn.sshConn == nil {
 							log.Printf("%sError: sshConn is nil for connection %s",
 								warnPrefix(), id)
-						} else {
-							err := conn.sshConn.Close()
-							if err != nil {
-								log.Printf("%sError closing SSH connection for %s: %v",
-									warnPrefix(), id, err)
-							}
 						}
+
+						toKill = append(toKill, pendingKill{
+							channel: conn.channel,
+							sshConn: conn.sshConn,
+							msg: fmt.Appendf(nil,
+								"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
+								connUptime.Round(time.Second)),
+							id:       id,
+							msgLabel: "idle timeout",
+						})
 
 						delete(connections, id)
 					} else if effTimeMax > 0 &&
@@ -1623,35 +1624,46 @@ func main() {
 							yellowDotPrefix(), id, conn.userName,
 							conn.hostName, connUptime.Round(time.Second))
 
-						if conn.channel != nil {
-							_, err := conn.channel.Write(fmt.Appendf(nil,
-								"\r\n\r\nCONNECTION TIMEOUT (link time %s)\r\n\r\n",
-								connUptime.Round(time.Second)))
-							if err != nil {
-								log.Printf(
-									"%sError writing connection timeout message "+
-										"to channel for %s: %v",
-									warnPrefix(), id, err,
-								)
-							}
-						}
-
 						if conn.sshConn == nil {
 							log.Printf("%sError: sshConn is nil for connection %s",
 								warnPrefix(), id)
-						} else {
-							err := conn.sshConn.Close()
-							if err != nil {
-								log.Printf("%sError closing SSH connection for %s: %v",
-									warnPrefix(), id, err)
-							}
 						}
+
+						toKill = append(toKill, pendingKill{
+							channel: conn.channel,
+							sshConn: conn.sshConn,
+							msg: fmt.Appendf(nil,
+								"\r\n\r\nCONNECTION TIMEOUT (link time %s)\r\n\r\n",
+								connUptime.Round(time.Second)),
+							id:       id,
+							msgLabel: "connection timeout",
+						})
 
 						delete(connections, id)
 					}
 				}
 
 				connectionsMutex.Unlock()
+
+				for _, k := range toKill {
+					if k.channel != nil {
+						_, err := k.channel.Write(k.msg)
+						if err != nil {
+							log.Printf(
+								"%sError writing %s message to channel for %s: %v",
+								warnPrefix(), k.msgLabel, k.id, err,
+							)
+						}
+					}
+
+					if k.sshConn != nil {
+						err := k.sshConn.Close()
+						if err != nil {
+							log.Printf("%sError closing SSH connection for %s: %v",
+								warnPrefix(), k.id, err)
+						}
+					}
+				}
 			}
 		}
 	}()
@@ -3156,10 +3168,11 @@ func reloadLists() {
 
 func killConnection(id string) {
 	connectionsMutex.Lock()
-	defer connectionsMutex.Unlock()
 
 	conn, ok := connections[id]
 	if !ok {
+		connectionsMutex.Unlock()
+
 		_, _ = fmt.Fprintf(os.Stdout, //nolint:gosec,nolintlint
 			"%s Session ID '%s' not found.\r\n",
 			nowStamp(), id)
@@ -3180,16 +3193,6 @@ func killConnection(id string) {
 	log.Printf("%sKilling connection %s...\r\n", //nolint:gosec,nolintlint
 		skullPrefix(), id)
 
-	if conn.channel != nil {
-		_, err := conn.channel.Write(
-			[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"),
-		)
-		if err != nil {
-			log.Printf("%sError writing to channel for %s: %v",
-				warnPrefix(), conn.ID, err)
-		}
-	}
-
 	connUptime := time.Since(conn.startTime)
 
 	log.Printf("%sTERMKILL [%s] %s@%s (link time %s)",
@@ -3198,15 +3201,31 @@ func killConnection(id string) {
 
 	adminKillsTotal.Add(1)
 
-	if conn.sshConn != nil {
-		err := conn.sshConn.Close()
+	channel := conn.channel
+	sshConn := conn.sshConn
+	connID := conn.ID
+
+	delete(connections, id)
+
+	connectionsMutex.Unlock()
+
+	if channel != nil {
+		_, err := channel.Write(
+			[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"),
+		)
 		if err != nil {
-			log.Printf("%sError closing SSH connection for %s: %v",
-				warnPrefix(), conn.ID, err)
+			log.Printf("%sError writing to channel for %s: %v",
+				warnPrefix(), connID, err)
 		}
 	}
 
-	delete(connections, id)
+	if sshConn != nil {
+		err := sshConn.Close()
+		if err != nil {
+			log.Printf("%sError closing SSH connection for %s: %v",
+				warnPrefix(), connID, err)
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4094,6 +4113,8 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 										warnPrefix(), conn.ID, err)
 								}
 							}
+
+							continue
 						}
 					}
 				}
