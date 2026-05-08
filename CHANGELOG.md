@@ -14,7 +14,7 @@
   * Pre-compiled regular expressions for improved performance.
   * Eliminated data races on console-logging state.
   * Changed the code to update peak user count atomically.
-  * Improved serialization of writes to the TELNET target connection
+  * Improved serialization of writes to the TELNET target connections.
 
 # v1.1.15 (2026-05-07 19:36:24)
 
