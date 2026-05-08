@@ -15,7 +15,7 @@
   * Eliminated data races on console-logging state.
   * Changed the code to update peak user count atomically.
   * Improved serialization of writes to the TELNET target connections.
-  * Made the SSH-channel reader goroutine cancellation-aware on
+  * Made the SSH-channel reader Goroutine cancellation-aware on
     sends so it cannot leak or send on an unread channel after
     shutdown.
   * Eliminated potential data races when updating and reloading the
@@ -42,10 +42,10 @@
   * Eliminated data race on the user-triggered `iconv` toggle.
   * Replaced some magic numbers with descriptively named constants.
   * Log a debug warning if the `gops` diagnostic agent fails to start.
-  * Reduced mDNS shutdown-watcher goroutines to a single one per
+  * Reduced mDNS shutdown-watcher Goroutines to a single one per
     announcement, instead of one per (interface, service) pair.
   * Cleaned up an mDNS interface-matching loop.
-  * Fixed a goroutine leak when a monitoring session's own SSH
+  * Fixed a Goroutine leak when a monitoring session's own SSH
     connection drops while the monitored connection is still active.
   * Eliminated data race on the monitor count in shared session
     status output.
@@ -80,20 +80,20 @@
     the whole file into memory, so very large logs no longer cause
     huge allocations during compression.
   * Hoisted the privileged-port capability check out of the
-    per-listener goroutine loop.
+    per-listener Goroutine loop.
   * Closed a small race window in graceful shutdown where a
     connection being established at the moment of `SIGUSR1` could
     be killed mid-handshake.
   * Made the kill-all path always remove the connection from the
     active list, even when the underlying SSH handle is missing.
   * Moved the SSH banner reverse-DNS lookup off the session start
-    path and into a background goroutine so a slow resolver no
+    path and into a background Goroutine so a slow resolver no
     longer adds up to a second of latency to every session.
   * Removed the dead per-connection `sshInTotal`/`sshOutTotal`
     fields and their writes; user-visible totals already came
     from the global directional counters.
   * Closed the slow monitor's SSH channel on per-write timeout
-    so wedged monitors no longer accumulate goroutines per
+    so wedged monitors no longer accumulate Goroutines per
     forwarded chunk.
   * Made the `iconv` and Emacs-keymap toggles atomic so they
     cannot be clobbered by a concurrent read in the SSH input
@@ -106,9 +106,9 @@
   * Doubled `0xFF` bytes inside the NAWS subnegotiation payload
     so window dimensions of `255`, `65280`, etc. no longer
     corrupt the TELNET stream.
-  * Replaced the per-`window-change` goroutine spawn with a
-    single drain goroutine and a latest-wins pending size, so
-    a flooding client cannot pile up unbounded NAWS goroutines.
+  * Replaced the per-`window-change` Goroutine spawn with a
+    single drain Goroutine and a latest-wins pending size, so
+    a flooding client cannot pile up unbounded NAWS Goroutines.
   * Routed the post-negotiation initial NAWS through the same
     latest-wins path so a `window-change` racing TELNET option
     negotiation is no longer dropped or clobbered.
@@ -137,7 +137,7 @@
     so a quick paste of multi-line commands no longer drops
     every line after the first.
   * Wrapped the per-connection top-level and SSH request-loop
-    goroutines in a panic recovery helper so a malformed input
+    Goroutines in a panic recovery helper so a malformed input
     can no longer take down the whole proxy.
   * Made the iconv TELNET decoder skip past `IAC IAC` inside
     subnegotiation bodies so a literal `0xFF` followed by
@@ -158,7 +158,7 @@
     logs no longer leak keystrokes to other local users.
   * Set a 30-second handshake deadline on accepted SSH
     connections so a peer that never speaks the version
-    string can no longer pin a goroutine indefinitely.
+    string can no longer pin a Goroutine indefinitely.
   * Added a 100ms write timeout on the kill-all path so a
     wedged client cannot stall the kill loop.
   * Made `abandonSSH` run as a deferred guard during the
@@ -179,7 +179,7 @@
     so repeated reloads no longer pile up redundant rules.
   * Closed sockets immediately on the accept loop's success
     path during graceful shutdown so a flooding client cannot
-    keep new handshake goroutines spawning.
+    keep new handshake Goroutines spawning.
   * Made the proxy uptime display include the day component
     so a multi-day runtime is no longer reported as `1h0m0s`.
   * Guarded the per-session goodbye-rate computations against
@@ -201,7 +201,7 @@
   * Made the invalid-share-username notice generic rather
     than echoing the typed username back to the SSH client.
   * Added panic recovery to the per-connection data-path
-    goroutines (NAWS sender, ctx watcher, SSH-to-TELNET pump,
+    Goroutines (NAWS sender, ctx watcher, SSH-to-TELNET pump,
     SSH byte reader, TELNET-to-SSH pump) so a panic on the
     data path can no longer crash the entire proxy.
   * Closed the raw connection on the no-RemoteAddr error
@@ -209,10 +209,10 @@
     leaks a TCP socket.
   * Added panic recovery to the idle/time killer, the
     database updater, the console-log rollover checker, the
-    monitor write fan-out, the inner monitor write goroutine,
+    monitor write fan-out, the inner monitor write Goroutine,
     and the monitor `Ctrl-]` reader so a panic on any of
     those paths cannot crash the proxy.
-  * Made the monitor write inner goroutine close its result
+  * Made the monitor write inner Goroutine close its result
     channel on panic so a panic-during-write does not leave
     the outer fan-out blocked on the result.
   * Reordered the per-connection cleanup-defer so the flag
@@ -226,7 +226,7 @@
   * Made compressed log file creation retry with a numeric
     suffix on collision, so a pre-existing target file no
     longer leaves the original log permanently on disk.
-  * Wrapped the per-connection reverse-DNS lookup goroutine
+  * Wrapped the per-connection reverse-DNS lookup Goroutine
     in panic recovery so an unexpected resolver failure can
     no longer crash the proxy.
   * Restructured the console-log rotation routine to release
@@ -273,17 +273,17 @@
     sibling map so a new connection cannot transiently
     attach as a monitor of a connection that was just killed.
   * Wrapped the console-input handler, the signal-dispatch
-    goroutine, the gops init goroutine, the mDNS shutdown
-    watcher, the abandon-SSH drain goroutines, the per-listener
-    accept goroutine, and the shutdown-watchdog logging-wait
-    goroutine in panic recovery for consistency with the rest
-    of the long-running goroutines.
+    Goroutine, the gops init Goroutine, the mDNS shutdown
+    watcher, the abandon-SSH drain Goroutines, the per-listener
+    accept Goroutine, and the shutdown-watchdog logging-wait
+    Goroutine in panic recovery for consistency with the rest
+    of the long-running Goroutines.
   * Surfaced an alert when the console-input handler stops
     unexpectedly so an operator can tell the interactive
     console has been disabled.
   * Grew the `listGoroutines` stack-dump buffer dynamically
     so a heavily loaded process is no longer truncated to
-    the first 1 MiB of goroutine output.
+    the first 1 MiB of Goroutine output.
   * Promoted the per-session `sshIn`, `sshOut`, `telnetIn`,
     and `telnetOut` byte counters to `atomic.Uint64`,
     eliminating a 32-bit alignment dependency on the
@@ -296,10 +296,10 @@
     into a single `atomic.Pointer[targetEndpoint]` so the
     status display can never observe a torn host/port pair
     during alt-host transitions.
-  * Skipped spawning the idle/time killer goroutine entirely
+  * Skipped spawning the idle/time killer Goroutine entirely
     when no limits are configured, removing a spurious
     "stopped unexpectedly" alert at startup.
-  * Restructured the signal-dispatch goroutines so a panic
+  * Restructured the signal-dispatch Goroutines so a panic
     inside a single signal handler no longer permanently
     disables signal delivery for the rest of the proxy's
     lifetime.
@@ -310,9 +310,9 @@
     closing notice so a wedged monitor cannot stall its
     teardown.
   * Added panic recovery to the per-connection write
-    goroutines spawned by `immediateShutdown` and
+    Goroutines spawned by `immediateShutdown` and
     `killAllConnections`.
-  * Bounds-clamped the goroutine state-extraction slice in
+  * Bounds-clamped the Goroutine state-extraction slice in
     `listGoroutines` so an atypical `runtime.Stack` output
     cannot panic the console handler.
   * Eliminated a brief unlock window in shareable-username
@@ -345,6 +345,10 @@
     from `v0.36.0` to `v0.37.0`.
   * Updated [`golang.org/x/term`](golang.org/x/term)
     from `v0.42.0` to `v0.43.0`.
+  * Updated [`golang.org/x/crypto`](golang.org/x/crypto)
+    from `v0.50.0` to `v0.51.0`.
+  * Updated [`golang.org/x/net`](golang.org/x/net)
+    from `v0.53.0` to `v0.54.0`.
 
 # v1.1.15 (2026-05-07 19:36:24)
 
