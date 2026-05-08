@@ -196,6 +196,7 @@ gtags
 jstemmer
 juntaki
 lintsetup
+listchars
 nilaway
 nodwarf
 notparallel
