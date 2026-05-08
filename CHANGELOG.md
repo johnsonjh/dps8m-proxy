@@ -229,6 +229,24 @@
   * Wrapped the per-connection reverse-DNS lookup goroutine
     in panic recovery so an unexpected resolver failure can
     no longer crash the proxy.
+  * Restructured the console-log rotation routine to release
+    the console-log mutex via `defer`, removing a deadlock
+    that could occur if a panic interrupted the locked
+    section.
+  * Distinguished a panic-recovered monitor write from a
+    successful write so a recurring panic in the SSH channel
+    write no longer silently keeps the slow monitor open
+    and spams the console with stack traces every chunk.
+  * Refused to compress a session log whose source path is
+    a symlink, narrowing a TOCTOU window in shared-host
+    deployments.
+  * Removed the redundant `O_TRUNC` flag from the new unique
+    compressed file opener (it has no effect with `O_EXCL`).
+  * Surfaced an alert log line when the idle/time killer,
+    the database updater, or the console-log rollover
+    checker stops unexpectedly (e.g., after a recovered
+    panic), so an operator can tell that a service has been
+    silently disabled.
 []()
 
 []()
