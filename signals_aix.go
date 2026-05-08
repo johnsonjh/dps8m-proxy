@@ -41,19 +41,21 @@ func runSignalHandlers() {
 		syscall.SIGHUP, syscall.SIGUSR1, syscall.SIGUSR2, syscall.SIGDANGER)
 
 	go func() {
-		defer recoverGoroutine("signalHandler")
-
 		for s := range sigChan {
-			if s == syscall.SIGDANGER {
-				log.Printf(
-					"%sSIGDANGER received: Requesting garbage collection and freeing memory.\r\n",
-					boomPrefix(),
-				)
-				debug.FreeOSMemory()
-				lowerGOGC()
-			} else {
-				handleSignal(s)
-			}
+			func(s os.Signal) {
+				defer recoverGoroutine("signalHandler")
+
+				if s == syscall.SIGDANGER {
+					log.Printf(
+						"%sSIGDANGER received: Requesting garbage collection and freeing memory.\r\n",
+						boomPrefix(),
+					)
+					debug.FreeOSMemory()
+					lowerGOGC()
+				} else {
+					handleSignal(s)
+				}
+			}(s)
 		}
 	}()
 }

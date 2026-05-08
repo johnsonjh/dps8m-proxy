@@ -296,6 +296,39 @@
     into a single `atomic.Pointer[targetEndpoint]` so the
     status display can never observe a torn host/port pair
     during alt-host transitions.
+  * Skipped spawning the idle/time killer goroutine entirely
+    when no limits are configured, removing a spurious
+    "stopped unexpectedly" alert at startup.
+  * Restructured the signal-dispatch goroutines so a panic
+    inside a single signal handler no longer permanently
+    disables signal delivery for the rest of the proxy's
+    lifetime.
+  * Added a 100ms write timeout on the single-connection
+    kill path and on the idle/time killer's per-connection
+    write so a wedged peer cannot stall those paths.
+  * Added a one-second write timeout on the monitor session
+    closing notice so a wedged monitor cannot stall its
+    teardown.
+  * Added panic recovery to the per-connection write
+    goroutines spawned by `immediateShutdown` and
+    `killAllConnections`.
+  * Bounds-clamped the goroutine state-extraction slice in
+    `listGoroutines` so an atypical `runtime.Stack` output
+    cannot panic the console handler.
+  * Eliminated a brief unlock window in shareable-username
+    generation by moving the random-name + collision-check
+    + map insert into a single critical section.
+  * Held the console-input "stopped unexpectedly" alert when
+    `gracefulShutdownMode` is set so an operator-initiated
+    graceful shutdown followed by stdin EOF no longer
+    produces a misleading alert.
+  * Promoted the per-connection `totalMonitors` counter to
+    `atomic.Uint64` for consistency with the rest of the
+    atomic-counter sweep.
+  * Moved the idle-and-time-killer log lines outside the
+    connections-mutex critical section so a wedged terminal
+    or filesystem stall cannot block the entire connections
+    map during enforcement.
 []()
 
 []()

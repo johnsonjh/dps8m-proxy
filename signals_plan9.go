@@ -29,18 +29,20 @@ func runSignalHandlers() {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGHUP)
 
 	go func() {
-		defer recoverGoroutine("signalHandler")
-
 		for s := range sigChan {
-			switch s {
-			case syscall.SIGHUP:
-				log.Printf("%sSIGHUP received: Reloading whitelist and/or blacklist.\r\n",
-					bellPrefix())
-				reloadLists()
+			func(s os.Signal) {
+				defer recoverGoroutine("signalHandler")
 
-			case syscall.SIGINT:
-				immediateShutdown()
-			}
+				switch s {
+				case syscall.SIGHUP:
+					log.Printf("%sSIGHUP received: Reloading whitelist and/or blacklist.\r\n",
+						bellPrefix())
+					reloadLists()
+
+				case syscall.SIGINT:
+					immediateShutdown()
+				}
+			}(s)
 		}
 	}()
 }

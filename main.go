@@ -319,7 +319,7 @@ type targetEndpoint struct {
 }
 
 type Connection struct {
-	totalMonitors       uint64
+	totalMonitors       atomic.Uint64
 	startTime           time.Time
 	lastActivityTime    atomic.Int64
 	telnetConn          net.Conn
@@ -1668,145 +1668,155 @@ func main() {
 
 	go shutdownWatchdog()
 
-	go func() {
-		defer func() {
-			select {
-			case <-shutdownSignal:
+	if idleMax > 0 || timeMax > 0 || idleDefMax > 0 || timeDefMax > 0 {
+		go func() {
+			defer func() {
+				select {
+				case <-shutdownSignal:
 
-			default:
-				log.Printf(
-					"%sIdle/time killer has stopped unexpectedly; idle and time limits will not be enforced.",
-					alertPrefix(),
-				)
+				default:
+					log.Printf(
+						"%sIdle/time killer has stopped unexpectedly; idle and time limits will not be enforced.",
+						alertPrefix(),
+					)
+				}
+			}()
+			defer recoverGoroutine("idleKiller")
+
+			checkInterval := 10 * time.Second
+
+			for {
+				select {
+				case <-shutdownSignal:
+					return
+
+				case <-time.After(checkInterval):
+					type pendingKill struct {
+						channel  ssh.Channel
+						sshConn  *ssh.ServerConn
+						msg      []byte
+						id       string
+						msgLabel string
+						logLine  string
+						sshNil   bool
+					}
+
+					var toKill []pendingKill
+
+					connectionsMutex.Lock()
+
+					for id, conn := range connections {
+						if conn.monitoring.Load() {
+							continue
+						}
+
+						idleTime := time.Since(time.Unix(0, conn.lastActivityTime.Load()))
+						connUptime := time.Since(conn.startTime)
+
+						effIdleMax := idleMax
+						effTimeMax := timeMax
+
+						if conn.isDefaultTarget {
+							if idleDefMax > 0 {
+								effIdleMax = idleDefMax
+							}
+
+							if timeDefMax > 0 {
+								effTimeMax = timeDefMax
+							}
+						}
+
+						if effIdleMax > 0 &&
+							idleTime > time.Duration( //nolint:gosec,nolintlint
+								effIdleMax,
+							)*time.Second {
+							idleKillsTotal.Add(1)
+
+							toKill = append(toKill, pendingKill{
+								channel: conn.channel,
+								sshConn: conn.sshConn,
+								msg: fmt.Appendf(nil,
+									"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
+									connUptime.Round(time.Second)),
+								id:       id,
+								msgLabel: "idle timeout",
+								logLine: fmt.Sprintf(
+									"%sIDLEKILL [%s] %s@%s (idle %s, link %s)",
+									yellowDotPrefix(), id, conn.userName,
+									conn.hostName, idleTime.Round(time.Second),
+									connUptime.Round(time.Second),
+								),
+								sshNil: conn.sshConn == nil,
+							})
+
+							delete(connections, id)
+							delete(shareableConnections, conn.shareableUsername)
+						} else if effTimeMax > 0 &&
+							connUptime > time.Duration( //nolint:gosec,nolintlint
+								effTimeMax,
+							)*time.Second {
+							timeKillsTotal.Add(1)
+
+							toKill = append(toKill, pendingKill{
+								channel: conn.channel,
+								sshConn: conn.sshConn,
+								msg: fmt.Appendf(nil,
+									"\r\n\r\nCONNECTION TIMEOUT (link time %s)\r\n\r\n",
+									connUptime.Round(time.Second)),
+								id:       id,
+								msgLabel: "connection timeout",
+								logLine: fmt.Sprintf(
+									"%sTIMEKILL [%s] %s@%s (link time %s)",
+									yellowDotPrefix(), id, conn.userName,
+									conn.hostName, connUptime.Round(time.Second),
+								),
+								sshNil: conn.sshConn == nil,
+							})
+
+							delete(connections, id)
+							delete(shareableConnections, conn.shareableUsername)
+						}
+					}
+
+					connectionsMutex.Unlock()
+
+					for _, k := range toKill {
+						log.Printf("%s", k.logLine)
+
+						if k.sshNil {
+							log.Printf("%sError: sshConn is nil for connection %s",
+								warnPrefix(), k.id)
+						}
+
+						if k.channel != nil {
+							done := make(chan struct{})
+
+							go func(ch ssh.Channel, msg []byte) {
+								defer recoverGoroutine("idleKiller channel write")
+								defer close(done)
+
+								_, _ = ch.Write(msg)
+							}(k.channel, k.msg)
+
+							select {
+							case <-done:
+
+							case <-time.After(100 * time.Millisecond):
+							}
+						}
+
+						if k.sshConn != nil {
+							err := k.sshConn.Close()
+							if err != nil {
+								log.Printf("%sError closing SSH connection for %s: %v",
+									warnPrefix(), k.id, err)
+							}
+						}
+					}
+				}
 			}
 		}()
-		defer recoverGoroutine("idleKiller")
-
-		if idleMax == 0 && timeMax == 0 && idleDefMax == 0 && timeDefMax == 0 {
-			return
-		}
-
-		checkInterval := 10 * time.Second
-
-		for {
-			select {
-			case <-shutdownSignal:
-				return
-
-			case <-time.After(checkInterval):
-				type pendingKill struct {
-					channel  ssh.Channel
-					sshConn  *ssh.ServerConn
-					msg      []byte
-					id       string
-					msgLabel string
-				}
-
-				var toKill []pendingKill
-
-				connectionsMutex.Lock()
-
-				for id, conn := range connections {
-					if conn.monitoring.Load() {
-						continue
-					}
-
-					idleTime := time.Since(time.Unix(0, conn.lastActivityTime.Load()))
-					connUptime := time.Since(conn.startTime)
-
-					effIdleMax := idleMax
-					effTimeMax := timeMax
-
-					if conn.isDefaultTarget {
-						if idleDefMax > 0 {
-							effIdleMax = idleDefMax
-						}
-
-						if timeDefMax > 0 {
-							effTimeMax = timeDefMax
-						}
-					}
-
-					if effIdleMax > 0 &&
-						idleTime > time.Duration(effIdleMax)*time.Second { //nolint:gosec,nolintlint
-						idleKillsTotal.Add(1)
-
-						log.Printf("%sIDLEKILL [%s] %s@%s (idle %s, link %s)",
-							yellowDotPrefix(), id, conn.userName,
-							conn.hostName, idleTime.Round(time.Second),
-							connUptime.Round(time.Second))
-
-						if conn.sshConn == nil {
-							log.Printf("%sError: sshConn is nil for connection %s",
-								warnPrefix(), id)
-						}
-
-						toKill = append(toKill, pendingKill{
-							channel: conn.channel,
-							sshConn: conn.sshConn,
-							msg: fmt.Appendf(nil,
-								"\r\n\r\nIDLE TIMEOUT (link time %s)\r\n\r\n",
-								connUptime.Round(time.Second)),
-							id:       id,
-							msgLabel: "idle timeout",
-						})
-
-						delete(connections, id)
-						delete(shareableConnections, conn.shareableUsername)
-					} else if effTimeMax > 0 &&
-						connUptime > time.Duration( //nolint:gosec,nolintlint
-							effTimeMax,
-						)*time.Second {
-						timeKillsTotal.Add(1)
-
-						log.Printf("%sTIMEKILL [%s] %s@%s (link time %s)",
-							yellowDotPrefix(), id, conn.userName,
-							conn.hostName, connUptime.Round(time.Second))
-
-						if conn.sshConn == nil {
-							log.Printf("%sError: sshConn is nil for connection %s",
-								warnPrefix(), id)
-						}
-
-						toKill = append(toKill, pendingKill{
-							channel: conn.channel,
-							sshConn: conn.sshConn,
-							msg: fmt.Appendf(nil,
-								"\r\n\r\nCONNECTION TIMEOUT (link time %s)\r\n\r\n",
-								connUptime.Round(time.Second)),
-							id:       id,
-							msgLabel: "connection timeout",
-						})
-
-						delete(connections, id)
-						delete(shareableConnections, conn.shareableUsername)
-					}
-				}
-
-				connectionsMutex.Unlock()
-
-				for _, k := range toKill {
-					if k.channel != nil {
-						_, err := k.channel.Write(k.msg)
-						if err != nil {
-							log.Printf(
-								"%sError writing %s message to channel for %s: %v",
-								warnPrefix(), k.msgLabel, k.id, err,
-							)
-						}
-					}
-
-					if k.sshConn != nil {
-						err := k.sshConn.Close()
-						if err != nil {
-							log.Printf("%sError closing SSH connection for %s: %v",
-								warnPrefix(), k.id, err)
-						}
-					}
-				}
-			}
-		}
-	}()
+	}
 
 	select {}
 }
@@ -1856,6 +1866,10 @@ func debugInit(addr string) {
 
 func handleConsoleInput() {
 	defer func() {
+		if gracefulShutdownMode.Load() {
+			return
+		}
+
 		select {
 		case <-shutdownSignal:
 
@@ -2574,11 +2588,12 @@ func immediateShutdown() {
 					done := make(chan struct{})
 
 					go func() {
+						defer recoverGoroutine("immediateShutdown channel write")
+						defer close(done)
+
 						_, _ = ci.channel.Write(
 							[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"),
 						)
-
-						close(done)
 					}()
 
 					select {
@@ -3403,12 +3418,21 @@ func killConnection(id string) {
 	connectionsMutex.Unlock()
 
 	if channel != nil {
-		_, err := channel.Write(
-			[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"),
-		)
-		if err != nil {
-			log.Printf("%sError writing to channel for %s: %v",
-				warnPrefix(), connID, err)
+		done := make(chan struct{})
+
+		go func(ch ssh.Channel) {
+			defer recoverGoroutine("killConnection channel write")
+			defer close(done)
+
+			_, _ = ch.Write(
+				[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"),
+			)
+		}(channel)
+
+		select {
+		case <-done:
+
+		case <-time.After(100 * time.Millisecond):
 		}
 	}
 
@@ -3482,11 +3506,12 @@ func killAllConnections() {
 			done := make(chan struct{})
 
 			go func(ch ssh.Channel) {
+				defer recoverGoroutine("killAllConnections channel write")
+				defer close(done)
+
 				_, _ = ch.Write(
 					[]byte("\r\n\r\nCONNECTION TERMINATED\r\n\r\n"),
 				)
-
-				close(done)
 			}(c.channel)
 
 			select {
@@ -3949,15 +3974,14 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	defer cancel()
 
 	conn := &Connection{
-		ID:                sid,
-		sshConn:           sshConn,
-		startTime:         time.Now(),
-		cancelCtx:         ctx,
-		cancelFunc:        cancel,
-		userName:          userName,
-		hostName:          hostName,
-		shareableUsername: newShareableUsername(&connectionsMutex),
-		nawsKick:          make(chan struct{}, 1),
+		ID:         sid,
+		sshConn:    sshConn,
+		startTime:  time.Now(),
+		cancelCtx:  ctx,
+		cancelFunc: cancel,
+		userName:   userName,
+		hostName:   hostName,
+		nawsKick:   make(chan struct{}, 1),
 	}
 
 	conn.emacsKeymapEnabled.Store(keymapByDefault)
@@ -3989,11 +4013,13 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 	connectionsMutex.Lock()
 
+	conn.shareableUsername = newShareableUsernameLocked()
+
 	existingConn, found := shareableConnections[conn.userName]
 	if found {
 		conn.monitoring.Store(true)
 		conn.monitoredConnection = existingConn
-		atomic.AddUint64(&existingConn.totalMonitors, 1)
+		existingConn.totalMonitors.Add(1)
 		existingConn.wasMonitored.Store(true)
 	}
 
@@ -4817,15 +4843,30 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 		dur := time.Since(conn.startTime)
 
-		_, err := channel.Write(fmt.Appendf(nil,
+		closingNotice := fmt.Appendf(nil,
 			"\r\nMONITORING SESSION CLOSED (monitored for %s)\r\n\r\n",
-			dur.Round(time.Second)))
-		if err != nil {
-			log.Printf("%sError writing to channel for %s: %v",
-				warnPrefix(), conn.ID, err)
+			dur.Round(time.Second))
+
+		writeDone := make(chan struct{})
+
+		go func(ch ssh.Channel) {
+			defer recoverGoroutine("monitor closing notice")
+			defer close(writeDone)
+
+			_, _ = ch.Write(closingNotice)
+		}(channel)
+
+		select {
+		case <-writeDone:
+
+		case <-time.After(time.Second):
+			log.Printf(
+				"%sMonitor closing notice timed out for %s",
+				warnPrefix(), conn.ID,
+			)
 		}
 
-		err = channel.Close()
+		err := channel.Close()
 		if err != nil {
 			log.Printf("%sError closing channel for %s: %v",
 				warnPrefix(), conn.ID, err)
@@ -6481,7 +6522,7 @@ func handleMenuSelection(sel byte, conn *Connection, ch ssh.Channel,
 
 			connectionsMutex.Unlock()
 
-			totalMonitors := atomic.LoadUint64(&conn.totalMonitors)
+			totalMonitors := conn.totalMonitors.Load()
 
 			timesStr := "times"
 			if totalMonitors == 1 {
@@ -6774,7 +6815,10 @@ func newSessionID(connections map[string]*Connection, mutex *sync.Mutex) string 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func newShareableUsername(mutex *sync.Mutex) string {
+// newShareableUsernameLocked must be called with connectionsMutex held;
+// it returns a unique shareable username that does not collide with any
+// existing entry in shareableConnections.
+func newShareableUsernameLocked() string {
 	const chars = "cdhkmnprswxyzCDFGJKMNPRSTXY57"
 
 	for {
@@ -6792,13 +6836,7 @@ func newShareableUsername(mutex *sync.Mutex) string {
 
 		username := "_" + string(b)
 
-		mutex.Lock()
-
-		_, found := shareableConnections[username]
-
-		mutex.Unlock()
-
-		if !found {
+		if _, found := shareableConnections[username]; !found {
 			return username
 		}
 	}
@@ -7402,7 +7440,10 @@ func listGoroutines() {
 		}
 
 		id := header[1]
-		state := strings.Trim(lines[0][len(header[0])+len(id)+2:], " :")
+
+		stateStart := min(len(header[0])+len(id)+2, len(lines[0]))
+
+		state := strings.Trim(lines[0][stateStart:], " :")
 
 		entrypoint := lines[1]
 		caller := ""

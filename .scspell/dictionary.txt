@@ -541,6 +541,7 @@ sprintf
 sstrip
 statsviz
 stdbuf
+stdin
 systemcrypto
 systemctl
 tmpl
