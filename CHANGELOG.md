@@ -74,6 +74,10 @@
 * Dependency Updates
   * Updated [`golang.org/x/sys`](golang.org/x/sys)
     from `v0.43.0` to `v0.44.0`.
+  * Updated [`golang.org/x/text`](golang.org/x/text)
+    from `v0.36.0` to `v0.37.0`.
+  * Updated [`golang.org/x/term`](golang.org/x/term)
+    from `v0.42.0` to `v0.43.0`.
 
 # v1.1.15 (2026-05-07 19:36:24)
 
