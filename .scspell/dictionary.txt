@@ -528,6 +528,7 @@ readonly
 refname
 setcap
 shfmt
+sigusr
 sorairolake
 sprintf
 sstrip
