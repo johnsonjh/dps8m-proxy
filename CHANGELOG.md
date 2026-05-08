@@ -15,6 +15,9 @@
   * Eliminated data races on console-logging state.
   * Changed the code to update peak user count atomically.
   * Improved serialization of writes to the TELNET target connections.
+  * Made the SSH-channel reader goroutine cancellation-aware on
+    sends so it cannot leak or send on an unread channel after
+    shutdown.
 
 # v1.1.15 (2026-05-07 19:36:24)
 

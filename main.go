@@ -4660,32 +4660,28 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		errorChan := make(chan error)
 
 		go func() {
-			for {
-				select {
-				case <-func() <-chan struct{} {
-					if ctx == nil {
-						return nil
-					}
+			var done <-chan struct{}
+			if ctx != nil {
+				done = ctx.Done()
+			}
 
-					return ctx.Done()
-				}():
-					close(byteChan)
-					close(errorChan)
+			for {
+				b, err := reader.ReadByte()
+				if err != nil {
+					select {
+					case errorChan <- err:
+
+					case <-done:
+					}
 
 					return
+				}
 
-				default:
-					b, err := reader.ReadByte()
-					if err != nil {
-						errorChan <- err
+				select {
+				case byteChan <- b:
 
-						close(byteChan)
-						close(errorChan)
-
-						return
-					}
-
-					byteChan <- b
+				case <-done:
+					return
 				}
 			}
 		}()
