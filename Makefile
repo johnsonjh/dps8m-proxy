@@ -286,7 +286,7 @@ pvs-golang:
 		{ env printf '%s\n' "⚠️ pvs-golang not found!" \
 			2> /dev/null || :; exit 0; } ; \
 		$(RM) "dps8m-proxy.json" > /dev/null 2>&1 || :; \
-		export PWD_P="$$(pwd -P)"; \
+		export PWD_P="$$(pwd -P)"; export GOTOOLCHAIN=auto; \
 		set -x; "$$(command -v pvs-golang)" analyze \
 			--output "$${PWD_P:?}"/dps8m-proxy.json \
 			"$${PWD_P:?}" && \
