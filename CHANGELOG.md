@@ -59,6 +59,9 @@
   * Cleaned up partial compressed log output on compression failures.
   * Added a fallback for unknown compression levels so log
     rotation can never silently produce an uncompressed output.
+  * Fixed a bug in the statistics calculations and prevent underflows.
+  * Console reload (`r`/`R`) now reports specifically which list is
+    missing, and skips the reload when neither is configured.
 
 # v1.1.15 (2026-05-07 19:36:24)
 

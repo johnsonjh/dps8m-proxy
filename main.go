@@ -1822,17 +1822,32 @@ func handleConsoleInput() {
 			}
 
 		case "r", "R":
-			if blacklistFile == "" || whitelistFile == "" {
+			var msg string
+
+			switch {
+			case blacklistFile == "" && whitelistFile == "":
+				msg = "Reload requested but no lists enabled."
+
+			case blacklistFile == "" && whitelistFile != "":
+				msg = "Reload requested; only whitelist enabled."
+
+			case blacklistFile != "" && whitelistFile == "":
+				msg = "Reload requested; only blacklist enabled."
+			}
+
+			if msg != "" {
 				_, err := fmt.Fprintf(os.Stdout,
-					"%s %sReload requested but no lists enabled.\r\n",
-					nowStamp(), alertPrefix())
+					"%s %s%s\r\n",
+					nowStamp(), alertPrefix(), msg)
 				if err != nil {
 					log.Printf("%sError writing to stdout: %v",
 						boomPrefix(), err)
 				}
 			}
 
-			reloadLists()
+			if blacklistFile != "" || whitelistFile != "" {
+				reloadLists()
+			}
 
 		case "xyzzy": // :)
 			if isConsoleLogQuiet.Load() {
@@ -2000,13 +2015,16 @@ func showStats() {
 
 			{
 				"* SSH Other Errors/Disconnects",
-				strconv.FormatUint(sshSessionsTotal.Load()-
-					monitorSessionsTotal.Load()-
-					sshRequestTimeoutTotal.Load()-
-					sshIllegalSubsystemTotal.Load()-
-					sshExecRejectedTotal.Load()-
-					acceptErrorsTotal.Load()-
-					sshHandshakeFailedTotal.Load(), 10),
+				strconv.FormatUint(subSatU64(
+					sshConnectionsTotal.Load(),
+					sshSessionsTotal.Load(),
+					monitorSessionsTotal.Load(),
+					sshRequestTimeoutTotal.Load(),
+					sshIllegalSubsystemTotal.Load(),
+					sshExecRejectedTotal.Load(),
+					acceptErrorsTotal.Load(),
+					sshHandshakeFailedTotal.Load(),
+				), 10),
 			},
 			{
 				"Connections Killed by Admin",
@@ -2177,22 +2195,26 @@ func showStats() {
 
 			{
 				"* SSH Other Errors/Disconnects",
-				strconv.FormatUint(sshConnectionsTotal.Load()-
-					sshSessionsTotal.Load()-
-					monitorSessionsTotal.Load()-
-					sshRequestTimeoutTotal.Load()-
-					sshIllegalSubsystemTotal.Load()-
-					sshExecRejectedTotal.Load()-
-					acceptErrorsTotal.Load()-
-					sshHandshakeFailedTotal.Load(), 10),
-				strconv.FormatUint((lifetimeSSHconnectionsTotal.Load()+sshConnectionsTotal.Load())-
-					(lifetimeSSHsessionsTotal.Load()+sshSessionsTotal.Load())-
-					(lifetimeMonitorSessionsTotal.Load()+monitorSessionsTotal.Load())-
-					(lifetimeSSHrequestTimeoutTotal.Load()+sshRequestTimeoutTotal.Load())-
-					(lifetimeSSHillegalSubsystemTotal.Load()+sshIllegalSubsystemTotal.Load())-
-					(lifetimeSSHexecRejectedTotal.Load()+sshExecRejectedTotal.Load())-
-					(lifetimeAcceptErrorsTotal.Load()+acceptErrorsTotal.Load())-
-					(lifetimeSSHhandshakeFailedTotal.Load()+sshHandshakeFailedTotal.Load()), 10),
+				strconv.FormatUint(subSatU64(
+					sshConnectionsTotal.Load(),
+					sshSessionsTotal.Load(),
+					monitorSessionsTotal.Load(),
+					sshRequestTimeoutTotal.Load(),
+					sshIllegalSubsystemTotal.Load(),
+					sshExecRejectedTotal.Load(),
+					acceptErrorsTotal.Load(),
+					sshHandshakeFailedTotal.Load(),
+				), 10),
+				strconv.FormatUint(subSatU64(
+					lifetimeSSHconnectionsTotal.Load()+sshConnectionsTotal.Load(),
+					lifetimeSSHsessionsTotal.Load()+sshSessionsTotal.Load(),
+					lifetimeMonitorSessionsTotal.Load()+monitorSessionsTotal.Load(),
+					lifetimeSSHrequestTimeoutTotal.Load()+sshRequestTimeoutTotal.Load(),
+					lifetimeSSHillegalSubsystemTotal.Load()+sshIllegalSubsystemTotal.Load(),
+					lifetimeSSHexecRejectedTotal.Load()+sshExecRejectedTotal.Load(),
+					lifetimeAcceptErrorsTotal.Load()+acceptErrorsTotal.Load(),
+					lifetimeSSHhandshakeFailedTotal.Load()+sshHandshakeFailedTotal.Load(),
+				), 10),
 			},
 
 			{
@@ -5767,6 +5789,20 @@ func optName(b byte) string {
 
 	return fmt.Sprintf("OPT_%d",
 		b)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func subSatU64(a uint64, subs ...uint64) uint64 {
+	for _, s := range subs {
+		if s >= a {
+			return 0
+		}
+
+		a -= s
+	}
+
+	return a
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
