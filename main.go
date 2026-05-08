@@ -194,6 +194,7 @@ var (
 	blacklistFile                    string
 	networksMutex                    sync.RWMutex
 	connections                      = make(map[string]*Connection)
+	shareableConnections             = make(map[string]*Connection)
 	connectionsMutex                 sync.Mutex
 	consoleLogFile                   *os.File
 	consoleLogMutex                  sync.Mutex
@@ -222,6 +223,7 @@ var (
 	showVersion                      bool
 	showLicense                      bool
 	shutdownOnce                     sync.Once
+	immediateOnce                    sync.Once
 	shutdownSignal                   chan struct{}
 	sshAddr                          []string
 	telnetHostPort                   string
@@ -320,7 +322,6 @@ type Connection struct {
 	cancelCtx           context.Context
 	channel             ssh.Channel
 	sshConn             *ssh.ServerConn
-	logFile             *os.File
 	monitoredConnection *Connection
 	cancelFunc          context.CancelFunc
 	ID                  string
@@ -332,7 +333,6 @@ type Connection struct {
 	nawsKick            chan struct{}
 	shareableUsername   string
 	userName            string
-	basePath            string
 	targetPort          atomic.Int32
 	initialWindowWidth  atomic.Uint32
 	initialWindowHeight atomic.Uint32
@@ -1035,7 +1035,23 @@ func pflag_mustLookup(name string) *pflag.Flag { //nolint:revive
 
 func shutdownWatchdog() {
 	<-shutdownSignal
-	loggingWg.Wait()
+
+	loggingDone := make(chan struct{})
+
+	go func() {
+		loggingWg.Wait()
+		close(loggingDone)
+	}()
+
+	select {
+	case <-loggingDone:
+
+	case <-time.After(30 * time.Second):
+		log.Printf(
+			"%sShutdown timed out waiting for logs to flush; forcing exit.",
+			alertPrefix(),
+		)
+	}
 
 	closeDB()
 
@@ -2489,7 +2505,7 @@ func toggleDenyNewConnections() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func immediateShutdown() {
-	shutdownOnce.Do(
+	immediateOnce.Do(
 		func() {
 			log.Printf("%sImmediate shutdown initiated.\r\n",
 				boomPrefix())
@@ -2567,13 +2583,11 @@ func immediateShutdown() {
 				}
 			}
 
-			select {
-			case <-shutdownSignal:
-				// Already closed
-
-			default:
-				close(shutdownSignal)
-			}
+			shutdownOnce.Do(
+				func() {
+					close(shutdownSignal)
+				},
+			)
 
 			for i := range 50 {
 				connectionsMutex.Lock()
@@ -2637,9 +2651,9 @@ func immediateShutdown() {
 func listConnections(truncate bool) {
 	connectionsMutex.Lock()
 
-	defer connectionsMutex.Unlock()
-
 	if len(connections) == 0 {
+		connectionsMutex.Unlock()
+
 		fmt.Printf("\r%s No active connections.\r\n",
 			nowStamp())
 
@@ -2650,6 +2664,8 @@ func listConnections(truncate bool) {
 	for _, conn := range connections {
 		conns = append(conns, conn)
 	}
+
+	connectionsMutex.Unlock()
 
 	sort.Slice(
 		conns,
@@ -3937,19 +3953,12 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 	connectionsMutex.Lock()
 
-	found := false
-
-	for _, existingConn := range connections {
-		if existingConn.shareableUsername == conn.userName {
-			conn.monitoring.Store(true)
-			conn.monitoredConnection = existingConn
-			atomic.AddUint64(&existingConn.totalMonitors, 1)
-			existingConn.wasMonitored.Store(true)
-
-			found = true
-
-			break
-		}
+	existingConn, found := shareableConnections[conn.userName]
+	if found {
+		conn.monitoring.Store(true)
+		conn.monitoredConnection = existingConn
+		atomic.AddUint64(&existingConn.totalMonitors, 1)
+		existingConn.wasMonitored.Store(true)
 	}
 
 	if !found && strings.HasPrefix(conn.userName, "_") &&
@@ -3960,6 +3969,7 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 	connectionsInFlight.Add(1)
 
 	connections[sid] = conn
+	shareableConnections[conn.shareableUsername] = conn
 
 	currentLen := uint64(len(connections))
 
@@ -3974,8 +3984,18 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 		connectionsMutex.Lock()
 
-		if conn.sshConn != nil {
-			err := conn.sshConn.Close()
+		sshConnSnapshot := conn.sshConn
+
+		delete(connections, sid)
+		delete(shareableConnections, conn.shareableUsername)
+
+		fireShutdown := connectionsInFlight.Add(^uint64(0)) == 0 &&
+			gracefulShutdownMode.Load()
+
+		connectionsMutex.Unlock()
+
+		if sshConnSnapshot != nil {
+			err := sshConnSnapshot.Close()
 			if err != nil {
 				if !strings.Contains(err.Error(), "use of closed network connection") {
 					log.Printf("%sError closing SSH connection for %s: %v",
@@ -3983,13 +4003,6 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 				}
 			}
 		}
-
-		delete(connections, sid)
-
-		fireShutdown := connectionsInFlight.Add(^uint64(0)) == 0 &&
-			gracefulShutdownMode.Load()
-
-		connectionsMutex.Unlock()
 
 		if fireShutdown {
 			shutdownOnce.Do(
@@ -4864,8 +4877,6 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 			return
 		}
 
-		conn.logFile = logfile
-		conn.basePath = basePath
 		logwriter = logfile
 
 		loggingWg.Add(1)
@@ -6719,7 +6730,7 @@ func newSessionID(connections map[string]*Connection, mutex *sync.Mutex) string 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex) string {
+func newShareableUsername(_ map[string]*Connection, mutex *sync.Mutex) string {
 	const chars = "cdhkmnprswxyzCDFGJKMNPRSTXY57"
 
 	for {
@@ -6739,15 +6750,7 @@ func newShareableUsername(connections map[string]*Connection, mutex *sync.Mutex)
 
 		mutex.Lock()
 
-		found := false
-
-		for _, conn := range connections {
-			if conn.shareableUsername == username {
-				found = true
-
-				break
-			}
-		}
+		_, found := shareableConnections[username]
 
 		mutex.Unlock()
 

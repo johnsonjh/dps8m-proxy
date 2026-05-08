@@ -128,7 +128,8 @@ fi
 
 set +x
 env printf '\nInstallation script for "%s" linters finished.\n' "${BRANCH:?}"
-env printf '(Be sure "%s" has been added to your PATH.\n' "$(go env GOPATH)"
+gopath="$(go env GOPATH || :)"
+env printf '(Be sure "%s" has been added to your PATH.\n' "${gopath:?}"
 
 ###############################################################################
 # Local Variables:

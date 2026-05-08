@@ -247,6 +247,27 @@
     checker stops unexpectedly (e.g., after a recovered
     panic), so an operator can tell that a service has been
     silently disabled.
+  * Split the immediate-shutdown force-kill body off from
+    the shutdown-signal close once, so an interrupt signal
+    after a graceful shutdown was already in progress can
+    still force-kill connections instead of being a no-op.
+  * Moved the per-connection SSH connection close out of
+    the connections-mutex critical section in the normal
+    teardown path so a slow peer no longer serializes
+    teardown of unrelated connections.
+  * Released the connections mutex in the connection list
+    command before writing rows to standard output so a
+    wedged terminal cannot block other connection-mutex
+    consumers.
+  * Indexed the shareable-username lookup by a sibling map
+    so `O(N)` linear scans during connection setup become
+    `O(1)`.
+  * Bounded the graceful-shutdown wait on the logging
+    wait-group with a 30-second timeout so a wedged
+    session cannot prevent the proxy from exiting.
+  * Removed the unused `logFile` and `basePath` fields from
+    the connection struct (their last reader was deleted in
+    the 2025-07-13 logging-race fix).
 []()
 
 []()
