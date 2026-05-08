@@ -1,4 +1,4 @@
-FILETYPE: Go; .go
+FILETYPE: Go; .go, .mod
 addrs
 altroute
 appendf
@@ -70,6 +70,7 @@ rdonly
 readlink
 regexp
 replacer
+setq
 sighup
 sigint
 sigquit
@@ -244,6 +245,7 @@ gtags
 FILEID: 7d32bc40-6bd2-11f0-8af5-80ee73e9b8e7
 expandtab
 setcap
+setq
 sigint
 systemctl
 xargs
@@ -300,6 +302,7 @@ posixly
 proxybox
 reuseaddr
 setcap
+setq
 setsid
 shellcheck
 shfmt

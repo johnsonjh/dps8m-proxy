@@ -32,6 +32,9 @@
     `atomic.Int64` of UnixNano) and on the connection's `channel`
     and `telnetConn` fields (writes now serialized through the
     connections mutex).
+  * Renamed the proxy traffic stats labels from "Inbound"/"Outbound"
+    to the direction-explicit "SSH to TELNET" and "TELNET to SSH"
+    so the displayed totals are unambiguous.
 
 # v1.1.15 (2026-05-07 19:36:24)
 

@@ -1939,12 +1939,12 @@ func showStats() {
 			},
 
 			{
-				"Total Proxy Traffic Inbound",
+				"Total Bytes SSH to TELNET",
 				formatBytes(trafficOutTotal.Load()),
 			},
 
 			{
-				"Total Proxy Traffic Outbound",
+				"Total Bytes TELNET to SSH",
 				formatBytes(trafficInTotal.Load()),
 			},
 
@@ -2096,14 +2096,14 @@ func showStats() {
 			},
 
 			{
-				"Total Proxy Traffic Inbound",
+				"Total Bytes SSH to TELNET",
 				formatBytes(trafficOutTotal.Load()),
 				formatBytes(lifetimeTrafficOutTotal.Load() +
 					trafficOutTotal.Load()),
 			},
 
 			{
-				"Total Proxy Traffic Outbound",
+				"Total Bytes TELNET to SSH",
 				formatBytes(trafficInTotal.Load()),
 				formatBytes(lifetimeTrafficInTotal.Load() +
 					trafficInTotal.Load()),
