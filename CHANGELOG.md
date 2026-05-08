@@ -62,6 +62,18 @@
   * Fixed a bug in the statistics calculations and prevent underflows.
   * Console reload (`r`/`R`) now reports specifically which list is
     missing, and skips the reload when neither is configured.
+[]()
+
+[]()
+* Code Quality & Maintenance
+  * Extended and corrected use of Local Variables blocks in various
+    files for easier editing of the source code using GNU Emacs.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated [`golang.org/x/sys`](golang.org/x/sys)
+    from `v0.43.0` to `v0.44.0`.
 
 # v1.1.15 (2026-05-07 19:36:24)
 
@@ -77,7 +89,7 @@
 
 []()
 * Code Quality & Maintenance
-  * Add `Local Variables` blocks to various files for easier editing
+  * Added `Local Variables` blocks to various files for easier editing
     of the source code using GNU Emacs.
 []()
 
@@ -1816,6 +1828,10 @@ done
 <!--
 Local Variables:
 mode: markdown
+indent-tabs-mode: nil
+fill-column: 72
+eval: (setq-local display-fill-column-indicator-column 72)
+eval: (display-fill-column-indicator-mode 1)
 End:
 -->
 <!-- vim: set ft=markdown expandtab cc=72 : -->
