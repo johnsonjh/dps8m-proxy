@@ -20,6 +20,7 @@
     shutdown.
   * Eliminated potential data races when updating and reloading the
     blacklist and whitelist.
+  * Made graceful shutdown wait for connections to fully tear down.
 
 # v1.1.15 (2026-05-07 19:36:24)
 

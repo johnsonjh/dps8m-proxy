@@ -235,6 +235,7 @@ var (
 	compressLevel                    string
 	dbLogLevel                       string
 	sshDelay                         float64
+	connectionsInFlight              atomic.Uint64
 	acceptErrorsTotal                atomic.Uint64
 	adminKillsTotal                  atomic.Uint64
 	altHostRoutesTotal               atomic.Uint64
@@ -3692,6 +3693,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		conn.invalidShare = true
 	}
 
+	connectionsInFlight.Add(1)
+
 	connections[sid] = conn
 
 	currentLen := uint64(len(connections))
@@ -3739,16 +3742,14 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 
 		delete(connections, sid)
 
-		if gracefulShutdownMode.Load() && len(connections) == 0 {
-			connectionsMutex.Unlock()
+		connectionsMutex.Unlock()
 
+		if connectionsInFlight.Add(^uint64(0)) == 0 && gracefulShutdownMode.Load() {
 			shutdownOnce.Do(
 				func() {
 					close(shutdownSignal)
 				},
 			)
-		} else {
-			connectionsMutex.Unlock()
 		}
 
 		const unknownHost = "<UNKNOWN>"
