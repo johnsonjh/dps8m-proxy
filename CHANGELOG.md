@@ -26,6 +26,12 @@
   * Stopped holding the connections mutex during channel writes and
     SSH connection closes, so a slow or stuck peer no longer stalls
     the accept loop or other connection handlers.
+  * Fixed a potential WaitGroup deadlock that could hang shutdown.
+  * Fixed logging of some compression related error messages.
+  * Eliminated data races on `lastActivityTime` (now an
+    `atomic.Int64` of UnixNano) and on the connection's `channel`
+    and `telnetConn` fields (writes now serialized through the
+    connections mutex).
 
 # v1.1.15 (2026-05-07 19:36:24)
 

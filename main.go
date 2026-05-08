@@ -302,7 +302,7 @@ type Connection struct {
 	sshOutTotal         uint64
 	sshInTotal          uint64
 	startTime           time.Time
-	lastActivityTime    time.Time
+	lastActivityTime    atomic.Int64
 	telnetConn          net.Conn
 	telnetWriteMutex    sync.Mutex
 	cancelCtx           context.Context
@@ -1573,7 +1573,7 @@ func main() {
 						continue
 					}
 
-					idleTime := time.Since(conn.lastActivityTime)
+					idleTime := time.Since(time.Unix(0, conn.lastActivityTime.Load()))
 					connUptime := time.Since(conn.startTime)
 
 					effIdleMax := idleMax
@@ -2574,7 +2574,9 @@ func listConnections(truncate bool) {
 
 			details = fmt.Sprintf("%s@%s%s",
 				user, conn.sshConn.RemoteAddr(), targetInfo)
-			idle = time.Since(conn.lastActivityTime).Round(time.Second).String()
+			idle = time.Since(
+				time.Unix(0, conn.lastActivityTime.Load()),
+			).Round(time.Second).String()
 		}
 
 		rows = append(
@@ -3661,7 +3663,6 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		ID:                 sid,
 		sshConn:            sshConn,
 		startTime:          time.Now(),
-		lastActivityTime:   time.Now(),
 		cancelCtx:          ctx,
 		cancelFunc:         cancel,
 		userName:           userName,
@@ -3669,6 +3670,8 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 		shareableUsername:  newShareableUsername(connections, &connectionsMutex),
 		emacsKeymapEnabled: keymapByDefault,
 	}
+
+	conn.lastActivityTime.Store(time.Now().UnixNano())
 
 	if iconv != "" {
 		cm := findCharmap(iconv)
@@ -3853,7 +3856,11 @@ func handleConn(rawConn net.Conn, edSigner, rsaSigner, ecdsaSigner ssh.Signer) {
 			continue
 		}
 
+		connectionsMutex.Lock()
+
 		conn.channel = ch
+
+		connectionsMutex.Unlock()
 
 		go handleSession(conn.cancelCtx, conn, ch, requests, keyLog)
 	}
@@ -4535,6 +4542,22 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		conn.basePath = basePath
 		logwriter = logfile
 
+		loggingWg.Add(1)
+
+		defer func() {
+			dur := time.Since(start)
+
+			_, err := logwriter.Write(fmt.Appendf(nil,
+				nowStamp()+" Session end (link time %s)\r\n",
+				dur.Round(time.Second)))
+			if err != nil {
+				log.Printf("%sError writing to log: %v",
+					warnPrefix(), err)
+			}
+
+			closeAndCompressLog(logfile, basePath+".log")
+		}()
+
 		_, err := logwriter.Write(
 			[]byte(nowStamp() + " Session start\r\n"),
 		)
@@ -4550,20 +4573,6 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 					warnPrefix(), conn.ID, err)
 			}
 		}
-
-		defer func() {
-			dur := time.Since(start)
-
-			_, err := logwriter.Write(fmt.Appendf(nil,
-				nowStamp()+" Session end (link time %s)\r\n",
-				dur.Round(time.Second)))
-			if err != nil {
-				log.Printf("%sError writing to log: %v",
-					warnPrefix(), err)
-			}
-
-			closeAndCompressLog(logfile, basePath+".log")
-		}()
 	} else {
 		logwriter = io.Discard
 	}
@@ -4664,7 +4673,12 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		_ = tcp2.SetNoDelay(true)
 	}
 
+	connectionsMutex.Lock()
+
 	conn.telnetConn = remote
+
+	connectionsMutex.Unlock()
+
 	telnetReader := bufio.NewReader(remote)
 
 	go func() {
@@ -4777,7 +4791,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				escTimer = nil
 
 			case b := <-byteChan:
-				conn.lastActivityTime = time.Now()
+				conn.lastActivityTime.Store(time.Now().UnixNano())
 
 				atomic.AddUint64(&sshIn, 1)
 				atomic.AddUint64(&conn.sshInTotal, 1)
@@ -5069,7 +5083,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 						warnPrefix(), conn.ID, err)
 				}
 
-				conn.lastActivityTime = time.Now()
+				conn.lastActivityTime.Store(time.Now().UnixNano())
 			}
 		}
 	}()
@@ -6158,8 +6172,6 @@ func createDatedLog(sid string, addr net.Addr) (*os.File, string, error) {
 			err)
 	}
 
-	loggingWg.Add(1)
-
 	return f, pathBase, nil
 }
 
@@ -6629,21 +6641,17 @@ func compressLogFile(logFilePath string) {
 
 	defer func() {
 		err := compressedFile.Close()
-		if err != nil {
-			if strings.Contains(err.Error(), "writer already closed") {
-				log.Printf("%sError closing compressed file: %v",
-					warnPrefix(), err)
-			}
+		if err != nil && !strings.Contains(err.Error(), "file already closed") {
+			log.Printf("%sError closing compressed file: %v",
+				warnPrefix(), err)
 		}
 	}()
 
 	defer func() {
 		err := writer.Close()
-		if err != nil {
-			if strings.Contains(err.Error(), "file already closed") {
-				log.Printf("%sError closing writer: %v",
-					warnPrefix(), err)
-			}
+		if err != nil && !strings.Contains(err.Error(), "writer already closed") {
+			log.Printf("%sError closing writer: %v",
+				warnPrefix(), err)
 		}
 	}()
 
