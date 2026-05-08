@@ -124,6 +124,12 @@ else
 fi
 
 ###############################################################################
+# Finish
+
+env printf 'Installation script for "%s" linters finished.\n' "${BRANCH:?}"
+env printf '(Be sure "%s\n" has been added to your PATH.\n' "$(go env GOPATH)"
+
+###############################################################################
 # Local Variables:
 # mode: shell
 # indent-tabs-mode: nil
