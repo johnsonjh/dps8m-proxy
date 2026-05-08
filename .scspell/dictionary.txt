@@ -663,6 +663,7 @@ pigz
 pkcs
 preallocating
 prebuilt
+precompiled
 proxying
 realtime
 refactored

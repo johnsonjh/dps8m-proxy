@@ -189,7 +189,7 @@ var (
 	consoleLogMutex                  sync.Mutex
 	consoleLog                       string
 	lastLogDate                      string
-	isConsoleLogQuiet                bool
+	isConsoleLogQuiet                atomic.Bool
 	debugNegotiation                 bool
 	debugAddr                        string
 	denyNewConnectionsMode           atomic.Bool
@@ -970,7 +970,7 @@ func shutdownWatchdog() {
 
 	closeDB()
 
-	if isConsoleLogQuiet {
+	if isConsoleLogQuiet.Load() {
 		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sAll connections closed. Exiting.\r\n",
 			nowStamp(), byePrefix())
@@ -1092,7 +1092,7 @@ func main() {
 				errorPrefix(), consoleLog) // LINTED: Fatalf
 		}
 
-		isConsoleLogQuiet = (cl == "quiet")
+		isConsoleLogQuiet.Store(cl == "quiet")
 	}
 
 	if dbEnabled {
@@ -1263,7 +1263,7 @@ func main() {
 	reloadLists()
 
 	if strings.Contains(telnetHostPort, "@") {
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --telnet-host cannot contain a username (e.g., 'user@'); "+
 					"you specified: %s\r\n",
@@ -1316,7 +1316,7 @@ func main() {
 	}
 
 	if idleMax > 0 && timeMax > 0 && idleMax >= timeMax {
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: --idle-max (%d) cannot be greater than or equal to --time-max"+
 					" (%d)\r\n",
@@ -1342,7 +1342,7 @@ func main() {
 	}
 
 	if effIdleDefMax > 0 && effTimeDefMax > 0 && effIdleDefMax >= effTimeDefMax {
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: effective default target idle-max (%d) cannot be greater than "+
 					"or equal to effective default target time-max (%d)\r\n",
@@ -1364,7 +1364,7 @@ func main() {
 	),
 		"ed25519")
 	if err != nil {
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: Ed25519 host key error: %v\r\n",
 				nowStamp(), errorPrefix(), err)
@@ -1384,7 +1384,7 @@ func main() {
 	),
 		"rsa")
 	if err != nil {
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: RSA host key error: %v\r\n",
 				nowStamp(), errorPrefix(), err)
@@ -1404,7 +1404,7 @@ func main() {
 	),
 		"ecdsa")
 	if err != nil {
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sERROR: ECDSA host key error: %v\r\n",
 				nowStamp(), errorPrefix(), err)
@@ -1424,7 +1424,7 @@ func main() {
 
 			listener, err := net.Listen("tcp", addr)
 			if err != nil {
-				if isConsoleLogQuiet {
+				if isConsoleLogQuiet.Load() {
 					_, _ = fmt.Fprintf(os.Stdout,
 						"%s %sERROR: LISTEN on %s: %v\r\n",
 						nowStamp(), errorPrefix(), addr, err)
@@ -1487,7 +1487,7 @@ func main() {
 	}
 
 	if !noConsole {
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %s - Type '?' for help\r\n",
 				nowStamp(), startMsg)
@@ -1505,7 +1505,7 @@ func main() {
 	if !isUnixSocket(telnetHostPort) {
 		_, _, err := net.SplitHostPort(telnetHostPort)
 		if err != nil {
-			if isConsoleLogQuiet {
+			if isConsoleLogQuiet.Load() {
 				_, _ = fmt.Fprintf(os.Stdout,
 					"%s %sERROR: Could not parse default TELNET target: %v\r\n",
 					nowStamp(), errorPrefix(), err)
@@ -1810,7 +1810,7 @@ func handleConsoleInput() {
 			reloadLists()
 
 		case "xyzzy": // :)
-			if isConsoleLogQuiet {
+			if isConsoleLogQuiet.Load() {
 				fmt.Printf("%s %sNothing happens.\r\n",
 					nowStamp(), easterEggPrefix())
 			}
@@ -1819,7 +1819,7 @@ func handleConsoleInput() {
 				easterEggPrefix())
 
 		case "XYZZY": // =)
-			if isConsoleLogQuiet {
+			if isConsoleLogQuiet.Load() {
 				fmt.Printf("%s %sNOTHING HAPPENS.\r\n",
 					nowStamp(), easterEggPrefix())
 			}
@@ -2266,7 +2266,7 @@ func toggleGracefulShutdown() {
 		log.Printf("%sGraceful shutdown canceled.\r\n",
 			bellPrefix())
 
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sGraceful shutdown canceled.\r\n",
 				nowStamp(), bellPrefix())
@@ -2277,7 +2277,7 @@ func toggleGracefulShutdown() {
 		log.Printf("%sNo new connections will be accepted.\r\n",
 			skullPrefix())
 
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sNo new connections will be accepted.\r\n",
 				nowStamp(), skullPrefix())
@@ -2286,7 +2286,7 @@ func toggleGracefulShutdown() {
 		log.Printf("%sGraceful shutdown initiated.\r\n",
 			bellPrefix())
 
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sGraceful shutdown initiated.\r\n",
 				nowStamp(), bellPrefix())
@@ -2317,7 +2317,7 @@ func toggleDenyNewConnections() {
 		log.Printf("%sDeny connections canceled.\r\n",
 			thumbsUpPrefix())
 
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sDeny connections canceled.\r\n",
 				nowStamp(), thumbsUpPrefix())
@@ -2328,7 +2328,7 @@ func toggleDenyNewConnections() {
 		log.Printf("%sNo new connections will be accepted.\r\n",
 			skullPrefix())
 
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, _ = fmt.Fprintf(os.Stdout,
 				"%s %sNo new connections will be accepted.\r\n",
 				nowStamp(), skullPrefix())
@@ -2344,7 +2344,7 @@ func immediateShutdown() {
 			log.Printf("%sImmediate shutdown initiated.\r\n",
 				boomPrefix())
 
-			if isConsoleLogQuiet {
+			if isConsoleLogQuiet.Load() {
 				_, _ = fmt.Fprintf(os.Stdout,
 					"%s %sImmediate shutdown initiated.\r\n",
 					nowStamp(), boomPrefix())
@@ -2451,7 +2451,7 @@ func immediateShutdown() {
 				time.Sleep(100 * time.Millisecond)
 			}
 
-			if isConsoleLogQuiet {
+			if isConsoleLogQuiet.Load() {
 				_, _ = fmt.Fprintf(os.Stdout,
 					"%s %sWaiting for logs to flush...\r\n",
 					nowStamp(), bellPrefix())
@@ -2464,7 +2464,7 @@ func immediateShutdown() {
 
 			closeDB()
 
-			if isConsoleLogQuiet {
+			if isConsoleLogQuiet.Load() {
 				_, _ = fmt.Fprintf(os.Stdout,
 					"%s %sExiting.\r\n",
 					nowStamp(), byePrefix())
@@ -2757,9 +2757,13 @@ func listConfiguration() {
 
 	updateMaxLength(s4)
 
-	if consoleLog != "" {
+	consoleLogMutex.Lock()
+	clName := consoleLog
+	consoleLogMutex.Unlock()
+
+	if clName != "" {
 		var quietMode string
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			quietMode = "quiet"
 		} else {
 			quietMode = "noquiet" //nolint:goconst,nolintlint
@@ -2957,10 +2961,14 @@ func listConfiguration() {
 	printRow(&b, fmt.Sprintf("No Session Logging: %t",
 		noLog))
 
-	if consoleLog != "" {
+	consoleLogMutex.Lock()
+	clName = consoleLog
+	consoleLogMutex.Unlock()
+
+	if clName != "" {
 		var quietMode string
 
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			quietMode = "quiet"
 		} else {
 			quietMode = "noquiet"
@@ -3139,7 +3147,7 @@ func killConnection(id string) {
 		return
 	}
 
-	if isConsoleLogQuiet {
+	if isConsoleLogQuiet.Load() {
 		_, err := fmt.Fprintf(os.Stdout, //nolint:gosec,nolintlint
 			"%s %sKilling connection %s...\r\n",
 			nowStamp(), skullPrefix(), id)
@@ -3226,7 +3234,7 @@ func killAllConnections() {
 	connectionsMutex.Unlock()
 
 	for _, c := range connsToKill {
-		if isConsoleLogQuiet {
+		if isConsoleLogQuiet.Load() {
 			_, err := fmt.Fprintf(os.Stdout,
 				"%s %sKilling connection %s...\r\n",
 				nowStamp(), skullPrefix(), c.id)
@@ -6244,7 +6252,7 @@ func setupConsoleLogging() {
 		return
 	}
 
-	if isConsoleLogQuiet {
+	if isConsoleLogQuiet.Load() {
 		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sConsole logging requested (suppressing console output)\r\n",
 			nowStamp(), alertPrefix())
@@ -6271,7 +6279,11 @@ func startConsoleLogRolloverChecker() {
 			now := time.Now()
 			currentDate := now.Format("2006-01-02")
 
-			if lastLogDate != currentDate {
+			consoleLogMutex.Lock()
+			lastDate := lastLogDate
+			consoleLogMutex.Unlock()
+
+			if lastDate != currentDate {
 				log.Printf("%sDate changed, rotating console log.",
 					bellPrefix())
 				rotateConsoleLogAt(now)
@@ -6298,7 +6310,9 @@ func rotateConsoleLogAt(t time.Time) {
 		_, _ = fmt.Fprintf(os.Stdout,
 			"%s %sERROR: Failed to create console log directory: %v\r\n",
 			nowStamp(), warnPrefix(), err)
-		isConsoleLogQuiet = false
+
+		isConsoleLogQuiet.Store(false)
+
 		consoleLog = ""
 
 		if consoleLogFile != nil {
@@ -6322,8 +6336,8 @@ func rotateConsoleLogAt(t time.Time) {
 		os.FileMode(logPerm), //nolint:gosec,nolintlint
 	)
 	if err != nil {
-		if isConsoleLogQuiet {
-			isConsoleLogQuiet = false
+		if isConsoleLogQuiet.Load() {
+			isConsoleLogQuiet.Store(false)
 		}
 
 		_, _ = fmt.Fprintf(os.Stdout,
@@ -6353,7 +6367,7 @@ func rotateConsoleLogAt(t time.Time) {
 
 	fileWriter := &emojiStripperWriter{w: consoleLogFile}
 
-	if isConsoleLogQuiet {
+	if isConsoleLogQuiet.Load() {
 		log.SetOutput(fileWriter)
 	} else {
 		log.SetOutput(io.MultiWriter(os.Stdout, fileWriter))
