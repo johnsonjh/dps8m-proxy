@@ -5,7 +5,10 @@
 
 # v1.1.16-dev
 
-* TBD
+* New Features & Improvements
+  * Fixed a potential panic in the `SIGUSR1` signal handler by closing
+    the shutdown channel via `sync.Once`, ensuring all shutdown
+    listeners are reliably notified.
 
 # v1.1.15 (2026-05-07 19:36:24)
 
