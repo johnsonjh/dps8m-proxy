@@ -349,6 +349,8 @@
     from `v0.50.0` to `v0.51.0`.
   * Updated [`golang.org/x/net`](golang.org/x/net)
     from `v0.53.0` to `v0.54.0`.
+  * Updated [`golang.org/x/tools`](golang.org/x/tools)
+    from `v0.44.0` to `v0.45.0`.
 
 # v1.1.15 (2026-05-07 19:36:24)
 
