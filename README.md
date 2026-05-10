@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.1.16-dev (2026-May-09 g5118679) [linux/amd64]
+DPS8M Proxy v1.1.16-dev (2026-May-10 g3e3d0a5) [linux/amd64]
 
 Usage for proxy:
 
@@ -155,7 +155,7 @@ Usage for proxy:
   --debug-telnet                Debug TELNET option negotiation
   --debug-server <string>       Enable HTTP debug server listening address
                                     [e.g., ":6060", "[::1]:6060"]
-  --no-filter                   Disable link filtering of NULL characters
+  --filter                      Enable link filtering of NULL characters
   --no-sanitize                 Disable ASCII sanitization of error messages
                                     (allowing non-ASCII error reports via SSH)
   --gops                        Enable the "gops" diagnostic agent
@@ -279,9 +279,11 @@ are, hopefully, documented here:
     You can also remove *all* of these files if you don’t want to
     use this functionality.
 
-* The `--no-filter` option disables link filtering of NULL characters.
-  This is required to use the ZMODEM inline file transfer protocol
-  or other host applications that use NULL-terminated packet sequences.
+* The `--filter` option enables link filtering of NULL characters.
+
+  Filtering is now disabled by default to support the ZMODEM inline
+  file transfer protocol and other host applications that use require
+  NULL-terminated packet sequences.
 
 * The `--iconv` option enables legacy character map conversion of
   TELNET text to UTF-8, and takes the name of the legacy mapping.
@@ -326,7 +328,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.1.16-dev (2026-May-09 g5118679) [linux/amd64]
+DPS8M Proxy v1.1.16-dev (2026-May-10 g3e3d0a5) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -607,7 +609,7 @@ predecessor (code statistics 📈 provided by
 <th>675</th>
 <th>7871</th>
 <th>1888</th>
-<th>258649</th>
+<th>258652</th>
 <th>4745</th>
 </tr><tr>
 <th>Shell</th>
@@ -632,13 +634,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>641</th>
-<th>126</th>
+<th>643</th>
+<th>127</th>
 <th>0</th>
-<th>515</th>
+<th>516</th>
 <th>0</th>
-<th>30001</th>
-<th>502</th>
+<th>30033</th>
+<th>503</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -663,13 +665,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>29</th>
-<th>12953</th>
-<th>2702</th>
+<th>12955</th>
+<th>2703</th>
 <th>1067</th>
-<th>9184</th>
+<th>9185</th>
 <th>2113</th>
-<th>337720</th>
-<th>6044</th>
+<th>337755</th>
+<th>6045</th>
 </tr></tfoot></table>
 
 
