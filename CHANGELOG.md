@@ -292,9 +292,8 @@
     eliminating a 32-bit alignment dependency on the
     compiler's escape analysis.
   * Packed the per-connection initial PTY window dimensions
-    into a single `atomic.Pointer[nawsSize]` so the post-
-    negotiation read can never observe a torn width/height
-    pair.
+    into a single `atomic.Pointer[nawsSize]` so the post-negotiation
+    read can never observe a torn width/height pair.
   * Packed the per-connection TELNET target host and port
     into a single `atomic.Pointer[targetEndpoint]` so the
     status display can never observe a torn host/port pair
