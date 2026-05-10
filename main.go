@@ -213,7 +213,7 @@ var (
 	loggingWg                        sync.WaitGroup
 	noBanner                         bool
 	noCompress                       bool
-	noFilter                         bool
+	enableFilter                     bool
 	noSanitize                       bool
 	enableGops                       bool
 	enableMDNS                       bool
@@ -844,9 +844,9 @@ func init() { //nolint:gochecknoinits
 		"Enable HTTP debug server listening address\r\n"+
 			"    [e.g., \":6060\", \"[::1]:6060\"]")
 
-	pflag.BoolVar(&noFilter,
-		"no-filter", false,
-		"Disable link filtering of NULL characters")
+	pflag.BoolVar(&enableFilter,
+		"filter", false,
+		"Enable link filtering of NULL characters")
 
 	pflag.BoolVar(&noSanitize,
 		"no-sanitize", false,
@@ -5484,7 +5484,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 				iconvActive := conn.iconvEnabled.Load() && conn.iconvDecoder != nil
 				fwd := buf[:n]
 
-				if !noFilter {
+				if enableFilter {
 					fwd = bytes.ReplaceAll(fwd, []byte{0}, []byte{})
 				}
 

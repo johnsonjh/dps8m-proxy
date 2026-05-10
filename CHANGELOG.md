@@ -7,6 +7,9 @@
 
 * New Features & Improvements
   * Fixed a potential panic in the `SIGUSR1` signal handler.
+  * Renamed the `--no-filter` flag to `--filter` and inverted the
+    default behavior so that link filtering of NULL characters is
+    now disabled by default.
   * Fixed a potential panic in the SSH `pty-req` handler.
   * Suppressed a spurious "Unable to parse clean shutdown marker
     date" warning when initializing a new statistics database.
