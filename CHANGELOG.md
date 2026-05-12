@@ -3,7 +3,7 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.16-dev
+# v1.2.0
 
 * New Features & Improvements
   * Fixed a potential panic in the `SIGUSR1` signal handler.
