@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.0
+# v1.2.1-dev
+
+* TBD
+
+# v1.2.0 (2026-05-12 15:38:46)
 
 * New Features & Improvements
   * Fixed a potential panic in the `SIGUSR1` signal handler.
