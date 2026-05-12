@@ -3,7 +3,358 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.1.15 (2026-05-07)
+# v1.1.16-dev
+
+* New Features & Improvements
+  * Fixed a potential panic in the `SIGUSR1` signal handler.
+  * Renamed the `--no-filter` flag to `--filter` and inverted the
+    default behavior so that link filtering of NULL characters is
+    now disabled by default.
+  * Fixed a potential panic in the SSH `pty-req` handler.
+  * Suppressed a spurious "Unable to parse clean shutdown marker
+    date" warning when initializing a new statistics database.
+  * Hardened per-althost content lookups.
+  * Pre-compiled regular expressions for improved performance.
+  * Eliminated data races on console-logging state.
+  * Changed the code to update peak user count atomically.
+  * Improved serialization of writes to the TELNET target connections.
+  * Made the SSH-channel reader Goroutine cancellation-aware on
+    sends so it cannot leak or send on an unread channel after
+    shutdown.
+  * Eliminated potential data races when updating and reloading the
+    blacklist and whitelist.
+  * Made graceful shutdown wait for connections to fully tear down.
+  * Fixed SSH handler by preventing it from sending a redundant second
+    reply when rejecting SFTP requests.
+  * Stopped holding the connections mutex during channel writes and
+    SSH connection closes, so a slow or stuck peer no longer stalls
+    the accept loop or other connection handlers.
+  * Fixed a potential WaitGroup deadlock that could hang shutdown.
+  * Fixed logging of some compression related error messages.
+  * Eliminated data races on `lastActivityTime` (now an
+    `atomic.Int64` of UnixNano) and on the connection's `channel`
+    and `telnetConn` fields (writes now serialized through the
+    connections mutex).
+  * Renamed the proxy traffic stats labels from "Inbound"/"Outbound"
+    to the direction-explicit "SSH to TELNET" and "TELNET to SSH"
+    so the displayed totals are unambiguous.
+  * Made graceful shutdown triggers consistent across all paths.
+  * Unified mutex protection for `conn.telnetConn` reads and writes.
+  * Hardened `pty-req` parsing against 32-bit integer overflow.
+  * Tightened in-flight connection counter Add/defer pairing.
+  * Eliminated data race on the user-triggered `iconv` toggle.
+  * Replaced some magic numbers with descriptively named constants.
+  * Log a debug warning if the `gops` diagnostic agent fails to start.
+  * Reduced mDNS shutdown-watcher Goroutines to a single one per
+    announcement, instead of one per (interface, service) pair.
+  * Cleaned up an mDNS interface-matching loop.
+  * Fixed a Goroutine leak when a monitoring session's own SSH
+    connection drops while the monitored connection is still active.
+  * Eliminated data race on the monitor count in shared session
+    status output.
+  * Eliminated data races on per-connection terminal type, NAWS
+    state, initial window size, and shared-session monitored flag.
+  * Rejected port `0` in TELNET host:port specifications.
+  * Made the in-flight connection count and the connections map
+    reach zero in lockstep on session teardown.
+  * Fixed status-display column sizing with very long database paths.
+  * Fix a possible bug reporting the status of the `iconv` flag.
+  * Cleaned up partial compressed log output on compression failures.
+  * Added a fallback for unknown compression levels so log
+    rotation can never silently produce an uncompressed output.
+  * Fixed a bug in the statistics calculations and prevent underflows.
+  * Console reload (`r`/`R`) now reports specifically which list is
+    missing, and skips the reload when neither is configured.
+  * Closed an SSH resource leak on early-rejection paths.
+  * Sanitized SSH usernames and `pty-req` terminal types at capture
+    time to prevent log injection and stop attacker-controlled IAC
+    bytes from reaching the upstream TELNET server.
+  * Eliminated data race on the per-connection TELNET target
+    `host:port` (now stored atomically).
+  * Stopped a slow shared-session monitor from stalling the live
+    user's session by fanning out monitor channel writes with a
+    one-second shared timeout.
+  * Promoted the per-connection `monitoring` flag to `atomic.Bool`
+    for consistency with the other connection flags.
+  * Rejected second-and-later SSH session channels per connection
+    so a malicious client cannot race two `handleSession` runs over
+    the shared `channel`, log file, base path, and TELNET dial.
+  * Streamed session logs into the compressor instead of slurping
+    the whole file into memory, so very large logs no longer cause
+    huge allocations during compression.
+  * Hoisted the privileged-port capability check out of the
+    per-listener Goroutine loop.
+  * Closed a small race window in graceful shutdown where a
+    connection being established at the moment of `SIGUSR1` could
+    be killed mid-handshake.
+  * Made the kill-all path always remove the connection from the
+    active list, even when the underlying SSH handle is missing.
+  * Moved the SSH banner reverse-DNS lookup off the session start
+    path and into a background Goroutine so a slow resolver no
+    longer adds up to a second of latency to every session.
+  * Removed the dead per-connection `sshInTotal`/`sshOutTotal`
+    fields and their writes; user-visible totals already came
+    from the global directional counters.
+  * Closed the slow monitor's SSH channel on per-write timeout
+    so wedged monitors no longer accumulate Goroutines per
+    forwarded chunk.
+  * Made the `iconv` and Emacs-keymap toggles atomic so they
+    cannot be clobbered by a concurrent read in the SSH input
+    pump.
+  * Promoted the per-connection `emacsKeymapEnabled` flag to
+    `atomic.Bool`.
+  * Doubled `0xFF` bytes on the SSH-to-TELNET data path so a
+    user cannot inject forged TELNET commands by typing `IAC`
+    sequences.
+  * Doubled `0xFF` bytes inside the NAWS subnegotiation payload
+    so window dimensions of `255`, `65280`, etc. no longer
+    corrupt the TELNET stream.
+  * Replaced the per-`window-change` Goroutine spawn with a
+    single drain Goroutine and a latest-wins pending size, so
+    a flooding client cannot pile up unbounded NAWS Goroutines.
+  * Routed the post-negotiation initial NAWS through the same
+    latest-wins path so a `window-change` racing TELNET option
+    negotiation is no longer dropped or clobbered.
+  * Fixed the `--db-perm` help text default value, which had
+    been masked by a copy-paste setting `--log-perm` again.
+  * Capped the TELNET subnegotiation buffer at 4 KiB so a fast
+    hostile target cannot pump unbounded memory during option
+    negotiation.
+  * Made the menu `X` (Disconnect) command also cancel the
+    session context and close the SSH connection so a
+    non-cooperating client cannot leave the session pinned.
+  * Sanitized the SSH username in the public-key validation
+    log line so a malicious key-only client cannot inject
+    forged log entries.
+  * Held the console-log mutex across the `v` console command's
+    full output-rebinding sequence so a concurrent midnight
+    rollover cannot have its writer override silently reverted.
+  * Collapsed `IAC IAC` correctly inside TELNET subnegotiation
+    bodies so any future option that consumes the body sees
+    the proper literal `0xFF`.
+  * Updated the global outbound traffic counter from all three
+    SSH-input flush paths so escape-sequence and disconnect
+    flushes are no longer silently dropped from the lifetime
+    statistics.
+  * Hoisted the console-input buffered reader out of its loop
+    so a quick paste of multi-line commands no longer drops
+    every line after the first.
+  * Wrapped the per-connection top-level and SSH request-loop
+    Goroutines in a panic recovery helper so a malformed input
+    can no longer take down the whole proxy.
+  * Made the iconv TELNET decoder skip past `IAC IAC` inside
+    subnegotiation bodies so a literal `0xFF` followed by
+    `IAC SE`-like bytes no longer prematurely terminates the
+    subnegotiation scan.
+  * Made the session-ID and shareable-username generators
+    panic on a `crypto/rand` failure instead of silently
+    spinning on partially initialized buffers.
+  * Made session log filename selection use `O_EXCL` and
+    retry on collision so two sessions starting in the same
+    second with the same ID can no longer interleave their
+    log content.
+  * Hardened `subsystem` SSH-request-payload parsing against
+    a 32-bit integer overflow that could panic the proxy on
+    a malicious client.
+  * Created compressed log files honoring `--log-perm` instead
+    of the default world-readable mode so rotated session
+    logs no longer leak keystrokes to other local users.
+  * Set a 30-second handshake deadline on accepted SSH
+    connections so a peer that never speaks the version
+    string can no longer pin a Goroutine indefinitely.
+  * Added a 100ms write timeout on the kill-all path so a
+    wedged client cannot stall the kill loop.
+  * Made `abandonSSH` run as a deferred guard during the
+    handshake-to-teardown window so a panic between
+    `NewServerConn` success and full session setup can no
+    longer leak the SSH connection.
+  * Removed the unused `consoleInputActive` flag and its
+    dead gate in the console input loop.
+  * Pointed the truncated-listing hint at the correct console
+    command and removed an extra `s` from the label.
+  * Corrected the SSH "Other Errors/Disconnects" computation
+    so accept errors are no longer subtracted from connection
+    totals, monitor sessions are no longer double-counted, and
+    rejected/delay-abandoned connections are no longer
+    double-counted.
+  * Reset the implicit universal-deny blacklist in
+    whitelist-only mode on every reload instead of appending,
+    so repeated reloads no longer pile up redundant rules.
+  * Closed sockets immediately on the accept loop's success
+    path during graceful shutdown so a flooding client cannot
+    keep new handshake Goroutines spawning.
+  * Made the proxy uptime display include the day component
+    so a multi-day runtime is no longer reported as `1h0m0s`.
+  * Guarded the per-session goodbye-rate computations against
+    a sub-second link time so the displayed rate cannot be
+    `+Inf`.
+  * Added `O_EXCL` to compressed log file creation so a
+    pre-existing symlink at the rotated-log path can no
+    longer redirect rotated log writes.
+  * Added an exponential delay (capped at 1 s) on listener
+    accept errors so a sustained file-descriptor exhaustion
+    no longer spins the accept loop at full CPU.
+  * Tightened the per-connection cleanup-defer registration
+    so it runs immediately after the in-flight counter is
+    incremented and the connection is added to the map,
+    closing a small panic window that could leak both.
+  * Made `loggingWg.Add` and `loggingWg.Done` adjacent in
+    the session log setup so an out-of-band panic between
+    them can no longer block shutdown.
+  * Made the invalid-share-username notice generic rather
+    than echoing the typed username back to the SSH client.
+  * Added panic recovery to the per-connection data-path
+    Goroutines (NAWS sender, ctx watcher, SSH-to-TELNET pump,
+    SSH byte reader, TELNET-to-SSH pump) so a panic on the
+    data path can no longer crash the entire proxy.
+  * Closed the raw connection on the no-RemoteAddr error
+    path so a peer that produces a nil RemoteAddr no longer
+    leaks a TCP socket.
+  * Added panic recovery to the idle/time killer, the
+    database updater, the console-log rollover checker, the
+    monitor write fan-out, the inner monitor write Goroutine,
+    and the monitor `Ctrl-]` reader so a panic on any of
+    those paths cannot crash the proxy.
+  * Made the monitor write inner Goroutine close its result
+    channel on panic so a panic-during-write does not leave
+    the outer fan-out blocked on the result.
+  * Reordered the per-connection cleanup-defer so the flag
+    that arms it is set strictly after the defer is
+    registered, removing the last small panic window that
+    could have leaked the in-flight counter and map entry.
+  * Made the SSH-to-TELNET pump, SSH byte reader, and
+    TELNET-to-SSH pump cancel the connection context on
+    return so a panic on the data path tears the session
+    down instead of silently leaking it.
+  * Made compressed log file creation retry with a numeric
+    suffix on collision, so a pre-existing target file no
+    longer leaves the original log permanently on disk.
+  * Wrapped the per-connection reverse-DNS lookup Goroutine
+    in panic recovery so an unexpected resolver failure can
+    no longer crash the proxy.
+  * Restructured the console-log rotation routine to release
+    the console-log mutex via `defer`, removing a deadlock
+    that could occur if a panic interrupted the locked
+    section.
+  * Distinguished a panic-recovered monitor write from a
+    successful write so a recurring panic in the SSH channel
+    write no longer silently keeps the slow monitor open
+    and spams the console with stack traces every chunk.
+  * Refused to compress a session log whose source path is
+    a symlink, narrowing a TOCTOU window in shared-host
+    deployments.
+  * Removed the redundant `O_TRUNC` flag from the new unique
+    compressed file opener (it has no effect with `O_EXCL`).
+  * Surfaced an alert log line when the idle/time killer,
+    the database updater, or the console-log rollover
+    checker stops unexpectedly (e.g., after a recovered
+    panic), so an operator can tell that a service has been
+    silently disabled.
+  * Split the immediate-shutdown force-kill body off from
+    the shutdown-signal close once, so an interrupt signal
+    after a graceful shutdown was already in progress can
+    still force-kill connections instead of being a no-op.
+  * Moved the per-connection SSH connection close out of
+    the connections-mutex critical section in the normal
+    teardown path so a slow peer no longer serializes
+    teardown of unrelated connections.
+  * Released the connections mutex in the connection list
+    command before writing rows to standard output so a
+    wedged terminal cannot block other connection-mutex
+    consumers.
+  * Indexed the shareable-username lookup by a sibling map
+    so `O(N)` linear scans during connection setup become
+    `O(1)`.
+  * Bounded the graceful-shutdown wait on the logging
+    wait-group with a 30-second timeout so a wedged
+    session cannot prevent the proxy from exiting.
+  * Removed the unused `logFile` and `basePath` fields from
+    the connection struct (their last reader was deleted in
+    the 2025-07-13 logging-race fix).
+  * Made the kill-connection, kill-all, and idle/time-killer
+    paths also remove the entry from the shareable-username
+    sibling map so a new connection cannot transiently
+    attach as a monitor of a connection that was just killed.
+  * Wrapped the console-input handler, the signal-dispatch
+    Goroutine, the gops init Goroutine, the mDNS shutdown
+    watcher, the abandon-SSH drain Goroutines, the per-listener
+    accept Goroutine, and the shutdown-watchdog logging-wait
+    Goroutine in panic recovery for consistency with the rest
+    of the long-running Goroutines.
+  * Surfaced an alert when the console-input handler stops
+    unexpectedly so an operator can tell the interactive
+    console has been disabled.
+  * Grew the `listGoroutines` stack-dump buffer dynamically
+    so a heavily loaded process is no longer truncated to
+    the first 1 MiB of Goroutine output.
+  * Promoted the per-session `sshIn`, `sshOut`, `telnetIn`,
+    and `telnetOut` byte counters to `atomic.Uint64`,
+    eliminating a 32-bit alignment dependency on the
+    compiler's escape analysis.
+  * Packed the per-connection initial PTY window dimensions
+    into a single `atomic.Pointer[nawsSize]` so the post-negotiation
+    read can never observe a torn width/height pair.
+  * Packed the per-connection TELNET target host and port
+    into a single `atomic.Pointer[targetEndpoint]` so the
+    status display can never observe a torn host/port pair
+    during alt-host transitions.
+  * Skipped spawning the idle/time killer Goroutine entirely
+    when no limits are configured, removing a spurious
+    "stopped unexpectedly" alert at startup.
+  * Restructured the signal-dispatch Goroutines so a panic
+    inside a single signal handler no longer permanently
+    disables signal delivery for the rest of the proxy's
+    lifetime.
+  * Added a 100ms write timeout on the single-connection
+    kill path and on the idle/time killer's per-connection
+    write so a wedged peer cannot stall those paths.
+  * Added a one-second write timeout on the monitor session
+    closing notice so a wedged monitor cannot stall its
+    teardown.
+  * Added panic recovery to the per-connection write
+    Goroutines spawned by `immediateShutdown` and
+    `killAllConnections`.
+  * Bounds-clamped the Goroutine state-extraction slice in
+    `listGoroutines` so an atypical `runtime.Stack` output
+    cannot panic the console handler.
+  * Eliminated a brief unlock window in shareable-username
+    generation by moving the random-name + collision-check +
+    map insert into a single critical section.
+  * Held the console-input "stopped unexpectedly" alert when
+    `gracefulShutdownMode` is set so an operator-initiated
+    graceful shutdown followed by stdin EOF no longer
+    produces a misleading alert.
+  * Promoted the per-connection `totalMonitors` counter to
+    `atomic.Uint64` for consistency with the rest of the
+    atomic-counter sweep.
+  * Moved the idle-and-time-killer log lines outside the
+    connections-mutex critical section so a wedged terminal
+    or filesystem stall cannot block the entire connections
+    map during enforcement.
+[]()
+
+[]()
+* Code Quality & Maintenance
+  * Extended and corrected use of Local Variables blocks in various
+    files for easier editing of the source code using GNU Emacs.
+[]()
+
+[]()
+* Dependency Updates
+  * Updated [`golang.org/x/sys`](golang.org/x/sys)
+    from `v0.43.0` to `v0.44.0`.
+  * Updated [`golang.org/x/text`](golang.org/x/text)
+    from `v0.36.0` to `v0.37.0`.
+  * Updated [`golang.org/x/term`](golang.org/x/term)
+    from `v0.42.0` to `v0.43.0`.
+  * Updated [`golang.org/x/crypto`](golang.org/x/crypto)
+    from `v0.50.0` to `v0.51.0`.
+  * Updated [`golang.org/x/net`](golang.org/x/net)
+    from `v0.53.0` to `v0.54.0`.
+  * Updated [`golang.org/x/tools`](golang.org/x/tools)
+    from `v0.44.0` to `v0.45.0`.
+
+# v1.1.15 (2026-05-07 19:36:24)
 
 * Build System Improvements
   * Made `pvs-golang` optional when linting.
@@ -17,7 +368,7 @@
 
 []()
 * Code Quality & Maintenance
-  * Add `Local Variables` blocks to various files for easier editing
+  * Added `Local Variables` blocks to various files for easier editing
     of the source code using GNU Emacs.
 []()
 
@@ -1756,6 +2107,10 @@ done
 <!--
 Local Variables:
 mode: markdown
+indent-tabs-mode: nil
+fill-column: 72
+eval: (setq-local display-fill-column-indicator-column 72)
+eval: (display-fill-column-indicator-mode 1)
 End:
 -->
 <!-- vim: set ft=markdown expandtab cc=72 : -->

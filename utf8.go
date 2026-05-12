@@ -37,6 +37,10 @@ var (
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+var utf8LocaleRegexp = regexp.MustCompile(`(?i)utf.?8`)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func haveUTF8support() bool {
 	utf8SupportOnce.Do(
 		func() {
@@ -82,13 +86,12 @@ func canOutputUTF8() bool {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func isUTF8unix() bool {
-	pattern := regexp.MustCompile(`(?i)utf.?8`)
 	keys := []string{"LC_ALL", "LC_CTYPE", "LANG", "TERM"}
 
 	for _, key := range keys {
 		val := os.Getenv(key)
 
-		if val != "" && pattern.MatchString(val) {
+		if val != "" && utf8LocaleRegexp.MatchString(val) {
 			return true
 		}
 	}
@@ -413,6 +416,8 @@ func stripEmoji(s string) string {
 // Local Variables:
 // mode: go
 // tab-width: 4
+// eval: (setq-local display-fill-column-indicator-column 100)
+// eval: (display-fill-column-indicator-mode 1)
 // End:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // vim: set ft=go noexpandtab tabstop=4 cc=100 :

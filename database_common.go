@@ -292,17 +292,19 @@ func initDB() {
 
 			val := bucket.Get(shutdownMarkerKey) //nolint:unqueryvet,nolintlint
 
-			if bytes.Equal(val, []byte("0")) {
-				log.Printf("%sUnclean database shutdown detected!",
-					warnPrefix())
-			} else {
-				t, err := time.Parse(time.RFC3339, string(val))
-				if err != nil {
-					log.Printf("%sUnable to parse clean shutdown marker date '%s'.",
-						warnPrefix(), string(val))
+			if val != nil {
+				if bytes.Equal(val, []byte("0")) {
+					log.Printf("%sUnclean database shutdown detected!",
+						warnPrefix())
 				} else {
-					log.Printf("%sDatabase last shutdown %s.",
-						dbPrefix(), t.Format("2006-Jan-02 15:04:05"))
+					t, err := time.Parse(time.RFC3339, string(val))
+					if err != nil {
+						log.Printf("%sUnable to parse clean shutdown marker date '%s'.",
+							warnPrefix(), string(val))
+					} else {
+						log.Printf("%sDatabase last shutdown %s.",
+							dbPrefix(), t.Format("2006-Jan-02 15:04:05"))
+					}
 				}
 			}
 
@@ -542,6 +544,8 @@ func closeDB() {
 // Local Variables:
 // mode: go
 // tab-width: 4
+// eval: (setq-local display-fill-column-indicator-column 100)
+// eval: (display-fill-column-indicator-mode 1)
 // End:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // vim: set ft=go noexpandtab tabstop=4 cc=100 :

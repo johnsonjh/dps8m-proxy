@@ -39,16 +39,16 @@ func handleSignal(s os.Signal) {
 
 		connectionsMutex.Lock()
 
-		if len(connections) == 0 {
-			connectionsMutex.Unlock()
+		canShutdown := connectionsInFlight.Load() == 0
 
-			select {
-			case shutdownSignal <- struct{}{}:
+		connectionsMutex.Unlock()
 
-			default:
-			}
-		} else {
-			connectionsMutex.Unlock()
+		if canShutdown {
+			shutdownOnce.Do(
+				func() {
+					close(shutdownSignal)
+				},
+			)
 		}
 
 	case syscall.SIGUSR2:
@@ -66,6 +66,8 @@ func handleSignal(s os.Signal) {
 // Local Variables:
 // mode: go
 // tab-width: 4
+// eval: (setq-local display-fill-column-indicator-column 100)
+// eval: (display-fill-column-indicator-mode 1)
 // End:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // vim: set ft=go noexpandtab tabstop=4 cc=100 :

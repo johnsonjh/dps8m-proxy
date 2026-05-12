@@ -16,6 +16,8 @@ package main
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 import (
+	"log"
+
 	"github.com/google/gops/agent"
 )
 
@@ -27,12 +29,18 @@ const gopsEnabled = true
 
 func gopsInit() {
 	go func() {
-		_ = agent.Listen(
+		defer recoverGoroutine("gopsInit")
+
+		err := agent.Listen(
 			agent.Options{
 				ReuseSocketAddrAndPort: true,
 				ShutdownCleanup:        false,
 			},
 		)
+		if err != nil {
+			log.Printf("%sFailed to start gops agent: %v",
+				warnPrefix(), err)
+		}
 	}()
 }
 
@@ -46,6 +54,8 @@ func gopsClose() {
 // Local Variables:
 // mode: go
 // tab-width: 4
+// eval: (setq-local display-fill-column-indicator-column 100)
+// eval: (display-fill-column-indicator-mode 1)
 // End:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // vim: set ft=go noexpandtab tabstop=4 cc=100 :

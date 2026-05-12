@@ -1,4 +1,4 @@
-FILETYPE: Go; .go
+FILETYPE: Go; .go, .mod
 addrs
 altroute
 appendf
@@ -47,6 +47,7 @@ itoa
 klauspost
 linted
 loglevel
+lstat
 mccp
 mssp
 naws
@@ -70,6 +71,7 @@ rdonly
 readlink
 regexp
 replacer
+setq
 sighup
 sigint
 sigquit
@@ -92,6 +94,7 @@ ttype
 tzdata
 uintptr
 ulikunitz
+usernames
 warningf
 wronly
 
@@ -196,6 +199,7 @@ gtags
 jstemmer
 juntaki
 lintsetup
+listchars
 nilaway
 nodwarf
 notparallel
@@ -243,6 +247,7 @@ gtags
 FILEID: 7d32bc40-6bd2-11f0-8af5-80ee73e9b8e7
 expandtab
 setcap
+setq
 sigint
 systemctl
 xargs
@@ -299,6 +304,7 @@ posixly
 proxybox
 reuseaddr
 setcap
+setq
 setsid
 shellcheck
 shfmt
@@ -526,12 +532,16 @@ printf
 readonly
 refname
 setcap
+setq
 shfmt
+sigusr
+snapshotted
 sorairolake
 sprintf
 sstrip
 statsviz
 stdbuf
+stdin
 systemcrypto
 systemctl
 tmpl
@@ -551,8 +561,12 @@ goleak
 FILEID: ea37439c-48e0-11f1-a7af-80ee73e9b8e7
 codeowners
 
+FILEID: 842298dc-6bd1-11f0-ba59-80ee73e9b8e7
+sgops
+
 NATURAL:
 adduser
+althost
 american
 avahi
 backend
@@ -660,6 +674,7 @@ pigz
 pkcs
 preallocating
 prebuilt
+precompiled
 proxying
 realtime
 refactored
@@ -684,9 +699,11 @@ systemd
 tabstop
 tabstops
 tacacs
+teardown
 telnet
 timestamping
 tmux
+toctou
 toml
 toolchain
 toolchains

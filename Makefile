@@ -286,7 +286,7 @@ pvs-golang:
 		{ env printf '%s\n' "⚠️ pvs-golang not found!" \
 			2> /dev/null || :; exit 0; } ; \
 		$(RM) "dps8m-proxy.json" > /dev/null 2>&1 || :; \
-		export PWD_P="$$(pwd -P)"; \
+		export PWD_P="$$(pwd -P)"; export GOTOOLCHAIN=auto; \
 		set -x; "$$(command -v pvs-golang)" analyze \
 			--output "$${PWD_P:?}"/dps8m-proxy.json \
 			"$${PWD_P:?}" && \
@@ -609,18 +609,18 @@ install:
 # Local Variables:
 # mode: makefile
 # indent-tabs-mode: t
-# tab-width: 8
+# tab-width: 4
 # whitespace-style: (tabs tab-mark)
 # whitespace-display-mappings: ((tab-mark 9 [45] [45]))
-# fill-column: 80
+# fill-column: 78
 # eval: (setq-local whitespace-display-mappings
 #                   '((tab-mark 9
-#                               [45 45 45 45 45 45 62]
-#                               [45 45 45 45 45 45 62])))
+#                               [45 45 62]
+#                               [45 45 62])))
 # eval: (whitespace-mode 1)
 # eval: (setq-local display-fill-column-indicator-column 80)
 # eval: (display-fill-column-indicator-mode 1)
 # End:
 ##############################################################################
-# vim: set ft=make noexpandtab tabstop=4 cc=78 :
+# vim: set ft=make ts=4 ai noexpandtab list listchars=tab\:\>\- cc=78 :
 ##############################################################################

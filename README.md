@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.1.15 (2026-May-07 g3524b7e) [linux/amd64]
+DPS8M Proxy v1.1.16-dev (2026-May-11 g30524a2) [linux/amd64]
 
 Usage for proxy:
 
@@ -155,7 +155,7 @@ Usage for proxy:
   --debug-telnet                Debug TELNET option negotiation
   --debug-server <string>       Enable HTTP debug server listening address
                                     [e.g., ":6060", "[::1]:6060"]
-  --no-filter                   Disable link filtering of NULL characters
+  --filter                      Enable link filtering of NULL characters
   --no-sanitize                 Disable ASCII sanitization of error messages
                                     (allowing non-ASCII error reports via SSH)
   --gops                        Enable the "gops" diagnostic agent
@@ -279,9 +279,11 @@ are, hopefully, documented here:
     You can also remove *all* of these files if you don’t want to
     use this functionality.
 
-* The `--no-filter` option disables link filtering of NULL characters.
-  This is required to use the ZMODEM inline file transfer protocol
-  or other host applications that use NULL-terminated packet sequences.
+* The `--filter` option enables link filtering of NULL characters.
+
+  Filtering is now disabled by default to support the ZMODEM inline
+  file transfer protocol and other host applications that use require
+  NULL-terminated packet sequences.
 
 * The `--iconv` option enables legacy character map conversion of
   TELNET text to UTF-8, and takes the name of the legacy mapping.
@@ -326,12 +328,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.1.15 (2026-May-07 g3524b7e) [linux/amd64]
+DPS8M Proxy v1.1.16-dev (2026-May-11 g30524a2) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.1.15                          |
+| dps8m/proxy               | v1.1.16-dev                      |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -342,11 +344,11 @@ DPS8M Proxy v1.1.15 (2026-May-07 g3524b7e) [linux/amd64]
 | spf13/pflag               | v1.0.11* (2026-May-05, g18450ea) |
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
-| golang.org/x/crypto       | v0.50.0                          |
-| golang.org/x/net          | v0.53.0                          |
-| golang.org/x/sys          | v0.43.0                          |
-| golang.org/x/term         | v0.42.0                          |
-| golang.org/x/text         | v0.36.0                          |
+| golang.org/x/crypto       | v0.51.0                          |
+| golang.org/x/net          | v0.54.0                          |
+| golang.org/x/sys          | v0.44.0                          |
+| golang.org/x/term         | v0.43.0                          |
+| golang.org/x/text         | v0.37.0                          |
 | kernel.org/.../libcap/cap | v1.2.78                          |
 | kernel.org/.../libcap/psx | v1.2.78                          |
 | Go compiler (gc)          | v1.26.3                          |
@@ -602,23 +604,23 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>21</th>
-<th>10057</th>
-<th>2132</th>
-<th>616</th>
-<th>7309</th>
-<th>1755</th>
-<th>239304</th>
-<th>4397</th>
+<th>10890</th>
+<th>2344</th>
+<th>675</th>
+<th>7871</th>
+<th>1888</th>
+<th>258652</th>
+<th>4745</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
-<th>484</th>
-<th>100</th>
-<th>157</th>
-<th>227</th>
-<th>34</th>
-<th>14418</th>
-<th>219</th>
+<th>492</th>
+<th>102</th>
+<th>159</th>
+<th>231</th>
+<th>35</th>
+<th>14698</th>
+<th>224</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -627,28 +629,28 @@ predecessor (code statistics 📈 provided by
 <th>107</th>
 <th>430</th>
 <th>190</th>
-<th>22148</th>
+<th>22172</th>
 <th>382</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>637</th>
-<th>126</th>
+<th>643</th>
+<th>127</th>
 <th>0</th>
-<th>511</th>
+<th>516</th>
 <th>0</th>
-<th>29859</th>
-<th>498</th>
+<th>30033</th>
+<th>503</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
-<th>209</th>
+<th>218</th>
 <th>35</th>
-<th>107</th>
+<th>116</th>
 <th>67</th>
 <th>0</th>
-<th>7605</th>
-<th>135</th>
+<th>7892</th>
+<th>143</th>
 </tr><tr>
 <th>YAML</th>
 <th>1</th>
@@ -663,13 +665,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>29</th>
-<th>12099</th>
-<th>2488</th>
-<th>997</th>
-<th>8614</th>
-<th>1979</th>
-<th>317642</th>
-<th>5685</th>
+<th>12955</th>
+<th>2703</th>
+<th>1067</th>
+<th>9185</th>
+<th>2113</th>
+<th>337755</th>
+<th>6045</th>
 </tr></tfoot></table>
 
 
@@ -815,6 +817,10 @@ predecessor (code statistics 📈 provided by
 <!--
 Local Variables:
 mode: markdown
+indent-tabs-mode: nil
+fill-column: 72
+eval: (setq-local display-fill-column-indicator-column 72)
+eval: (display-fill-column-indicator-mode 1)
 End:
 -->
 <!-- vim: set ft=markdown expandtab cc=72 : -->
