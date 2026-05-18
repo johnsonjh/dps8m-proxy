@@ -5,6 +5,8 @@
 
 # v1.2.1-dev
 
+* Code Quality & Maintenance
+  * Updated `golangci-lint` rules for v2.12.2 and later releases.
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from `v1.0.11-0.20260505231352-18450ea2f1d4`
