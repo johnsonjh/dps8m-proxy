@@ -141,6 +141,7 @@ goimports
 golangci
 goleak
 golines
+gomodguard
 gops
 gostd
 ioutil
