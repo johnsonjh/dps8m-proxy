@@ -32,7 +32,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math"
 	"net"
 	"net/http"
 	_ "net/http/pprof" //nolint:gosec,nolintlint
@@ -205,8 +204,8 @@ var (
 	debugAddr                        string
 	denyNewConnectionsMode           atomic.Bool
 	gracefulShutdownMode             atomic.Bool
-	idleMax                          uint64
-	idleDefMax                       uint64
+	idleMax                          time.Duration
+	idleDefMax                       time.Duration
 	iconv                            string
 	keymapByDefault                  bool
 	logDir                           string
@@ -227,8 +226,8 @@ var (
 	shutdownSignal                   chan struct{}
 	sshAddr                          []string
 	telnetHostPort                   string
-	timeMax                          uint64
-	timeDefMax                       uint64
+	timeMax                          time.Duration
+	timeDefMax                       time.Duration
 	whitelistedNetworks              []*net.IPNet
 	whitelistFile                    string
 	issueFile                        = "issue.txt"
@@ -242,6 +241,8 @@ var (
 	helpUintTypeRegexp               = regexp.MustCompile(` uint   `)
 	helpOctalTypeRegexp              = regexp.MustCompile(` octal   `)
 	helpFloatTypeRegexp              = regexp.MustCompile(` float   `)
+	helpDurationTypeRegexp           = regexp.MustCompile(` duration `)
+	helpDurAfterTypeRegexp           = regexp.MustCompile(` <duration>      `)
 	compressAlgo                     string
 	compressLevel                    string
 	dbLogLevel                       string
@@ -758,6 +759,8 @@ func init() { //nolint:gochecknoinits
 		output = helpUintTypeRegexp.ReplaceAllString(output, " <uint> ")
 		output = helpOctalTypeRegexp.ReplaceAllString(output, " <octal> ")
 		output = helpFloatTypeRegexp.ReplaceAllString(output, " <float> ")
+		output = helpDurationTypeRegexp.ReplaceAllString(output, " <duration>")
+		output = helpDurAfterTypeRegexp.ReplaceAllString(output, " <duration>     ")
 		_, _ = fmt.Fprint(os.Stdout,
 			output)
 		_, _ = fmt.Fprintf(os.Stdout,
@@ -923,9 +926,9 @@ func init() { //nolint:gochecknoinits
 			"Path to persistent statistics storage database\r\n"+
 				"    (disabled by default)")
 
-		pflag.Uint64Var(&dbTime,
-			"db-time", 30,
-			"Elapsed seconds between database updates\r\n"+
+		pflag.DurationVar(&dbTime,
+			"db-time", 30*time.Second,
+			"Interval between database updates\r\n"+
 				"    [0 disables periodic writes]")
 
 		pflag.Var((*octalPermValue)(&dbPerm),
@@ -942,23 +945,23 @@ func init() { //nolint:gochecknoinits
 				"   ")
 	}
 
-	pflag.Uint64Var(&idleMax,
+	pflag.DurationVar(&idleMax,
 		"idle-max", 0,
-		"Maximum connection idle time allowed [seconds]")
+		"Maximum connection idle time allowed")
 
-	pflag.Uint64Var(&idleDefMax,
+	pflag.DurationVar(&idleDefMax,
 		"idle-def-max", 0,
 		"Maximum connection idle time allowed\r\n"+
-			"    for only the default target [seconds]")
+			"    for only the default target")
 
-	pflag.Uint64Var(&timeMax,
+	pflag.DurationVar(&timeMax,
 		"time-max", 0,
-		"Maximum connection link time allowed [seconds]")
+		"Maximum connection link time allowed")
 
-	pflag.Uint64Var(&timeDefMax,
+	pflag.DurationVar(&timeDefMax,
 		"time-def-max", 0,
 		"Maximum connection link time allowed\r\n"+
-			"    for only the default target [seconds]")
+			"    for only the default target")
 
 	pflag.StringVar(&blacklistFile,
 		"blacklist", "",
@@ -1078,8 +1081,67 @@ func shutdownWatchdog() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+func validateTimeouts() error {
+	if dbEnabled && dbPath != "" && dbTime < 0 {
+		return errors.New("--db-time cannot be negative")
+	}
+
+	if idleMax < 0 {
+		return errors.New("--idle-max cannot be negative")
+	}
+
+	if idleDefMax < 0 {
+		return errors.New("--idle-def-max cannot be negative")
+	}
+
+	if timeMax < 0 {
+		return errors.New("--time-max cannot be negative")
+	}
+
+	if timeDefMax < 0 {
+		return errors.New("--time-def-max cannot be negative")
+	}
+
+	if idleMax > 0 && timeMax > 0 && idleMax >= timeMax {
+		return fmt.Errorf("--idle-max (%s) cannot be greater than or equal to --time-max (%s)",
+			idleMax, timeMax)
+	}
+
+	effIdleDefMax := idleMax
+	if idleDefMax > 0 {
+		effIdleDefMax = idleDefMax
+	}
+
+	effTimeDefMax := timeMax
+	if timeDefMax > 0 {
+		effTimeDefMax = timeDefMax
+	}
+
+	if effIdleDefMax > 0 && effTimeDefMax > 0 && effIdleDefMax >= effTimeDefMax {
+		return fmt.Errorf("effective default target idle-max (%s) cannot be greater than "+
+			"or equal to effective default target time-max (%s)",
+			effIdleDefMax, effTimeDefMax)
+	}
+
+	return nil
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 func main() {
 	pflag.Parse()
+
+	err := validateTimeouts()
+	if err != nil {
+		if isConsoleLogQuiet.Load() {
+			_, _ = fmt.Fprintf(os.Stdout,
+				"%s %sERROR: %v\r\n",
+				nowStamp(), errorPrefix(), err)
+		}
+
+		log.Fatalf("%sERROR: %v",
+			errorPrefix(), err) // LINTED: Fatalf
+	}
 
 	if pflag.NFlag() == 0 && len(pflag.Args()) == 0 && guiLaunched() {
 		pflag.Usage()
@@ -1292,14 +1354,6 @@ func main() {
 	initDB()
 
 	if dbEnabled && dbPath != "" && dbTime > 0 {
-		const maxSeconds = uint64(math.MaxInt64 / int64(time.Second))
-
-		if dbTime > maxSeconds {
-			log.Printf("%sIllegal --db-time value: \"%d\" exceeds safe range. using \"30\"",
-				warnPrefix(), dbTime)
-			dbTime = 30
-		}
-
 		go func() {
 			defer func() {
 				select {
@@ -1314,10 +1368,10 @@ func main() {
 			}()
 			defer recoverGoroutine("dbUpdater")
 
-			log.Printf("%sStarting database updater with %d second interval.",
+			log.Printf("%sStarting database updater with %s interval.",
 				dbPrefix(), dbTime)
 
-			ticker := time.NewTicker(time.Duration(dbTime) * time.Second) //nolint:gosec,nolintlint
+			ticker := time.NewTicker(dbTime)
 			defer ticker.Stop()
 
 			for {
@@ -1380,85 +1434,6 @@ func main() {
 		log.Fatalf("%sERROR: --telnet-host cannot contain a username (e.g., 'user@'); "+
 			"you specified: %s",
 			errorPrefix(), telnetHostPort) // LINTED: Fatalf
-	}
-
-	if idleMax > 0 {
-		maxSeconds := uint64(math.MaxInt64 / int64(time.Second))
-		if idleMax > maxSeconds {
-			log.Printf("%sIllegal --idle-max value: \"%d\" exceeds safe range, using \"%d\"",
-				warnPrefix(), idleMax, maxSeconds)
-			idleMax = maxSeconds
-		}
-	}
-
-	if idleDefMax > 0 {
-		maxSeconds := uint64(math.MaxInt64 / int64(time.Second))
-		if idleDefMax > maxSeconds {
-			log.Printf("%sIllegal --idle-def-max value: \"%d\" exceeds safe range, using \"%d\"",
-				warnPrefix(), idleDefMax, maxSeconds)
-			idleDefMax = maxSeconds
-		}
-	}
-
-	if timeMax > 0 {
-		maxSeconds := uint64(math.MaxInt64 / int64(time.Second))
-		if timeMax > maxSeconds {
-			log.Printf("%sIllegal --time-max value: \"%d\" exceeds safe range, using \"%d\"",
-				warnPrefix(), timeMax, maxSeconds)
-			timeMax = maxSeconds
-		}
-	}
-
-	if timeDefMax > 0 {
-		maxSeconds := uint64(math.MaxInt64 / int64(time.Second))
-		if timeDefMax > maxSeconds {
-			log.Printf("%sIllegal --time-def-max value: \"%d\" exceeds safe range, using \"%d\"",
-				warnPrefix(), timeDefMax, maxSeconds)
-			timeDefMax = maxSeconds
-		}
-	}
-
-	if idleMax > 0 && timeMax > 0 && idleMax >= timeMax {
-		if isConsoleLogQuiet.Load() {
-			_, _ = fmt.Fprintf(os.Stdout,
-				"%s %sERROR: --idle-max (%d) cannot be greater than or equal to --time-max"+
-					" (%d)\r\n",
-				nowStamp(), errorPrefix(), idleMax, timeMax)
-		}
-
-		if enableGops {
-			gopsClose()
-		}
-
-		log.Fatalf("%sERROR: --idle-max (%d) cannot be greater than or equal to --time-max (%d)",
-			errorPrefix(), idleMax, timeMax) // LINTED: Fatalf
-	}
-
-	effIdleDefMax := idleMax
-	if idleDefMax > 0 {
-		effIdleDefMax = idleDefMax
-	}
-
-	effTimeDefMax := timeMax
-	if timeDefMax > 0 {
-		effTimeDefMax = timeDefMax
-	}
-
-	if effIdleDefMax > 0 && effTimeDefMax > 0 && effIdleDefMax >= effTimeDefMax {
-		if isConsoleLogQuiet.Load() {
-			_, _ = fmt.Fprintf(os.Stdout,
-				"%s %sERROR: effective default target idle-max (%d) cannot be greater than "+
-					"or equal to effective default target time-max (%d)\r\n",
-				nowStamp(), errorPrefix(), effIdleDefMax, effTimeDefMax)
-		}
-
-		if enableGops {
-			gopsClose()
-		}
-
-		log.Fatalf("%sERROR: effective default target idle-max (%d) cannot be greater than "+
-			"or equal to effective default target time-max (%d)",
-			errorPrefix(), effIdleDefMax, effTimeDefMax) // LINTED: Fatalf
 	}
 
 	edSigner, err := loadOrCreateHostKey(filepath.Join(
@@ -1727,9 +1702,7 @@ func main() {
 						}
 
 						if effIdleMax > 0 &&
-							idleTime > time.Duration( //nolint:gosec,nolintlint
-								effIdleMax,
-							)*time.Second {
+							idleTime > effIdleMax {
 							idleKillsTotal.Add(1)
 
 							toKill = append(toKill, pendingKill{
@@ -1752,9 +1725,7 @@ func main() {
 							delete(connections, id)
 							delete(shareableConnections, conn.shareableUsername)
 						} else if effTimeMax > 0 &&
-							connUptime > time.Duration( //nolint:gosec,nolintlint
-								effTimeMax,
-							)*time.Second {
+							connUptime > effTimeMax {
 							timeKillsTotal.Add(1)
 
 							toKill = append(toKill, pendingKill{
@@ -2929,16 +2900,16 @@ func listConfiguration() {
 	timeMaxStr := "disabled"
 
 	if timeMax > 0 {
-		timeMaxStr = fmt.Sprintf("%d seconds",
+		timeMaxStr = fmt.Sprintf("%v",
 			timeMax)
 	}
 
 	if timeDefMax > 0 {
 		if timeMax > 0 {
-			timeMaxStr += fmt.Sprintf(" (Def. Target: %d seconds)",
+			timeMaxStr += fmt.Sprintf(" (Def. Target: %v)",
 				timeDefMax)
 		} else {
-			timeMaxStr = fmt.Sprintf("disabled (Def. Target: %d seconds)",
+			timeMaxStr = fmt.Sprintf("disabled (Def. Target: %v)",
 				timeDefMax)
 		}
 	}
@@ -2948,16 +2919,16 @@ func listConfiguration() {
 	idleMaxStr := "disabled"
 
 	if idleMax > 0 {
-		idleMaxStr = fmt.Sprintf("%d seconds",
+		idleMaxStr = fmt.Sprintf("%v",
 			idleMax)
 	}
 
 	if idleDefMax > 0 {
 		if idleMax > 0 {
-			idleMaxStr += fmt.Sprintf(" (Def. Target: %d seconds)",
+			idleMaxStr += fmt.Sprintf(" (Def. Target: %v)",
 				idleDefMax)
 		} else {
-			idleMaxStr = fmt.Sprintf("disabled (Def. Target: %d seconds)",
+			idleMaxStr = fmt.Sprintf("disabled (Def. Target: %v)",
 				idleDefMax)
 		}
 	}
@@ -3071,12 +3042,12 @@ func listConfiguration() {
 			persistedStartTime.Format("2006-Jan-02 15:04:05"))
 	}
 
-	if dbTime > 1 && lifetimeString != "" { //nolint:gocritic
-		updateMaxLength(fmt.Sprintf("Database enabled: %s, %d seconds between writes",
+	if dbTime > time.Second && lifetimeString != "" { //nolint:gocritic
+		updateMaxLength(fmt.Sprintf("Database enabled: %s, %v interval between writes",
 			dbPath, dbTime))
-	} else if dbTime == 1 && lifetimeString != "" {
-		updateMaxLength(fmt.Sprintf("Database enabled: %s, 1 second between writes",
-			dbPath))
+	} else if dbTime == time.Second && lifetimeString != "" {
+		updateMaxLength(fmt.Sprintf("Database enabled: %s, %v interval between writes",
+			dbPath, dbTime))
 	} else if dbTime == 0 && lifetimeString != "" {
 		updateMaxLength(fmt.Sprintf("Database enabled: %s, periodic updates disabled",
 			dbPath))
@@ -3261,12 +3232,12 @@ func listConfiguration() {
 	printRow(&b, "Debug HTTP Server: "+debugHTTP)
 	printRow(&b, "Proxy Uptime: "+uptimeString)
 
-	if dbTime > 1 && lifetimeString != "" { //nolint:gocritic
-		printRow(&b, fmt.Sprintf("Database enabled: %s, %d seconds between writes",
+	if dbTime > time.Second && lifetimeString != "" { //nolint:gocritic
+		printRow(&b, fmt.Sprintf("Database enabled: %s, %v interval between writes",
 			dbPath, dbTime))
-	} else if dbTime == 1 && lifetimeString != "" {
-		printRow(&b, fmt.Sprintf("Database enabled: %s, 1 second between writes",
-			dbPath))
+	} else if dbTime == time.Second && lifetimeString != "" {
+		printRow(&b, fmt.Sprintf("Database enabled: %s, %v interval between writes",
+			dbPath, dbTime))
 	} else if dbTime == 0 && lifetimeString != "" {
 		printRow(&b, fmt.Sprintf("Database enabled: %s, periodic updates disabled",
 			dbPath))

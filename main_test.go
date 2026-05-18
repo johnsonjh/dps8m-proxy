@@ -374,6 +374,124 @@ func TestNaturalSort(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+func TestValidateTimeouts(t *testing.T) { //nolint:paralleltest,tparallel,nolintlint
+	if enableGops {
+		gopsClose()
+	}
+
+	defer goleak.VerifyNone(t)
+
+	origDbTime := dbTime
+	origIdleMax := idleMax
+	origIdleDefMax := idleDefMax
+	origTimeMax := timeMax
+	origTimeDefMax := timeDefMax
+	origDbPath := dbPath
+
+	defer func() {
+		dbTime = origDbTime
+		idleMax = origIdleMax
+		idleDefMax = origIdleDefMax
+		timeMax = origTimeMax
+		timeDefMax = origTimeDefMax
+		dbPath = origDbPath
+	}()
+
+	tests := []struct {
+		name       string
+		dbTime     time.Duration
+		dbPath     string
+		idleMax    time.Duration
+		idleDefMax time.Duration
+		timeMax    time.Duration
+		timeDefMax time.Duration
+		wantErr    bool
+	}{
+		{
+			name:    "Valid timeouts",
+			dbTime:  30 * time.Second,
+			dbPath:  "test.db",
+			idleMax: 10 * time.Second,
+			timeMax: 20 * time.Second,
+			wantErr: false,
+		},
+		{
+			name:    "Negative dbTime",
+			dbTime:  -1 * time.Second,
+			dbPath:  "test.db",
+			wantErr: true,
+		},
+		{
+			name:    "Negative idleMax",
+			idleMax: -1 * time.Second,
+			wantErr: true,
+		},
+		{
+			name:       "Negative idleDefMax",
+			idleDefMax: -1 * time.Second,
+			wantErr:    true,
+		},
+		{
+			name:    "Negative timeMax",
+			timeMax: -1 * time.Second,
+			wantErr: true,
+		},
+		{
+			name:       "Negative timeDefMax",
+			timeDefMax: -1 * time.Second,
+			wantErr:    true,
+		},
+		{
+			name:    "idleMax equals timeMax",
+			idleMax: 10 * time.Second,
+			timeMax: 10 * time.Second,
+			wantErr: true,
+		},
+		{
+			name:    "idleMax greater than timeMax",
+			idleMax: 20 * time.Second,
+			timeMax: 10 * time.Second,
+			wantErr: true,
+		},
+		{
+			name:       "effIdleDefMax greater than effTimeDefMax",
+			idleMax:    5 * time.Second,
+			idleDefMax: 15 * time.Second,
+			timeMax:    10 * time.Second,
+			wantErr:    true,
+		},
+		{
+			name:       "effIdleDefMax greater than effTimeDefMax with timeDefMax",
+			idleMax:    5 * time.Second,
+			idleDefMax: 15 * time.Second,
+			timeMax:    20 * time.Second,
+			timeDefMax: 10 * time.Second,
+			wantErr:    true,
+		},
+	}
+
+	for _, tt := range tests { //nolint:paralleltest,nolintlint
+		t.Run(
+			tt.name,
+			func(t *testing.T) {
+				dbTime = tt.dbTime
+				dbPath = tt.dbPath
+				idleMax = tt.idleMax
+				idleDefMax = tt.idleDefMax
+				timeMax = tt.timeMax
+				timeDefMax = tt.timeDefMax
+
+				err := validateTimeouts()
+				if (err != nil) != tt.wantErr {
+					t.Errorf("validateTimeouts() error = %v, wantErr %v", err, tt.wantErr)
+				}
+			},
+		)
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // Local Variables:
 // mode: go
 // tab-width: 4
