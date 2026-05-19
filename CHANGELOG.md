@@ -5,6 +5,11 @@
 
 # v1.2.1-dev
 
+* New Features & Improvements
+  * Switch to using Go durations (*e.g.*, `5s`, `250ms`, `5m`) for
+    specifying times and timeouts for `--db-time`, `--idle-max`,
+    `--idle-def-max`, `--time-max`, and `--time-def-max`; add
+    validation tests.
 * Code Quality & Maintenance
   * Updated `golangci-lint` rules for v2.12.2 and later releases.
 * Dependency Updates
@@ -340,15 +345,9 @@
     connections-mutex critical section so a wedged terminal
     or filesystem stall cannot block the entire connections
     map during enforcement.
-[]()
-
-[]()
 * Code Quality & Maintenance
   * Extended and corrected use of Local Variables blocks in various
     files for easier editing of the source code using GNU Emacs.
-[]()
-
-[]()
 * Dependency Updates
   * Updated [`golang.org/x/sys`](golang.org/x/sys)
     from `v0.43.0` to `v0.44.0`.
@@ -373,15 +372,9 @@
 * Build System Improvements
   * Integrated `pvs-golang` into the linting process and added a
     corresponding `make` target.
-[]()
-
-[]()
 * Code Quality & Maintenance
   * Added `Local Variables` blocks to various files for easier editing
     of the source code using GNU Emacs.
-[]()
-
-[]()
 * Dependency Updates
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
@@ -399,9 +392,6 @@
 * Code Quality & Maintenance
   * Improved code formatting across the project by conforming to
     current git `gofumpt -extra` and `golangci-lint` standards.
-[]()
-
-[]()
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from `v1.0.11-0.20260305102058-3d32e71abc0b`
@@ -412,9 +402,6 @@
 * Code Quality & Maintenance
   * Improved mocking for the version reporting tests, added additional
     version reporting tests, and appeased all source code linters.
-[]()
-
-[]()
 * Dependency Updates
   * Updated
     [`klauspost/compress`](https://github.com/klauspost/compress)
@@ -451,9 +438,6 @@
     channel termination.
   * Added check to guarantee the database is closed only after all
     background routines have stopped.
-[]()
-
-[]()
 * Code Quality & Maintenance
   * Normalized code style to be more consistent across the codebase.
   * Improved log file handling to prevent hangs if a log file failed
@@ -461,16 +445,10 @@
   * Improved robustness by adding proactive `nil` safety checks
     to `sendNaws` and `handleSession`.
   * Added additional defensive checking for `nil` channels.
-[]()
-
-[]()
 * Documentation Updates
   * Made it clearer that the `string` argument accepted by the
     `--telnet-host` and `--alt-host` options can be a path to
     a socket file as well as a host:port combo.
-[]()
-
-[]()
 * Build System Improvements
   * Simplified shell commands in the cross-compilation shell scripts
     by replacing `true` with the colon shell builtin.
@@ -552,9 +530,6 @@
 
 * Documentation Updates
   * Fix incorrect Emacs key remapping table `PgUp`/`PgDn` details.
-[]()
-
-[]()
 * Build System Improvements
   * Updated the `clean` `make` target in the `Makefile` to suppress
     unnecessary error output and improve the robustness of the cleanup
@@ -570,15 +545,9 @@
   * Added a fallback mechanism to the `clean` `make` target in
     the `Makefile` to try using `-mod=readonly` if the default
     `go clean` operation fails.
-[]()
-
-[]()
 * Dependency Management
   * Reorganized `go.mod` to explicitly separate direct, indirect,
     and test dependencies.
-[]()
-
-[]()
 * CI/CD Updates
   * Optimized the GitLab CI/CD pipeline by removing the unnecessary
     installation of Perl.
@@ -587,9 +556,6 @@
 
 * Build System & Tooling Improvements
   * Replaced Perl scripts with Awk scripts for documentation rebuilds.
-[]()
-
-[]()
 * Installation & Usage Documentation Updates
   * Added detailed documentation for system-wide installations using
     `make install` and `make install-strip`, including information
@@ -598,9 +564,6 @@
     `env GOTOOLCHAIN=auto` for a more robust installation experience.
   * Refined the explanation of how TELNET target-specific banner files
     are served when using the `--alt-host` functionality.
-[]()
-
-[]()
 * Markdown and Formatting
   * Normalized punctuation, spacing, and Markdown formatting throughout
     the documentation to improve consistency and readability.
@@ -618,9 +581,6 @@
     new temporary documentation build artifacts.
   * Updated `.gitignore` to exclude new temporary documentation
     build files.
-[]()
-
-[]()
 * Documentation Improvements
   * Refined the visual layout of the documentation by categorizing
     the `--iconv` option details into clear bullet points.
@@ -635,16 +595,10 @@
     explicit ("Disable the user SSH connection banner").
   * Improved the documentation for whitelist and blacklist file formats
     to clarify that they should contain "one item per line."
-[]()
-
-[]()
 * Build System Improvements
   * Enhanced the documentation generation process in the `Makefile`
     to automatically redact the full local path of the binary from
     the generated help text.
-[]()
-
-[]()
 * Testing Improvements
   * Refined the implementation of `TestNaturalLess` in `main_test.go`
     for better formatting and readability.
@@ -687,9 +641,6 @@
     flexible input by normalizing case, spaces, dashes, underscores,
     and common abbreviations like "`CP`" for "`Code Page`", "`Win`"
     for "`Windows`", and "`Mac`" for "`Macintosh`".
-[]()
-
-[]()
 * Dependency Updates
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
@@ -700,9 +651,6 @@
   * Updated
     [`libcap/psx`](https://kernel.org/pub/linux/libs/security/libcap/psx)
     from from `v1.2.77` to `v1.2.78`.
-[]()
-
-[]()
 * Testing Improvements
   * Added test cases for the new natural sort algorithm, including
     scenarios for mixed alphanumeric strings and standard character
@@ -728,9 +676,6 @@
     restricted session configurations.
   * New CLI Option `--iconv`: Added a new command-line flag to
     enable conversion of legacy character maps to UTF-8.
-[]()
-
-[]()
 * Interactive Menu Enhancements
   * Added the `C` command to the user control menu to allow users to
     toggle character map conversion (if enabled via `--iconv`)
@@ -739,15 +684,9 @@
     the `S` (Show Status) menu option.
   * Fixed bugs in the output alignment of the user control menu and
     improved connection statistics output.
-[]()
-
-[]()
 * CI/CD Updates
   * Updated the Android build pipeline to use Android NDK `r30-beta1`
     (updated from `r29`).
-[]()
-
-[]()
 * Testing Improvements
   * Added `TestFindCharmap` to verify the character map name
     normalization and fuzzy lookup logic.
@@ -760,9 +699,6 @@
   * New CLI Option `--no-filter`: Added a new command-line flag to
     disable the automatic stripping of `NULL` characters from the
     TELNET data stream.
-[]()
-
-[]()
 * Code Quality & Maintenance
   * Updated linting suppressions to align with the latest
     `golangci-lint` rules.
@@ -831,9 +767,6 @@
 * New Features & Improvements
   * Migrated inline `gosec` exceptions to standard `golangci-lint`
     syntax in `utf8.go`.
-[]()
-
-[]()
 * Dependency Updates
   * Updated [`x/net`](https://golang.org/x/net)
     from `v0.50.0` to `v0.51.0`.
@@ -880,9 +813,6 @@
     from `v1.25.6` to `v1.25.7`.
   * Updated [`miekg/dns`](https://github.com/miekg/dns)
     from `v1.1.70` to `v1.1.72`.
-[]()
-
-[]()
 * Build System Improvements
   * Updated `.golangci.yml` configuration.
   * Added `nolint:unqueryvet` directives to database bucket access in
@@ -922,9 +852,6 @@
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from `v1.0.11-0.20251007101450-6fcfbc9910e1`
     to `v1.0.11-0.20260110151513-b85eb9e15911`.
-[]()
-
-[]()
 * Build System Improvements
   * Updated `Makefile` to clear the `goimports` cache before
     running `gopls` linting checks, avoiding a possible warning.
@@ -943,9 +870,6 @@
 
 * Code Improvements
   * Normalized code style by adding missing whitespace in `main.go`.
-[]()
-
-[]()
 * Dependency Updates
   * Updated [`google/gops`](https://github.com/google/gops)
     from `v0.3.29-0.20250514124927-a2d8f7790eac` to the
@@ -958,9 +882,6 @@
 * New Features & Improvements
   * Improved performance and memory efficiency by pre-allocating data
     buffers in the TELNET negotiation logic.
-[]()
-
-[]()
 * Build System Improvements
   * Updated `.update-deps.sh` to optimize dependency update order.
   * Updated `.gitignore` to exclude additional temporary and
@@ -997,9 +918,6 @@
     directory exists.
   * Updated `.gitignore` to include core files and the
     `vendor` directory.
-[]()
-
-[]()
 * CI/CD Updates
   * Deactivated the Python `venv` after linting and fixed `tar`
     path exclusions.
@@ -1085,9 +1003,6 @@
   * Updated
     [`klauspost/compress`](https://github.com/klauspost/compress)
     from `v1.18.1` to `v1.18.2`.
-[]()
-
-[]()
 * New Features & Improvements
   * Added `--keymap` option for enabling Emacs keymapping mode
     by default.
@@ -1099,9 +1014,6 @@
   * Refactored code by consolidating all version identification and
     printing functions to a dedicated file.
   * Removed unused IEC size constants from the `main` package.
-[]()
-
-[]()
 * Build System Improvements
   * Added Emacs-style backup file patterns to the
     `.gitignore` configuration.
@@ -1126,9 +1038,6 @@
   * Corrected the help text for the `--ssh-addr` argument by changing
     the text "strings" to just "string".
   * Improved the formatting of help output by adding missing spaces.
-[]()
-
-[]()
 * Build System Improvements
   * Enabled the `color` and `trace` options of the `govulncheck`
     linting tool.
@@ -1189,9 +1098,6 @@
 
 * New Features & Improvements
   * Refined code style in the version reporting functionality.
-[]()
-
-[]()
 * Dependency Updates
   * Updated [`x/term`](https://golang.org/x/term)
     from `v0.36.0` to `v0.37.0`.
@@ -1208,9 +1114,6 @@
     bug affecting the `nilaway` and `revive` `make` targets.
   * Appeased `gofumpt` by adjusting variable declaration
     in `trap_darwin.go`.
-[]()
-
-[]()
 * Code Quality Improvements
   * Ensured `CloseHandle` is deferred with error suppression
     in `trap_windows.go`.
@@ -1247,9 +1150,6 @@
 * Build System Improvements
   * Added a lint check to verify that the top-level `LICENSE`
     file exactly matches `LICENSES/MIT.txt`.
-[]()
-
-[]()
 * Documentation Updates
   * Updated the list of required development tools to include
     the POSIX.1 `diff` utility.
@@ -1259,9 +1159,6 @@
 * CI/CD Updates
   * Updated the GitLab CI/CD configuration to call `pigz` with
     compression level `9` (instead of Zopfli).
-[]()
-
-[]()
 * Build System Improvements
   * Modified the linter setup script to support the `VERBOSE`
     environment variable for controlling installation output.
@@ -1277,9 +1174,6 @@
     and connection timeouts.
   * Added validation to ensure connection timeout values
     remain within safe ranges.
-[]()
-
-[]()
 * Build System Improvements
   * Updated the `.gitignore` file to exclude more output files.
 
@@ -1304,9 +1198,6 @@
 * Build System Improvements
   * Enabled symbol tables and DWARF information in pre-compiled
     release binaries by removing `-s` and `-w` linker flags.
-[]()
-
-[]()
 * Testing Improvements
   * Integrated the upstream Google `deadcode` linter.
   * Added automated installation of `deadcode` linter in the lint
@@ -1324,9 +1215,6 @@
     lookups while preventing potential `nil` pointer dereferences.
   * Normalized `fmt.Errorf` call formatting across the codebase for
     better consistency and readability.
-[]()
-
-[]()
 * Testing Improvements
   * Integrated the NilAway static analysis tool into the linting suite
     for enhanced `nil`-safety verification.
@@ -1343,9 +1231,6 @@
   * Enhanced error reporting across the database, host key generation,
     connection dialing, and logging modules (wrapping all returned
     errors with contextual information), as suggested by `wrapcheck`.
-[]()
-
-[]()
 * Testing Improvements
   * Enabled the `depguard` linter in the static analysis configuration
     to restrict imports and explicitly deny usage of the deprecated
@@ -1362,17 +1247,11 @@
     and configuration display paths.
   * Added a missing newline in the Unix signal handling initialization
     for improved code readability.
-[]()
-
-[]()
 * Testing Improvements
   * Enabled the `perfsprint` linter in the static analysis
     configuration and addressed all findings across the codebase.
   * Added `nolint` directives to suppress specific false positives in
     the UTF-8 handling logic.
-[]()
-
-[]()
 * Build System Improvements
   * Adjusted the `GOPROXY` settings in the dependency update script.
 
@@ -1386,9 +1265,6 @@
     application is started from a file manager rather than a terminal.
   * Expanded the list of recognized Linux GUI launchers to include
     common desktop environments and file managers.
-[]()
-
-[]()
 * CI/CD Updates
   * Updated the GitLab CI/CD configuration to use Zopfli compression
     via `pigz -11` for release assets.
@@ -1402,9 +1278,6 @@
     determine the Go toolchain version to use from the `go.mod` file.
   * Added the Android cross-compilation script to be checked by the
     `shfmt` and ShellCheck linters.
-[]()
-
-[]()
 * Documentation Updates
   * Updated the `socat` integration example in the documentation to
     utilize UNIX domain sockets.
@@ -1446,9 +1319,6 @@
     GitLab CI/CD pipeline.
   * Added `lzip`, `tar`, and the Android NDK to the GitLab CI/CD
     environment to facilitate Android CI/CD builds.
-[]()
-
-[]()
 * Build System Improvements
   * Added a new `.cross-android.sh` script to automate Android
     cross-compilation using the Android NDK.
@@ -1456,15 +1326,9 @@
     refer users to the new `.cross-android.sh` script.
   * Updated the `Makefile` to be more POSIX-compliant and allowed
     overriding `GOTOOLCHAIN` and `CGO_ENABLED` variables.
-[]()
-
-[]()
 * Testing Improvements
   * Enabled the `ireturn` linter in the static analysis configuration
     and addressed its findings.
-[]()
-
-[]()
 * New Features & Improvements
   * Improved the console warning message for GUI launches on Linux to
     specifically mention not using a file manager.
@@ -1488,15 +1352,9 @@
     mutex locking.
   * Enhanced error logging for failed TELNET target connections with
     better contextual information.
-[]()
-
-[]()
 * Testing Improvements
   * Refactored code structure to satisfy the `noinlineerr` linter.
   * Applied `ireturn` linter compliance to key loading functions.
-[]()
-
-[]()
 * Build System Improvements
   * Updated the dependency maintenance script to prioritize direct
     module downloads over the proxy.
@@ -1513,9 +1371,6 @@
 * New Features & Improvements
   * Added a new `--no-console` command-line argument to completely
     disable the interactive admin console.
-[]()
-
-[]()
 * Build System Improvements
   * Improved build reliability on macOS by explicitly calling
     the external `printf` utility (known to properly handle
@@ -1526,9 +1381,6 @@
 * New Features & Improvements
   * Applied various minor style and whitespace adjustments to enhance
     code consistency and readability.
-[]()
-
-[]()
 * Dependency Updates
   * Updated
     [`libcap/cap`](https://kernel.org/pub/linux/libs/security/libcap/cap)
@@ -1556,15 +1408,9 @@
     for better maintainability.
   * Extended the `.gitignore` file to include IBM OS/400 specific
     build artifacts.
-[]()
-
-[]()
 * Documentation Updates
   * Updated the help and usage information output to include the
     project home page and bug reporting URL.
-[]()
-
-[]()
 * Dependency Updates
   * Promoted [`x/sys`](golang.org/x/sys) from an indirect to
     a direct dependency at version `v0.37.0`.
@@ -1611,9 +1457,6 @@
   * Added the `!usr-merge-nag` Alpine meta-package to the
     GitLab CI/CD environment and ensured any error output is
     redirected to `/dev/null`.
-[]()
-
-[]()
 * Build System Improvements
   * Simplified shell commands in the `systemd` service file by
     replacing `true` with the colon shell builtin.
@@ -1641,21 +1484,12 @@
     and style after updating to latest `pflag` dependency.
   * Improved version reporting of the `pflag` dependency to show more
     human-readable version information.
-[]()
-
-[]()
 * Build System Improvements
   * Updated dependency update script to track the `pflag`
     master branch.
-[]()
-
-[]()
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from `v1.0.10` to `v1.0.11-0.20251007101450-6fcfbc9910e1`.
-[]()
-
-[]()
 * Internal Improvements
   * Adjusted code in `main.go` to satisfy new linter requirements for
     unchecked return values.
@@ -1680,9 +1514,6 @@
     corresponding `make` target.
   * Updated the lint setup script to install the
     `gopls` and `govulncheck` linters.
-[]()
-
-[]()
 * Internal Improvements
   * Modernized conditional logic in IBM AIX-specific signal handling
     by utilizing the built-in `max` function.
@@ -1737,9 +1568,6 @@
 
 * Build System Improvements
   * Removed the unnecessary `SHELL` override from the `Makefile`.
-[]()
-
-[]()
 * Dependency Updates
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
@@ -1805,14 +1633,8 @@
     during connection termination.
   * Ensured terminated connections were removed from the active
     sessions map.
-[]()
-
-[]()
 * Build System Improvements
   * Improved `setcap` detection in the `Makefile`.
-[]()
-
-[]()
 * Dependency Updates
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
@@ -1826,15 +1648,9 @@
 
 * New Features & Improvements
   * Added support for lzip compression of log files.
-[]()
-
-[]()
 * Build System Improvements
   * Updated the cross-compilation script to use POSIX-conforming
     shell syntax for PID referencing.
-[]()
-
-[]()
 * Dependency Updates
   * Added
     [`sorairolake/lzip-go`](https://github.com/sorairolake/lzip-go)
@@ -1849,9 +1665,6 @@
     the `true` command.
   * Integrated automatic `README.md` restoration into the `Makefile`
     linting target.
-[]()
-
-[]()
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from `v1.0.9` to `v1.0.10`.
@@ -1873,9 +1686,6 @@
 * New Features & Improvements
   * Removed "`b`", "`3`", and "`4`" from the safe character subset
     used for shareable username generation.
-[]()
-
-[]()
 * Dependency Updates
   * Updated [`ulikunitz/xz`](https://github.com/ulikunitz/xz)
     from `v0.5.13` to `v0.5.15`.
@@ -1884,9 +1694,6 @@
 
 * New Features & Improvements
   * Corrected misplaced parentheses in the mDNS help text.
-[]()
-
-[]()
 * Dependency Updates
   * Updated [`ulikunitz/xz`](https://github.com/ulikunitz/xz)
     from `v0.5.12` to `v0.5.13`.
@@ -1897,15 +1704,9 @@
   * Integrated `gops` and mDNS status into the interactive
     configuration display.
   * Updated the mDNS descriptions to use more precise wording.
-[]()
-
-[]()
 * Build System Improvements
   * Modified the `Makefile` to skip granting capabilities
     when installing inside a Docker container.
-[]()
-
-[]()
 * Dependency Updates
   * Updated [`etcd/bbolt`](https://go.etcd.io/bbolt)
     from `v1.4.2` to `v1.4.3`.
@@ -1920,9 +1721,6 @@
 * New Features & Improvements
   * Further restricted the safe character subset used for
     generating shareable usernames.
-[]()
-
-[]()
 * Build System Improvements
   * Improved the `Makefile` and cross-compilation scripts to better
     handle custom Go toolchains and checksum database settings.
@@ -1934,9 +1732,6 @@
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from `v1.24.6` to `v1.25.0`.
-[]()
-
-[]()
 * CI/CD Updates
   * Switched the `golangci-lint` installation method to build from
     source code via `go install` to accommodate the Go major
@@ -1953,9 +1748,6 @@
     information is always printed early during initialization.
   * Removed broken support for Microsoft Go `systemcrypto`
     FIPS 140 backend.
-[]()
-
-[]()
 * Dependency Updates
   * Added [`hashicorp/mdns`](https://github.com/hashicorp/mdns)
     `v1.0.6`.
@@ -2003,9 +1795,6 @@
     output buffer.
   * Improved the `Connection` struct layout to reduce
     memory usage by eliminating padding.
-[]()
-
-[]()
 * Build System Improvements
   * Modified the `Makefile` to use the `GO` variable for the full
     Go compiler path.
@@ -2013,9 +1802,6 @@
     `ssh_host_ecdsa_key.pem` file.
   * Improved the `Makefile` to automatically enable `GOSUMDB`
     if it is detected as being disabled.
-[]()
-
-[]()
 * CI/CD Updates
   * Configured the GitLab CI/CD pipeline to save and restore
     [vendored](https://go.dev/ref/mod#vendoring) dependencies.
@@ -2027,9 +1813,6 @@
     in the GitLab CI/CD configuration.
   * Disabled Go toolchain telemetry in the GitLab CI/CD
     build environment.
-[]()
-
-[]()
 * Dependency Updates
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
@@ -2052,24 +1835,15 @@
   * Fixed back-end connections for IPv6 systems by properly
     utilizing `net.JoinHostPort`.
   * Removed support for shorthand command-line flags.
-[]()
-
-[]()
 * Build System Improvements
   * Added a `golist` `make` target to identify
     outdated dependencies.
   * Extended the cross-compilation script to add support for
     `linux/mipssf` targets (no-FPU hardware requiring
     software floating point).
-[]()
-
-[]()
 * Testing Improvements
   * Integrated `govulncheck` into the Makefile and linting target
     to identify potential vulnerabilities.
-[]()
-
-[]()
 * CI/CD Updates
   * Optimized the GitLab CI/CD pipeline by removing redundant
     diagnostic output and tool installation steps.
@@ -2089,9 +1863,6 @@
     path construction across platforms.
   * Standardized the default format for file permissions across
     all configuration options.
-[]()
-
-[]()
 * CI/CD Updates
   * Improved the GitLab CI/CD pipeline by adding the `GIT_DEPTH`
     variable (defined to `0`) to the configuration, ensuring a
