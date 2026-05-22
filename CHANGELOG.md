@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.1
+# v1.2.2-dev
+
+* TBD
+
+# v1.2.1 (2026-05-22 01:28:42)
 
 * New Features & Improvements
   * Switch to using Go durations (*e.g.*, `5s`, `250ms`, `5m`) for
