@@ -387,6 +387,7 @@ func TestValidateTimeouts(t *testing.T) { //nolint:paralleltest,tparallel,nolint
 	origIdleDefMax := idleDefMax
 	origTimeMax := timeMax
 	origTimeDefMax := timeDefMax
+	origSSHDelay := sshDelay
 	origDbPath := dbPath
 
 	defer func() {
@@ -395,6 +396,7 @@ func TestValidateTimeouts(t *testing.T) { //nolint:paralleltest,tparallel,nolint
 		idleDefMax = origIdleDefMax
 		timeMax = origTimeMax
 		timeDefMax = origTimeDefMax
+		sshDelay = origSSHDelay
 		dbPath = origDbPath
 	}()
 
@@ -406,6 +408,7 @@ func TestValidateTimeouts(t *testing.T) { //nolint:paralleltest,tparallel,nolint
 		idleDefMax time.Duration
 		timeMax    time.Duration
 		timeDefMax time.Duration
+		sshDelay   time.Duration
 		wantErr    bool
 	}{
 		{
@@ -469,6 +472,26 @@ func TestValidateTimeouts(t *testing.T) { //nolint:paralleltest,tparallel,nolint
 			timeDefMax: 10 * time.Second,
 			wantErr:    true,
 		},
+		{
+			name:     "Negative sshDelay",
+			sshDelay: -1 * time.Second,
+			wantErr:  true,
+		},
+		{
+			name:     "sshDelay at upper limit",
+			sshDelay: time.Minute,
+			wantErr:  false,
+		},
+		{
+			name:     "sshDelay greater than upper limit",
+			sshDelay: time.Minute + time.Nanosecond,
+			wantErr:  true,
+		},
+		{
+			name:     "Valid sshDelay",
+			sshDelay: 5 * time.Second,
+			wantErr:  false,
+		},
 	}
 
 	for _, tt := range tests { //nolint:paralleltest,nolintlint
@@ -481,6 +504,7 @@ func TestValidateTimeouts(t *testing.T) { //nolint:paralleltest,tparallel,nolint
 				idleDefMax = tt.idleDefMax
 				timeMax = tt.timeMax
 				timeDefMax = tt.timeDefMax
+				sshDelay = tt.sshDelay
 
 				err := validateTimeouts()
 				if (err != nil) != tt.wantErr {

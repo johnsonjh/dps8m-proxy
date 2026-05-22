@@ -246,7 +246,7 @@ var (
 	compressAlgo                     string
 	compressLevel                    string
 	dbLogLevel                       string
-	sshDelay                         float64
+	sshDelay                         time.Duration
 	connectionsInFlight              atomic.Uint64
 	acceptErrorsTotal                atomic.Uint64
 	adminKillsTotal                  atomic.Uint64
@@ -810,10 +810,10 @@ func init() { //nolint:gochecknoinits
 
 	pflag_mustLookup("ssh-addr").DefValue = "\":2222\""
 
-	pflag.Float64Var(&sshDelay,
+	pflag.DurationVar(&sshDelay,
 		"ssh-delay", 0,
 		"Delay for incoming SSH connections\r\n"+
-			"    [\"0.0\" to \"30.0\" seconds] (no default)")
+			"    [\"0s\" to \"1m\"] (no default)")
 
 	pflag.BoolVar(&noBanner,
 		"no-banner", false,
@@ -1102,6 +1102,14 @@ func validateTimeouts() error {
 		return errors.New("--time-def-max cannot be negative")
 	}
 
+	if sshDelay < 0 {
+		return errors.New("--ssh-delay cannot be negative")
+	}
+
+	if sshDelay > time.Minute {
+		return errors.New("--ssh-delay cannot be greater than 1 minute")
+	}
+
 	if idleMax > 0 && timeMax > 0 && idleMax >= timeMax {
 		return fmt.Errorf("--idle-max (%s) cannot be greater than or equal to --time-max (%s)",
 			idleMax, timeMax)
@@ -1257,24 +1265,6 @@ func main() {
 			log.Fatalf("%sERROR: %v",
 				errorPrefix(), err) // LINTED: Fatalf
 		}
-	}
-
-	if sshDelay < 0 {
-		if enableGops {
-			gopsClose()
-		}
-
-		log.Fatalf("%sERROR: --ssh-delay cannot be negative!",
-			errorPrefix()) // LINTED: Fatalf
-	}
-
-	if sshDelay > 30 {
-		if enableGops {
-			gopsClose()
-		}
-
-		log.Fatalf("%sERROR: --ssh-delay cannot be greater than 30!",
-			errorPrefix()) // LINTED: Fatalf
 	}
 
 	if iconv != "" {
@@ -3107,8 +3097,7 @@ func listConfiguration() {
 	sshDelayStr := "disabled"
 
 	if sshDelay > 0 {
-		sshDelayStr = fmt.Sprintf("%.1f seconds",
-			sshDelay)
+		sshDelayStr = sshDelay.String()
 	}
 
 	printRow(&b, "SSH Connection Delay: "+sshDelayStr)
@@ -4692,7 +4681,7 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 		spinnerIndex := 0
 		startTime := time.Now()
 
-		for time.Since(startTime).Seconds() < sshDelay {
+		for time.Since(startTime) < sshDelay {
 			char := string(spinner[spinnerIndex])
 
 			_, err := channel.Write(fmt.Appendf(nil, "\r%s",

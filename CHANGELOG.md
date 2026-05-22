@@ -5,7 +5,10 @@
 
 # v1.2.2-dev
 
-* TBD
+* New Features & Improvements
+  * Switch `--ssh-delay` to use a Go duration (*e.g.*, `5s`,
+    `250ms`); raised the upper limit from `30s` to `1m`; added
+    validation tests.
 
 # v1.2.1 (2026-05-22 01:28:42)
 
