@@ -141,6 +141,7 @@ goimports
 golangci
 goleak
 golines
+gomodguard
 gops
 gostd
 ioutil
@@ -239,6 +240,7 @@ softfloat
 trimpath
 
 FILEID: 49b70692-6bd1-11f0-b2b1-80ee73e9b8e7
+envrc
 gitignore
 gpath
 grtags

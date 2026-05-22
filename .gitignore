@@ -18,6 +18,7 @@ cross.bin/
 deny-*.txt
 dps8m-proxy
 /dps8m-proxy.json
+.envrc
 GPATH
 GRTAGS
 GTAGS

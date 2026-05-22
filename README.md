@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.0 (2026-May-12 g39c1446) [linux/amd64]
+DPS8M Proxy v1.2.1-dev (2026-May-22 g5814ef6) [linux/amd64]
 
 Usage for proxy:
 
@@ -182,19 +182,19 @@ Usage for proxy:
                                     [e.g., "750", "755"] (default 750)
   --db-file <string>            Path to persistent statistics storage database
                                     (disabled by default)
-  --db-time <uint>              Elapsed seconds between database updates
-                                    [0 disables periodic writes] (default 30)
+  --db-time <duration>          Interval between database updates
+                                    [0 disables periodic writes] (default 30s)
   --db-perm <octal>             Permissions (octal) for new database files
                                     [e.g., "600", "644"] (default 600)
   --db-loglevel <string>        Database engine (BBoltDB) logging output level
                                     [level: "0" - "6", or "none" - "debug"]
                                     (default "error")
-  --idle-max <uint>             Maximum connection idle time allowed [seconds]
-  --idle-def-max <uint>         Maximum connection idle time allowed
-                                    for only the default target [seconds]
-  --time-max <uint>             Maximum connection link time allowed [seconds]
-  --time-def-max <uint>         Maximum connection link time allowed
-                                    for only the default target [seconds]
+  --idle-max <duration>         Maximum connection idle time allowed
+  --idle-def-max <duration>     Maximum connection idle time allowed
+                                    for only the default target
+  --time-max <duration>         Maximum connection link time allowed
+  --time-def-max <duration>     Maximum connection link time allowed
+                                    for only the default target
   --blacklist <string>          Enable blacklist [filename] (no default)
   --whitelist <string>          Enable whitelist [filename] (no default)
   --utc                         Use UTC (Coordinated Universal Time) for time
@@ -328,12 +328,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.0 (2026-May-12 g39c1446) [linux/amd64]
+DPS8M Proxy v1.2.1-dev (2026-May-22 g5814ef6) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.2.0                           |
+| dps8m/proxy               | v1.2.1-dev                       |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -341,12 +341,12 @@ DPS8M Proxy v1.2.0 (2026-May-12 g39c1446) [linux/amd64]
 | klauspost/compress        | v1.18.6                          |
 | miekg/dns                 | v1.1.72                          |
 | sorairolake/lzip-go       | v0.3.8                           |
-| spf13/pflag               | v1.0.11* (2026-May-05, g18450ea) |
+| spf13/pflag               | v1.0.11* (2026-May-16, g00f25b9) |
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
-| golang.org/x/crypto       | v0.51.0                          |
+| golang.org/x/crypto       | v0.52.0                          |
 | golang.org/x/net          | v0.54.0                          |
-| golang.org/x/sys          | v0.44.0                          |
+| golang.org/x/sys          | v0.45.0                          |
 | golang.org/x/term         | v0.43.0                          |
 | golang.org/x/text         | v0.37.0                          |
 | kernel.org/.../libcap/cap | v1.2.78                          |
@@ -604,13 +604,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>21</th>
-<th>10890</th>
-<th>2344</th>
-<th>675</th>
-<th>7871</th>
-<th>1888</th>
-<th>258652</th>
-<th>4745</th>
+<th>10979</th>
+<th>2351</th>
+<th>677</th>
+<th>7951</th>
+<th>1891</th>
+<th>260215</th>
+<th>4789</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -665,13 +665,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>29</th>
-<th>12955</th>
-<th>2703</th>
-<th>1067</th>
-<th>9185</th>
-<th>2113</th>
-<th>337755</th>
-<th>6045</th>
+<th>13044</th>
+<th>2710</th>
+<th>1069</th>
+<th>9265</th>
+<th>2116</th>
+<th>339318</th>
+<th>6089</th>
 </tr></tfoot></table>
 
 

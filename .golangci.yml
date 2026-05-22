@@ -20,12 +20,16 @@ linters:
     - gochecknoglobals
     - gocognit
     - gocyclo
+    - gomodguard
     - maintidx
     - mnd
     - nestif
     - noctx
     - varnamelen
     - wsl
+  enable:
+    - gomodguard_v2
+    - wsl_v5
   exclusions:
     generated: lax
     paths:

@@ -40,7 +40,7 @@ var (
 	db                  *bbolt.DB
 	dbMutex             sync.RWMutex
 	dbPath              string
-	dbTime              uint64
+	dbTime              time.Duration
 	persistedStartTime  time.Time
 	metaBucketName      = []byte("meta")
 	countersBucketName  = []byte("counters")

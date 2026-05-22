@@ -25,7 +25,7 @@ const dbEnabled = false
 
 var (
 	dbPath             string
-	dbTime             uint64
+	dbTime             time.Duration
 	persistedStartTime time.Time
 )
 
