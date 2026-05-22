@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.1 (2026-May-22 g6be8f55) [linux/amd64]
+DPS8M Proxy v1.2.2-dev (2026-May-22 g41ef36b) [linux/amd64]
 
 Usage for proxy:
 
@@ -142,8 +142,8 @@ Usage for proxy:
   --ssh-addr <string>           SSH listener address(es)
                                     [e.g., ":2222", "[::1]:8000"]
                                     (multiple allowed) (default ":2222")
-  --ssh-delay <float>           Delay for incoming SSH connections
-                                    ["0.0" to "30.0" seconds] (no default)
+  --ssh-delay <duration>        Delay for incoming SSH connections
+                                    ["0s" to "1m"] (no default)
   --no-banner                   Disable the user SSH connection banner
   --no-menu                     Disable the user SSH 'Control-]' menu
   --telnet-host <string>        Default TELNET target [host:port
@@ -328,12 +328,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.1 (2026-May-22 g6be8f55) [linux/amd64]
+DPS8M Proxy v1.2.2-dev (2026-May-22 g41ef36b) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.2.1                           |
+| dps8m/proxy               | v1.2.2-dev                       |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -345,7 +345,7 @@ DPS8M Proxy v1.2.1 (2026-May-22 g6be8f55) [linux/amd64]
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
 | golang.org/x/crypto       | v0.52.0                          |
-| golang.org/x/net          | v0.54.0                          |
+| golang.org/x/net          | v0.55.0                          |
 | golang.org/x/sys          | v0.45.0                          |
 | golang.org/x/term         | v0.43.0                          |
 | golang.org/x/text         | v0.37.0                          |
@@ -604,13 +604,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>21</th>
-<th>10979</th>
-<th>2351</th>
+<th>10992</th>
+<th>2349</th>
 <th>677</th>
-<th>7951</th>
-<th>1891</th>
-<th>260215</th>
-<th>4789</th>
+<th>7966</th>
+<th>1889</th>
+<th>260545</th>
+<th>4802</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -629,8 +629,8 @@ predecessor (code statistics 📈 provided by
 <th>107</th>
 <th>430</th>
 <th>190</th>
-<th>22172</th>
-<th>382</th>
+<th>22254</th>
+<th>385</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
@@ -665,13 +665,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>29</th>
-<th>13044</th>
-<th>2710</th>
+<th>13057</th>
+<th>2708</th>
 <th>1069</th>
-<th>9265</th>
-<th>2116</th>
-<th>339318</th>
-<th>6089</th>
+<th>9280</th>
+<th>2114</th>
+<th>339730</th>
+<th>6105</th>
 </tr></tfoot></table>
 
 

@@ -3,12 +3,22 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.1
+# v1.2.2
 
 * New Features & Improvements
-  * Switch to using Go durations (*e.g.*, `5s`, `250ms`, `5m`) for
+  * Switched `--ssh-delay` to use a Go duration (*e.g.*, `5s`,
+    `250ms`); raised the upper limit from `30s` to `1m`; added
+    validation tests.
+* Dependency Updates
+  * Updated [`x/net`](https://golang.org/x/net)
+    from `v0.54.0` to `v0.55.0`.
+
+# v1.2.1 (2026-05-22 01:28:42)
+
+* New Features & Improvements
+  * Switched to using Go durations (*e.g.*, `5s`, `250ms`, `5m`) for
     specifying times and timeouts for `--db-time`, `--idle-max`,
-    `--idle-def-max`, `--time-max`, and `--time-def-max`; add
+    `--idle-def-max`, `--time-max`, and `--time-def-max`; added
     validation tests.
 * Code Quality & Maintenance
   * Updated `golangci-lint` rules for v2.12.2 and later releases.

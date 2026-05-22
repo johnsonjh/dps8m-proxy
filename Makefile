@@ -14,7 +14,7 @@ AWK?=$$(command -v goawk 2> /dev/null || command -v gawk 2> /dev/null || \
 		command -v mawk 2> /dev/null || command -v awk)
 CP=cp -f
 GO=$$(command -v go)
-GOTOOLCHAIN=auto
+GOTOOLCHAIN="$$(grep '^go .*$$' go.mod | tr -cd 'go0-9.\n')+auto"
 MV=mv -f
 RM=rm -f
 SED?=$$(command -v gsed 2> /dev/null || command -v sed)
@@ -479,11 +479,11 @@ cross: .cross.sh
 scspell: ./.scspell/basedict.txt ./.scspell/dictionary.txt
 	@command -v scspell > /dev/null 2>&1 || \
 		{ env printf '%s\n' "⚠️ scspell not found!" \
-			2> /dev/null || :; exit 1; }
-	@env printf '%s\n' \
+			2> /dev/null || :; exit 0; }; \
+	env printf '%s\n' \
 		"ℹ️ Running scspell, use scspell-fix to run interactively" \
-			2> /dev/null || :
-	$(RM) ./tags ./GPATH ./GRTAGS ./GTAGS
+			2> /dev/null || :; \
+	set -x; $(RM) ./tags ./GPATH ./GRTAGS ./GTAGS > /dev/null 2>&1; \
 	scspell \
 		--report-only \
 		--override-dictionary ./.scspell/dictionary.txt \
