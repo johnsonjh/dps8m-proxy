@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.2
+# v1.2.3-dev
+
+* TBD
+
+# v1.2.2 (2026-05-22 23:07:09)
 
 * New Features & Improvements
   * Switched `--ssh-delay` to use a Go duration (*e.g.*, `5s`,
