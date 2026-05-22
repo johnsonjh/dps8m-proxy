@@ -3,7 +3,7 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.1-dev
+# v1.2.1
 
 * New Features & Improvements
   * Switch to using Go durations (*e.g.*, `5s`, `250ms`, `5m`) for
@@ -16,6 +16,10 @@
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from `v1.0.11-0.20260505231352-18450ea2f1d4`
     to `v1.0.11-0.20260516140500-00f25b95f69b`.
+  * Updated [`x/sys`](https://golang.org/x/sys)
+    from `v0.44.0` to `v0.45.0`.
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
+    from `v0.51.0` to `v0.52.0`.
 
 # v1.2.0 (2026-05-12 15:38:46)
 
