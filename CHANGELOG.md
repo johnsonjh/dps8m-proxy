@@ -6,16 +6,16 @@
 # v1.2.2-dev
 
 * New Features & Improvements
-  * Switch `--ssh-delay` to use a Go duration (*e.g.*, `5s`,
+  * Switched `--ssh-delay` to use a Go duration (*e.g.*, `5s`,
     `250ms`); raised the upper limit from `30s` to `1m`; added
     validation tests.
 
 # v1.2.1 (2026-05-22 01:28:42)
 
 * New Features & Improvements
-  * Switch to using Go durations (*e.g.*, `5s`, `250ms`, `5m`) for
+  * Switched to using Go durations (*e.g.*, `5s`, `250ms`, `5m`) for
     specifying times and timeouts for `--db-time`, `--idle-max`,
-    `--idle-def-max`, `--time-max`, and `--time-def-max`; add
+    `--idle-def-max`, `--time-max`, and `--time-def-max`; added
     validation tests.
 * Code Quality & Maintenance
   * Updated `golangci-lint` rules for v2.12.2 and later releases.
