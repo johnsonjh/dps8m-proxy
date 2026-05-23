@@ -618,7 +618,7 @@ install:
 #                               [45 45 62]
 #                               [45 45 62])))
 # eval: (whitespace-mode 1)
-# eval: (setq-local display-fill-column-indicator-column 80)
+# eval: (setq-local display-fill-column-indicator-column 78)
 # eval: (display-fill-column-indicator-mode 1)
 # End:
 ##############################################################################
