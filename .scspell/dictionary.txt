@@ -566,6 +566,20 @@ codeowners
 FILEID: 842298dc-6bd1-11f0-ba59-80ee73e9b8e7
 sgops
 
+FILEID: 96ac1a8e-5648-11f1-bf4a-80ee73e9b8e7
+bantime
+dosini
+findtime
+logpath
+maxretry
+
+FILEID: 3227e35e-5648-11f1-acfb-80ee73e9b8e7
+datepattern
+dosini
+failregex
+ignoreregex
+pollinterval
+
 NATURAL:
 adduser
 althost

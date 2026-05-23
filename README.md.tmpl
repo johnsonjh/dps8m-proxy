@@ -421,7 +421,9 @@ their session to access the following TELNET control features:
   Send Control‑] to disconnect.
   ```
 
-## Compressed logs
+## Logging
+
+### Compressed logs
 
 * By default, all session log files are compressed 🗜️ automatically
   when the session terminates, and console log files are compressed
@@ -431,6 +433,15 @@ their session to access the following TELNET control features:
   the past data, including through the compressed files. We recommend
   using [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the
   `‑z` option) for this task.
+
+### fail2ban integration
+
+* System administrators using any recent version of the
+  [fail2ban](https://github.com/fail2ban/fail2ban) intrusion
+  prevention software can use the example configuration files in the
+  [`fail2ban`](fail2ban) directory to automatically add the IP
+  addresses of users causing rejected connections on the proxy server
+  to the host system's firewall rules.
 
 ## Using OpenSSH host keys
 

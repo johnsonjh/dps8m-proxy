@@ -5,7 +5,8 @@
 
 # v1.2.3-dev
 
-* TBD
+* New Features & Improvements
+  * Added example configuration files for `fail2ban` integration.
 
 # v1.2.2 (2026-05-22 23:07:09)
 

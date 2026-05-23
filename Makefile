@@ -453,7 +453,7 @@ README.md doc docs: README.md.tmpl proxy
 
 SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
 		 .whitesource,.golangci.yml,dependabot.yml,.txt,CHANGELOG.md" \
-		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown' \
+		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown,conf:ini' \
 		 --include-symlinks
 
 scc:
