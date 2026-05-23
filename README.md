@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.3-dev (2026-May-22 ge77d2e5) [linux/amd64]
+DPS8M Proxy v1.2.3-dev (2026-May-23 g3b5b712) [linux/amd64]
 
 Usage for proxy:
 
@@ -328,7 +328,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.3-dev (2026-May-22 ge77d2e5) [linux/amd64]
+DPS8M Proxy v1.2.3-dev (2026-May-23 g3b5b712) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -522,7 +522,9 @@ their session to access the following TELNET control features:
   Send Control‑] to disconnect.
   ```
 
-## Compressed logs
+## Logging
+
+### Compressed logs
 
 * By default, all session log files are compressed 🗜️ automatically
   when the session terminates, and console log files are compressed
@@ -532,6 +534,15 @@ their session to access the following TELNET control features:
   the past data, including through the compressed files. We recommend
   using [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the
   `‑z` option) for this task.
+
+### fail2ban integration
+
+* System administrators using any recent version of the
+  [fail2ban](https://github.com/fail2ban/fail2ban) intrusion
+  prevention software can use the example configuration files in the
+  [`fail2ban`](fail2ban) directory to automatically add the IP
+  addresses of users causing rejected connections on the proxy server
+  to the host system's firewall rules.
 
 ## Using OpenSSH host keys
 
@@ -622,6 +633,16 @@ predecessor (code statistics 📈 provided by
 <th>14698</th>
 <th>224</th>
 </tr><tr>
+<th>INI</th>
+<th>2</th>
+<th>37</th>
+<th>4</th>
+<th>20</th>
+<th>13</th>
+<th>0</th>
+<th>1471</th>
+<th>23</th>
+</tr><tr>
 <th>Makefile</th>
 <th>1</th>
 <th>626</th>
@@ -629,18 +650,18 @@ predecessor (code statistics 📈 provided by
 <th>107</th>
 <th>430</th>
 <th>190</th>
-<th>22254</th>
+<th>22263</th>
 <th>385</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>643</th>
-<th>127</th>
+<th>654</th>
+<th>130</th>
 <th>0</th>
-<th>516</th>
+<th>524</th>
 <th>0</th>
-<th>30033</th>
-<th>503</th>
+<th>30431</th>
+<th>511</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -664,14 +685,14 @@ predecessor (code statistics 📈 provided by
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
-<th>29</th>
-<th>13057</th>
-<th>2708</th>
-<th>1069</th>
-<th>9280</th>
+<th>31</th>
+<th>13105</th>
+<th>2715</th>
+<th>1089</th>
+<th>9301</th>
 <th>2114</th>
-<th>339730</th>
-<th>6105</th>
+<th>341608</th>
+<th>6133</th>
 </tr></tfoot></table>
 
 
