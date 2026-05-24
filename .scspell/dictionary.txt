@@ -572,6 +572,7 @@ dosini
 findtime
 logpath
 maxretry
+setq
 
 FILEID: 3227e35e-5648-11f1-acfb-80ee73e9b8e7
 datepattern
@@ -579,6 +580,7 @@ dosini
 failregex
 ignoreregex
 pollinterval
+setq
 
 NATURAL:
 adduser
