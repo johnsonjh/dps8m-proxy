@@ -7,6 +7,10 @@
 
 * New Features & Improvements
   * Added example configuration files for `fail2ban` integration.
+* Dependency Updates
+  * Updated [`uber/goleak`](https://go.uber.org/goleak)
+    from `v1.3.1-0.20251210191316-2b7fd8a0d244`
+    to `v1.3.1-0.20260531204132-495d62673c6c`.
 
 # v1.2.2 (2026-05-22 23:07:09)
 
