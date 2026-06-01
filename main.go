@@ -244,6 +244,7 @@ var (
 	helpFloatTypeRegexp              = regexp.MustCompile(` float   `)
 	helpDurationTypeRegexp           = regexp.MustCompile(` duration `)
 	helpDurAfterTypeRegexp           = regexp.MustCompile(` <duration>      `)
+	helpAlignGapRegexp               = regexp.MustCompile(` {7,}`)
 	compressAlgo                     string
 	compressLevel                    string
 	dbLogLevel                       string
@@ -762,6 +763,12 @@ func init() { //nolint:gochecknoinits
 		output = helpFloatTypeRegexp.ReplaceAllString(output, " <float> ")
 		output = helpDurationTypeRegexp.ReplaceAllString(output, " <duration>")
 		output = helpDurAfterTypeRegexp.ReplaceAllString(output, " <duration>     ")
+
+		output = helpAlignGapRegexp.ReplaceAllStringFunc(output,
+			func(gap string) string {
+				return gap[6:]
+			})
+
 		_, _ = fmt.Fprint(os.Stdout,
 			output)
 		_, _ = fmt.Fprintf(os.Stdout,
@@ -893,7 +900,7 @@ func init() { //nolint:gochecknoinits
 
 	pflag.BoolVar(&staticConsoleLog,
 		"static-console-log", false,
-		"Write console log to a static, non-rotated file\r\n"+
+		"Write console log to a static non-rotated file\r\n"+
 			"    in the log directory (reopened on SIGHUP)")
 
 	pflag.StringVar(&compressAlgo,
