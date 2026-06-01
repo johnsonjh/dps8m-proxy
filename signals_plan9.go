@@ -37,7 +37,10 @@ func runSignalHandlers() {
 				case syscall.SIGHUP:
 					log.Printf("%sSIGHUP received: Reloading whitelist and/or blacklist.\r\n",
 						bellPrefix())
+
 					reloadLists()
+
+					reopenConsoleLog()
 
 				case syscall.SIGINT:
 					immediateShutdown()

@@ -31,6 +31,8 @@ func handleSignal(s os.Signal) {
 
 		reloadLists()
 
+		reopenConsoleLog()
+
 	case syscall.SIGUSR1:
 		log.Printf("%sSIGUSR1 received: Initiating graceful shutdown.\r\n",
 			bellPrefix())

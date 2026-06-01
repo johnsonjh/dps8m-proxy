@@ -141,6 +141,14 @@ are, hopefully, documented here:
     **only** to the log file, where in `noquiet` mode, messages are
     logged to **both** the console and the log file.
 
+  * Console logs are normally written to a dated subdirectory (*e.g.,*
+    `log/2025/07/15/console.log`) and rotated daily, compressing the
+    file from the previous day.  The `--static-console-log` option
+    instead writes a single, non-rotated `console.log` directly in the
+    base log directory.  This file is never compressed by the proxy; on
+    `SIGHUP` it is closed and reopened so an external tool such as
+    [`logrotate`](https://github.com/logrotate/logrotate) can rotate it.
+
   * By default, the local time zone is used for time display and
     writing log files.  Users can specify the `‑‑utc` option to use
     UTC (Coordinated Universal Time) instead.  Additionally, on
@@ -337,6 +345,17 @@ tables).
   |    `SIGHUP` | Reloads *access control lists* (`‑‑whitelist`, `‑‑blacklist`)      |
   | `SIGDANGER` | Attempts to immediately free as much memory as possible (AIX‑only) |
 
+* When `--static-console-log` is enabled, `SIGHUP` will close and
+  reopen the console log file (*in addition* to reloading the access
+  control lists), so an external log rotation tool such as
+  [`logrotate`](https://github.com/logrotate/logrotate) can rotate the
+  `console.log` file without restarting the proxy.
+
+* Microsoft Windows does **not** support POSIX signals, so none of the
+  signals above (including `SIGHUP`) are available there; the
+  corresponding actions can instead be performed using the interactive
+  admin console commands as described above.
+
 ### Management with systemd
 
 If you’re running the proxy on a Linux system, you can use `systemd`
@@ -428,6 +447,11 @@ their session to access the following TELNET control features:
 * By default, all session log files are compressed 🗜️ automatically
   when the session terminates, and console log files are compressed
   when the log rolls over (*i.e.*, when starting a new day).
+
+* The console log written with `--static-console-log` is an exception.
+  It is never compressed by the proxy, because rotation and
+  compression is delegated to an external helper, triggered via
+  `SIGHUP` (see the signal table above).
 
 * When reviewing logs, administrators often need to search through all
   the past data, including through the compressed files. We recommend

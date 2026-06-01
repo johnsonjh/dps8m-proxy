@@ -7,6 +7,9 @@
 
 * New Features & Improvements
   * Added example configuration files for `fail2ban` integration.
+  * Added `--static-console-log` to write a single non-rotated and
+    uncompressed console log to a single location is reopened on
+    `SIGHUP` (for use with external log rotation such as `logrotate`).
 * Dependency Updates
   * Updated [`uber/goleak`](https://go.uber.org/goleak)
     from `v1.3.1-0.20251210191316-2b7fd8a0d244`

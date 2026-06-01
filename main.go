@@ -200,6 +200,7 @@ var (
 	consoleLog                       string
 	lastLogDate                      string
 	isConsoleLogQuiet                atomic.Bool
+	staticConsoleLog                 bool
 	debugNegotiation                 bool
 	debugAddr                        string
 	denyNewConnectionsMode           atomic.Bool
@@ -889,6 +890,11 @@ func init() { //nolint:gochecknoinits
 		"console-log", "",
 		"Enable console logging [\"quiet\", \"noquiet\"]\r\n"+
 			"    (disabled by default)")
+
+	pflag.BoolVar(&staticConsoleLog,
+		"static-console-log", false,
+		"Write console log to a static, non-rotated file\r\n"+
+			"    in the log directory (reopened on SIGHUP)")
 
 	pflag.StringVar(&compressAlgo,
 		"compress-algo", "gzip",
@@ -2944,6 +2950,10 @@ func listConfiguration() {
 			quietMode = "noquiet" //nolint:goconst,nolintlint
 		}
 
+		if staticConsoleLog {
+			quietMode += " (static)"
+		}
+
 		updateMaxLength("Console Logging: " + quietMode)
 	} else {
 		updateMaxLength("Console Logging: disabled")
@@ -3161,6 +3171,10 @@ func listConfiguration() {
 			quietMode = "quiet"
 		} else {
 			quietMode = "noquiet"
+		}
+
+		if staticConsoleLog {
+			quietMode += " (static)"
 		}
 
 		printRow(&b, "Console Logging: "+quietMode)
@@ -6844,6 +6858,13 @@ func getFileContent(baseFilename, username string) ([]byte, error) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 func getConsoleLogPath(t time.Time) string {
+	if staticConsoleLog {
+		return filepath.Join(
+			logDir,
+			"console.log",
+		)
+	}
+
 	return filepath.Join(
 		logDir,
 		fmt.Sprintf("%04d",
@@ -6874,6 +6895,10 @@ func setupConsoleLogging() {
 	}
 
 	rotateConsoleLogAt(time.Now())
+
+	if staticConsoleLog {
+		return
+	}
 
 	go startConsoleLogRolloverChecker()
 }
@@ -7009,7 +7034,7 @@ func rotateConsoleLogAt(t time.Time) {
 				nowStamp(), warnPrefix(), err)
 		}
 
-		if !noCompress {
+		if !noCompress && !staticConsoleLog {
 			compressLogFile(oldLogPath)
 		}
 	}
