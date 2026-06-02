@@ -145,9 +145,13 @@ are, hopefully, documented here:
     `log/2025/07/15/console.log`) and rotated daily, compressing the
     file from the previous day.  The `--static-console-log` option
     instead writes a single, non-rotated `console.log` directly in the
-    base log directory.  This file is never compressed by the proxy; on
-    `SIGHUP` it is closed and reopened so an external tool such as
-    [`logrotate`](https://github.com/logrotate/logrotate) can rotate it.
+    base log directory.  This file is never compressed by the proxy;
+    on `SIGHUP` it is closed and reopened so an external tool such as
+    [`logrotate`](https://github.com/logrotate/logrotate) can rotate
+    it.  An
+    [example configuration](logrotate/logrotate.d/dps8m-proxy.conf)
+    that you can copy to your `/etc/logrotate.d/` directory
+    is provided.
 
   * By default, the local time zone is used for time display and
     writing log files.  Users can specify the `‑‑utc` option to use

@@ -591,6 +591,19 @@ FILEID: 4c24063c-5dca-11f1-98e6-246e96298730
 consolelog
 logrotate
 
+FILEID: 95923476-5e27-11f1-b43a-80ee73e9b8e7
+delaycompress
+endscript
+killall
+logrotate
+maxsize
+missingok
+notifempty
+postrotate
+setq
+sharedscripts
+systemctl
+
 NATURAL:
 adduser
 althost
