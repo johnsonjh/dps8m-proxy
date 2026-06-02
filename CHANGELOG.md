@@ -6,7 +6,8 @@
 # v1.2.3-dev
 
 * New Features & Improvements
-  * Added example configuration files for `fail2ban` integration.
+  * Added example configuration files for `fail2ban` and
+    `logrotate` integration.
   * Added `--static-console-log` to write a single non-rotated and
     uncompressed console log to a single location is reopened on
     `SIGHUP` (for use with external log rotation such as `logrotate`).

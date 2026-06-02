@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.3-dev (2026-Jun-01 gea38c3a) [linux/amd64]
+DPS8M Proxy v1.2.3*-dev (2026-Jun-02 g51636c9+) [linux/amd64]
 
 Usage for proxy:
 
@@ -224,9 +224,13 @@ are, hopefully, documented here:
     `log/2025/07/15/console.log`) and rotated daily, compressing the
     file from the previous day.  The `--static-console-log` option
     instead writes a single, non-rotated `console.log` directly in the
-    base log directory.  This file is never compressed by the proxy; on
-    `SIGHUP` it is closed and reopened so an external tool such as
-    [`logrotate`](https://github.com/logrotate/logrotate) can rotate it.
+    base log directory.  This file is never compressed by the proxy;
+    on `SIGHUP` it is closed and reopened so an external tool such as
+    [`logrotate`](https://github.com/logrotate/logrotate) can rotate
+    it.  An
+    [example configuration](logrotate/logrotate.d/dps8m-proxy.conf)
+    that you can copy to your `/etc/logrotate.d/` directory
+    is provided.
 
   * By default, the local time zone is used for time display and
     writing log files.  Users can specify the `‑‑utc` option to use
@@ -338,12 +342,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.3-dev (2026-Jun-01 gea38c3a) [linux/amd64]
+DPS8M Proxy v1.2.3*-dev (2026-Jun-02 g51636c9+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.2.3-dev                       |
+| dps8m/proxy               | v1.2.3*-dev                      |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -660,14 +664,14 @@ predecessor (code statistics 📈 provided by
 <th>224</th>
 </tr><tr>
 <th>INI</th>
-<th>2</th>
-<th>54</th>
-<th>4</th>
-<th>38</th>
-<th>12</th>
-<th>0</th>
-<th>2034</th>
+<th>3</th>
+<th>97</th>
+<th>8</th>
+<th>59</th>
 <th>30</th>
+<th>0</th>
+<th>3417</th>
+<th>54</th>
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
@@ -681,13 +685,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>678</th>
+<th>682</th>
 <th>134</th>
 <th>0</th>
-<th>544</th>
+<th>548</th>
 <th>0</th>
-<th>31726</th>
-<th>531</th>
+<th>31879</th>
+<th>535</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -711,14 +715,14 @@ predecessor (code statistics 📈 provided by
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
-<th>32</th>
-<th>13368</th>
-<th>2767</th>
-<th>1156</th>
-<th>9445</th>
+<th>33</th>
+<th>13415</th>
+<th>2771</th>
+<th>1177</th>
+<th>9467</th>
 <th>2141</th>
-<th>348464</th>
-<th>6217</th>
+<th>350000</th>
+<th>6244</th>
 </tr></tfoot></table>
 
 
