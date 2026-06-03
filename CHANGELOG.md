@@ -15,6 +15,9 @@
   * Updated [`uber/goleak`](https://go.uber.org/goleak)
     from `v1.3.1-0.20251210191316-2b7fd8a0d244`
     to `v1.3.1-0.20260601033505-f20ade1f3abe`.
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.26.3` to `v1.26.4`.
 
 # v1.2.2 (2026-05-22 23:07:09)
 
