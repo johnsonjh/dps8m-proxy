@@ -3,7 +3,12 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.3 (2026-06-03)
+# v1.2.4
+
+* Documentation Updates
+  * Regenerated project documentation only.
+
+# v1.2.3 (2026-06-03 22:17:11)
 
 * New Features & Improvements
   * Added example configuration files for `fail2ban` and
