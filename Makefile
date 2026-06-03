@@ -11,13 +11,15 @@
 
 CGO_ENABLED=0
 AWK?=$$(command -v goawk 2> /dev/null || command -v gawk 2> /dev/null || \
-		command -v mawk 2> /dev/null || command -v awk)
+		command -v mawk 2> /dev/null || command -v awk || \
+		printf '%s\n' "awk")
 CP=cp -f
-GO=$$(command -v go)
+GO=$$(command -v go || printf '%s\n' "go")
 GOTOOLCHAIN="$$(grep '^go .*$$' go.mod | tr -cd 'go0-9.\n')+auto"
 MV=mv -f
 RM=rm -f
-SED?=$$(command -v gsed 2> /dev/null || command -v sed)
+SED?=$$(command -v gsed 2> /dev/null || command -v sed || \
+	 printf '%s\n' "sed")
 
 ##############################################################################
 # Target: all
