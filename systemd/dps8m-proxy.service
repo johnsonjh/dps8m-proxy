@@ -167,7 +167,6 @@ ExecStopPost=/bin/sh -c '\
 # Hardening options
 
 # Added in versions through 229
-NoNewPrivileges=true
 PrivateDevices=true
 ProtectSystem=full
 SystemCallArchitectures=native
@@ -177,7 +176,6 @@ MemoryDenyWriteExecute=true
 RestrictRealtime=true
 
 # Added in version 232
-PrivateUsers=self
 ProtectControlGroups=true
 ProtectKernelModules=true
 ProtectKernelTunables=true
