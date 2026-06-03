@@ -14,7 +14,7 @@
 * Dependency Updates
   * Updated [`uber/goleak`](https://go.uber.org/goleak)
     from `v1.3.1-0.20251210191316-2b7fd8a0d244`
-    to `v1.3.1-0.20260601033505-f20ade1f3abe`.
+    to `v1.3.1-0.20260602155401-5f791e3ef83b`.
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from `v1.26.3` to `v1.26.4`.
