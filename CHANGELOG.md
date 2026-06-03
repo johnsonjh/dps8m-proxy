@@ -3,7 +3,7 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.3-dev
+# v1.2.3 (2026-06-03)
 
 * New Features & Improvements
   * Added example configuration files for `fail2ban` and
@@ -11,6 +11,7 @@
   * Added `--static-console-log` to write a single non-rotated and
     uncompressed console log to a single location is reopened on
     `SIGHUP` (for use with external log rotation such as `logrotate`).
+  * Changed the systemd sandboxing options to be more permissive.
 * Dependency Updates
   * Updated [`uber/goleak`](https://go.uber.org/goleak)
     from `v1.3.1-0.20251210191316-2b7fd8a0d244`
