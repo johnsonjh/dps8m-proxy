@@ -3,7 +3,24 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.2
+# v1.2.3 (2026-06-03)
+
+* New Features & Improvements
+  * Added example configuration files for `fail2ban` and
+    `logrotate` integration.
+  * Added `--static-console-log` to write a single non-rotated and
+    uncompressed console log to a single location is reopened on
+    `SIGHUP` (for use with external log rotation such as `logrotate`).
+  * Changed the systemd sandboxing options to be more permissive.
+* Dependency Updates
+  * Updated [`uber/goleak`](https://go.uber.org/goleak)
+    from `v1.3.1-0.20251210191316-2b7fd8a0d244`
+    to `v1.3.1-0.20260602155401-5f791e3ef83b`.
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.26.3` to `v1.26.4`.
+
+# v1.2.2 (2026-05-22 23:07:09)
 
 * New Features & Improvements
   * Switched `--ssh-delay` to use a Go duration (*e.g.*, `5s`,

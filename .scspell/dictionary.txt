@@ -286,6 +286,7 @@ kisielk
 klauspost
 libcap
 lintsetup
+logrotate
 magicant
 mailto
 miekg
@@ -334,6 +335,7 @@ achaea
 bcdhkmnprswxyz
 cdhkmnprswxyz
 gochecknoinits
+logrotate
 raddr
 sduplicate
 sinvalid
@@ -519,6 +521,7 @@ ireturn
 klauspost
 libcap
 loglevel
+logrotate
 maxcomlen
 miekg
 mipssf
@@ -536,6 +539,7 @@ refname
 setcap
 setq
 shfmt
+sighup
 sigusr
 snapshotted
 sorairolake
@@ -565,6 +569,40 @@ codeowners
 
 FILEID: 842298dc-6bd1-11f0-ba59-80ee73e9b8e7
 sgops
+
+FILEID: 96ac1a8e-5648-11f1-bf4a-80ee73e9b8e7
+bantime
+dosini
+findtime
+logpath
+maxretry
+pyinotify
+setq
+
+FILEID: 3227e35e-5648-11f1-acfb-80ee73e9b8e7
+datepattern
+dosini
+failregex
+ignoreregex
+pollinterval
+setq
+
+FILEID: 4c24063c-5dca-11f1-98e6-246e96298730
+consolelog
+logrotate
+
+FILEID: 95923476-5e27-11f1-b43a-80ee73e9b8e7
+delaycompress
+endscript
+killall
+logrotate
+maxsize
+missingok
+notifempty
+postrotate
+setq
+sharedscripts
+systemctl
 
 NATURAL:
 adduser

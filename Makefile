@@ -11,13 +11,15 @@
 
 CGO_ENABLED=0
 AWK?=$$(command -v goawk 2> /dev/null || command -v gawk 2> /dev/null || \
-		command -v mawk 2> /dev/null || command -v awk)
+		command -v mawk 2> /dev/null || command -v awk || \
+		printf '%s\n' "awk")
 CP=cp -f
-GO=$$(command -v go)
+GO=$$(command -v go || printf '%s\n' "go")
 GOTOOLCHAIN="$$(grep '^go .*$$' go.mod | tr -cd 'go0-9.\n')+auto"
 MV=mv -f
 RM=rm -f
-SED?=$$(command -v gsed 2> /dev/null || command -v sed)
+SED?=$$(command -v gsed 2> /dev/null || command -v sed || \
+	 printf '%s\n' "sed")
 
 ##############################################################################
 # Target: all
@@ -453,7 +455,7 @@ README.md doc docs: README.md.tmpl proxy
 
 SCCFLAGS=--exclude-file "LICENSE,REUSE.toml,README.md,renovate.json,\
 		 .whitesource,.golangci.yml,dependabot.yml,.txt,CHANGELOG.md" \
-		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown' \
+		 --no-size --no-cocomo -ud --count-as 'tmpl:Markdown,conf:ini' \
 		 --include-symlinks
 
 scc:
@@ -618,7 +620,7 @@ install:
 #                               [45 45 62]
 #                               [45 45 62])))
 # eval: (whitespace-mode 1)
-# eval: (setq-local display-fill-column-indicator-column 80)
+# eval: (setq-local display-fill-column-indicator-column 78)
 # eval: (display-fill-column-indicator-mode 1)
 # End:
 ##############################################################################

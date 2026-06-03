@@ -390,6 +390,7 @@ func getMainModuleVersion() string {
 // Local Variables:
 // mode: go
 // tab-width: 4
+// fill-column: 100
 // eval: (setq-local display-fill-column-indicator-column 100)
 // eval: (display-fill-column-indicator-mode 1)
 // End:

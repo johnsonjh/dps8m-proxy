@@ -31,6 +31,8 @@ func handleSignal(s os.Signal) {
 
 		reloadLists()
 
+		reopenConsoleLog()
+
 	case syscall.SIGUSR1:
 		log.Printf("%sSIGUSR1 received: Initiating graceful shutdown.\r\n",
 			bellPrefix())
@@ -66,6 +68,7 @@ func handleSignal(s os.Signal) {
 // Local Variables:
 // mode: go
 // tab-width: 4
+// fill-column: 100
 // eval: (setq-local display-fill-column-indicator-column 100)
 // eval: (display-fill-column-indicator-mode 1)
 // End:

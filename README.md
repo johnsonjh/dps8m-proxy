@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.2 (2026-May-22 g3177a86) [linux/amd64]
+DPS8M Proxy v1.2.3-dev (2026-Jun-03 gcf30a4b) [linux/amd64]
 
 Usage for proxy:
 
@@ -169,6 +169,8 @@ Usage for proxy:
   --no-console                  Disable the interactive admin console
   --console-log <string>        Enable console logging ["quiet", "noquiet"]
                                     (disabled by default)
+  --static-console-log          Write console log to a static non-rotated file
+                                    in the log directory (reopened on SIGHUP)
   --compress-algo <string>      Compression algorithm for log files
                                     ["gzip", "lzip", "xz", "zstd"]
                                     (default "gzip")
@@ -217,6 +219,18 @@ are, hopefully, documented here:
     `noquiet`.  In `quiet` mode, all non‑fatal messages are logged
     **only** to the log file, where in `noquiet` mode, messages are
     logged to **both** the console and the log file.
+
+  * Console logs are normally written to a dated subdirectory (*e.g.,*
+    `log/2025/07/15/console.log`) and rotated daily, compressing the
+    file from the previous day.  The `--static-console-log` option
+    instead writes a single, non-rotated `console.log` directly in the
+    base log directory.  This file is never compressed by the proxy;
+    on `SIGHUP` it is closed and reopened so an external tool such as
+    [`logrotate`](https://github.com/logrotate/logrotate) can rotate
+    it.  An
+    [example configuration](logrotate/logrotate.d/dps8m-proxy.conf)
+    that you can copy to your `/etc/logrotate.d/` directory
+    is provided.
 
   * By default, the local time zone is used for time display and
     writing log files.  Users can specify the `‑‑utc` option to use
@@ -328,12 +342,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.2 (2026-May-22 g3177a86) [linux/amd64]
+DPS8M Proxy v1.2.3-dev (2026-Jun-03 gcf30a4b) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.2.2                           |
+| dps8m/proxy               | v1.2.3-dev                       |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -351,7 +365,7 @@ DPS8M Proxy v1.2.2 (2026-May-22 g3177a86) [linux/amd64]
 | golang.org/x/text         | v0.37.0                          |
 | kernel.org/.../libcap/cap | v1.2.78                          |
 | kernel.org/.../libcap/psx | v1.2.78                          |
-| Go compiler (gc)          | v1.26.3                          |
+| Go compiler (gc)          | v1.26.4                          |
 +===========================+==================================+
 ```
 
@@ -438,6 +452,17 @@ tables).
   |    `SIGHUP` | Reloads *access control lists* (`‑‑whitelist`, `‑‑blacklist`)      |
   | `SIGDANGER` | Attempts to immediately free as much memory as possible (AIX‑only) |
 
+* When `--static-console-log` is enabled, `SIGHUP` will close and
+  reopen the console log file (*in addition* to reloading the access
+  control lists), so an external log rotation tool such as
+  [`logrotate`](https://github.com/logrotate/logrotate) can rotate the
+  `console.log` file without restarting the proxy.
+
+* Microsoft Windows does **not** support POSIX signals, so none of the
+  signals above (including `SIGHUP`) are available there; the
+  corresponding actions can instead be performed using the interactive
+  admin console commands as described above.
+
 ### Management with systemd
 
 If you’re running the proxy on a Linux system, you can use `systemd`
@@ -522,16 +547,32 @@ their session to access the following TELNET control features:
   Send Control‑] to disconnect.
   ```
 
-## Compressed logs
+## Logging
+
+### Compressed logs
 
 * By default, all session log files are compressed 🗜️ automatically
   when the session terminates, and console log files are compressed
   when the log rolls over (*i.e.*, when starting a new day).
 
+* The console log written with `--static-console-log` is an exception.
+  It is never compressed by the proxy, because rotation and
+  compression is delegated to an external helper, triggered via
+  `SIGHUP` (see the signal table above).
+
 * When reviewing logs, administrators often need to search through all
   the past data, including through the compressed files. We recommend
   using [`ripgrep`](https://github.com/BurntSushi/ripgrep) (with the
   `‑z` option) for this task.
+
+### fail2ban integration
+
+* System administrators using any recent version of the
+  [fail2ban](https://github.com/fail2ban/fail2ban) intrusion
+  prevention software can use the example configuration files in the
+  [`fail2ban`](fail2ban) directory to automatically add the IP
+  addresses of users causing rejected connections on the proxy server
+  to the host system's firewall rules.
 
 ## Using OpenSSH host keys
 
@@ -603,14 +644,14 @@ predecessor (code statistics 📈 provided by
 </tr></thead>
 <tbody><tr>
 <th>Go</th>
-<th>21</th>
-<th>10992</th>
-<th>2349</th>
-<th>677</th>
-<th>7966</th>
-<th>1889</th>
-<th>260545</th>
-<th>4802</th>
+<th>22</th>
+<th>11214</th>
+<th>2397</th>
+<th>726</th>
+<th>8091</th>
+<th>1916</th>
+<th>265543</th>
+<th>4865</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -622,35 +663,45 @@ predecessor (code statistics 📈 provided by
 <th>14698</th>
 <th>224</th>
 </tr><tr>
+<th>INI</th>
+<th>3</th>
+<th>97</th>
+<th>8</th>
+<th>59</th>
+<th>30</th>
+<th>0</th>
+<th>3417</th>
+<th>54</th>
+</tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>626</th>
+<th>628</th>
 <th>89</th>
 <th>107</th>
-<th>430</th>
-<th>190</th>
-<th>22254</th>
-<th>385</th>
+<th>432</th>
+<th>193</th>
+<th>22339</th>
+<th>387</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>643</th>
-<th>127</th>
+<th>682</th>
+<th>134</th>
 <th>0</th>
-<th>516</th>
+<th>548</th>
 <th>0</th>
-<th>30033</th>
-<th>503</th>
+<th>31879</th>
+<th>535</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
-<th>218</th>
+<th>216</th>
 <th>35</th>
 <th>116</th>
-<th>67</th>
+<th>65</th>
 <th>0</th>
-<th>7892</th>
-<th>143</th>
+<th>7853</th>
+<th>141</th>
 </tr><tr>
 <th>YAML</th>
 <th>1</th>
@@ -664,14 +715,14 @@ predecessor (code statistics 📈 provided by
 </tr></tbody>
 <tfoot><tr>
 <th>Total</th>
-<th>29</th>
-<th>13057</th>
-<th>2708</th>
-<th>1069</th>
-<th>9280</th>
-<th>2114</th>
-<th>339730</th>
-<th>6105</th>
+<th>33</th>
+<th>13415</th>
+<th>2771</th>
+<th>1177</th>
+<th>9467</th>
+<th>2144</th>
+<th>350037</th>
+<th>6244</th>
 </tr></tfoot></table>
 
 
