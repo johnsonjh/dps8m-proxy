@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.5-dev (2026-Jun-03 gdaba8fe) [linux/amd64]
+DPS8M Proxy v1.2.5*-dev (2026-Jun-03 g25fcf7d+) [linux/amd64]
 
 Usage for proxy:
 
@@ -296,7 +296,7 @@ are, hopefully, documented here:
 * The `--filter` option enables link filtering of NULL characters.
 
   Filtering is now disabled by default to support the ZMODEM inline
-  file transfer protocol and other host applications that use require
+  file transfer protocol and other host applications that require
   NULL-terminated packet sequences.
 
 * The `--iconv` option enables legacy character map conversion of
@@ -342,12 +342,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.5-dev (2026-Jun-03 gdaba8fe) [linux/amd64]
+DPS8M Proxy v1.2.5*-dev (2026-Jun-03 g25fcf7d+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.2.5-dev                       |
+| dps8m/proxy               | v1.2.5*-dev                      |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -690,7 +690,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>548</th>
 <th>0</th>
-<th>31879</th>
+<th>31875</th>
 <th>535</th>
 </tr><tr>
 <th>Systemd</th>
@@ -721,7 +721,7 @@ predecessor (code statistics 📈 provided by
 <th>1177</th>
 <th>9467</th>
 <th>2144</th>
-<th>350037</th>
+<th>350033</th>
 <th>6244</th>
 </tr></tfoot></table>
 
