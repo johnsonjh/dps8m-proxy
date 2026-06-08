@@ -28,7 +28,7 @@ require (
 	golang.org/x/crypto v0.52.0
 	golang.org/x/sys v0.45.0
 	golang.org/x/term v0.43.0
-	golang.org/x/text v0.37.0
+	golang.org/x/text v0.38.0
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.78
 )
 
@@ -45,7 +45,7 @@ require (
 	github.com/miekg/dns v1.1.72 // indirect
 	golang.org/x/mod v0.36.0 // indirect
 	golang.org/x/net v0.55.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/tools v0.45.0 // indirect
 	kernel.org/pub/linux/libs/security/libcap/psx v1.2.78 // indirect
 )
