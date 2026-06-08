@@ -9,6 +9,8 @@
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from `v1.0.11-0.20260516140500-00f25b95f69b`
     to `v1.0.11-0.20260606142053-9912b67606cf`.
+  * Updated [`x/sys`](https://golang.org/x/sys)
+    from `v0.45.0` to `v0.46.0`.
 
 # v1.2.4 (2026-06-03 22:22:01)
 
