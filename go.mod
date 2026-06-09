@@ -22,13 +22,13 @@ require (
 	github.com/hashicorp/mdns v1.0.6
 	github.com/klauspost/compress v1.18.6
 	github.com/sorairolake/lzip-go v0.3.8
-	github.com/spf13/pflag v1.0.11-0.20260516140500-00f25b95f69b
+	github.com/spf13/pflag v1.0.11-0.20260606142053-9912b67606cf
 	github.com/ulikunitz/xz v0.5.15
 	go.etcd.io/bbolt v1.4.3
-	golang.org/x/crypto v0.52.0
-	golang.org/x/sys v0.45.0
-	golang.org/x/term v0.43.0
-	golang.org/x/text v0.37.0
+	golang.org/x/crypto v0.53.0
+	golang.org/x/sys v0.46.0
+	golang.org/x/term v0.44.0
+	golang.org/x/text v0.38.0
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.78
 )
 
@@ -43,9 +43,9 @@ require go.uber.org/goleak v1.3.1-0.20260602155401-5f791e3ef83b // test
 require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/miekg/dns v1.1.72 // indirect
-	golang.org/x/mod v0.36.0 // indirect
+	golang.org/x/mod v0.37.0 // indirect
 	golang.org/x/net v0.55.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/tools v0.45.0 // indirect
 	kernel.org/pub/linux/libs/security/libcap/psx v1.2.78 // indirect
 )

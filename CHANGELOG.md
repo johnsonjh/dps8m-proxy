@@ -3,7 +3,24 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.4 (2026-06-03)
+# v1.2.5 (2026-06-09)
+
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260516140500-00f25b95f69b`
+    to `v1.0.11-0.20260606142053-9912b67606cf`.
+  * Updated [`x/mod`](https://golang.org/x/sys)
+    from `v0.36.0` to `v0.37.0`.
+  * Updated [`x/sys`](https://golang.org/x/sys)
+    from `v0.45.0` to `v0.46.0`.
+  * Updated [`x/term`](https://golang.org/x/sys)
+    from `v0.43.0` to `v0.44.0`.
+  * Updated [`x/text`](https://golang.org/x/sys)
+    from `v0.37.0` to `v0.38.0`.
+  * Updated [`x/crypto`](https://golang.org/x/sys)
+    from `v0.52.0` to `v0.53.0`.
+
+# v1.2.4 (2026-06-03 22:22:01)
 
 * Documentation Updates
   * Regenerated project documentation only.
@@ -14,7 +31,7 @@
   * Added example configuration files for `fail2ban` and
     `logrotate` integration.
   * Added `--static-console-log` to write a single non-rotated and
-    uncompressed console log to a single location is reopened on
+    uncompressed console log to a single location that is reopened on
     `SIGHUP` (for use with external log rotation such as `logrotate`).
   * Changed the systemd sandboxing options to be more permissive.
 * Dependency Updates
@@ -94,7 +111,8 @@
   * Tightened in-flight connection counter Add/defer pairing.
   * Eliminated data race on the user-triggered `iconv` toggle.
   * Replaced some magic numbers with descriptively named constants.
-  * Log a debug warning if the `gops` diagnostic agent fails to start.
+  * Logged a debug warning if the `gops` diagnostic agent fails to
+    start.
   * Reduced mDNS shutdown-watcher Goroutines to a single one per
     announcement, instead of one per (interface, service) pair.
   * Cleaned up an mDNS interface-matching loop.
@@ -108,13 +126,13 @@
   * Made the in-flight connection count and the connections map
     reach zero in lockstep on session teardown.
   * Fixed status-display column sizing with very long database paths.
-  * Fix a possible bug reporting the status of the `iconv` flag.
+  * Fixed a possible bug reporting the status of the `iconv` flag.
   * Cleaned up partial compressed log output on compression failures.
   * Added a fallback for unknown compression levels so log
     rotation can never silently produce an uncompressed output.
   * Fixed a bug in the statistics calculations and prevent underflows.
-  * Console reload (`r`/`R`) now reports specifically which list is
-    missing, and skips the reload when neither is configured.
+  * Made console reload (`r`/`R`) report specifically which list is
+    missing, and skip the reload when neither is configured.
   * Closed an SSH resource leak on early-rejection paths.
   * Sanitized SSH usernames and `pty-req` terminal types at capture
     time to prevent log injection and stop attacker-controlled IAC
@@ -466,13 +484,13 @@
 * New Features & Improvements
   * Fixed TELNET NAWS updates and SSH user session deadlock, making
     updates fully asynchronous.
-  * Hopefully fixed a bug causing timeout logic to rarely not drop
-    some long-running connections.
+  * Hopefully fixed a bug that occasionally prevented the timeout
+    logic from dropping long-running connections.
   * Improved reliability of TELNET negotiations with a more robust
     parser and improved timeout logic.
   * Fixed a hang during proxy shutdown by implementing non-blocking
     channel termination.
-  * Added check to guarantee the database is closed only after all
+  * Added a check to guarantee the database is closed only after all
     background routines have stopped.
 * Code Quality & Maintenance
   * Normalized code style to be more consistent across the codebase.
@@ -492,7 +510,7 @@
     bug affecting the `lint` `make` target.
 
 # v1.1.6 (2026-04-18 18:17:13)
-        
+
 * New Features & Improvements
   * Fixed a bug in offline builds by not clearing the `.version` file
     in `distclean` `make` target.
@@ -533,7 +551,7 @@
 * New Features & Improvements
   * Applied numerous style and quality enhancements throughout the
     codebase.
-  * Add a new `CHANGELOG.md` file detailing the changes in each
+  * Added a new `CHANGELOG.md` file detailing the changes in each
     released version of the software.
 * Build System Improvements
   * Integrated a new `coverage` `make` target into the standard
@@ -683,10 +701,10 @@
     from `v1.26.1` to `v1.26.2`.
   * Updated
     [`libcap/cap`](https://kernel.org/pub/linux/libs/security/libcap/cap)
-    from from `v1.2.77` to `v1.2.78`.
+    from `v1.2.77` to `v1.2.78`.
   * Updated
     [`libcap/psx`](https://kernel.org/pub/linux/libs/security/libcap/psx)
-    from from `v1.2.77` to `v1.2.78`.
+    from `v1.2.77` to `v1.2.78`.
 * Testing Improvements
   * Added test cases for the new natural sort algorithm, including
     scenarios for mixed alphanumeric strings and standard character

@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.4 (2026-Jun-03 gb5943cc) [linux/amd64]
+DPS8M Proxy v1.2.5-dev (2026-Jun-09 g7e55e55) [linux/amd64]
 
 Usage for proxy:
 
@@ -296,7 +296,7 @@ are, hopefully, documented here:
 * The `--filter` option enables link filtering of NULL characters.
 
   Filtering is now disabled by default to support the ZMODEM inline
-  file transfer protocol and other host applications that use require
+  file transfer protocol and other host applications that require
   NULL-terminated packet sequences.
 
 * The `--iconv` option enables legacy character map conversion of
@@ -342,12 +342,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.4 (2026-Jun-03 gb5943cc) [linux/amd64]
+DPS8M Proxy v1.2.5-dev (2026-Jun-09 g7e55e55) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.2.4                           |
+| dps8m/proxy               | v1.2.5-dev                       |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -355,14 +355,14 @@ DPS8M Proxy v1.2.4 (2026-Jun-03 gb5943cc) [linux/amd64]
 | klauspost/compress        | v1.18.6                          |
 | miekg/dns                 | v1.1.72                          |
 | sorairolake/lzip-go       | v0.3.8                           |
-| spf13/pflag               | v1.0.11* (2026-May-16, g00f25b9) |
+| spf13/pflag               | v1.0.11* (2026-Jun-06, g9912b67) |
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
-| golang.org/x/crypto       | v0.52.0                          |
+| golang.org/x/crypto       | v0.53.0                          |
 | golang.org/x/net          | v0.55.0                          |
-| golang.org/x/sys          | v0.45.0                          |
-| golang.org/x/term         | v0.43.0                          |
-| golang.org/x/text         | v0.37.0                          |
+| golang.org/x/sys          | v0.46.0                          |
+| golang.org/x/term         | v0.44.0                          |
+| golang.org/x/text         | v0.38.0                          |
 | kernel.org/.../libcap/cap | v1.2.78                          |
 | kernel.org/.../libcap/psx | v1.2.78                          |
 | Go compiler (gc)          | v1.26.4                          |
@@ -690,7 +690,7 @@ predecessor (code statistics 📈 provided by
 <th>0</th>
 <th>548</th>
 <th>0</th>
-<th>31879</th>
+<th>31875</th>
 <th>535</th>
 </tr><tr>
 <th>Systemd</th>
@@ -721,7 +721,7 @@ predecessor (code statistics 📈 provided by
 <th>1177</th>
 <th>9467</th>
 <th>2144</th>
-<th>350037</th>
+<th>350033</th>
 <th>6244</th>
 </tr></tfoot></table>
 
