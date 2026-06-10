@@ -412,17 +412,17 @@
   * Extended and corrected use of Local Variables blocks in various
     files for easier editing of the source code using GNU Emacs.
 * Dependency Updates
-  * Updated [`golang.org/x/sys`](golang.org/x/sys)
+  * Updated [`golang.org/x/sys`](https://golang.org/x/sys)
     from `v0.43.0` to `v0.44.0`.
-  * Updated [`golang.org/x/text`](golang.org/x/text)
+  * Updated [`golang.org/x/text`](https://golang.org/x/text)
     from `v0.36.0` to `v0.37.0`.
-  * Updated [`golang.org/x/term`](golang.org/x/term)
+  * Updated [`golang.org/x/term`](https://golang.org/x/term)
     from `v0.42.0` to `v0.43.0`.
-  * Updated [`golang.org/x/crypto`](golang.org/x/crypto)
+  * Updated [`golang.org/x/crypto`](https://golang.org/x/crypto)
     from `v0.50.0` to `v0.51.0`.
-  * Updated [`golang.org/x/net`](golang.org/x/net)
+  * Updated [`golang.org/x/net`](https://golang.org/x/net)
     from `v0.53.0` to `v0.54.0`.
-  * Updated [`golang.org/x/tools`](golang.org/x/tools)
+  * Updated [`golang.org/x/tools`](https://golang.org/x/tools)
     from `v0.44.0` to `v0.45.0`.
 
 # v1.1.15 (2026-05-07 19:36:24)
@@ -1475,7 +1475,7 @@
   * Updated the help and usage information output to include the
     project home page and bug reporting URL.
 * Dependency Updates
-  * Promoted [`x/sys`](golang.org/x/sys) from an indirect to
+  * Promoted [`x/sys`](https://golang.org/x/sys) from an indirect to
     a direct dependency at version `v0.37.0`.
 
 # v0.1.45 (2025-10-23 07:07:35)
