@@ -369,6 +369,7 @@ gtags
 honnef
 kisielk
 ldflags
+libmagic
 lintsetup
 metafirst
 mgechev
