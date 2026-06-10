@@ -18,15 +18,15 @@
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from `v1.0.11-0.20260516140500-00f25b95f69b`
     to `v1.0.11-0.20260606142053-9912b67606cf`.
-  * Updated [`x/mod`](https://golang.org/x/sys)
+  * Updated [`x/mod`](https://golang.org/x/mod)
     from `v0.36.0` to `v0.37.0`.
   * Updated [`x/sys`](https://golang.org/x/sys)
     from `v0.45.0` to `v0.46.0`.
-  * Updated [`x/term`](https://golang.org/x/sys)
+  * Updated [`x/term`](https://golang.org/x/term)
     from `v0.43.0` to `v0.44.0`.
-  * Updated [`x/text`](https://golang.org/x/sys)
+  * Updated [`x/text`](https://golang.org/x/text)
     from `v0.37.0` to `v0.38.0`.
-  * Updated [`x/crypto`](https://golang.org/x/sys)
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
     from `v0.52.0` to `v0.53.0`.
 
 # v1.2.4 (2026-06-03 22:22:01)
