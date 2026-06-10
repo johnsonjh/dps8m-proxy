@@ -44,7 +44,7 @@ pages:
     - python3 -m venv $(pwd)/.venv
     - . $(pwd)/.venv/bin/activate
     - pip install --upgrade pip || true
-    - pip install --upgrade scspell3k codespell reuse
+    - pip install --upgrade scspell3k codespell
     - env CI_NO_CROSS=1 pdpmake lint
     - deactivate
     - git diff --exit-code
