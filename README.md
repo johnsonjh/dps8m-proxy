@@ -126,7 +126,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.6 (2026-Jun-10 gd8f3735) [linux/amd64]
+DPS8M Proxy v1.2.7-dev (2026-Jun-12 g40c48a3) [linux/amd64]
 
 Usage for proxy:
 
@@ -342,16 +342,16 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.6 (2026-Jun-10 gd8f3735) [linux/amd64]
+DPS8M Proxy v1.2.7-dev (2026-Jun-12 g40c48a3) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.2.6                           |
+| dps8m/proxy               | v1.2.7-dev                       |
 | arl/statsviz              | v0.8.0                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
-| hashicorp/mdns            | v1.0.6                           |
+| hashicorp/mdns            | v1.0.7                           |
 | klauspost/compress        | v1.18.6                          |
 | miekg/dns                 | v1.1.72                          |
 | sorairolake/lzip-go       | v0.3.8                           |
@@ -359,7 +359,7 @@ DPS8M Proxy v1.2.6 (2026-Jun-10 gd8f3735) [linux/amd64]
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.4.3                           |
 | golang.org/x/crypto       | v0.53.0                          |
-| golang.org/x/net          | v0.55.0                          |
+| golang.org/x/net          | v0.56.0                          |
 | golang.org/x/sys          | v0.46.0                          |
 | golang.org/x/term         | v0.44.0                          |
 | golang.org/x/text         | v0.38.0                          |
@@ -710,7 +710,7 @@ predecessor (code statistics 📈 provided by
 <th>10</th>
 <th>70</th>
 <th>0</th>
-<th>4302</th>
+<th>4337</th>
 <th>77</th>
 </tr></tbody>
 <tfoot><tr>
@@ -721,7 +721,7 @@ predecessor (code statistics 📈 provided by
 <th>1177</th>
 <th>9467</th>
 <th>2144</th>
-<th>350027</th>
+<th>350062</th>
 <th>6244</th>
 </tr></tfoot></table>
 
