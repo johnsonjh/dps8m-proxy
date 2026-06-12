@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.7 (2026-06-12)
+# v1.2.8-dev
+
+* TBD
+
+# v1.2.7 (2026-06-12 19:16:12)
 
 * Dependency Updates
   * Updated [`hashicorp/mdns`](https://github.com/hashicorp/mdns)
