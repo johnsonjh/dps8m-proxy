@@ -3,9 +3,15 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.7-dev
+# v1.2.7 (2026-06-12)
 
-* TBD
+* Dependency Updates
+  * Updated [`hashicorp/mdns`](https://github.com/hashicorp/mdns)
+    from `v1.0.6` to `v1.0.7`.
+  * Updated [`x/net`](https://golang.org/x/net)
+    from `v0.55.0` to `v0.56.0`.
+  * Updated [`x/tools`](https://golang.org/x/tools)
+    from `v0.45.0` to `v0.46.0`.
 
 # v1.2.6 (2026-06-10 00:20:46)
 
