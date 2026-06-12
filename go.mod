@@ -19,7 +19,7 @@ go 1.26.4
 require (
 	github.com/arl/statsviz v0.8.0
 	github.com/google/gops v0.3.29
-	github.com/hashicorp/mdns v1.0.6
+	github.com/hashicorp/mdns v1.0.7
 	github.com/klauspost/compress v1.18.6
 	github.com/sorairolake/lzip-go v0.3.8
 	github.com/spf13/pflag v1.0.11-0.20260606142053-9912b67606cf
