@@ -5,7 +5,9 @@
 
 # v1.2.8-dev
 
-* TBD
+* Dependency Updates
+  * Updated [`etcd/bbolt`](https://go.etcd.io/bbolt)
+    from `v1.4.3` to `v1.5.0`.
 
 # v1.2.7 (2026-06-12 19:16:12)
 
