@@ -24,7 +24,7 @@ require (
 	github.com/sorairolake/lzip-go v0.3.8
 	github.com/spf13/pflag v1.0.11-0.20260606142053-9912b67606cf
 	github.com/ulikunitz/xz v0.5.15
-	go.etcd.io/bbolt v1.4.3
+	go.etcd.io/bbolt v1.5.0
 	golang.org/x/crypto v0.53.0
 	golang.org/x/sys v0.46.0
 	golang.org/x/term v0.44.0
