@@ -8,6 +8,8 @@
 * Dependency Updates
   * Updated [`etcd/bbolt`](https://go.etcd.io/bbolt)
     from `v1.4.3` to `v1.5.0`.
+* Code Quality & Maintenance
+  * Updated `golangci-lint` rules for current git releases.
 
 # v1.2.7 (2026-06-12 19:16:12)
 
