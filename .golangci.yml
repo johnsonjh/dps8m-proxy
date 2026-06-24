@@ -15,6 +15,7 @@ linters:
     - cyclop
     - err113
     - exhaustruct
+    - exhaustruct_v5
     - forbidigo
     - funlen
     - gochecknoglobals
