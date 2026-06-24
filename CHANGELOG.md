@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.8 (2026-06-24)
+# v1.2.9-dev
+
+* TBD
+
+# v1.2.8 (2026-06-24 07:57:33)
 
 * Dependency Updates
   * Updated [`etcd/bbolt`](https://go.etcd.io/bbolt)
