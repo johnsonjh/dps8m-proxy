@@ -5,7 +5,12 @@
 
 # v1.2.9-dev
 
-* TBD
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260606142053-9912b67606cf`
+    to `v1.0.11-0.20260624200946-6404d8209615`.
+  * Updated [`x/tools`](https://golang.org/x/tools)
+    from `v0.46.0` to `V0.47.0`.
 
 # v1.2.8 (2026-06-24 07:57:33)
 

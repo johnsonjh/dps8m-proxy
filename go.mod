@@ -22,7 +22,7 @@ require (
 	github.com/hashicorp/mdns v1.0.7
 	github.com/klauspost/compress v1.18.6
 	github.com/sorairolake/lzip-go v0.3.8
-	github.com/spf13/pflag v1.0.11-0.20260606142053-9912b67606cf
+	github.com/spf13/pflag v1.0.11-0.20260624200946-6404d8209615
 	github.com/ulikunitz/xz v0.5.15
 	go.etcd.io/bbolt v1.5.0
 	golang.org/x/crypto v0.53.0
@@ -46,7 +46,7 @@ require (
 	golang.org/x/mod v0.37.0 // indirect
 	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/sync v0.21.0 // indirect
-	golang.org/x/tools v0.46.0 // indirect
+	golang.org/x/tools v0.47.0 // indirect
 	kernel.org/pub/linux/libs/security/libcap/psx v1.2.78 // indirect
 )
 
