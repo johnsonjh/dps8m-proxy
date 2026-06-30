@@ -3,7 +3,7 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.9-dev (2026-06-25)
+# v1.2.9-dev (2026-06-30)
 
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
@@ -11,6 +11,9 @@
     to `v1.0.11-0.20260624200946-6404d8209615`.
   * Updated [`x/tools`](https://golang.org/x/tools)
     from `v0.46.0` to `V0.47.0`.
+  * Updated
+    [`klauspost/compress`](https://github.com/klauspost/compress)
+    from `v1.18.6` to `v1.18.7`.
 
 # v1.2.8 (2026-06-24 07:57:33)
 
