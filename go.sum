@@ -22,6 +22,8 @@ github.com/sorairolake/lzip-go v0.3.8 h1:j5Q2313INdTA80ureWYRhX+1K78mUXfMoPZCw/i
 github.com/sorairolake/lzip-go v0.3.8/go.mod h1:JcBqGMV0frlxwrsE9sMWXDjqn3EeVf0/54YPsw66qkU=
 github.com/spf13/pflag v1.0.11-0.20260606142053-9912b67606cf h1:9izYYBWOOCzgjvGj63sege28vdGIt6xrvnJpkmcdTvM=
 github.com/spf13/pflag v1.0.11-0.20260606142053-9912b67606cf/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
+github.com/spf13/pflag v1.0.11-0.20260703132444-5fdac2d16c16 h1:A3uf5DU6NqZIl62N5mDUsom/JCEhJcAdyNOiAfsUCeY=
+github.com/spf13/pflag v1.0.11-0.20260703132444-5fdac2d16c16/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/ulikunitz/xz v0.5.15 h1:9DNdB5s+SgV3bQ2ApL10xRc35ck0DuIX/isZvIk+ubY=
