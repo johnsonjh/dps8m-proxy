@@ -8,7 +8,7 @@
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from `v1.0.11-0.20260606142053-9912b67606cf`
-    to `v1.0.11-0.20260703113220-dca783ac210b`.
+    to `v1.0.11-0.20260703132444-5fdac2d16c16`.
   * Updated [`x/tools`](https://golang.org/x/tools)
     from `v0.46.0` to `V0.47.0`.
   * Updated
