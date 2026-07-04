@@ -394,6 +394,7 @@ thead
 FILEID: 07ec62c0-6dbb-11f0-b70f-80ee73e9b8e7
 bccde
 fcfbc
+fdac
 goleak
 gomod
 gops
@@ -443,6 +444,8 @@ ulikunitz
 
 FILEID: 4dc282c4-6bd2-11f0-a475-80ee73e9b8e7
 fcfbc
+fdac
+gdca
 
 FILEID: 210c336a-b24a-11f0-ab08-80ee73e9b8e7
 doublecmd
@@ -504,6 +507,7 @@ distclean
 errorf
 expandtab
 fcfbc
+fdac
 filepath
 fkickers
 gcompat

@@ -3,7 +3,21 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.8 (2026-06-24)
+# v1.2.9-dev (2026-07-04)
+
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260606142053-9912b67606cf`
+    to `v1.0.11-0.20260703132444-5fdac2d16c16`.
+  * Updated [`x/tools`](https://golang.org/x/tools)
+    from `v0.46.0` to `V0.47.0`.
+  * Updated
+    [`klauspost/compress`](https://github.com/klauspost/compress)
+    from `v1.18.6` to `v1.19.0`.
+  * Updated [`arl/statsviz`](https://github.com/arl/statsviz)
+    from `v0.8.0` to `v0.8.1`.
+
+# v1.2.8 (2026-06-24 07:57:33)
 
 * Dependency Updates
   * Updated [`etcd/bbolt`](https://go.etcd.io/bbolt)
