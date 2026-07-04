@@ -3,7 +3,7 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.9-dev (2026-07-02)
+# v1.2.9-dev (2026-07-04)
 
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
@@ -14,6 +14,8 @@
   * Updated
     [`klauspost/compress`](https://github.com/klauspost/compress)
     from `v1.18.6` to `v1.19.0`.
+  * Updated [`arl/statsviz`](https://github.com/arl/statsviz)
+    from `v0.8.0` to `v0.8.1`.
 
 # v1.2.8 (2026-06-24 07:57:33)
 
