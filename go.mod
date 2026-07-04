@@ -17,7 +17,7 @@ go 1.26.4
 
 // Direct dependencies
 require (
-	github.com/arl/statsviz v0.8.0
+	github.com/arl/statsviz v0.8.1
 	github.com/google/gops v0.3.29
 	github.com/hashicorp/mdns v1.0.7
 	github.com/klauspost/compress v1.19.0
