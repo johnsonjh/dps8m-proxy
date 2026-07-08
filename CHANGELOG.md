@@ -18,6 +18,8 @@
     from `v0.53.0` to `v0.54.0`.
   * Updated [`x/mod`](https://golang.org/x/mod)
     from `v0.37.0` to `v0.38.0`.
+  * Updated [`x/net`](https://golang.org/x/net)
+    from `v0.56.0` to `v0.57.0`.
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from `v1.26.4` to `v1.26.5`.
