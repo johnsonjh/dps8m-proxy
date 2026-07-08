@@ -26,7 +26,7 @@ require (
 	github.com/ulikunitz/xz v0.5.15
 	go.etcd.io/bbolt v1.5.0
 	golang.org/x/crypto v0.53.0
-	golang.org/x/sys v0.46.0
+	golang.org/x/sys v0.47.0
 	golang.org/x/term v0.44.0
 	golang.org/x/text v0.39.0
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.78
@@ -45,7 +45,7 @@ require (
 	github.com/miekg/dns v1.1.72 // indirect
 	golang.org/x/mod v0.37.0 // indirect
 	golang.org/x/net v0.56.0 // indirect
-	golang.org/x/sync v0.21.0 // indirect
+	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/tools v0.47.0 // indirect
 	kernel.org/pub/linux/libs/security/libcap/psx v1.2.78 // indirect
 )
