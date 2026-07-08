@@ -7,11 +7,17 @@
 
 * Dependency Updates
   * Updated [`x/text`](https://golang.org/x/text)
-    from `v0.38.0` to `v0.39.0`.
+    from `v0.38.0` to `v0.40.0`.
   * Updated [`x/sys`](https://golang.org/x/sys)
     from `v0.46.0` to `v0.47.0`.
   * Updated [`x/sync`](https://golang.org/x/sync)
     from `v0.21.0` to `v0.22.0`.
+  * Updated [`x/term`](https://golang.org/x/term)
+    from `v0.44.0` to `v0.45.0`.
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
+    from `v0.53.0` to `v0.54.0`.
+  * Updated [`x/mod`](https://golang.org/x/mod)
+    from `v0.37.0` to `v0.38.0`.
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from `v1.26.4` to `v1.26.5`.
