@@ -14,6 +14,8 @@
     from `v0.21.0` to `v0.22.0`.
   * Updated [`x/term`](https://golang.org/x/term)
     from `v0.44.0` to `v0.45.0`.
+  * Updated [`x/tools`](https://golang.org/x/tools)
+    from `v0.47.0` to `V0.48.0`.
   * Updated [`x/crypto`](https://golang.org/x/crypto)
     from `v0.53.0` to `v0.54.0`.
   * Updated [`x/mod`](https://golang.org/x/mod)
