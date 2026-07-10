@@ -3,7 +3,30 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.9 (2026-07-04)
+# v1.2.10 (2026-07-10)
+
+* Dependency Updates
+  * Updated [`x/text`](https://golang.org/x/text)
+    from `v0.38.0` to `v0.40.0`.
+  * Updated [`x/sys`](https://golang.org/x/sys)
+    from `v0.46.0` to `v0.47.0`.
+  * Updated [`x/sync`](https://golang.org/x/sync)
+    from `v0.21.0` to `v0.22.0`.
+  * Updated [`x/term`](https://golang.org/x/term)
+    from `v0.44.0` to `v0.45.0`.
+  * Updated [`x/tools`](https://golang.org/x/tools)
+    from `v0.47.0` to `V0.48.0`.
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
+    from `v0.53.0` to `v0.54.0`.
+  * Updated [`x/mod`](https://golang.org/x/mod)
+    from `v0.37.0` to `v0.38.0`.
+  * Updated [`x/net`](https://golang.org/x/net)
+    from `v0.56.0` to `v0.57.0`.
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.26.4` to `v1.26.5`.
+
+# v1.2.9 (2026-07-04 09:10:53)
 
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)

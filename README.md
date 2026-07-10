@@ -6,7 +6,6 @@
 <!-- scspell-id: 698e77d8-6bd2-11f0-9441-80ee73e9b8e7 -->
 <!-- NB: Do not modify README.md directly; modify README.md.tmpl -->
 
-[![Go Report Card](https://goreportcard.com/badge/gitlab.com/dps8m/proxy)](https://goreportcard.com/report/gitlab.com/dps8m/proxy)
 [![Pipeline Status](https://gitlab.com/dps8m/proxy/badges/master/pipeline.svg)](https://gitlab.com/dps8m/proxy/-/pipelines/)
 [![CodeQL](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql)
 [![Dependabot Updates](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates)
@@ -126,7 +125,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.9 (2026-Jul-04 g08ad623) [linux/amd64]
+DPS8M Proxy v1.2.10-dev (2026-Jul-10 g3b6bb41) [linux/amd64]
 
 Usage for proxy:
 
@@ -342,12 +341,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.9 (2026-Jul-04 g08ad623) [linux/amd64]
+DPS8M Proxy v1.2.10-dev (2026-Jul-10 g3b6bb41) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.2.9                           |
+| dps8m/proxy               | v1.2.10-dev                      |
 | arl/statsviz              | v0.8.1                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -358,14 +357,14 @@ DPS8M Proxy v1.2.9 (2026-Jul-04 g08ad623) [linux/amd64]
 | spf13/pflag               | v1.0.11* (2026-Jul-03, g5fdac2d) |
 | ulikunitz/xz              | v0.5.15                          |
 | go.etcd.io/bbolt          | v1.5.0                           |
-| golang.org/x/crypto       | v0.53.0                          |
-| golang.org/x/net          | v0.56.0                          |
-| golang.org/x/sys          | v0.46.0                          |
-| golang.org/x/term         | v0.44.0                          |
-| golang.org/x/text         | v0.38.0                          |
+| golang.org/x/crypto       | v0.54.0                          |
+| golang.org/x/net          | v0.57.0                          |
+| golang.org/x/sys          | v0.47.0                          |
+| golang.org/x/term         | v0.45.0                          |
+| golang.org/x/text         | v0.40.0                          |
 | kernel.org/.../libcap/cap | v1.2.78                          |
 | kernel.org/.../libcap/psx | v1.2.78                          |
-| Go compiler (gc)          | v1.26.4                          |
+| Go compiler (gc)          | v1.26.5                          |
 +===========================+==================================+
 ```
 
@@ -685,13 +684,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>682</th>
+<th>681</th>
 <th>134</th>
 <th>0</th>
-<th>548</th>
+<th>547</th>
 <th>0</th>
-<th>31875</th>
-<th>535</th>
+<th>31744</th>
+<th>534</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -716,13 +715,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>33</th>
-<th>13415</th>
+<th>13414</th>
 <th>2771</th>
 <th>1177</th>
-<th>9467</th>
+<th>9466</th>
 <th>2145</th>
-<th>350062</th>
-<th>6244</th>
+<th>349931</th>
+<th>6243</th>
 </tr></tfoot></table>
 
 
