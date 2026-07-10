@@ -3,7 +3,7 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.10-dev (2026-07-08)
+# v1.2.10 (2026-07-10)
 
 * Dependency Updates
   * Updated [`x/text`](https://golang.org/x/text)
