@@ -5,7 +5,12 @@
 
 # v1.2.11-dev
 
-* TBD
+* Dependency Updates
+  * Updated
+    [`klauspost/compress`](https://github.com/klauspost/compress)
+    from `v1.19.0` to `v1.19.1`.
+  * Updated [`ulikunitz/xz`](https://github.com/ulikunitz/xz)
+    from `v0.5.15` to `v0.5.16`.
 
 # v1.2.10 (2026-07-10 21:39:57)
 
