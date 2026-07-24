@@ -11,6 +11,8 @@
     from `v1.19.0` to `v1.19.1`.
   * Updated [`ulikunitz/xz`](https://github.com/ulikunitz/xz)
     from `v0.5.15` to `v0.5.16`.
+  * Updated the [Android NDK](https://developer.android.com/ndk/)
+    from `r30-beta1` to `r30-beta2`.
 
 # v1.2.10 (2026-07-10 21:39:57)
 
