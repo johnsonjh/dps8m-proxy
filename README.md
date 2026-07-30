@@ -9,6 +9,7 @@
 [![Pipeline Status](https://gitlab.com/dps8m/proxy/badges/master/pipeline.svg)](https://gitlab.com/dps8m/proxy/-/pipelines/)
 [![CodeQL](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/github-code-scanning/codeql)
 [![Dependabot Updates](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/johnsonjh/dps8m-proxy/actions/workflows/dependabot/dependabot-updates)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=johnsonjh_dps8m-proxy&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=johnsonjh_dps8m-proxy)
 [![REUSE status](https://api.reuse.software/badge/gitlab.com/dps8m/proxy)](https://api.reuse.software/info/gitlab.com/dps8m/proxy)
 
 ## Overview
@@ -124,7 +125,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.12-dev (2026-Jul-30 ge64beb4) [linux/amd64]
+DPS8M Proxy v1.2.12-dev (2026-Jul-30 gc05d7f4) [linux/amd64]
 
 Usage for proxy:
 
@@ -340,7 +341,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.12-dev (2026-Jul-30 ge64beb4) [linux/amd64]
+DPS8M Proxy v1.2.12-dev (2026-Jul-30 gc05d7f4) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
