@@ -3,7 +3,18 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.10 (2026-07-10)
+# v1.2.11 (2026-07-30)
+
+* Dependency Updates
+  * Updated
+    [`klauspost/compress`](https://github.com/klauspost/compress)
+    from `v1.19.0` to `v1.19.1`.
+  * Updated [`ulikunitz/xz`](https://github.com/ulikunitz/xz)
+    from `v0.5.15` to `v0.5.16`.
+  * Updated the [Android NDK](https://developer.android.com/ndk/)
+    from `r30-beta1` to `r30-beta2`.
+
+# v1.2.10 (2026-07-10 21:39:57)
 
 * Dependency Updates
   * Updated [`x/text`](https://golang.org/x/text)

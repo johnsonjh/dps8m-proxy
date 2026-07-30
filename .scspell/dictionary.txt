@@ -167,9 +167,11 @@ goleak
 FILEID: 5865f38c-6bd2-11f0-882d-80ee73e9b8e7
 basedict
 bindir
+boundp
 codeowners
 codespell
 deadcode
+defface
 deps
 destdir
 distclean
@@ -201,11 +203,13 @@ jstemmer
 juntaki
 lintsetup
 listchars
+mapc
 nilaway
 nodwarf
 notparallel
 pflag
 printf
+propertize
 readonly
 rlength
 rstart
