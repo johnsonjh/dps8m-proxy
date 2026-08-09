@@ -125,7 +125,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.12-dev (2026-Aug-06 gd3ade14) [linux/amd64]
+DPS8M Proxy v1.2.12-dev (2026-Aug-09 g0675da8) [linux/amd64]
 
 Usage for proxy:
 
@@ -341,7 +341,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.12-dev (2026-Aug-06 gd3ade14) [linux/amd64]
+DPS8M Proxy v1.2.12-dev (2026-Aug-09 g0675da8) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -354,7 +354,7 @@ DPS8M Proxy v1.2.12-dev (2026-Aug-06 gd3ade14) [linux/amd64]
 | klauspost/compress        | v1.19.2                          |
 | miekg/dns                 | v1.1.72                          |
 | sorairolake/lzip-go       | v0.3.8                           |
-| spf13/pflag               | v1.0.11* (2026-Jul-03, g5fdac2d) |
+| spf13/pflag               | v1.0.11* (2026-Aug-09, g4f8e905) |
 | ulikunitz/xz              | v0.5.16                          |
 | go.etcd.io/bbolt          | v1.5.0                           |
 | golang.org/x/crypto       | v0.54.0                          |
