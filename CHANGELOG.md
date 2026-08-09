@@ -9,6 +9,9 @@
   * Updated
     [`klauspost/compress`](https://github.com/klauspost/compress)
     from `v1.19.1` to `v1.19.2`.
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260703132444-5fdac2d16c16`
+    to `v1.0.11-0.20260809081120-4f8e9056816a`.
 
 # v1.2.11 (2026-07-30 10:53:38)
 
