@@ -120,6 +120,7 @@ lint check:
 		gofmt \
 		gofumpt \
 		govet \
+		gofix \
 		goverify \
 		gotidydiff \
 		staticcheck \
@@ -375,6 +376,14 @@ tags ctags gtags GRPATH GRTAGS GTAGS:
 		gogtags > /dev/null 2>&1 || :; } || :
 
 ##############################################################################
+# Target: gofix
+
+gofix:
+	env GOTOOLCHAIN=$(GOTOOLCHAIN) $$($(GO) env 2>&1 | \
+		grep -q "GOSUMDB=.*off.*" && \
+		printf '%s\n' 'GOSUMDB=sum.golang.org' || :) $(GO) fix
+
+##############################################################################
 # Target: govet
 
 govet:
@@ -605,7 +614,7 @@ install:
 	revive errcheck deadcode govulncheck gopls gofumpt shfmt shellcheck \
 	codespell tags ctags gtags GRPATH GRTAGS GTAGS govet doc docs scc \
 	cross scspell scspell-fix cover coverage strip sstrip install-strip \
-	install
+	install gofix
 
 ##############################################################################
 # Local Variables:
