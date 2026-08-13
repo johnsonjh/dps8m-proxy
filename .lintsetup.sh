@@ -118,7 +118,7 @@ if [ "${BRANCH:-}" = "master" ]; then
 else
   "${GO:?}" install "${V:-}" "go.uber.org/nilaway/cmd/nilaway@latest"
   # shellcheck disable=SC2312
-  curl -fsSL \
+  curl --proto "=https" -fsSL \
     "https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh" \
     | ${SHELL:-/bin/sh} -s -- -b "$(go env GOPATH)/bin" latest
 fi
