@@ -125,7 +125,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.12-dev (2026-Aug-12 gd64fe88) [linux/amd64]
+DPS8M Proxy v1.2.12-dev (2026-Aug-13 g54b71d3) [linux/amd64]
 
 Usage for proxy:
 
@@ -341,7 +341,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.12-dev (2026-Aug-12 gd64fe88) [linux/amd64]
+DPS8M Proxy v1.2.12-dev (2026-Aug-13 g54b71d3) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -674,13 +674,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Makefile</th>
 <th>1</th>
-<th>628</th>
-<th>89</th>
-<th>107</th>
-<th>432</th>
-<th>194</th>
-<th>22339</th>
-<th>387</th>
+<th>637</th>
+<th>91</th>
+<th>109</th>
+<th>437</th>
+<th>196</th>
+<th>22603</th>
+<th>391</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
@@ -715,13 +715,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>33</th>
-<th>13414</th>
-<th>2771</th>
-<th>1177</th>
-<th>9466</th>
-<th>2145</th>
-<th>349948</th>
-<th>6243</th>
+<th>13423</th>
+<th>2773</th>
+<th>1179</th>
+<th>9471</th>
+<th>2147</th>
+<th>350212</th>
+<th>6247</th>
 </tr></tfoot></table>
 
 
