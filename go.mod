@@ -42,10 +42,8 @@ require go.uber.org/goleak v1.3.1-0.20260602155401-5f791e3ef83b // test
 // Indirect dependencies
 require (
 	github.com/gorilla/websocket v1.5.3 // indirect
-	github.com/miekg/dns v1.1.72 // indirect
-	golang.org/x/mod v0.39.0 // indirect
+	github.com/miekg/dns v1.1.73 // indirect
 	golang.org/x/net v0.58.0 // indirect
-	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/tools v0.49.0 // indirect
 	kernel.org/pub/linux/libs/security/libcap/psx v1.2.78 // indirect
 )

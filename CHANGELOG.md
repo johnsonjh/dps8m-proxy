@@ -3,9 +3,15 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.13-dev
+# v1.2.13-dev (2026-08-19)
 
-* TBD
+* Dependency Updates
+  * Updated [`miekg/dns`](https://github.com/miekg/dns)
+    from `v1.1.72` to `v1.1.73`.
+  * Removed [`x/sync`](https://golang.org/x/sync)
+    `v0.22.0`.
+  * Removed [`x/mod`](https://golang.org/x/mod)
+    `v0.39.0`.
 
 # v1.2.12 (2026-08-13 18:54:06)
 
