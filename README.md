@@ -125,7 +125,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.14-dev (2026-Aug-25 g88d2072) [linux/amd64]
+DPS8M Proxy v1.2.14-dev (2026-Aug-25 g584e4f1) [linux/amd64]
 
 Usage for proxy:
 
@@ -341,7 +341,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.14-dev (2026-Aug-25 g88d2072) [linux/amd64]
+DPS8M Proxy v1.2.14-dev (2026-Aug-25 g584e4f1) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
@@ -684,13 +684,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>681</th>
+<th>679</th>
 <th>134</th>
 <th>0</th>
-<th>547</th>
+<th>545</th>
 <th>0</th>
-<th>31744</th>
-<th>534</th>
+<th>31450</th>
+<th>532</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -715,13 +715,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>33</th>
-<th>13422</th>
+<th>13420</th>
 <th>2773</th>
 <th>1179</th>
-<th>9470</th>
+<th>9468</th>
 <th>2147</th>
-<th>350197</th>
-<th>6246</th>
+<th>349903</th>
+<th>6244</th>
 </tr></tfoot></table>
 
 
@@ -856,9 +856,7 @@ predecessor (code statistics 📈 provided by
   |                                  [spf13/pflag](https://github.com/spf13/pflag) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                [ulikunitz/xz](https://github.com/ulikunitz/xz) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                        [x/crypto](https://golang.org/x/crypto) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
-  |                                              [x/mod](https://golang.org/x/mod) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                              [x/net](https://golang.org/x/net) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
-  |                                            [x/sync](https://golang.org/x/sync) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                              [x/sys](https://golang.org/x/sys) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                            [x/term](https://golang.org/x/term) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                            [x/text](https://golang.org/x/text) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
