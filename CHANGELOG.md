@@ -12,6 +12,8 @@
     `v0.22.0`.
   * Removed [`x/mod`](https://golang.org/x/mod)
     `v0.39.0`.
+  * Updated the [Android NDK](https://developer.android.com/ndk/)
+    from `r30-beta2` to `r30-beta3` (actually `RC 1`).
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from `v1.26.6` to `v1.27.0`.
