@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.13-dev (2026-08-25)
+# v1.2.14-dev
+
+* TBD
+
+# v1.2.13 (2026-08-25 02:36:17)
 
 * Dependency Updates
   * Updated [`miekg/dns`](https://github.com/miekg/dns)
