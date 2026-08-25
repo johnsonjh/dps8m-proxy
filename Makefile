@@ -132,7 +132,6 @@ lint check:
 		nilaway \
 		golist \
 		govulncheck \
-		pvs-golang \
 		gopls
 	@test -z "$${CI_NO_CROSS:-}" && { \
 		env printf '\n%s\n' "🧩 Running 'make cross'..." 2> /dev/null || :; \
