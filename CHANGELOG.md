@@ -7,6 +7,11 @@
 
 * Documentation Updates
   * Updated project documentation.
+* Dependency Updates
+  * Remove `x/mod` and `x/sync` from `.update-deps.sh` script.
+  * Updated [`uber/goleak`](https://go.uber.org/goleak)
+    from `v1.3.1-0.20260602155401-5f791e3ef83b`
+    to `v1.3.1-0.20260827201342-503ad8e57afa`.
 
 # v1.2.13 (2026-08-25 02:36:17)
 
