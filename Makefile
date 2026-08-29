@@ -277,7 +277,7 @@ govulncheck:
 		grep -q "GOSUMDB=.*off.*" && printf '%s\n' \
 		'GOSUMDB=sum.golang.org' || :) \
 		govulncheck \
-			-show color,traces \
+			-show color,traces,verbose \
 			./...
 
 ##############################################################################
