@@ -1,5 +1,5 @@
-github.com/arl/statsviz v0.8.1 h1:9Ns7GBWCPWn46M/KfqZ5BqRxU578e/MV7/DOwpt2Sd8=
-github.com/arl/statsviz v0.8.1/go.mod h1:z3rQqviSGmoVkR/09Z7ygIwWlE/1Rdslvw3azST/4rQ=
+github.com/arl/statsviz v0.8.2 h1:sceiee7nGyPCEFq3y25krycRqwefBJbC5xnNZjSfLiE=
+github.com/arl/statsviz v0.8.2/go.mod h1:z3rQqviSGmoVkR/09Z7ygIwWlE/1Rdslvw3azST/4rQ=
 github.com/google/gops v0.3.29 h1:n98J2qSOK1NJvRjdLDcjgDryjpIBGhbaqph1mXKL0rY=
 github.com/google/gops v0.3.29/go.mod h1:8N3jZftuPazvUwtYY/ncG4iPrjp15ysNKLfq+QQPiwc=
 github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=

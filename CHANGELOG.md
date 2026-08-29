@@ -3,7 +3,7 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.14-dev (2026-08-25)
+# v1.2.14-dev (2026-08-29)
 
 * Documentation Updates
   * Updated project documentation.
@@ -12,6 +12,8 @@
   * Updated [`uber/goleak`](https://go.uber.org/goleak)
     from `v1.3.1-0.20260602155401-5f791e3ef83b`
     to `v1.3.1-0.20260827201342-503ad8e57afa`.
+  * Updated [`arl/statsviz`](https://github.com/arl/statsviz)
+    from `v0.8.1` to `v0.8.2`.
 
 # v1.2.13 (2026-08-25 02:36:17)
 
