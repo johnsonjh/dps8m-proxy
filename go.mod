@@ -27,7 +27,7 @@ require (
 	github.com/spf13/pflag v1.0.11-0.20260809081120-4f8e9056816a
 	github.com/ulikunitz/xz v0.5.16
 	go.etcd.io/bbolt v1.5.0
-	go.uber.org/goleak v1.3.1-0.20260602155401-5f791e3ef83b
+	go.uber.org/goleak v1.3.1-0.20260827201342-503ad8e57afa
 	golang.org/x/crypto v0.55.0
 	golang.org/x/sys v0.47.0
 	golang.org/x/term v0.45.0
