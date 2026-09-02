@@ -125,7 +125,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.13 (2026-Aug-25 g5d32ec6) [linux/amd64]
+DPS8M Proxy v1.2.14-dev (2026-Sep-02 gcdd7f65) [linux/amd64]
 
 Usage for proxy:
 
@@ -341,13 +341,13 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.13 (2026-Aug-25 g5d32ec6) [linux/amd64]
+DPS8M Proxy v1.2.14-dev (2026-Sep-02 gcdd7f65) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.2.13                          |
-| arl/statsviz              | v0.8.1                           |
+| dps8m/proxy               | v1.2.14-dev                      |
+| arl/statsviz              | v0.8.2                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
 | hashicorp/mdns            | v1.0.7                           |
@@ -364,7 +364,7 @@ DPS8M Proxy v1.2.13 (2026-Aug-25 g5d32ec6) [linux/amd64]
 | golang.org/x/text         | v0.41.0                          |
 | kernel.org/.../libcap/cap | v1.2.78                          |
 | kernel.org/.../libcap/psx | v1.2.78                          |
-| Go compiler (gc)          | v1.27.0                          |
+| Go compiler (gc)          | v1.27.1                          |
 +===========================+==================================+
 ```
 
@@ -654,13 +654,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
-<th>492</th>
-<th>102</th>
+<th>486</th>
+<th>100</th>
 <th>159</th>
-<th>231</th>
+<th>227</th>
 <th>35</th>
-<th>14715</th>
-<th>224</th>
+<th>14600</th>
+<th>222</th>
 </tr><tr>
 <th>INI</th>
 <th>3</th>
@@ -679,18 +679,18 @@ predecessor (code statistics 📈 provided by
 <th>109</th>
 <th>436</th>
 <th>196</th>
-<th>22588</th>
+<th>22596</th>
 <th>390</th>
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>681</th>
+<th>679</th>
 <th>134</th>
 <th>0</th>
-<th>547</th>
+<th>545</th>
 <th>0</th>
-<th>31744</th>
-<th>534</th>
+<th>31450</th>
+<th>532</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -715,13 +715,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>33</th>
-<th>13422</th>
-<th>2773</th>
+<th>13414</th>
+<th>2771</th>
 <th>1179</th>
-<th>9470</th>
+<th>9464</th>
 <th>2147</th>
-<th>350197</th>
-<th>6246</th>
+<th>349796</th>
+<th>6242</th>
 </tr></tfoot></table>
 
 
@@ -856,9 +856,7 @@ predecessor (code statistics 📈 provided by
   |                                  [spf13/pflag](https://github.com/spf13/pflag) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                [ulikunitz/xz](https://github.com/ulikunitz/xz) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                        [x/crypto](https://golang.org/x/crypto) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
-  |                                              [x/mod](https://golang.org/x/mod) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                              [x/net](https://golang.org/x/net) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
-  |                                            [x/sync](https://golang.org/x/sync) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                              [x/sys](https://golang.org/x/sys) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                            [x/term](https://golang.org/x/term) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |
   |                                            [x/text](https://golang.org/x/text) | [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) |

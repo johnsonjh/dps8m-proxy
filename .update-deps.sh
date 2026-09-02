@@ -38,10 +38,10 @@ set -x
 ###############################################################################
 # Update deps
 
-${GO:?} get -u github.com/google/gops@master
+${GO:?} get -u github.com/arl/statsviz@latest
 ${GO:?} mod tidy
 
-${GO:?} get -u github.com/arl/statsviz@latest
+${GO:?} get -u github.com/google/gops@master
 ${GO:?} mod tidy
 
 ${GO:?} get -u github.com/hashicorp/mdns@latest
@@ -86,13 +86,7 @@ ${GO:?} mod tidy
 ${GO:?} get -u github.com/miekg/dns@latest
 ${GO:?} mod tidy
 
-${GO:?} get -u golang.org/x/mod@latest
-${GO:?} mod tidy
-
 ${GO:?} get -u golang.org/x/net@latest
-${GO:?} mod tidy
-
-${GO:?} get -u golang.org/x/sync@latest
 ${GO:?} mod tidy
 
 ${GO:?} get -u golang.org/x/sys@latest
