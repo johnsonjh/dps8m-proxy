@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.14 (2026-09-02)
+# v1.2.15-dev
+
+* TBD
+
+# v1.2.14 (2026-09-02 01:02:30)
 
 * Documentation Updates
   * Updated project documentation.
