@@ -3,7 +3,7 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.14-dev (2026-08-29)
+# v1.2.14-dev (2026-09-01)
 
 * Documentation Updates
   * Updated project documentation.
@@ -14,6 +14,9 @@
     to `v1.3.1-0.20260827201342-503ad8e57afa`.
   * Updated [`arl/statsviz`](https://github.com/arl/statsviz)
     from `v0.8.1` to `v0.8.2`.
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.27.0` to `v1.27.1`.
 
 # v1.2.13 (2026-08-25 02:36:17)
 
