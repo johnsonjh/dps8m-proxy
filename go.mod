@@ -20,13 +20,13 @@ require (
 	github.com/arl/statsviz v0.8.2
 	github.com/google/gops v0.3.29
 	github.com/hashicorp/mdns v1.0.7
-	github.com/klauspost/compress v1.19.2
+	github.com/klauspost/compress v1.20.0
 	github.com/sorairolake/lzip-go v0.3.8
-	github.com/spf13/pflag v1.0.11-0.20260809081120-4f8e9056816a
+	github.com/spf13/pflag v1.0.11-0.20260903041036-d19b08657e10
 	github.com/ulikunitz/xz v0.5.16
 	go.etcd.io/bbolt v1.5.0
 	go.uber.org/goleak v1.3.1-0.20260827201342-503ad8e57afa
-	golang.org/x/crypto v0.55.0
+	golang.org/x/crypto v0.56.0
 	golang.org/x/sys v0.47.0
 	golang.org/x/term v0.45.0
 	golang.org/x/text v0.41.0

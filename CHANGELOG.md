@@ -3,9 +3,17 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.15-dev
+# v1.2.15-dev (2026-09-03)
 
-* TBD
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260809081120-4f8e9056816a`
+    to `v1.0.11-0.20260903041036-d19b08657e10`.
+  * Updated
+    [`klauspost/compress`](https://github.com/klauspost/compress)
+    from `v1.19.2` to `v1.20.0`.
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
+    from `v0.55.0` to `v0.56.0`.
 
 # v1.2.14 (2026-09-02 01:02:30)
 
