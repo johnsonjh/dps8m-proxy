@@ -29,6 +29,8 @@
     from `v1.19.2` to `v1.20.0`.
   * Updated [`x/crypto`](https://golang.org/x/crypto)
     from `v0.55.0` to `v0.56.0`.
+  * Updated the [Android NDK](https://developer.android.com/ndk/)
+    from `r30-beta3` to `r30`.
 
 # v1.2.14 (2026-09-02 01:02:30)
 
