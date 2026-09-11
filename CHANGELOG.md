@@ -3,7 +3,24 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.15 (2026-09-03)
+# v1.2.16 (2026-09-11)
+
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260903041036-d19b08657e10`
+    to `v1.0.11-0.20260906095637-161f35afe1f4`.
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
+    from `v0.56.0` to `v0.57.0`.
+  * Updated [`x/sys`](https://golang.org/x/sys)
+    from `v0.47.0` to `v0.48.0`.
+  * Updated [`x/term`](https://golang.org/x/term)
+    from `v0.45.0` to `v0.46.0`.
+  * Updated [`x/text`](https://golang.org/x/text)
+    from `v0.41.0` to `v0.42.0`.
+  * Updated the [Android NDK](https://developer.android.com/ndk/)
+    from `r30-beta3` to `r30`.
+
+# v1.2.15 (2026-09-03 04:30:52)
 
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)

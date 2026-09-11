@@ -125,7 +125,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.15 (2026-Sep-03 g95720c3) [linux/amd64]
+DPS8M Proxy v1.2.16-dev (2026-Sep-11 gb59eaf8) [linux/amd64]
 
 Usage for proxy:
 
@@ -341,12 +341,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.15 (2026-Sep-03 g95720c3) [linux/amd64]
+DPS8M Proxy v1.2.16-dev (2026-Sep-11 gb59eaf8) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.2.15                          |
+| dps8m/proxy               | v1.2.16-dev                      |
 | arl/statsviz              | v0.8.2                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -354,14 +354,14 @@ DPS8M Proxy v1.2.15 (2026-Sep-03 g95720c3) [linux/amd64]
 | klauspost/compress        | v1.20.0                          |
 | miekg/dns                 | v1.1.73                          |
 | sorairolake/lzip-go       | v0.3.8                           |
-| spf13/pflag               | v1.0.11* (2026-Sep-03, gd19b086) |
+| spf13/pflag               | v1.0.11* (2026-Sep-06, g161f35a) |
 | ulikunitz/xz              | v0.5.16                          |
 | go.etcd.io/bbolt          | v1.5.0                           |
-| golang.org/x/crypto       | v0.56.0                          |
-| golang.org/x/net          | v0.58.0                          |
-| golang.org/x/sys          | v0.47.0                          |
-| golang.org/x/term         | v0.45.0                          |
-| golang.org/x/text         | v0.41.0                          |
+| golang.org/x/crypto       | v0.57.0                          |
+| golang.org/x/net          | v0.59.0                          |
+| golang.org/x/sys          | v0.48.0                          |
+| golang.org/x/term         | v0.46.0                          |
+| golang.org/x/text         | v0.42.0                          |
 | kernel.org/.../libcap/cap | v1.2.78                          |
 | kernel.org/.../libcap/psx | v1.2.78                          |
 | Go compiler (gc)          | v1.27.1                          |
@@ -709,7 +709,7 @@ predecessor (code statistics 📈 provided by
 <th>10</th>
 <th>70</th>
 <th>0</th>
-<th>4337</th>
+<th>4331</th>
 <th>77</th>
 </tr></tbody>
 <tfoot><tr>
@@ -720,7 +720,7 @@ predecessor (code statistics 📈 provided by
 <th>1179</th>
 <th>9464</th>
 <th>2147</th>
-<th>349796</th>
+<th>349790</th>
 <th>6242</th>
 </tr></tfoot></table>
 
