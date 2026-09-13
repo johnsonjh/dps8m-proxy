@@ -125,7 +125,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.17-dev (2026-Sep-11 g8214d0c) [linux/amd64]
+DPS8M Proxy v1.2.17*-dev (2026-Sep-11 g3a271b0+) [linux/amd64]
 
 Usage for proxy:
 
@@ -341,12 +341,12 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.17-dev (2026-Sep-11 g8214d0c) [linux/amd64]
+DPS8M Proxy v1.2.17*-dev (2026-Sep-11 g3a271b0+) [linux/amd64]
 
 +===========================+==================================+
 | Component                 | Version                          |
 +===========================+==================================+
-| dps8m/proxy               | v1.2.17-dev                      |
+| dps8m/proxy               | v1.2.17*-dev                     |
 | arl/statsviz              | v0.8.2                           |
 | google/gops               | v0.3.29                          |
 | gorilla/websocket         | v1.5.3                           |
@@ -684,13 +684,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>679</th>
-<th>134</th>
+<th>689</th>
+<th>136</th>
 <th>0</th>
-<th>545</th>
+<th>553</th>
 <th>0</th>
-<th>31450</th>
-<th>532</th>
+<th>31986</th>
+<th>540</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -715,13 +715,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>33</th>
-<th>13414</th>
-<th>2771</th>
+<th>13424</th>
+<th>2773</th>
 <th>1179</th>
-<th>9464</th>
+<th>9472</th>
 <th>2147</th>
-<th>349790</th>
-<th>6242</th>
+<th>350326</th>
+<th>6250</th>
 </tr></tfoot></table>
 
 
@@ -769,6 +769,16 @@ predecessor (code statistics 📈 provided by
     of this documentation.
 
 ## Development
+
+* If you would like to contribute to the project, it is *extremely*
+  *important* that you have ***all*** of the linters, static analysis
+  tools, and cross‑toolchains installed, and that `make lint` passes
+  completely clean, as this is a prerequisite for any change.
+  Every linter has, at some point, caught real bugs in the code.
+
+* Usage of AI (artificial intelligence) tools by contributors *is*
+  permitted, subject to the same terms and conditions as the
+  [LLVM AI Tool Use Policy](https://llvm.org/docs/AIToolPolicy.html).
 
 ### Required
 
