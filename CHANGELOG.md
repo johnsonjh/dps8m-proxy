@@ -3,9 +3,12 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.17-dev
+# v1.2.17-dev (2026-09-16)
 
-* TBD
+* Dependency Updates
+  * Updated [`uber/goleak`](https://go.uber.org/goleak)
+    from `v1.3.1-0.20260827201342-503ad8e57afa`
+    to `v1.3.1-0.20260915222441-b656bfda2fbf`.
 
 # v1.2.16 (2026-09-11 16:59:53)
 
