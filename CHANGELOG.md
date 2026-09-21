@@ -11,6 +11,9 @@
     to `v1.3.1-0.20260915222441-b656bfda2fbf`.
   * Updated [`ulikunitz/xz`](https://github.com/ulikunitz/xz)
     from `v0.5.16` to `v0.5.17`.
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260906095637-161f35afe1f4`
+    to `v1.0.11-0.20260921074312-c966cfef4737`.
 
 # v1.2.16 (2026-09-11 16:59:53)
 
