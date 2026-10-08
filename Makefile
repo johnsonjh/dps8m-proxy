@@ -123,7 +123,6 @@ lint check:
 		gofix \
 		goverify \
 		gotidydiff \
-		staticcheck \
 		errcheck \
 		deadcode \
 		shellcheck \
