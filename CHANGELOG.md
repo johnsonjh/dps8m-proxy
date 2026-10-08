@@ -5,6 +5,9 @@
 
 # v1.2.17-dev (2026-09-19)
 
+* Build System Improvements
+  * Temporarily disable standalone `errcheck` and `staticcheck`
+    linters due to Go `1.27.2` incompatibility.
 * Dependency Updates
   * Updated [`uber/goleak`](https://go.uber.org/goleak)
     from `v1.3.1-0.20260827201342-503ad8e57afa`
@@ -19,6 +22,8 @@
     from `v1.20.0` to `v1.20.1`.
   * Updated [`x/tools`](https://golang.org/x/tools)
     from `v0.49.0` to `V0.51.0`.
+  * Updated [`x/net`](https://golang.org/x/net)
+    from `v0.58.0` to `v0.60.0`.
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from `v1.27.1` to `v1.27.2`.
