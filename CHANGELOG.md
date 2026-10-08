@@ -17,6 +17,11 @@
   * Updated
     [`klauspost/compress`](https://github.com/klauspost/compress)
     from `v1.20.0` to `v1.20.1`.
+  * Updated [`x/tools`](https://golang.org/x/tools)
+    from `v0.49.0` to `V0.51.0`.
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.27.1` to `v1.27.2`.
 
 # v1.2.16 (2026-09-11 16:59:53)
 
