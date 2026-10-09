@@ -9,6 +9,7 @@
   * Temporarily disable standalone `errcheck` and `staticcheck`
     linters due to Go `1.27.2` incompatibility.
 * Dependency Updates
+  * Removed [`x/tools`](https://golang.org/x/tools).
   * Updated [`uber/goleak`](https://go.uber.org/goleak)
     from `v1.3.1-0.20260827201342-503ad8e57afa`
     to `v1.3.1-0.20260915222441-b656bfda2fbf`.
@@ -20,12 +21,16 @@
   * Updated
     [`klauspost/compress`](https://github.com/klauspost/compress)
     from `v1.20.0` to `v1.20.1`.
-  * Updated [`x/tools`](https://golang.org/x/tools)
-    from `v0.49.0` to `V0.51.0`.
   * Updated [`x/net`](https://golang.org/x/net)
-    from `v0.58.0` to `v0.60.0`.
+    from `v0.58.0` to `v0.61.0`.
   * Updated [`x/sys`](https://golang.org/x/sys)
     from `v0.48.0` to `v0.49.0`.
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
+    from `v0.57.0` to `v0.58.0`.
+  * Updated [`x/text`](https://golang.org/x/text)
+    from `v0.42.0` to `v0.43.0`.
+  * Updated [`x/term`](https://golang.org/x/term)
+    from `v0.46.0` to `v0.47.0`.
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from `v1.27.1` to `v1.27.2`.
