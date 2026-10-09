@@ -125,7 +125,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.17-dev (2026-Oct-09 g2e32004) [linux/amd64]
+DPS8M Proxy v1.2.17-dev (2026-Oct-09 ga0227dd) [linux/amd64]
 
 Usage for proxy:
 
@@ -341,7 +341,7 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.17-dev (2026-Oct-09 g2e32004) [linux/amd64]
+DPS8M Proxy v1.2.17-dev (2026-Oct-09 ga0227dd) [linux/amd64]
 
 +===========================+=======================================+
 | Component                 | Version                               |
@@ -357,11 +357,11 @@ DPS8M Proxy v1.2.17-dev (2026-Oct-09 g2e32004) [linux/amd64]
 | spf13/pflag               | v1.0.11-0.20260921074312-c966cfef4737 |
 | ulikunitz/xz              | v0.5.17                               |
 | go.etcd.io/bbolt          | v1.5.0                                |
-| golang.org/x/crypto       | v0.57.0                               |
-| golang.org/x/net          | v0.60.0                               |
+| golang.org/x/crypto       | v0.58.0                               |
+| golang.org/x/net          | v0.61.0                               |
 | golang.org/x/sys          | v0.49.0                               |
-| golang.org/x/term         | v0.46.0                               |
-| golang.org/x/text         | v0.42.0                               |
+| golang.org/x/term         | v0.47.0                               |
+| golang.org/x/text         | v0.43.0                               |
 | kernel.org/.../libcap/cap | v1.2.78                               |
 | kernel.org/.../libcap/psx | v1.2.78                               |
 | Go compiler (gc)          | v1.27.2                               |
