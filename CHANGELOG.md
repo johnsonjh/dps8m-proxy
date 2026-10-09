@@ -24,6 +24,8 @@
     from `v0.49.0` to `V0.51.0`.
   * Updated [`x/net`](https://golang.org/x/net)
     from `v0.58.0` to `v0.60.0`.
+  * Updated [`x/sys`](https://golang.org/x/sys)
+    from `v0.48.0` to `v0.49.0`.
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from `v1.27.1` to `v1.27.2`.
