@@ -5545,7 +5545,11 @@ func handleSession(ctx context.Context, conn *Connection, channel ssh.Channel,
 
 								_ = ch.Close()
 
-								<-writeDone
+								//revive:disable:empty-block
+								if <-writeDone != nil { //nolint:staticcheck
+									// Appease linter
+								}
+								//revive:enable:empty-block
 							}
 						}(monCh)
 					}

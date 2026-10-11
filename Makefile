@@ -119,6 +119,8 @@ lint check:
 		revive \
 		gofmt \
 		gofumpt \
+		errcheck \
+		staticcheck \
 		govet \
 		gofix \
 		goverify \
