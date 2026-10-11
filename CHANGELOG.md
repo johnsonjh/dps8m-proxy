@@ -3,7 +3,38 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.16 (2026-09-11)
+# v1.2.17 (2026-10-11)
+
+* Dependency Updates
+  * Removed [`x/tools`](https://golang.org/x/tools).
+  * Updated [`uber/goleak`](https://go.uber.org/goleak)
+    from `v1.3.1-0.20260827201342-503ad8e57afa`
+    to `v1.3.1-0.20260915222441-b656bfda2fbf`.
+  * Updated [`ulikunitz/xz`](https://github.com/ulikunitz/xz)
+    from `v0.5.16` to `v0.5.17`.
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260906095637-161f35afe1f4`
+    to `v1.0.11-0.20260921074312-c966cfef4737`.
+  * Updated
+    [`klauspost/compress`](https://github.com/klauspost/compress)
+    from `v1.20.0` to `v1.20.1`.
+  * Updated [`x/net`](https://golang.org/x/net)
+    from `v0.58.0` to `v0.61.0`.
+  * Updated [`x/sys`](https://golang.org/x/sys)
+    from `v0.48.0` to `v0.49.0`.
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
+    from `v0.57.0` to `v0.58.0`.
+  * Updated [`x/text`](https://golang.org/x/text)
+    from `v0.42.0` to `v0.43.0`.
+  * Updated [`x/term`](https://golang.org/x/term)
+    from `v0.46.0` to `v0.47.0`.
+  * Updated [`x/tools`](https://golang.org/x/tools)
+    from `v0.49.0` to `V0.52.0`.
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.27.1` to `v1.27.2`.
+
+# v1.2.16 (2026-09-11 16:59:53)
 
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)

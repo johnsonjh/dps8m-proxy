@@ -125,7 +125,7 @@ A recent version of [Go](https://go.dev/) 🐹 is required to build
   arguments:
 
 ```plaintext
-DPS8M Proxy v1.2.16 (2026-Sep-11 gc0e6ce8) [linux/amd64]
+DPS8M Proxy v1.2.17-dev (2026-Oct-11 ga926b63) [linux/amd64]
 
 Usage for proxy:
 
@@ -341,31 +341,31 @@ are, hopefully, documented here:
   name and version of the Go toolchain used to build the software:
 
 ```plaintext
-DPS8M Proxy v1.2.16 (2026-Sep-11 gc0e6ce8) [linux/amd64]
+DPS8M Proxy v1.2.17-dev (2026-Oct-11 ga926b63) [linux/amd64]
 
-+===========================+==================================+
-| Component                 | Version                          |
-+===========================+==================================+
-| dps8m/proxy               | v1.2.16                          |
-| arl/statsviz              | v0.8.2                           |
-| google/gops               | v0.3.29                          |
-| gorilla/websocket         | v1.5.3                           |
-| hashicorp/mdns            | v1.0.7                           |
-| klauspost/compress        | v1.20.0                          |
-| miekg/dns                 | v1.1.73                          |
-| sorairolake/lzip-go       | v0.3.8                           |
-| spf13/pflag               | v1.0.11* (2026-Sep-06, g161f35a) |
-| ulikunitz/xz              | v0.5.16                          |
-| go.etcd.io/bbolt          | v1.5.0                           |
-| golang.org/x/crypto       | v0.57.0                          |
-| golang.org/x/net          | v0.59.0                          |
-| golang.org/x/sys          | v0.48.0                          |
-| golang.org/x/term         | v0.46.0                          |
-| golang.org/x/text         | v0.42.0                          |
-| kernel.org/.../libcap/cap | v1.2.78                          |
-| kernel.org/.../libcap/psx | v1.2.78                          |
-| Go compiler (gc)          | v1.27.1                          |
-+===========================+==================================+
++===========================+=======================================+
+| Component                 | Version                               |
++===========================+=======================================+
+| dps8m/proxy               | v1.2.17-dev                           |
+| arl/statsviz              | v0.8.2                                |
+| google/gops               | v0.3.29                               |
+| gorilla/websocket         | v1.5.3                                |
+| hashicorp/mdns            | v1.0.7                                |
+| klauspost/compress        | v1.20.1                               |
+| miekg/dns                 | v1.1.73                               |
+| sorairolake/lzip-go       | v0.3.8                                |
+| spf13/pflag               | v1.0.11-0.20260921074312-c966cfef4737 |
+| ulikunitz/xz              | v0.5.17                               |
+| go.etcd.io/bbolt          | v1.5.0                                |
+| golang.org/x/crypto       | v0.58.0                               |
+| golang.org/x/net          | v0.61.0                               |
+| golang.org/x/sys          | v0.49.0                               |
+| golang.org/x/term         | v0.47.0                               |
+| golang.org/x/text         | v0.43.0                               |
+| kernel.org/.../libcap/cap | v1.2.78                               |
+| kernel.org/.../libcap/psx | v1.2.78                               |
+| Go compiler (gc)          | v1.27.2                               |
++===========================+=======================================+
 ```
 
 * If you need to see additional details about the `proxy` binary,
@@ -644,13 +644,13 @@ predecessor (code statistics 📈 provided by
 <tbody><tr>
 <th>Go</th>
 <th>22</th>
-<th>11214</th>
+<th>11218</th>
 <th>2397</th>
-<th>726</th>
-<th>8091</th>
-<th>1916</th>
-<th>265543</th>
-<th>4865</th>
+<th>729</th>
+<th>8092</th>
+<th>1918</th>
+<th>265686</th>
+<th>4868</th>
 </tr><tr>
 <th>Shell</th>
 <th>4</th>
@@ -684,13 +684,13 @@ predecessor (code statistics 📈 provided by
 </tr><tr>
 <th>Markdown</th>
 <th>1</th>
-<th>679</th>
-<th>134</th>
+<th>689</th>
+<th>136</th>
 <th>0</th>
-<th>545</th>
+<th>553</th>
 <th>0</th>
-<th>31450</th>
-<th>532</th>
+<th>31986</th>
+<th>540</th>
 </tr><tr>
 <th>Systemd</th>
 <th>1</th>
@@ -715,13 +715,13 @@ predecessor (code statistics 📈 provided by
 <tfoot><tr>
 <th>Total</th>
 <th>33</th>
-<th>13414</th>
-<th>2771</th>
-<th>1179</th>
-<th>9464</th>
-<th>2147</th>
-<th>349790</th>
-<th>6242</th>
+<th>13428</th>
+<th>2773</th>
+<th>1182</th>
+<th>9473</th>
+<th>2149</th>
+<th>350469</th>
+<th>6253</th>
 </tr></tfoot></table>
 
 
@@ -769,6 +769,16 @@ predecessor (code statistics 📈 provided by
     of this documentation.
 
 ## Development
+
+* If you would like to contribute to the project, it is *extremely*
+  *important* that you have ***all*** of the linters, static analysis
+  tools, and cross‑toolchains installed, and that `make lint` passes
+  completely clean, as this is a prerequisite for any change.
+  Every linter has, at some point, caught real bugs in the code.
+
+* Usage of AI (artificial intelligence) tools by contributors *is*
+  permitted, subject to the same terms and conditions as the
+  [LLVM AI Tool Use Policy](https://llvm.org/docs/AIToolPolicy.html).
 
 ### Required
 

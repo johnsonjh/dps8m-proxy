@@ -119,12 +119,12 @@ lint check:
 		revive \
 		gofmt \
 		gofumpt \
+		errcheck \
+		staticcheck \
 		govet \
 		gofix \
 		goverify \
 		gotidydiff \
-		staticcheck \
-		errcheck \
 		deadcode \
 		shellcheck \
 		shfmt \
