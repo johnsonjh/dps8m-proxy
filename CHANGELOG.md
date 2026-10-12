@@ -5,7 +5,10 @@
 
 # v1.2.18
 
-* TBD
+* Dependency Updates
+  * Updated
+    [`klauspost/compress`](https://github.com/klauspost/compress)
+    from `v1.20.1` to `v1.20.3`.
 
 # v1.2.17 (2026-10-11 17:38:28)
 
