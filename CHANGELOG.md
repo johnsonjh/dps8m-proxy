@@ -5,7 +5,10 @@
 
 # v1.2.19
 
-* TBD
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260921074312-c966cfef4737`
+    to `v1.0.11-0.20261019083819-70f284b93daa`.
 
 # v1.2.18 (2026-10-12 12:57:15)
 
