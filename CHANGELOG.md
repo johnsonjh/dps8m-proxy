@@ -8,7 +8,10 @@
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from `v1.0.11-0.20260921074312-c966cfef4737`
-    to `v1.0.11-0.20261019083819-70f284b93daa`.
+    to `v1.0.11-0.20261020072923-d26a4dcd30a3`.
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.27.2` to `v1.27.3`.
 
 # v1.2.18 (2026-10-12 12:57:15)
 
