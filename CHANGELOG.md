@@ -3,12 +3,14 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.19
+# v1.2.19-dev
 
 * Dependency Updates
   * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
     from `v1.0.11-0.20260921074312-c966cfef4737`
-    to `v1.0.11-0.20261020072923-d26a4dcd30a3`.
+    to `v1.0.11-0.20261028120535-f3a68a10eace`.
+  * Updated [`x/net`](https://golang.org/x/net)
+    from `v0.61.0` to `v0.62.0`.
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from `v1.27.2` to `v1.27.3`.

@@ -22,7 +22,7 @@ require (
 	github.com/hashicorp/mdns v1.0.7
 	github.com/klauspost/compress v1.20.3
 	github.com/sorairolake/lzip-go v0.3.8
-	github.com/spf13/pflag v1.0.11-0.20261020072923-d26a4dcd30a3
+	github.com/spf13/pflag v1.0.11-0.20261028120535-f3a68a10eace
 	github.com/ulikunitz/xz v0.5.17
 	go.etcd.io/bbolt v1.5.0
 	go.uber.org/goleak v1.3.1-0.20260915222441-b656bfda2fbf
@@ -37,7 +37,7 @@ require (
 require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/miekg/dns v1.1.73 // indirect
-	golang.org/x/net v0.61.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
 	golang.org/x/tools v0.52.0 // indirect
 	kernel.org/pub/linux/libs/security/libcap/psx v1.2.78 // indirect
 )
