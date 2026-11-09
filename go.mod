@@ -27,7 +27,7 @@ require (
 	go.etcd.io/bbolt v1.5.0
 	go.uber.org/goleak v1.3.1-0.20260915222441-b656bfda2fbf
 	golang.org/x/crypto v0.58.0
-	golang.org/x/sys v0.49.0
+	golang.org/x/sys v0.50.0
 	golang.org/x/term v0.47.0
 	golang.org/x/text v0.43.0
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.78
