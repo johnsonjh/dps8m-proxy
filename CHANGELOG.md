@@ -21,7 +21,7 @@
     from `v0.43.0` to `v0.44.0`.
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
-    from `v1.27.2` to `v1.27.3`.
+    from `v1.27.2` to `v1.27.4`.
 
 # v1.2.18 (2026-10-12 12:57:15)
 
