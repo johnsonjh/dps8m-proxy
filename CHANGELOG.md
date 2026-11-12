@@ -19,6 +19,8 @@
     from `v0.47.0` to `v0.48.0`.
   * Updated [`x/text`](https://golang.org/x/text)
     from `v0.43.0` to `v0.44.0`.
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
+    from `v0.58.0` to `v0.59.0`.
   * Updated the
     [Go compiler and libraries](https://go.dev/doc/devel/release)
     from `v1.27.2` to `v1.27.4`.

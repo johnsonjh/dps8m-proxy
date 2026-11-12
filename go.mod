@@ -26,7 +26,7 @@ require (
 	github.com/ulikunitz/xz v0.5.17
 	go.etcd.io/bbolt v1.5.0
 	go.uber.org/goleak v1.3.1-0.20260915222441-b656bfda2fbf
-	golang.org/x/crypto v0.58.0
+	golang.org/x/crypto v0.59.0
 	golang.org/x/sys v0.50.0
 	golang.org/x/term v0.48.0
 	golang.org/x/text v0.44.0
