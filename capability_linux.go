@@ -20,7 +20,7 @@ import (
 	"os"
 	"sync"
 
-	"kernel.org/pub/linux/libs/security/libcap/cap"
+	kcap "kernel.org/pub/linux/libs/security/libcap/cap"
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,9 +45,9 @@ func showCapabilityMessage(exePath string) {
 func checkCapability() {
 	hasBindCap := false
 
-	cv, err := cap.FromName("cap_net_bind_service")
+	cv, err := kcap.FromName("cap_net_bind_service")
 	if err == nil {
-		hasBindCap, _ = cap.GetProc().GetFlag(cap.Effective, cv)
+		hasBindCap, _ = kcap.GetProc().GetFlag(kcap.Effective, cv)
 	}
 
 	exePath := resolveExePath()

@@ -3,7 +3,29 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.18 (2026-10-12)
+# v1.2.19 (2026-11-13)
+
+* Dependency Updates
+  * Updated [`spf13/pflag`](https://github.com/spf13/pflag)
+    from `v1.0.11-0.20260921074312-c966cfef4737` to `v1.1.0`.
+  * Updated [`x/net`](https://golang.org/x/net)
+    from `v0.61.0` to `v0.62.0`.
+  * Updated
+    [`klauspost/compress`](https://github.com/klauspost/compress)
+    from `v1.20.3` to `v1.20.4`.
+  * Updated [`x/sys`](https://golang.org/x/sys)
+    from `v0.49.0` to `v0.50.0`.
+  * Updated [`x/term`](https://golang.org/x/term)
+    from `v0.47.0` to `v0.48.0`.
+  * Updated [`x/text`](https://golang.org/x/text)
+    from `v0.43.0` to `v0.44.0`.
+  * Updated [`x/crypto`](https://golang.org/x/crypto)
+    from `v0.58.0` to `v0.59.0`.
+  * Updated the
+    [Go compiler and libraries](https://go.dev/doc/devel/release)
+    from `v1.27.2` to `v1.27.4`.
+
+# v1.2.18 (2026-10-12 12:57:15)
 
 * Dependency Updates
   * Updated

@@ -11,7 +11,7 @@ SPDX-PackageSupplier = "The DPS8M Development Team <contact-project+dps8m-dps8m-
 SPDX-PackageDownloadLocation = "https://gitlab.com/dps8m/proxy"
 
 [[annotations]]
-path = ["block.txt", "deny.txt", "go.mod", "go.sum", "issue.txt", "renovate.json", ".whitesource", ".scspell/basedict.txt", ".scspell/dictionary.txt"]
+path = ["block.txt", "deny.txt", "go.sum", "issue.txt", "renovate.json", ".whitesource", ".scspell/basedict.txt", ".scspell/dictionary.txt"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2025-2026 Jeffrey H. Johnson"
 SPDX-License-Identifier = "MIT-0"

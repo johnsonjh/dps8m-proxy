@@ -11,7 +11,7 @@ module gitlab.com/dps8m/proxy
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-go 1.27.2
+go 1.27.4
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -20,16 +20,16 @@ require (
 	github.com/arl/statsviz v0.8.2
 	github.com/google/gops v0.3.29
 	github.com/hashicorp/mdns v1.0.7
-	github.com/klauspost/compress v1.20.3
+	github.com/klauspost/compress v1.20.4
 	github.com/sorairolake/lzip-go v0.3.8
-	github.com/spf13/pflag v1.0.11-0.20260921074312-c966cfef4737
+	github.com/spf13/pflag v1.1.0
 	github.com/ulikunitz/xz v0.5.17
 	go.etcd.io/bbolt v1.5.0
 	go.uber.org/goleak v1.3.1-0.20260915222441-b656bfda2fbf
-	golang.org/x/crypto v0.58.0
-	golang.org/x/sys v0.49.0
-	golang.org/x/term v0.47.0
-	golang.org/x/text v0.43.0
+	golang.org/x/crypto v0.59.0
+	golang.org/x/sys v0.50.0
+	golang.org/x/term v0.48.0
+	golang.org/x/text v0.44.0
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.78
 )
 
@@ -37,8 +37,7 @@ require (
 require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/miekg/dns v1.1.73 // indirect
-	golang.org/x/net v0.61.0 // indirect
-	golang.org/x/tools v0.52.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
 	kernel.org/pub/linux/libs/security/libcap/psx v1.2.78 // indirect
 )
 
