@@ -5,7 +5,9 @@
 
 # v1.2.20-dev
 
-* TBD
+* Dependency Updates
+  * Updated [`x/net`](https://golang.org/x/net)
+    from `v0.62.0` to `v0.63.0`.
 
 # v1.2.19 (2026-11-13 19:48:43)
 

@@ -37,7 +37,8 @@ require (
 require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/miekg/dns v1.1.73 // indirect
-	golang.org/x/net v0.62.0 // indirect
+	golang.org/x/net v0.63.0 // indirect
+	golang.org/x/tools v0.53.0 // indirect
 	kernel.org/pub/linux/libs/security/libcap/psx v1.2.78 // indirect
 )
 
