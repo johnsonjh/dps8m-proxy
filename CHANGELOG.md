@@ -8,6 +8,9 @@
 * Dependency Updates
   * Updated [`x/net`](https://golang.org/x/net)
     from `v0.62.0` to `v0.63.0`.
+  * Updated
+    [`klauspost/compress`](https://github.com/klauspost/compress)
+    from `v1.20.4` to `v1.20.5`.
 
 # v1.2.19 (2026-11-13 19:48:43)
 
