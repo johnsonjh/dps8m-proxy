@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT-0 -->
 <!-- scspell-id: 82d273a4-3902-11f1-a5f6-80ee73e9b8e7 -->
 
-# v1.2.20 (2026-11-23)
+# v1.2.21-dev
+
+* TBD
+
+# v1.2.20 (2026-11-23 05:59:50)
 
 * Dependency Updates
   * Updated [`x/net`](https://golang.org/x/net)
